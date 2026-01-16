@@ -43,3 +43,8 @@ next-env.d.ts
 # electron
 /electron-dist/
 /dist/
+
+# Database files
+*.db
+*.db-wal
+*.db-shm
