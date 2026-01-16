@@ -1,6 +1,6 @@
 ---
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
-argument-hint: 'feature description'
+argument-hint: "feature description"
 description: Generate detailed implementation plans through automated 3-step orchestration
 ---
 

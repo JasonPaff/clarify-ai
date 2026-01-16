@@ -1,6 +1,6 @@
 ---
 allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:client-component-specialist), Task(subagent_type:server-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:unit-test-specialist), Task(subagent_type:component-test-specialist), Task(subagent_type:integration-test-specialist), Task(subagent_type:e2e-test-specialist), Task(subagent_type:test-infrastructure-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
-argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
+argument-hint: "path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]"
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
 

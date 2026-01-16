@@ -24,6 +24,7 @@ pnpm db:migrate          # Run Drizzle migrations
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: Next.js 16 + React 19 + TypeScript 5 + Tailwind CSS 4
 - **Desktop**: Electron 35 with context isolation and sandbox enabled
 - **AI**: Vercel AI SDK with Anthropic, OpenAI, and Google providers
@@ -32,6 +33,7 @@ pnpm db:migrate          # Run Drizzle migrations
 - **Components**: @base-ui/react (unstyled, accessible primitives)
 
 ### Project Structure
+
 - `app/` - Next.js App Router pages and layouts
 - `components/` - React components (features/, layout/, projects/, ui/)
 - `electron/` - Main process (main.ts) and preload script (preload.ts)
@@ -40,7 +42,9 @@ pnpm db:migrate          # Run Drizzle migrations
 - `docs/` - Base UI component documentation
 
 ### Electron IPC Architecture
+
 The app uses context isolation for security. The renderer process accesses Node capabilities through `window.electronAPI`, exposed via the preload script:
+
 - `electronAPI.fs` - File operations (read, write, stat, exists, readDirectory)
 - `electronAPI.dialog` - Native dialogs (openDirectory, openFile, saveFile)
 - `electronAPI.store` - Persistent key-value storage (electron-store)
@@ -49,7 +53,9 @@ The app uses context isolation for security. The renderer process accesses Node 
 Path validation in main.ts prevents directory traversal attacks.
 
 ### Global Types
+
 Defined in `types/component-types.ts` and available globally:
+
 - `Children<TProps>` - Props with optional children
 - `RequiredChildren<TProps>` - Props with required children
 - `ClassName<TProps>` - Props with optional className
@@ -57,6 +63,7 @@ Defined in `types/component-types.ts` and available globally:
 - `Prettify<T>` - Type utility for cleaner hover info
 
 ### Import Alias
+
 Use `@/*` to import from project root (e.g., `@/components/ui/Button`).
 
 ## Code Style

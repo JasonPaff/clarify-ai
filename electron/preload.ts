@@ -29,12 +29,11 @@ export interface ElectronAPI {
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
       error?: string;
-       
+
       success: boolean;
     }>;
     readFile(
       path: string
-       
     ): Promise<{ content?: string; error?: string; success: boolean }>;
     stat(path: string): Promise<{
       error?: string;
@@ -45,13 +44,12 @@ export interface ElectronAPI {
         mtime: string;
         size: number;
       };
-       
+
       success: boolean;
     }>;
     writeFile(
       path: string,
       content: string
-       
     ): Promise<{ error?: string; success: boolean }>;
   };
   store: {

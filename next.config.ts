@@ -1,4 +1,3 @@
- 
 import type { NextConfig } from "next";
 
 const isElectronBuild = process.env.BUILD_TARGET === "electron";

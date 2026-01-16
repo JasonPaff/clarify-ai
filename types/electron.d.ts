@@ -15,17 +15,17 @@ export interface ElectronAPI {
   dialog: {
     openDirectory(): Promise<null | string>;
     openFile(
-      filters?: Array<{ extensions: Array<string>; name: string; }>
+      filters?: Array<{ extensions: Array<string>; name: string }>
     ): Promise<null | string>;
     saveFile(
       defaultPath?: string,
-      filters?: Array<{ extensions: Array<string>; name: string; }>
+      filters?: Array<{ extensions: Array<string>; name: string }>
     ): Promise<null | string>;
   };
   fs: {
     exists(path: string): Promise<boolean>;
     readDirectory(path: string): Promise<{
-      entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string; }>;
+      entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
       error?: string;
       success: boolean;
     }>;
