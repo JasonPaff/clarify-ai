@@ -19,9 +19,11 @@ export const metadata: Metadata = {
   title: "Create Next App",
 };
 
-export default function RootLayout({ children }: RequiredChildren) {
+type RootLayoutProps = RequiredChildren;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
+    <html lang={"en"}>
       <body
         className={`
           ${geistSans.variable}
@@ -29,7 +31,9 @@ export default function RootLayout({ children }: RequiredChildren) {
           antialiased
         `}
       >
-        {children}
+        {/* base-ui requires this root class */}
+        {/* eslint-disable-next-line better-tailwindcss/no-unknown-classes */}
+        <div className={"root"}>{children}</div>
       </body>
     </html>
   );

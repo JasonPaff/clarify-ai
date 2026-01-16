@@ -35,14 +35,19 @@ const eslintConfig = defineConfig([
   // Opinionated React Snob config.
   {
     ...eslintReactSnob.configs.strict,
-    "react-snob/no-inline-styles": "off",
-    "react-snob/require-derived-conditional-prefix": "off",
-    "react-snob/require-boolean-prefix-is": [
-      "error",
-      {
-        allowedPrefixes: ["as", "can", "has", "is", "should", "was", "will"],
-      },
-    ],
+  },
+  {
+    rules: {
+      eqeqeq: "error",
+      "react-snob/no-inline-styles": "off",
+      "react-snob/require-boolean-prefix-is": [
+        "error",
+        {
+          allowedPrefixes: ["as", "can", "has", "is", "should", "was", "will"],
+        },
+      ],
+      "react-snob/require-derived-conditional-prefix": "off",
+    },
   },
   // Prettier config must be the last to override conflicting rules.
   eslintConfigPrettier,
