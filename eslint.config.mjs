@@ -3,6 +3,7 @@ import nextTs from "eslint-config-next/typescript";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import perfectionist from "eslint-plugin-perfectionist";
+import eslintReactSnob from "eslint-plugin-react-snob";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
@@ -30,6 +31,18 @@ const eslintConfig = defineConfig([
         entryPoint: "app/globals.css",
       },
     },
+  },
+  // Opinionated React Snob config.
+  {
+    ...eslintReactSnob.configs.strict,
+    "react-snob/no-inline-styles": "off",
+    "react-snob/require-derived-conditional-prefix": "off",
+    "react-snob/require-boolean-prefix-is": [
+      "error",
+      {
+        allowedPrefixes: ["as", "can", "has", "is", "should", "was", "will"],
+      },
+    ],
   },
   // Prettier config must be the last to override conflicting rules.
   eslintConfigPrettier,
