@@ -47,6 +47,7 @@ const eslintConfig = defineConfig([
         },
       ],
       "react-snob/require-derived-conditional-prefix": "off",
+      "@typescript-eslint/array-type": "off"
     },
   },
   // Prettier config must be the last to override conflicting rules.
