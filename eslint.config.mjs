@@ -4,6 +4,7 @@ import eslintConfigPrettier from "eslint-config-prettier/flat";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import perfectionist from "eslint-plugin-perfectionist";
 import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -16,6 +17,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // TypeScript ESLint recommended and stylistic rules.
+  tseslint.configs.recommended,
+  tseslint.configs.stylistic,
   // Perfectionist for sorting imports, objects, etc.
   perfectionist.configs["recommended-natural"],
   // Better Tailwind CSS for class sorting and validation.
