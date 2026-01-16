@@ -1,3 +1,5 @@
+import { eq, sql } from "drizzle-orm";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import {
   app,
   BrowserWindow,
@@ -12,8 +14,20 @@ import Store from "electron-store";
 import * as fs from "fs/promises";
 import * as path from "path";
 
+import {
+  closeDatabase,
+  type DrizzleDatabase,
+  initializeDatabase,
+  type NewProject,
+  type Project,
+  projects,
+} from "../db";
+
 const isDev = process.env.NODE_ENV === "development";
 const loadURL = isDev ? null : serve({ directory: "out" });
+
+// Database instance
+let db: DrizzleDatabase;
 
 interface StoreType {
   delete(key: string): void;
@@ -55,6 +69,22 @@ async function createWindow(): Promise<void> {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
+}
+
+// Initialize database and run migrations
+function initializeDb(): void {
+  const dbPath = isDev
+    ? path.join(process.cwd(), "clarify-dev.db")
+    : path.join(app.getPath("userData"), "clarify.db");
+
+  db = initializeDatabase(dbPath);
+
+  // Run migrations
+  const migrationsFolder = isDev
+    ? path.join(process.cwd(), "drizzle")
+    : path.join(process.resourcesPath, "drizzle");
+
+  migrate(db, { migrationsFolder });
 }
 
 // Path validation to prevent directory traversal attacks
@@ -299,8 +329,54 @@ ipcMain.handle(
   }
 );
 
+// IPC Handlers for database operations - Projects
+ipcMain.handle("db:projects:getAll", (): Array<Project> => {
+  return db.select().from(projects).all();
+});
+
+ipcMain.handle(
+  "db:projects:getById",
+  (_event: IpcMainInvokeEvent, id: number): Project | undefined => {
+    return db.select().from(projects).where(eq(projects.id, id)).get();
+  }
+);
+
+ipcMain.handle(
+  "db:projects:create",
+  (_event: IpcMainInvokeEvent, data: NewProject): Project => {
+    return db.insert(projects).values(data).returning().get();
+  }
+);
+
+ipcMain.handle(
+  "db:projects:update",
+  (
+    _event: IpcMainInvokeEvent,
+    id: number,
+    data: Partial<NewProject>
+  ): Project | undefined => {
+    return db
+      .update(projects)
+      .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+      .where(eq(projects.id, id))
+      .returning()
+      .get();
+  }
+);
+
+ipcMain.handle(
+  "db:projects:delete",
+  (_event: IpcMainInvokeEvent, id: number): boolean => {
+    const result = db.delete(projects).where(eq(projects.id, id)).run();
+    return result.changes > 0;
+  }
+);
+
 // App lifecycle
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  initializeDb();
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -312,4 +388,8 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+app.on("before-quit", () => {
+  closeDatabase();
 });

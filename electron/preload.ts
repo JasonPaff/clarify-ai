@@ -14,6 +14,18 @@ export interface ElectronAPI {
     ): Promise<string>;
     getVersion(): Promise<string>;
   };
+  db: {
+    projects: {
+      create(data: NewProject): Promise<Project>;
+      delete(id: number): Promise<boolean>;
+      getAll(): Promise<Array<Project>>;
+      getById(id: number): Promise<Project | undefined>;
+      update(
+        id: number,
+        data: Partial<NewProject>
+      ): Promise<Project | undefined>;
+    };
+  };
   dialog: {
     openDirectory(): Promise<null | string>;
     openFile(
@@ -59,10 +71,33 @@ export interface ElectronAPI {
   };
 }
 
+export interface NewProject {
+  description?: null | string;
+  name: string;
+}
+
+// Database types (mirrors db/schema.ts)
+export interface Project {
+  createdAt: string;
+  description: null | string;
+  id: number;
+  name: string;
+  updatedAt: string;
+}
+
 const electronAPI: ElectronAPI = {
   app: {
     getPath: (name) => ipcRenderer.invoke("app:getPath", name),
     getVersion: () => ipcRenderer.invoke("app:getVersion"),
+  },
+  db: {
+    projects: {
+      create: (data) => ipcRenderer.invoke("db:projects:create", data),
+      delete: (id) => ipcRenderer.invoke("db:projects:delete", id),
+      getAll: () => ipcRenderer.invoke("db:projects:getAll"),
+      getById: (id) => ipcRenderer.invoke("db:projects:getById", id),
+      update: (id, data) => ipcRenderer.invoke("db:projects:update", id, data),
+    },
   },
   dialog: {
     openDirectory: () => ipcRenderer.invoke("dialog:openDirectory"),

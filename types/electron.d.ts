@@ -1,3 +1,17 @@
+// Database types (mirrors db/schema.ts)
+export interface Project {
+  createdAt: string;
+  description: string | null;
+  id: number;
+  name: string;
+  updatedAt: string;
+}
+
+export interface NewProject {
+  description?: string | null;
+  name: string;
+}
+
 export interface ElectronAPI {
   app: {
     getPath(
@@ -11,6 +25,15 @@ export interface ElectronAPI {
         | "userData"
     ): Promise<string>;
     getVersion(): Promise<string>;
+  };
+  db: {
+    projects: {
+      create(data: NewProject): Promise<Project>;
+      delete(id: number): Promise<boolean>;
+      getAll(): Promise<Project[]>;
+      getById(id: number): Promise<Project | undefined>;
+      update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
+    };
   };
   dialog: {
     openDirectory(): Promise<null | string>;
