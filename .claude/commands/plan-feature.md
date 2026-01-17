@@ -7,7 +7,6 @@ description: Generate detailed implementation plans through automated 3-step orc
 You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process.
 
 @CLAUDE.MD
-@package.json
 
 ## Command Usage
 
