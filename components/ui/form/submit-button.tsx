@@ -23,7 +23,7 @@ export function SubmitButton({
       {([isSubmitting, canSubmit]) => (
         <Button
           aria-busy={isSubmitting || undefined}
-          aria-disabled={(!canSubmit || isSubmitting) || undefined}
+          aria-disabled={!canSubmit || isSubmitting || undefined}
           className={cn(className)}
           disabled={!canSubmit || isSubmitting}
           size={size}

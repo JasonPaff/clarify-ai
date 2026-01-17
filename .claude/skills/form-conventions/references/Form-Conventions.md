@@ -105,12 +105,12 @@ export {
 
 ### Hook Usage
 
-| Hook             | Purpose                                    | Use In                  |
-| ---------------- | ------------------------------------------ | ----------------------- |
-| `useAppForm`     | Create form instance with registered fields| Form container          |
-| `useFieldContext`| Access field state and handlers            | Field components        |
-| `useFormContext` | Access form state and methods              | Form-level components   |
-| `withForm`       | HOC to wrap form components                | Form component creation |
+| Hook              | Purpose                                     | Use In                  |
+| ----------------- | ------------------------------------------- | ----------------------- |
+| `useAppForm`      | Create form instance with registered fields | Form container          |
+| `useFieldContext` | Access field state and handlers             | Field components        |
+| `useFormContext`  | Access form state and methods               | Form-level components   |
+| `withForm`        | HOC to wrap form components                 | Form component creation |
 
 ---
 
@@ -299,21 +299,18 @@ const FormWithFocus = withFocusManagement(YourFormComponent);
 All field components must support three size variants:
 
 ```typescript
-export const inputVariants = cva(
-  `base-styles-here`,
-  {
-    defaultVariants: {
-      size: "default",
+export const inputVariants = cva(`base-styles-here`, {
+  defaultVariants: {
+    size: "default",
+  },
+  variants: {
+    size: {
+      default: "h-9 px-3 text-sm",
+      lg: "h-10 px-4 text-base",
+      sm: "h-8 px-2 text-xs",
     },
-    variants: {
-      size: {
-        default: "h-9 px-3 text-sm",
-        lg: "h-10 px-4 text-base",
-        sm: "h-8 px-2 text-xs",
-      },
-    },
-  }
-);
+  },
+});
 ```
 
 ### Data Attribute Styling
@@ -391,18 +388,18 @@ Access field state through the field context:
 const field = useFieldContext<string>();
 
 // Current value
-field.state.value
+field.state.value;
 
 // Validation errors
-field.state.meta.errors[0]  // First error
-field.state.meta.errors     // All errors
+field.state.meta.errors[0]; // First error
+field.state.meta.errors; // All errors
 
 // Field name
-field.name
+field.name;
 
 // Handlers
-field.handleChange(value)
-field.handleBlur
+field.handleChange(value);
+field.handleBlur;
 ```
 
 ---
@@ -430,7 +427,8 @@ export const MyForm = () => (
 Returns utilities for managing focus:
 
 ```typescript
-const { focusFirstError, registerField, unregisterField } = useFocusManagement();
+const { focusFirstError, registerField, unregisterField } =
+  useFocusManagement();
 
 // Register a field (typically in useEffect)
 registerField(fieldName, inputRef);
@@ -449,7 +447,9 @@ Wraps a form component with FocusProvider:
 ```typescript
 import { withFocusManagement } from "@/components/ui/form/focus-management/with-focus-management";
 
-const MyFormComponent = (props) => { /* ... */ };
+const MyFormComponent = (props) => {
+  /* ... */
+};
 
 export const MyForm = withFocusManagement(MyFormComponent);
 ```
