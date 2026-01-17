@@ -2,6 +2,7 @@
 
 import { Switch } from "@base-ui/react/switch";
 import { cva, type VariantProps } from "class-variance-authority";
+import { useId } from "react";
 
 import { useFieldContext } from "@/lib/forms/form-hook";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 import {
   descriptionVariants,
   errorVariants,
+  getAriaDescribedBy,
   labelVariants,
 } from "./field-wrapper";
 
@@ -82,15 +84,28 @@ export function SwitchField({
   size,
 }: SwitchFieldProps) {
   const field = useFieldContext<boolean>();
+  const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <label className={"flex items-center gap-2"}>
         <Switch.Root
+          aria-describedby={getAriaDescribedBy(
+            descriptionId,
+            errorId,
+            Boolean(description),
+            hasError
+          )}
+          aria-invalid={hasError || undefined}
           checked={field.state.value ?? false}
           className={switchVariants({ size })}
           disabled={disabled}
+          id={id}
           name={field.name}
           onCheckedChange={(checked) => field.handleChange(checked)}
         >
@@ -99,11 +114,23 @@ export function SwitchField({
         <span className={labelVariants({ size })}>{label}</span>
       </label>
       {description && !error && (
-        <p className={cn(descriptionVariants({ size }), "pl-11")}>
+        <p
+          className={cn(descriptionVariants({ size }), "pl-11")}
+          id={descriptionId}
+        >
           {description}
         </p>
       )}
-      {error && <p className={cn(errorVariants({ size }), "pl-11")}>{error}</p>}
+      {error && (
+        <p
+          aria-live={"polite"}
+          className={cn(errorVariants({ size }), "pl-11")}
+          id={errorId}
+          role={"alert"}
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }

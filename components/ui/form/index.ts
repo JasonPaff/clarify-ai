@@ -4,6 +4,7 @@ export {
   errorVariants,
   FieldWrapper,
   fieldWrapperVariants,
+  getAriaDescribedBy,
   labelVariants,
 } from "./field-wrapper";
 export { FormError } from "./form-error";

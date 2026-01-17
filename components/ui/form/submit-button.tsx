@@ -22,6 +22,8 @@ export function SubmitButton({
     <form.Subscribe selector={(state) => [state.isSubmitting, state.canSubmit]}>
       {([isSubmitting, canSubmit]) => (
         <Button
+          aria-busy={isSubmitting || undefined}
+          aria-disabled={(!canSubmit || isSubmitting) || undefined}
           className={cn(className)}
           disabled={!canSubmit || isSubmitting}
           size={size}

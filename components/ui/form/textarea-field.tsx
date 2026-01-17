@@ -6,7 +6,7 @@ import { useId } from "react";
 import { useFieldContext } from "@/lib/forms/form-hook";
 import { cn } from "@/lib/utils";
 
-import { FieldWrapper } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
 
 export const textareaVariants = cva(
   `
@@ -15,6 +15,8 @@ export const textareaVariants = cva(
     placeholder:text-muted-foreground
     focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none
     disabled:cursor-not-allowed disabled:opacity-50
+    aria-invalid:border-destructive
+    aria-invalid:focus:ring-destructive
   `,
   {
     defaultVariants: {
@@ -50,17 +52,30 @@ export function TextareaField({
 }: TextareaFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <FieldWrapper
       description={description}
+      descriptionId={descriptionId}
       error={error}
+      errorId={errorId}
       label={label}
       labelFor={id}
       size={size}
     >
       <textarea
+        aria-describedby={getAriaDescribedBy(
+          descriptionId,
+          errorId,
+          Boolean(description),
+          hasError
+        )}
+        aria-invalid={hasError || undefined}
         className={cn(textareaVariants({ size }), className)}
         disabled={disabled}
         id={id}

@@ -10,7 +10,7 @@ import { useId } from "react";
 import { useFieldContext } from "@/lib/forms/form-hook";
 import { cn } from "@/lib/utils";
 
-import { FieldWrapper } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
 
 export const numberInputVariants = cva(
   `
@@ -80,18 +80,25 @@ export function NumberFieldComponent({
 }: NumberFieldComponentProps) {
   const field = useFieldContext<null | number>();
   const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <FieldWrapper
       className={className}
       description={description}
+      descriptionId={descriptionId}
       error={error}
+      errorId={errorId}
       label={label}
       labelFor={id}
       size={size}
     >
       <NumberField.Root
+        aria-invalid={hasError || undefined}
         disabled={disabled}
         id={id}
         max={max}
@@ -103,24 +110,32 @@ export function NumberFieldComponent({
       >
         <NumberField.Group className={"flex"}>
           <NumberField.Decrement
+            aria-label={"Decrease value"}
             className={cn(
               numberButtonVariants({ size }),
               "rounded-l-md border-r-0"
             )}
           >
-            <MinusIcon />
+            <MinusIcon aria-hidden={"true"} />
           </NumberField.Decrement>
           <NumberField.Input
+            aria-describedby={getAriaDescribedBy(
+              descriptionId,
+              errorId,
+              Boolean(description),
+              hasError
+            )}
             className={numberInputVariants({ size })}
             onBlur={field.handleBlur}
           />
           <NumberField.Increment
+            aria-label={"Increase value"}
             className={cn(
               numberButtonVariants({ size }),
               "rounded-r-md border-l-0"
             )}
           >
-            <PlusIcon />
+            <PlusIcon aria-hidden={"true"} />
           </NumberField.Increment>
         </NumberField.Group>
       </NumberField.Root>

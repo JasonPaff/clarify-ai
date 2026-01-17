@@ -60,7 +60,9 @@ type FieldWrapperProps = ClassName &
   RequiredChildren &
   VariantProps<typeof fieldWrapperVariants> & {
     description?: string;
+    descriptionId?: string;
     error?: string;
+    errorId?: string;
     label: string;
     labelFor?: string;
   };
@@ -69,7 +71,9 @@ export function FieldWrapper({
   children,
   className,
   description,
+  descriptionId,
   error,
+  errorId,
   label,
   labelFor,
   size,
@@ -81,9 +85,38 @@ export function FieldWrapper({
       </label>
       {children}
       {description && !error && (
-        <p className={descriptionVariants({ size })}>{description}</p>
+        <p className={descriptionVariants({ size })} id={descriptionId}>
+          {description}
+        </p>
       )}
-      {error && <p className={errorVariants({ size })}>{error}</p>}
+      {error && (
+        <p
+          aria-live={"polite"}
+          className={errorVariants({ size })}
+          id={errorId}
+          role={"alert"}
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
+}
+
+/**
+ * Helper to build aria-describedby value from description and error IDs
+ */
+export function getAriaDescribedBy(
+  descriptionId: string | undefined,
+  errorId: string | undefined,
+  hasDescription: boolean,
+  hasError: boolean
+): string | undefined {
+  const ids: Array<string> = [];
+  if (hasError && errorId) {
+    ids.push(errorId);
+  } else if (hasDescription && descriptionId) {
+    ids.push(descriptionId);
+  }
+  return ids.length > 0 ? ids.join(" ") : undefined;
 }

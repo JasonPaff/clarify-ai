@@ -7,7 +7,7 @@ import { useId } from "react";
 import { useFieldContext } from "@/lib/forms/form-hook";
 import { cn } from "@/lib/utils";
 
-import { FieldWrapper } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
 
 export const inputVariants = cva(
   `
@@ -52,17 +52,30 @@ export function TextField({
 }: TextFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <FieldWrapper
       description={description}
+      descriptionId={descriptionId}
       error={error}
+      errorId={errorId}
       label={label}
       labelFor={id}
       size={size}
     >
       <Input
+        aria-describedby={getAriaDescribedBy(
+          descriptionId,
+          errorId,
+          Boolean(description),
+          hasError
+        )}
+        aria-invalid={hasError || undefined}
         className={cn(inputVariants({ size }), className)}
         disabled={disabled}
         id={id}

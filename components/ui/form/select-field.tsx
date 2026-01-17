@@ -7,7 +7,7 @@ import { useId } from "react";
 
 import { useFieldContext } from "@/lib/forms/form-hook";
 
-import { FieldWrapper } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
 
 export const selectTriggerVariants = cva(
   `
@@ -99,13 +99,19 @@ export function SelectField({
 }: SelectFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <FieldWrapper
       className={className}
       description={description}
+      descriptionId={descriptionId}
       error={error}
+      errorId={errorId}
       label={label}
       labelFor={id}
       size={size}
@@ -121,10 +127,20 @@ export function SelectField({
         onValueChange={(value) => field.handleChange(value ?? "")}
         value={field.state.value}
       >
-        <Select.Trigger className={selectTriggerVariants({ size })} id={id}>
+        <Select.Trigger
+          aria-describedby={getAriaDescribedBy(
+            descriptionId,
+            errorId,
+            Boolean(description),
+            hasError
+          )}
+          aria-invalid={hasError || undefined}
+          className={selectTriggerVariants({ size })}
+          id={id}
+        >
           <Select.Value placeholder={placeholder} />
           <Select.Icon>
-            <ChevronDown className={"size-4 opacity-50"} />
+            <ChevronDown aria-hidden={"true"} className={"size-4 opacity-50"} />
           </Select.Icon>
         </Select.Trigger>
         <Select.Portal>

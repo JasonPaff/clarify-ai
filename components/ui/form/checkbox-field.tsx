@@ -5,6 +5,7 @@ import type { ComponentProps } from "react";
 import { Checkbox } from "@base-ui/react/checkbox";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Check } from "lucide-react";
+import { useId } from "react";
 
 import { useFieldContext } from "@/lib/forms/form-hook";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   descriptionVariants,
   errorVariants,
+  getAriaDescribedBy,
   labelVariants,
 } from "./field-wrapper";
 
@@ -67,15 +69,28 @@ export function CheckboxField({
   size,
 }: CheckboxFieldProps) {
   const field = useFieldContext<boolean>();
+  const id = useId();
+
+  const descriptionId = `${id}-description`;
+  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0];
+  const hasError = Boolean(error);
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>
       <label className={"flex items-center gap-2"}>
         <Checkbox.Root
+          aria-describedby={getAriaDescribedBy(
+            descriptionId,
+            errorId,
+            Boolean(description),
+            hasError
+          )}
+          aria-invalid={hasError || undefined}
           checked={field.state.value ?? false}
           className={checkboxVariants({ size })}
           disabled={disabled}
+          id={id}
           name={field.name}
           onCheckedChange={(checked) => field.handleChange(checked)}
         >
@@ -85,17 +100,29 @@ export function CheckboxField({
               data-unchecked:hidden
             `}
           >
-            <CheckIcon size={size} />
+            <CheckIcon aria-hidden={"true"} size={size} />
           </Checkbox.Indicator>
         </Checkbox.Root>
         <span className={labelVariants({ size })}>{label}</span>
       </label>
       {description && !error && (
-        <p className={cn(descriptionVariants({ size }), "pl-6")}>
+        <p
+          className={cn(descriptionVariants({ size }), "pl-6")}
+          id={descriptionId}
+        >
           {description}
         </p>
       )}
-      {error && <p className={cn(errorVariants({ size }), "pl-6")}>{error}</p>}
+      {error && (
+        <p
+          aria-live={"polite"}
+          className={cn(errorVariants({ size }), "pl-6")}
+          id={errorId}
+          role={"alert"}
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 }
