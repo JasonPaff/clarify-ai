@@ -88,7 +88,7 @@ import { entityKeys } from "./entity";
 
 export const queries = mergeQueryKeys(
   // ... existing keys
-  entityKeys,
+  entityKeys
 );
 ```
 
@@ -170,10 +170,7 @@ export function useUpdateEntity() {
     }) => entities.update(id, data),
     onSuccess: (entity) => {
       if (entity) {
-        queryClient.setQueryData(
-          entityKeys.detail(entity.id).queryKey,
-          entity,
-        );
+        queryClient.setQueryData(entityKeys.detail(entity.id).queryKey, entity);
         void queryClient.invalidateQueries({ queryKey: entityKeys.list._def });
       }
     },

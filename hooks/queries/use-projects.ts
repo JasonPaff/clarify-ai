@@ -67,7 +67,7 @@ export function useUpdateProject() {
       if (project) {
         queryClient.setQueryData(
           projectKeys.detail(project.id).queryKey,
-          project,
+          project
         );
         void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
       }

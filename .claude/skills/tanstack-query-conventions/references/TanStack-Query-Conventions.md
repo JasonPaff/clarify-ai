@@ -138,10 +138,10 @@ export function useProject(id: number) {
 
 ### Query Hook Naming Conventions
 
-| Pattern | Name | Example |
-|---------|------|---------|
-| List all | `use{Entities}` | `useProjects()` |
-| Get by ID | `use{Entity}` | `useProject(id)` |
+| Pattern       | Name                      | Example                           |
+| ------------- | ------------------------- | --------------------------------- |
+| List all      | `use{Entities}`           | `useProjects()`                   |
+| Get by ID     | `use{Entity}`             | `useProject(id)`                  |
 | Filtered list | `use{Entities}By{Filter}` | `useFeaturesByProject(projectId)` |
 
 ### Required Query Options
@@ -197,11 +197,11 @@ export function useCreateProject() {
 
 ### Mutation Hook Naming Conventions
 
-| Operation | Name | Example |
-|-----------|------|---------|
-| Create | `useCreate{Entity}` | `useCreateProject()` |
-| Update | `useUpdate{Entity}` | `useUpdateProject()` |
-| Delete | `useDelete{Entity}` | `useDeleteProject()` |
+| Operation     | Name                  | Example               |
+| ------------- | --------------------- | --------------------- |
+| Create        | `useCreate{Entity}`   | `useCreateProject()`  |
+| Update        | `useUpdate{Entity}`   | `useUpdateProject()`  |
+| Delete        | `useDelete{Entity}`   | `useDeleteProject()`  |
 | Custom action | `use{Action}{Entity}` | `useArchiveProject()` |
 
 ### Cache Invalidation Patterns
@@ -243,7 +243,7 @@ export function useUpdateProject() {
         // Update the detail cache directly
         queryClient.setQueryData(
           projectKeys.detail(project.id).queryKey,
-          project,
+          project
         );
         // Invalidate list to refetch
         void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
@@ -529,7 +529,7 @@ export function useUpdateProject() {
       if (project) {
         queryClient.setQueryData(
           projectKeys.detail(project.id).queryKey,
-          project,
+          project
         );
         void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
       }
