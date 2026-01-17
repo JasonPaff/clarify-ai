@@ -34,7 +34,7 @@ export const TabsTrigger = ({ className, ref, ...props }: TabsTriggerProps) => {
           whitespace-nowrap text-muted-foreground transition-colors outline-none
           hover:text-foreground
           focus-visible:relative focus-visible:z-10 focus-visible:ring-2
-          focus-visible:ring-accent focus-visible:ring-offset-2
+          focus-visible:ring-accent
           data-active:text-foreground
         `,
         className
@@ -77,7 +77,6 @@ export const TabsPanel = ({ className, ref, ...props }: TabsPanelProps) => {
         `
           mt-4 outline-none
           focus-visible:ring-2 focus-visible:ring-accent
-          focus-visible:ring-offset-2
         `,
         className
       )}

@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { X } from "lucide-react";
 import { $path } from "next-typesafe-url";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import type { CreateProjectFormValues } from "@/lib/validations/project";
 
 import {
   DialogBackdrop,
+  DialogClose,
   DialogDescription,
   DialogPopup,
   DialogPortal,
@@ -17,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { IconButton } from "@/components/ui/icon-button";
 import { useCreateProject } from "@/hooks/queries/use-projects";
 
 import { CreateProjectForm } from "./create-project-form";
@@ -60,6 +63,13 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>
+          <div className={"relative"}>
+            <DialogClose
+              render={<IconButton className={"absolute -top-2 -right-2"} />}
+            >
+              <X className={"size-4"} />
+            </DialogClose>
+          </div>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
             Create a new project to organize your feature requests and

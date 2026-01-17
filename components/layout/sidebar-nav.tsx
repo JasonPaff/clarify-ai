@@ -82,7 +82,8 @@ function NavItemLink({ active, collapsed, item }: NavItemLinkProps) {
       className={cn(
         `
           flex h-9 items-center gap-3 rounded-md px-3 text-sm font-medium
-          transition-colors
+          transition-colors outline-none
+          focus-visible:ring-2 focus-visible:ring-accent
         `,
         active && "bg-accent text-accent-foreground",
         !active &&

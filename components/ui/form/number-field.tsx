@@ -16,7 +16,7 @@ export const numberInputVariants = cva(
   `
     border-y border-border bg-transparent text-center text-foreground
     tabular-nums
-    focus:z-10 focus:ring-2 focus:ring-accent focus:ring-offset-2
+    focus:z-10 focus:ring-2 focus:ring-accent
     focus:outline-none
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-invalid:border-destructive

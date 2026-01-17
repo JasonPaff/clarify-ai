@@ -20,7 +20,7 @@ import {
 export const checkboxVariants = cva(
   `
     flex items-center justify-center rounded-sm border
-    focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2
+    focus-visible:ring-2 focus-visible:ring-accent
     focus-visible:outline-none
     data-checked:border-accent data-checked:bg-accent
     data-checked:text-accent-foreground

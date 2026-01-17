@@ -13,7 +13,7 @@ export const selectTriggerVariants = cva(
   `
     inline-flex w-full items-center justify-between gap-2 rounded-md border
     border-border bg-transparent text-foreground
-    focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none
+    focus:ring-2 focus:ring-accent focus:outline-none
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-popup-open:ring-2 data-popup-open:ring-accent
   `,

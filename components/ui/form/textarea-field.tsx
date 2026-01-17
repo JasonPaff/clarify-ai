@@ -13,7 +13,7 @@ export const textareaVariants = cva(
     w-full resize-none rounded-md border border-border bg-transparent
     text-foreground
     placeholder:text-muted-foreground
-    focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:outline-none
+    focus:ring-2 focus:ring-accent focus:outline-none
     disabled:cursor-not-allowed disabled:opacity-50
     aria-invalid:border-destructive
     aria-invalid:focus:ring-destructive

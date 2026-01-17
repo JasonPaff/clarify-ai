@@ -27,6 +27,10 @@ export function ProjectCard({
 }: ProjectCardProps) {
   return (
     <Link
+      className={`
+        block rounded-lg outline-none
+        focus-visible:ring-2 focus-visible:ring-accent
+      `}
       href={$path({
         route: "/projects/[projectId]",
         routeParams: { projectId: id },
