@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
+allowed-tools: Task(subagent_type:implementation_planner), Task(subagent_type:file-discovery-agent), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
 argument-hint: 'feature description'
 description: Generate detailed implementation plans through automated 3-step orchestration
 ---
@@ -76,7 +76,8 @@ When the user runs this command, execute this simple 3-step workflow:
 
 ### Step 2: AI-Powered File Discovery
 
-**Objective**: Use the file discovery agent to intelligently identify all files relevant to implementing the feature by analyzing the refined request and codebase structure.
+**Objective**: Use the file discovery agent to intelligently identify all files 
+relevant to implementing the feature by analyzing the refined request and codebase structure.
 
 **Process**:
 
