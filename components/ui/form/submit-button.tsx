@@ -1,6 +1,8 @@
 'use client';
 
-import { type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
+
+import { useStore } from '@tanstack/react-form';
 
 import { Button, buttonVariants } from '@/components/ui/button';
 import { useFormContext } from '@/lib/forms/form-hook';
@@ -11,21 +13,19 @@ type SubmitButtonProps = ClassName & RequiredChildren & VariantProps<typeof butt
 export function SubmitButton({ children, className, size, variant }: SubmitButtonProps) {
   const form = useFormContext();
 
+  const [isSubmitting] = useStore(form.store, (state) => [state.isSubmitting]);
+
   return (
-    <form.Subscribe selector={(state) => [state.isSubmitting, state.canSubmit]}>
-      {([isSubmitting, canSubmit]) => (
-        <Button
-          aria-busy={isSubmitting || undefined}
-          aria-disabled={!canSubmit || isSubmitting || undefined}
-          className={cn(className)}
-          disabled={!canSubmit || isSubmitting}
-          size={size}
-          type={'submit'}
-          variant={variant}
-        >
-          {isSubmitting ? 'Submitting...' : children}
-        </Button>
-      )}
-    </form.Subscribe>
+    <Button
+      aria-busy={isSubmitting || undefined}
+      aria-disabled={isSubmitting || undefined}
+      className={cn(className)}
+      disabled={isSubmitting}
+      size={size}
+      type={'submit'}
+      variant={variant}
+    >
+      {children}
+    </Button>
   );
 }
