@@ -1,8 +1,6 @@
-// Query Keys Factory
-export const projectKeys = {
-  all: ["projects"] as const,
-  detail: (id: number) => [...projectKeys.details(), id] as const,
-  details: () => [...projectKeys.all, "detail"] as const,
-  list: (filters?: string) => [...projectKeys.lists(), filters] as const,
-  lists: () => [...projectKeys.all, "list"] as const,
-};
+import { createQueryKeys } from "@lukemorales/query-key-factory";
+
+export const projectKeys = createQueryKeys("projects", {
+  detail: (id: number) => [id],
+  list: (filters?: string) => [{ filters }],
+});

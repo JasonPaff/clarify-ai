@@ -27,8 +27,8 @@ function PrefetchCriticalData() {
     if (!isElectron) return;
 
     void queryClient.prefetchQuery({
+      ...projectKeys.list(),
       queryFn: () => projects.getAll(),
-      queryKey: projectKeys.lists(),
     });
   }, [queryClient, isElectron, projects]);
 

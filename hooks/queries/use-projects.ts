@@ -14,7 +14,7 @@ export function useCreateProject() {
     mutationFn: (data: Parameters<typeof projects.create>[0]) =>
       projects.create(data),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+      void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
     },
   });
 }
@@ -26,7 +26,7 @@ export function useDeleteProject() {
   return useMutation({
     mutationFn: (id: number) => projects.delete(id),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      void queryClient.invalidateQueries({ queryKey: projectKeys._def });
     },
   });
 }
@@ -35,9 +35,9 @@ export function useProject(id: number) {
   const { isElectron, projects } = useElectronDb();
 
   return useQuery({
+    ...projectKeys.detail(id),
     enabled: isElectron,
     queryFn: () => projects.getById(id),
-    queryKey: projectKeys.detail(id),
   });
 }
 
@@ -45,9 +45,9 @@ export function useProjects() {
   const { isElectron, projects } = useElectronDb();
 
   return useQuery({
+    ...projectKeys.list(),
     enabled: isElectron,
     queryFn: () => projects.getAll(),
-    queryKey: projectKeys.lists(),
   });
 }
 
@@ -65,8 +65,11 @@ export function useUpdateProject() {
     }) => projects.update(id, data),
     onSuccess: (project) => {
       if (project) {
-        queryClient.setQueryData(projectKeys.detail(project.id), project);
-        void queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+        queryClient.setQueryData(
+          projectKeys.detail(project.id).queryKey,
+          project,
+        );
+        void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
       }
     },
   });
