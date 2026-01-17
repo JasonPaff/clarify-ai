@@ -9,8 +9,8 @@
     "db:migrate": "drizzle-kit migrate",
     "dev": "next dev --turbopack",
     "electron:compile": "node ./node_modules/typescript/bin/tsc -b electron/tsconfig.json",
-    "electron:dev": "concurrently -k \"cross-env NODE_ENV=development pnpm dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "cross-env BUILD_TARGET=electron pnpm build && pnpm electron:compile",
+    "electron:dev": "concurrently -k \"cross-env NODE_ENV=development pnpm dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "electron:dist": "pnpm electron:build && electron-builder",
     "format": "prettier --write .",
     "lint": "eslint --fix --cache",
@@ -45,8 +45,7 @@
     "react-error-boundary": "^6.1.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.5",
-    "zod-validation-error": "^5.0.0",
-    "zustand": "^5.0.10"
+    "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
