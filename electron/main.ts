@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { app, BrowserWindow } from 'electron';
 import serve from 'electron-serve';
