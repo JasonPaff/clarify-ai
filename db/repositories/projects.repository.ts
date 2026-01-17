@@ -1,9 +1,9 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, sql } from 'drizzle-orm';
 
-import type { DrizzleDatabase } from "../index";
-import type { NewProject, Project } from "../schema";
+import type { DrizzleDatabase } from '../index';
+import type { NewProject, Project } from '../schema';
 
-import { projects } from "../schema";
+import { projects } from '../schema';
 
 export interface ProjectsRepository {
   create(data: NewProject): Project;
@@ -13,9 +13,7 @@ export interface ProjectsRepository {
   update(id: number, data: Partial<NewProject>): Project | undefined;
 }
 
-export function createProjectsRepository(
-  db: DrizzleDatabase
-): ProjectsRepository {
+export function createProjectsRepository(db: DrizzleDatabase): ProjectsRepository {
   return {
     create(data: NewProject): Project {
       return db.insert(projects).values(data).returning().get();

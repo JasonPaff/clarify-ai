@@ -1,13 +1,11 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
+import { X } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { X } from "lucide-react";
-import { $path } from "next-typesafe-url";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-import type { CreateProjectFormValues } from "@/lib/validations/project";
+import type { CreateProjectFormValues } from '@/lib/validations/project';
 
 import {
   DialogBackdrop,
@@ -18,15 +16,13 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { IconButton } from "@/components/ui/icon-button";
-import { useCreateProject } from "@/hooks/queries/use-projects";
+} from '@/components/ui/dialog';
+import { IconButton } from '@/components/ui/icon-button';
+import { useCreateProject } from '@/hooks/queries/use-projects';
 
-import { CreateProjectForm } from "./create-project-form";
+import { CreateProjectForm } from './create-project-form';
 
-interface NewProjectDialogProps {
-  children: ReactNode;
-}
+type NewProjectDialogProps = RequiredChildren;
 
 export function NewProjectDialog({ children }: NewProjectDialogProps) {
   const [open, setOpen] = useState(false);
@@ -44,7 +40,7 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
       setOpen(false);
       router.push(
         $path({
-          route: "/projects/[projectId]",
+          route: '/projects/[projectId]',
           routeParams: { projectId: project.id },
         })
       );
@@ -57,30 +53,23 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
-      <DialogTrigger nativeButton={false} render={<span className={"inline-flex"} />}>
+      <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
         {children}
       </DialogTrigger>
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>
-          <div className={"relative"}>
-            <DialogClose
-              render={<IconButton className={"absolute -top-2 -right-2"} />}
-            >
-              <X className={"size-4"} />
+          <div className={'relative'}>
+            <DialogClose render={<IconButton className={'absolute -top-2 -right-2'} />}>
+              <X className={'size-4'} />
             </DialogClose>
           </div>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
-            Create a new project to organize your feature requests and
-            implementation plans.
+            Create a new project to organize your feature requests and implementation plans.
           </DialogDescription>
-          <div className={"mt-6"}>
-            <CreateProjectForm
-              isSubmitting={createProject.isPending}
-              onCancel={handleCancel}
-              onSubmit={handleSubmit}
-            />
+          <div className={'mt-6'}>
+            <CreateProjectForm isSubmitting={createProject.isPending} onCancel={handleCancel} onSubmit={handleSubmit} />
           </div>
         </DialogPopup>
       </DialogPortal>

@@ -1,36 +1,35 @@
-"use client";
+'use client';
 
-import type { ComponentProps } from "react";
+import type { ComponentProps } from 'react';
 
-import { NumberField } from "@base-ui/react/number-field";
-import { cva, type VariantProps } from "class-variance-authority";
-import { Minus, Plus } from "lucide-react";
-import { useId } from "react";
+import { NumberField } from '@base-ui/react/number-field';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Minus, Plus } from 'lucide-react';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
 
 export const numberInputVariants = cva(
   `
     border-y border-border bg-transparent text-center text-foreground
     tabular-nums
-    focus:z-10 focus:ring-2 focus:ring-accent
-    focus:outline-none
+    focus:z-10 focus:ring-2 focus:ring-accent focus:outline-none
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-invalid:border-destructive
     data-invalid:focus:ring-destructive
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "h-9 w-20 text-sm",
-        lg: "h-10 w-24 text-base",
-        sm: "h-8 w-16 text-xs",
+        default: 'h-9 w-20 text-sm',
+        lg: 'h-10 w-24 text-base',
+        sm: 'h-8 w-16 text-xs',
       },
     },
   }
@@ -46,13 +45,13 @@ export const numberButtonVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "size-9",
-        lg: "size-10",
-        sm: "size-8",
+        default: 'size-9',
+        lg: 'size-10',
+        sm: 'size-8',
       },
     },
   }
@@ -108,34 +107,23 @@ export function NumberFieldComponent({
         step={step}
         value={field.state.value}
       >
-        <NumberField.Group className={"flex"}>
+        <NumberField.Group className={'flex'}>
           <NumberField.Decrement
-            aria-label={"Decrease value"}
-            className={cn(
-              numberButtonVariants({ size }),
-              "rounded-l-md border-r-0"
-            )}
+            aria-label={'Decrease value'}
+            className={cn(numberButtonVariants({ size }), 'rounded-l-md border-r-0')}
           >
-            <MinusIcon aria-hidden={"true"} />
+            <MinusIcon aria-hidden={'true'} />
           </NumberField.Decrement>
           <NumberField.Input
-            aria-describedby={getAriaDescribedBy(
-              descriptionId,
-              errorId,
-              Boolean(description),
-              hasError
-            )}
+            aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
             className={numberInputVariants({ size })}
             onBlur={field.handleBlur}
           />
           <NumberField.Increment
-            aria-label={"Increase value"}
-            className={cn(
-              numberButtonVariants({ size }),
-              "rounded-r-md border-l-0"
-            )}
+            aria-label={'Increase value'}
+            className={cn(numberButtonVariants({ size }), 'rounded-r-md border-l-0')}
           >
-            <PlusIcon aria-hidden={"true"} />
+            <PlusIcon aria-hidden={'true'} />
           </NumberField.Increment>
         </NumberField.Group>
       </NumberField.Root>
@@ -143,10 +131,10 @@ export function NumberFieldComponent({
   );
 }
 
-function MinusIcon(props: ComponentProps<"svg">) {
-  return <Minus className={"size-3.5"} {...props} />;
+function MinusIcon(props: ComponentProps<'svg'>) {
+  return <Minus className={'size-3.5'} {...props} />;
 }
 
-function PlusIcon(props: ComponentProps<"svg">) {
-  return <Plus className={"size-3.5"} {...props} />;
+function PlusIcon(props: ComponentProps<'svg'>) {
+  return <Plus className={'size-3.5'} {...props} />;
 }

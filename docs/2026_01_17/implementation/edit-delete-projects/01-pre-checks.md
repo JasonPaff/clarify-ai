@@ -27,14 +27,14 @@
 
 ## Routing Table
 
-| Step | Title | Specialist Agent |
-|------|-------|------------------|
-| 1 | Add Update Project Validation Schema | tanstack-form |
-| 2 | Create Edit Project Form Component | tanstack-form |
-| 3 | Create Edit Project Dialog Component | general-purpose |
-| 4 | Create Delete Project Confirmation Dialog | general-purpose |
-| 5 | Update Project Settings Page | general-purpose |
-| 6 | Export New Components from Index | general-purpose |
+| Step | Title                                     | Specialist Agent |
+| ---- | ----------------------------------------- | ---------------- |
+| 1    | Add Update Project Validation Schema      | tanstack-form    |
+| 2    | Create Edit Project Form Component        | tanstack-form    |
+| 3    | Create Edit Project Dialog Component      | general-purpose  |
+| 4    | Create Delete Project Confirmation Dialog | general-purpose  |
+| 5    | Update Project Settings Page              | general-purpose  |
+| 6    | Export New Components from Index          | general-purpose  |
 
 ## Status
 

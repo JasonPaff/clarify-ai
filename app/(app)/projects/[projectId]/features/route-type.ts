@@ -1,5 +1,5 @@
-import { DynamicRoute, InferPagePropsType } from "next-typesafe-url";
-import { z } from "zod";
+import { DynamicRoute, InferPagePropsType } from 'next-typesafe-url';
+import { z } from 'zod';
 
 export const Route = {
   routeParams: z.object({

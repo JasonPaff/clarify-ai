@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 type EmptyStateProps = ClassName<{
   action?: ReactNode;
@@ -11,20 +11,9 @@ type EmptyStateProps = ClassName<{
   title: string;
 }>;
 
-export function EmptyState({
-  action,
-  className,
-  description,
-  icon,
-  title,
-}: EmptyStateProps) {
+export function EmptyState({ action, className, description, icon, title }: EmptyStateProps) {
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center py-12 text-center",
-        className
-      )}
-    >
+    <div className={cn('flex flex-col items-center justify-center py-12 text-center', className)}>
       {icon && (
         <div
           className={`
@@ -35,13 +24,9 @@ export function EmptyState({
           {icon}
         </div>
       )}
-      <h3 className={"text-lg font-semibold"}>{title}</h3>
-      {description && (
-        <p className={"mt-1 max-w-sm text-sm text-muted-foreground"}>
-          {description}
-        </p>
-      )}
-      {action && <div className={"mt-4"}>{action}</div>}
+      <h3 className={'text-lg font-semibold'}>{title}</h3>
+      {description && <p className={'mt-1 max-w-sm text-sm text-muted-foreground'}>{description}</p>}
+      {action && <div className={'mt-4'}>{action}</div>}
     </div>
   );
 }

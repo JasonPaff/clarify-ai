@@ -58,13 +58,13 @@ The projects page requires a modal dialog component that enables users to create
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| Format | ✅ Single paragraph, no headers/sections |
-| Word Count | ~350 words |
-| Length Ratio | ~23x original (15 → 350 words) |
-| Intent Preserved | ✅ Core intent maintained |
-| Technical Context | ✅ Relevant stack details included |
+| Check             | Result                                   |
+| ----------------- | ---------------------------------------- |
+| Format            | ✅ Single paragraph, no headers/sections |
+| Word Count        | ~350 words                               |
+| Length Ratio      | ~23x original (15 → 350 words)           |
+| Intent Preserved  | ✅ Core intent maintained                |
+| Technical Context | ✅ Relevant stack details included       |
 
 ## Notes
 

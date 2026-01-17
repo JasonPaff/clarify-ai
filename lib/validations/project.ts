@@ -1,10 +1,7 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // Shared field validations for DRY compliance
-const projectNameSchema = z
-  .string()
-  .min(1, "Project name is required")
-  .max(255, "Project name is too long");
+const projectNameSchema = z.string().min(1, 'Project name is required').max(255, 'Project name is too long');
 
 const projectDescriptionSchema = z.string();
 

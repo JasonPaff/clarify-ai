@@ -1,14 +1,6 @@
-"use client";
+'use client';
 
-import {
-  createContext,
-  use,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, use, useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react';
 
 interface SidebarContextValue {
   collapsed: boolean;
@@ -28,15 +20,15 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
   });
 
   useEffect(() => {
-    const stored = localStorage.getItem("sidebar-collapsed");
+    const stored = localStorage.getItem('sidebar-collapsed');
     if (stored !== null) {
-      updateCollapsed(stored === "true");
+      updateCollapsed(stored === 'true');
     }
   }, []);
 
   const handleSetCollapsed = useCallback((value: boolean) => {
     setCollapsed(value);
-    localStorage.setItem("sidebar-collapsed", String(value));
+    localStorage.setItem('sidebar-collapsed', String(value));
   }, []);
 
   const toggle = useCallback(() => {
@@ -45,13 +37,13 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if ((event.metaKey || event.ctrlKey) && event.key === "b") {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'b') {
         event.preventDefault();
         toggle();
       }
     }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [toggle]);
 
   const value = useMemo(
@@ -65,7 +57,7 @@ export function SidebarProvider({ children }: SidebarProviderProps) {
 export function useSidebar() {
   const context = use(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider");
+    throw new Error('useSidebar must be used within a SidebarProvider');
   }
   return context;
 }

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { FolderPlus, Plus } from "lucide-react";
-import { Fragment } from "react";
+import { FolderPlus, Plus } from 'lucide-react';
+import { Fragment } from 'react';
 
-import { QueryErrorBoundary } from "@/components/data/query-error-boundary";
-import { PageHeader } from "@/components/layout/page-header";
-import { NewProjectDialog } from "@/components/projects/new-project-dialog";
-import { ProjectCard } from "@/components/projects/project-card";
-import { ProjectsSkeleton } from "@/components/skeletons/projects-skeleton";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { useProjects } from "@/hooks/queries/use-projects";
+import { QueryErrorBoundary } from '@/components/data/query-error-boundary';
+import { PageHeader } from '@/components/layout/page-header';
+import { NewProjectDialog } from '@/components/projects/new-project-dialog';
+import { ProjectCard } from '@/components/projects/project-card';
+import { ProjectsSkeleton } from '@/components/skeletons/projects-skeleton';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { useProjects } from '@/hooks/queries/use-projects';
 
 export default function ProjectsPage() {
   return (
@@ -19,13 +19,13 @@ export default function ProjectsPage() {
         action={
           <NewProjectDialog>
             <Button>
-              <Plus className={"size-4"} />
+              <Plus className={'size-4'} />
               New Project
             </Button>
           </NewProjectDialog>
         }
-        description={"Manage your feature planning projects"}
-        title={"Projects"}
+        description={'Manage your feature planning projects'}
+        title={'Projects'}
       />
 
       <QueryErrorBoundary>
@@ -48,16 +48,14 @@ function ProjectsContent() {
         action={
           <NewProjectDialog>
             <Button>
-              <Plus className={"size-4"} />
+              <Plus className={'size-4'} />
               Create your first project
             </Button>
           </NewProjectDialog>
         }
-        description={
-          "Projects help you organize feature requests and implementation plans for your applications."
-        }
-        icon={<FolderPlus className={"size-6"} />}
-        title={"No projects yet"}
+        description={'Projects help you organize feature requests and implementation plans for your applications.'}
+        icon={<FolderPlus className={'size-6'} />}
+        title={'No projects yet'}
       />
     );
   }

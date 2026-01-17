@@ -1,6 +1,6 @@
 ---
 allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:database-schema), Task(subagent_type:tanstack-query), Task(subagent_type:tanstack-form), Task(subagent_type:tanstack-form-base-components), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,pnpm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
-argument-hint: "path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]"
+argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
 
@@ -9,12 +9,14 @@ description: Execute implementation plan with structured tracking and validation
 **YOU MUST delegate every implementation step to a subagent using the Task tool.**
 
 **YOU MUST NOT:**
+
 - ❌ Use Edit tool to modify code files
 - ❌ Use Write tool to create code files
 - ❌ Implement any code changes yourself
 - ❌ Read source files to understand implementation details
 
 **YOU MUST:**
+
 - ✅ Use Task tool with `subagent_type` for EVERY implementation step
 - ✅ Only use Read for the plan file and log files you create
 - ✅ Only use Write for implementation log files (in docs/)
@@ -42,13 +44,13 @@ description: Execute implementation plan with structured tracking and validation
 
 ## Common Mistakes - DO NOT DO THESE
 
-| Wrong                                          | Right                                              |
-|------------------------------------------------|----------------------------------------------------|
-| Reading component files to understand patterns | Subagent reads files it needs                      |
-| Using Edit to modify source code               | Task tool delegates to subagent                    |
-| Using Write to create new components           | Task tool delegates to subagent                    |
-| Implementing multiple steps before delegating  | Delegate EACH step via Task tool                   |
-| Skipping the routing table                     | ALWAYS create routing table in Phase 2             |
+| Wrong                                          | Right                                  |
+| ---------------------------------------------- | -------------------------------------- |
+| Reading component files to understand patterns | Subagent reads files it needs          |
+| Using Edit to modify source code               | Task tool delegates to subagent        |
+| Using Write to create new components           | Task tool delegates to subagent        |
+| Implementing multiple steps before delegating  | Delegate EACH step via Task tool       |
+| Skipping the routing table                     | ALWAYS create routing table in Phase 2 |
 
 ---
 
@@ -89,13 +91,13 @@ You do NOT implement code. Subagents implement code.
 
 ## Available Specialist Agents
 
-| Agent                          | Domain                       | When to Use                                          |
-| ------------------------------ | ---------------------------- | ---------------------------------------------------- |
-| `database-schema`              | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`          |
-| `tanstack-query`               | Data fetching & server state | Query hooks, mutations, cache management             |
-| `tanstack-form`                | Form implementations         | Forms in dialogs, pages, features + validation schemas |
-| `tanstack-form-base-components`| Base form components         | Field components in `components/ui/form/`            |
-| `general-purpose`              | Everything else              | React components, pages, utilities, etc.             |
+| Agent                           | Domain                       | When to Use                                            |
+| ------------------------------- | ---------------------------- | ------------------------------------------------------ |
+| `database-schema`               | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`            |
+| `tanstack-query`                | Data fetching & server state | Query hooks, mutations, cache management               |
+| `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas |
+| `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`              |
+| `general-purpose`               | Everything else              | React components, pages, utilities, etc.               |
 
 ## Step-Type Detection Rules
 
@@ -276,12 +278,14 @@ YY-implementation-summary.md  # Final summary
 ## Error Handling
 
 **If subagent fails:**
+
 1. Log failure details to step results file
 2. Keep todo as "in_progress"
 3. In `--step-by-step` mode: Ask user how to proceed
 4. Otherwise: Continue to next step or abort based on severity
 
 **If quality gates fail:**
+
 1. Show error output
 2. Provide fix recommendations
 3. Ask user whether to continue or abort
@@ -297,6 +301,7 @@ Before taking any action, ask yourself:
 If yes: **STOP and use Task tool instead.**
 
 Your tools for implementation are:
+
 - ✅ `Task(subagent_type="...")` - Delegate implementation
 - ✅ `Read` - Only for plan file and your log files
 - ✅ `Write` - Only for log files in docs/
@@ -305,6 +310,7 @@ Your tools for implementation are:
 - ✅ `AskUserQuestion` - User decisions
 
 Your tools are NOT for:
+
 - ❌ `Edit` on source files
 - ❌ `Write` on source files
 - ❌ `Read` on source files (subagents do this)

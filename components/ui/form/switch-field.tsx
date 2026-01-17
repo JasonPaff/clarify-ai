@@ -1,38 +1,32 @@
-"use client";
+'use client';
 
-import { Switch } from "@base-ui/react/switch";
-import { cva, type VariantProps } from "class-variance-authority";
-import { useId } from "react";
+import { Switch } from '@base-ui/react/switch';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import {
-  descriptionVariants,
-  errorVariants,
-  getAriaDescribedBy,
-  labelVariants,
-} from "./field-wrapper";
+import { descriptionVariants, errorVariants, getAriaDescribedBy, labelVariants } from './field-wrapper';
 
 export const switchVariants = cva(
   `
     relative inline-flex shrink-0 cursor-pointer rounded-full border-2
     border-transparent transition-colors duration-200 ease-in-out
-    focus-visible:ring-2 focus-visible:ring-accent
-    focus-visible:outline-none
+    focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none
     data-checked:bg-accent
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-unchecked:bg-muted
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "h-5 w-9",
-        lg: "h-6 w-11",
-        sm: "h-4 w-7",
+        default: 'h-5 w-9',
+        lg: 'h-6 w-11',
+        sm: 'h-4 w-7',
       },
     },
   }
@@ -45,7 +39,7 @@ export const switchThumbVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
@@ -76,13 +70,7 @@ type SwitchFieldProps = ClassName &
     label: string;
   };
 
-export function SwitchField({
-  className,
-  description,
-  disabled,
-  label,
-  size,
-}: SwitchFieldProps) {
+export function SwitchField({ className, description, disabled, label, size }: SwitchFieldProps) {
   const field = useFieldContext<boolean>();
   const id = useId();
 
@@ -92,15 +80,10 @@ export function SwitchField({
   const hasError = Boolean(error);
 
   return (
-    <div className={cn("flex flex-col gap-1", className)}>
-      <label className={"flex items-center gap-2"}>
+    <div className={cn('flex flex-col gap-1', className)}>
+      <label className={'flex items-center gap-2'}>
         <Switch.Root
-          aria-describedby={getAriaDescribedBy(
-            descriptionId,
-            errorId,
-            Boolean(description),
-            hasError
-          )}
+          aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
           aria-invalid={hasError || undefined}
           checked={field.state.value ?? false}
           className={switchVariants({ size })}
@@ -114,20 +97,12 @@ export function SwitchField({
         <span className={labelVariants({ size })}>{label}</span>
       </label>
       {description && !error && (
-        <p
-          className={cn(descriptionVariants({ size }), "pl-11")}
-          id={descriptionId}
-        >
+        <p className={cn(descriptionVariants({ size }), 'pl-11')} id={descriptionId}>
           {description}
         </p>
       )}
       {error && (
-        <p
-          aria-live={"polite"}
-          className={cn(errorVariants({ size }), "pl-11")}
-          id={errorId}
-          role={"alert"}
-        >
+        <p aria-live={'polite'} className={cn(errorVariants({ size }), 'pl-11')} id={errorId} role={'alert'}>
           {error}
         </p>
       )}

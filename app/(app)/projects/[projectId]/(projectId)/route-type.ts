@@ -1,10 +1,5 @@
-import {
-  DynamicLayout,
-  DynamicRoute,
-  InferLayoutPropsType,
-  InferPagePropsType,
-} from "next-typesafe-url";
-import { z } from "zod";
+import { DynamicLayout, DynamicRoute, InferLayoutPropsType, InferPagePropsType } from 'next-typesafe-url';
+import { z } from 'zod';
 
 export const Route = {
   routeParams: z.object({

@@ -1,8 +1,8 @@
-import { ipcMain, type IpcMainInvokeEvent } from "electron";
-import * as fs from "fs/promises";
-import * as path from "path";
+import { ipcMain, type IpcMainInvokeEvent } from 'electron';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
-import { IpcChannels } from "./channels";
+import { IpcChannels } from './channels';
 
 export function registerFsHandlers(): void {
   ipcMain.handle(
@@ -12,14 +12,14 @@ export function registerFsHandlers(): void {
       filePath: string
     ): Promise<{ content?: string; error?: string; success: boolean }> => {
       if (!isValidPath(filePath)) {
-        return { error: "Invalid file path", success: false };
+        return { error: 'Invalid file path', success: false };
       }
       try {
-        const content = await fs.readFile(filePath, "utf-8");
+        const content = await fs.readFile(filePath, 'utf-8');
         return { content, success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
           success: false,
         };
       }
@@ -34,14 +34,14 @@ export function registerFsHandlers(): void {
       content: string
     ): Promise<{ error?: string; success: boolean }> => {
       if (!isValidPath(filePath)) {
-        return { error: "Invalid file path", success: false };
+        return { error: 'Invalid file path', success: false };
       }
       try {
-        await fs.writeFile(filePath, content, "utf-8");
+        await fs.writeFile(filePath, content, 'utf-8');
         return { success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
           success: false,
         };
       }
@@ -59,7 +59,7 @@ export function registerFsHandlers(): void {
       success: boolean;
     }> => {
       if (!isValidPath(dirPath)) {
-        return { error: "Invalid directory path", success: false };
+        return { error: 'Invalid directory path', success: false };
       }
       try {
         const dirents = await fs.readdir(dirPath, { withFileTypes: true });
@@ -71,27 +71,24 @@ export function registerFsHandlers(): void {
         return { entries, success: true };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
           success: false,
         };
       }
     }
   );
 
-  ipcMain.handle(
-    IpcChannels.fs.exists,
-    async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
-      if (!isValidPath(filePath)) {
-        return false;
-      }
-      try {
-        await fs.access(filePath);
-        return true;
-      } catch {
-        return false;
-      }
+  ipcMain.handle(IpcChannels.fs.exists, async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
+    if (!isValidPath(filePath)) {
+      return false;
     }
-  );
+    try {
+      await fs.access(filePath);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 
   ipcMain.handle(
     IpcChannels.fs.stat,
@@ -110,7 +107,7 @@ export function registerFsHandlers(): void {
       success: boolean;
     }> => {
       if (!isValidPath(filePath)) {
-        return { error: "Invalid file path", success: false };
+        return { error: 'Invalid file path', success: false };
       }
       try {
         const stats = await fs.stat(filePath);
@@ -126,7 +123,7 @@ export function registerFsHandlers(): void {
         };
       } catch (error) {
         return {
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : 'Unknown error',
           success: false,
         };
       }
@@ -137,5 +134,5 @@ export function registerFsHandlers(): void {
 // Path validation to prevent directory traversal attacks
 function isValidPath(filePath: string): boolean {
   const normalizedPath = path.normalize(filePath);
-  return !normalizedPath.includes("..");
+  return !normalizedPath.includes('..');
 }

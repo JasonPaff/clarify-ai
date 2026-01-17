@@ -1,39 +1,26 @@
 // Re-export database types for renderer use
-export type { NewProject, Project } from "../db/types";
+export type { NewProject, Project } from '../db/types';
 
 export interface ElectronAPI {
   app: {
-    getPath(
-      name:
-        | "appData"
-        | "desktop"
-        | "documents"
-        | "downloads"
-        | "home"
-        | "temp"
-        | "userData"
-    ): Promise<string>;
+    getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
     getVersion(): Promise<string>;
   };
   db: {
     projects: {
-      create(
-        data: import("../db/types").NewProject
-      ): Promise<import("../db/types").Project>;
+      create(data: import('../db/types').NewProject): Promise<import('../db/types').Project>;
       delete(id: number): Promise<boolean>;
-      getAll(): Promise<Array<import("../db/types").Project>>;
-      getById(id: number): Promise<import("../db/types").Project | undefined>;
+      getAll(): Promise<Array<import('../db/types').Project>>;
+      getById(id: number): Promise<import('../db/types').Project | undefined>;
       update(
         id: number,
-        data: Partial<import("../db/types").NewProject>
-      ): Promise<import("../db/types").Project | undefined>;
+        data: Partial<import('../db/types').NewProject>
+      ): Promise<import('../db/types').Project | undefined>;
     };
   };
   dialog: {
     openDirectory(): Promise<null | string>;
-    openFile(
-      filters?: Array<{ extensions: Array<string>; name: string }>
-    ): Promise<null | string>;
+    openFile(filters?: Array<{ extensions: Array<string>; name: string }>): Promise<null | string>;
     saveFile(
       defaultPath?: string,
       filters?: Array<{ extensions: Array<string>; name: string }>
@@ -46,9 +33,7 @@ export interface ElectronAPI {
       error?: string;
       success: boolean;
     }>;
-    readFile(
-      path: string
-    ): Promise<{ content?: string; error?: string; success: boolean }>;
+    readFile(path: string): Promise<{ content?: string; error?: string; success: boolean }>;
     stat(path: string): Promise<{
       error?: string;
       stats?: {
@@ -60,10 +45,7 @@ export interface ElectronAPI {
       };
       success: boolean;
     }>;
-    writeFile(
-      path: string,
-      content: string
-    ): Promise<{ error?: string; success: boolean }>;
+    writeFile(path: string, content: string): Promise<{ error?: string; success: boolean }>;
   };
   store: {
     delete(key: string): Promise<boolean>;

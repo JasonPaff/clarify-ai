@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import type { ComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from 'react';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
-type IconButtonProps = ComponentPropsWithRef<"button">;
+type IconButtonProps = ComponentPropsWithRef<'button'>;
 
 export const IconButton = ({ className, ref, ...props }: IconButtonProps) => {
   return (
@@ -14,7 +14,8 @@ export const IconButton = ({ className, ref, ...props }: IconButtonProps) => {
           inline-flex size-9 items-center justify-center rounded-md
           text-muted-foreground transition-colors
           hover:bg-muted hover:text-foreground
-          focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none
+          focus-visible:ring-2 focus-visible:ring-accent
+          focus-visible:outline-none
           disabled:pointer-events-none disabled:opacity-50
         `,
         className

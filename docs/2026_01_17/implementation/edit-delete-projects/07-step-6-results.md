@@ -20,6 +20,7 @@
 ## Notes
 
 All new dialog components are now exported and can be imported using:
+
 ```typescript
-import { EditProjectDialog, EditProjectForm, DeleteProjectDialog } from "@/components/projects"
+import { EditProjectDialog, EditProjectForm, DeleteProjectDialog } from '@/components/projects';
 ```

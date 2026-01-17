@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { X } from "lucide-react";
-import { useState } from "react";
+import { X } from 'lucide-react';
+import { useState } from 'react';
 
-import type { UpdateProjectFormValues } from "@/lib/validations/project";
+import type { UpdateProjectFormValues } from '@/lib/validations/project';
 
 import {
   DialogBackdrop,
@@ -16,25 +16,22 @@ import {
   DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { IconButton } from "@/components/ui/icon-button";
-import { useUpdateProject } from "@/hooks/queries/use-projects";
+} from '@/components/ui/dialog';
+import { IconButton } from '@/components/ui/icon-button';
+import { useUpdateProject } from '@/hooks/queries/use-projects';
 
-import { EditProjectForm } from "./edit-project-form";
+import { EditProjectForm } from './edit-project-form';
 
 interface EditProjectDialogProps {
   children: ReactNode;
   project: {
-    description: string | null;
+    description: null | string;
     id: number;
     name: string;
   };
 }
 
-export function EditProjectDialog({
-  children,
-  project,
-}: EditProjectDialogProps) {
+export function EditProjectDialog({ children, project }: EditProjectDialogProps) {
   const [open, setOpen] = useState(false);
 
   const updateProject = useUpdateProject();
@@ -59,24 +56,20 @@ export function EditProjectDialog({
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<span className={"inline-flex"} />}>
+      <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
         {children}
       </DialogTrigger>
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>
-          <div className={"relative"}>
-            <DialogClose
-              render={<IconButton className={"absolute -top-2 -right-2"} />}
-            >
-              <X className={"size-4"} />
+          <div className={'relative'}>
+            <DialogClose render={<IconButton className={'absolute -top-2 -right-2'} />}>
+              <X className={'size-4'} />
             </DialogClose>
           </div>
           <DialogTitle>Edit Project</DialogTitle>
-          <DialogDescription>
-            Update your project name and description.
-          </DialogDescription>
-          <div className={"mt-6"}>
+          <DialogDescription>Update your project name and description.</DialogDescription>
+          <div className={'mt-6'}>
             <EditProjectForm
               isSubmitting={updateProject.isPending}
               onCancel={handleCancel}

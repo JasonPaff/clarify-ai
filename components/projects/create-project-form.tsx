@@ -1,11 +1,8 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { useAppForm } from "@/lib/forms";
-import {
-  type CreateProjectFormValues,
-  createProjectSchema,
-} from "@/lib/validations/project";
+import { Button } from '@/components/ui/button';
+import { useAppForm } from '@/lib/forms';
+import { type CreateProjectFormValues, createProjectSchema } from '@/lib/validations/project';
 
 interface CreateProjectFormProps {
   isSubmitting?: boolean;
@@ -13,15 +10,11 @@ interface CreateProjectFormProps {
   onSubmit: (values: CreateProjectFormValues) => Promise<void> | void;
 }
 
-export function CreateProjectForm({
-  isSubmitting,
-  onCancel,
-  onSubmit,
-}: CreateProjectFormProps) {
+export function CreateProjectForm({ isSubmitting, onCancel, onSubmit }: CreateProjectFormProps) {
   const form = useAppForm({
     defaultValues: {
-      description: "",
-      name: "",
+      description: '',
+      name: '',
     },
     onSubmit: async ({ value }) => {
       await onSubmit(value);
@@ -39,40 +32,28 @@ export function CreateProjectForm({
         void form.handleSubmit();
       }}
     >
-      <div className={"flex flex-col gap-4"}>
-        <form.AppField name={"name"}>
-          {(field) => (
-            <field.TextField
-              label={"Project Name"}
-              placeholder={"Enter project name"}
-            />
-          )}
+      <div className={'flex flex-col gap-4'}>
+        <form.AppField name={'name'}>
+          {(field) => <field.TextField label={'Project Name'} placeholder={'Enter project name'} />}
         </form.AppField>
 
-        <form.AppField name={"description"}>
+        <form.AppField name={'description'}>
           {(field) => (
             <field.TextareaField
-              description={"Optional description for your project"}
-              label={"Description"}
-              placeholder={"Describe your project..."}
+              description={'Optional description for your project'}
+              label={'Description'}
+              placeholder={'Describe your project...'}
               rows={4}
             />
           )}
         </form.AppField>
 
-        <div className={"mt-2 flex justify-end gap-3"}>
-          <Button
-            disabled={isSubmitting}
-            onClick={onCancel}
-            type={"button"}
-            variant={"outline"}
-          >
+        <div className={'mt-2 flex justify-end gap-3'}>
+          <Button disabled={isSubmitting} onClick={onCancel} type={'button'} variant={'outline'}>
             Cancel
           </Button>
           <form.AppForm>
-            <form.SubmitButton>
-              {isSubmitting ? "Creating..." : "Create Project"}
-            </form.SubmitButton>
+            <form.SubmitButton>{isSubmitting ? 'Creating...' : 'Create Project'}</form.SubmitButton>
           </form.AppForm>
         </div>
       </div>

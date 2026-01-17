@@ -25,11 +25,11 @@ This orchestration creates a detailed implementation plan through a 3-step proce
 
 ## Summary
 
-| Step | Duration | Files | Status |
-|------|----------|-------|--------|
-| Feature Refinement | ~30s | - | ✅ |
-| File Discovery | ~60s | 41 discovered | ✅ |
-| Implementation Planning | ~60s | 7 steps | ✅ |
+| Step                    | Duration | Files         | Status |
+| ----------------------- | -------- | ------------- | ------ |
+| Feature Refinement      | ~30s     | -             | ✅     |
+| File Discovery          | ~60s     | 41 discovered | ✅     |
+| Implementation Planning | ~60s     | 7 steps       | ✅     |
 
 ## Output
 

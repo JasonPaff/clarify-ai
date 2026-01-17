@@ -1,21 +1,12 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from 'electron';
 
-import type { NewProject, Project } from "../db/schema";
+import type { NewProject, Project } from '../db/schema';
 
-import { IpcChannels } from "./ipc";
+import { IpcChannels } from './ipc';
 
 export interface ElectronAPI {
   app: {
-    getPath(
-      name:
-        | "appData"
-        | "desktop"
-        | "documents"
-        | "downloads"
-        | "home"
-        | "temp"
-        | "userData"
-    ): Promise<string>;
+    getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
     getVersion(): Promise<string>;
   };
   db: {
@@ -24,17 +15,12 @@ export interface ElectronAPI {
       delete(id: number): Promise<boolean>;
       getAll(): Promise<Array<Project>>;
       getById(id: number): Promise<Project | undefined>;
-      update(
-        id: number,
-        data: Partial<NewProject>
-      ): Promise<Project | undefined>;
+      update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
     };
   };
   dialog: {
     openDirectory(): Promise<null | string>;
-    openFile(
-      filters?: Array<{ extensions: Array<string>; name: string }>
-    ): Promise<null | string>;
+    openFile(filters?: Array<{ extensions: Array<string>; name: string }>): Promise<null | string>;
     saveFile(
       defaultPath?: string,
       filters?: Array<{ extensions: Array<string>; name: string }>
@@ -47,9 +33,7 @@ export interface ElectronAPI {
       error?: string;
       success: boolean;
     }>;
-    readFile(
-      path: string
-    ): Promise<{ content?: string; error?: string; success: boolean }>;
+    readFile(path: string): Promise<{ content?: string; error?: string; success: boolean }>;
     stat(path: string): Promise<{
       error?: string;
       stats?: {
@@ -61,10 +45,7 @@ export interface ElectronAPI {
       };
       success: boolean;
     }>;
-    writeFile(
-      path: string,
-      content: string
-    ): Promise<{ error?: string; success: boolean }>;
+    writeFile(path: string, content: string): Promise<{ error?: string; success: boolean }>;
   };
   store: {
     delete(key: string): Promise<boolean>;
@@ -80,37 +61,30 @@ const electronAPI: ElectronAPI = {
   },
   db: {
     projects: {
-      create: (data) =>
-        ipcRenderer.invoke(IpcChannels.db.projects.create, data),
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.projects.create, data),
       delete: (id) => ipcRenderer.invoke(IpcChannels.db.projects.delete, id),
       getAll: () => ipcRenderer.invoke(IpcChannels.db.projects.getAll),
       getById: (id) => ipcRenderer.invoke(IpcChannels.db.projects.getById, id),
-      update: (id, data) =>
-        ipcRenderer.invoke(IpcChannels.db.projects.update, id, data),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.projects.update, id, data),
     },
   },
   dialog: {
     openDirectory: () => ipcRenderer.invoke(IpcChannels.dialog.openDirectory),
-    openFile: (filters) =>
-      ipcRenderer.invoke(IpcChannels.dialog.openFile, filters),
-    saveFile: (defaultPath, filters) =>
-      ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
+    openFile: (filters) => ipcRenderer.invoke(IpcChannels.dialog.openFile, filters),
+    saveFile: (defaultPath, filters) => ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
   },
   fs: {
     exists: (path) => ipcRenderer.invoke(IpcChannels.fs.exists, path),
-    readDirectory: (path) =>
-      ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
+    readDirectory: (path) => ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
     readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),
     stat: (path) => ipcRenderer.invoke(IpcChannels.fs.stat, path),
-    writeFile: (path, content) =>
-      ipcRenderer.invoke(IpcChannels.fs.writeFile, path, content),
+    writeFile: (path, content) => ipcRenderer.invoke(IpcChannels.fs.writeFile, path, content),
   },
   store: {
     delete: (key) => ipcRenderer.invoke(IpcChannels.store.delete, key),
-    get: <T>(key: string) =>
-      ipcRenderer.invoke(IpcChannels.store.get, key) as Promise<T | undefined>,
+    get: <T>(key: string) => ipcRenderer.invoke(IpcChannels.store.get, key) as Promise<T | undefined>,
     set: (key, value) => ipcRenderer.invoke(IpcChannels.store.set, key, value),
   },
 };
 
-contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+contextBridge.exposeInMainWorld('electronAPI', electronAPI);

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
-import { AppShell } from "@/components/layout/app-shell";
-import { ContentArea } from "@/components/layout/content-area";
-import { useElectronDb } from "@/hooks/useElectron";
-import { projectKeys } from "@/lib/queries/projects";
+import { AppShell } from '@/components/layout/app-shell';
+import { ContentArea } from '@/components/layout/content-area';
+import { useElectronDb } from '@/hooks/useElectron';
+import { projectKeys } from '@/lib/queries/projects';
 
 type AppLayoutProps = RequiredChildren;
 

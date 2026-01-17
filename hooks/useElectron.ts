@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from 'react';
 
-import type { ElectronAPI } from "@/types/electron";
+import type { ElectronAPI } from '@/types/electron';
 
 interface UseElectronResult {
   api: ElectronAPI | null;
@@ -11,14 +11,14 @@ interface UseElectronResult {
 
 export function useElectron(): UseElectronResult {
   const isElectron = useMemo(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return false;
     }
     return window.electronAPI !== undefined;
   }, []);
 
   const api = useMemo(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return null;
     }
     return window.electronAPI ?? null;
@@ -37,14 +37,7 @@ export function useElectronApp() {
 
   const getPath = useCallback(
     async (
-      name:
-        | "appData"
-        | "desktop"
-        | "documents"
-        | "downloads"
-        | "home"
-        | "temp"
-        | "userData"
+      name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'
     ): Promise<null | string> => {
       if (!api) return null;
       return api.app.getPath(name);
@@ -64,14 +57,12 @@ export function useElectronDb() {
 
   const projects = useMemo(
     () => ({
-      create: (
-        data: Parameters<NonNullable<typeof api>["db"]["projects"]["create"]>[0]
-      ) => {
-        if (!api) throw new Error("Electron API not available");
+      create: (data: Parameters<NonNullable<typeof api>['db']['projects']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
         return api.db.projects.create(data);
       },
       delete: (id: number) => {
-        if (!api) throw new Error("Electron API not available");
+        if (!api) throw new Error('Electron API not available');
         return api.db.projects.delete(id);
       },
       getAll: () => api?.db.projects.getAll() ?? Promise.resolve([]),
@@ -79,11 +70,8 @@ export function useElectronDb() {
         if (!api) return Promise.resolve(undefined);
         return api.db.projects.getById(id);
       },
-      update: (
-        id: number,
-        data: Parameters<NonNullable<typeof api>["db"]["projects"]["update"]>[1]
-      ) => {
-        if (!api) throw new Error("Electron API not available");
+      update: (id: number, data: Parameters<NonNullable<typeof api>['db']['projects']['update']>[1]) => {
+        if (!api) throw new Error('Electron API not available');
         return api.db.projects.update(id, data);
       },
     }),
@@ -102,9 +90,7 @@ export function useElectronDialog() {
   }, [api]);
 
   const openFile = useCallback(
-    async (
-      filters?: Array<{ extensions: Array<string>; name: string }>
-    ): Promise<null | string> => {
+    async (filters?: Array<{ extensions: Array<string>; name: string }>): Promise<null | string> => {
       if (!api) return null;
       return api.dialog.openFile(filters);
     },
@@ -134,21 +120,16 @@ export function useElectronFs() {
   const { api, isElectron } = useElectron();
 
   const readFile = useCallback(
-    async (
-      path: string
-    ): Promise<{ content?: string; error?: string; success: boolean }> => {
-      if (!api) return { error: "Not running in Electron", success: false };
+    async (path: string): Promise<{ content?: string; error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
       return api.fs.readFile(path);
     },
     [api]
   );
 
   const writeFile = useCallback(
-    async (
-      path: string,
-      content: string
-    ): Promise<{ error?: string; success: boolean }> => {
-      if (!api) return { error: "Not running in Electron", success: false };
+    async (path: string, content: string): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
       return api.fs.writeFile(path, content);
     },
     [api]
@@ -162,7 +143,7 @@ export function useElectronFs() {
       error?: string;
       success: boolean;
     }> => {
-      if (!api) return { error: "Not running in Electron", success: false };
+      if (!api) return { error: 'Not running in Electron', success: false };
       return api.fs.readDirectory(path);
     },
     [api]
@@ -190,7 +171,7 @@ export function useElectronFs() {
       };
       success: boolean;
     }> => {
-      if (!api) return { error: "Not running in Electron", success: false };
+      if (!api) return { error: 'Not running in Electron', success: false };
       return api.fs.stat(path);
     },
     [api]

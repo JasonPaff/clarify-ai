@@ -18,6 +18,7 @@ Use Skill tool: react-coding-conventions
 ```
 
 These load the complete conventions references that you MUST follow:
+
 - `tanstack-form-base-components` - Field/form component architecture, CVA styling, accessibility, registration
 - `react-coding-conventions` - Code style, component structure, naming conventions, TypeScript patterns
 
@@ -37,6 +38,7 @@ When given a natural language request for a base form component, follow this wor
 ### Step 1: Load Conventions
 
 Invoke both convention skills to load all project conventions:
+
 1. `tanstack-form-base-components` - Base component-specific patterns
 2. `react-coding-conventions` - General React/TypeScript patterns
 
@@ -60,12 +62,14 @@ Invoke both convention skills to load all project conventions:
 ### Step 4: Determine Component Category
 
 **Field Components** (bind to form field state):
+
 - Use `useFieldContext<T>()` hook
 - Handle value, onChange, onBlur
 - Display validation errors
 - Register in `fieldComponents`
 
 **Form Components** (access form state):
+
 - Use `useFormContext()` hook
 - Subscribe to form state with `form.Subscribe`
 - Handle form-level concerns
@@ -205,6 +209,7 @@ const field = useFieldContext<string[]>();
 Use the correct event binding pattern:
 
 **Text inputs**:
+
 ```typescript
 onBlur={field.handleBlur}
 onChange={(e) => field.handleChange(e.target.value)}
@@ -212,12 +217,14 @@ value={field.state.value ?? ""}
 ```
 
 **Boolean inputs**:
+
 ```typescript
 checked={field.state.value ?? false}
 onCheckedChange={(checked) => field.handleChange(checked)}
 ```
 
 **Number inputs**:
+
 ```typescript
 onBlur={field.handleBlur}
 onValueChange={(value) => field.handleChange(value)}
@@ -225,6 +232,7 @@ value={field.state.value}
 ```
 
 **Select inputs**:
+
 ```typescript
 onOpenChange={(open) => {
   if (!open) {
@@ -275,13 +283,14 @@ return (
 Add the component to `lib/forms/form-hook.ts`:
 
 **For Field Components**:
+
 ```typescript
-import { MyField } from "@/components/ui/form/my-field";
+import { MyField } from '@/components/ui/form/my-field';
 
 export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     CheckboxField,
-    MyField,        // Add here (alphabetical)
+    MyField, // Add here (alphabetical)
     NumberField: NumberFieldComponent,
     SelectField,
     // ...
@@ -291,14 +300,15 @@ export const { useAppForm, withForm } = createFormHook({
 ```
 
 **For Form Components**:
+
 ```typescript
-import { MyFormComponent } from "@/components/ui/form/my-form-component";
+import { MyFormComponent } from '@/components/ui/form/my-form-component';
 
 export const { useAppForm, withForm } = createFormHook({
   // ...
   formComponents: {
     FormError,
-    MyFormComponent,  // Add here (alphabetical)
+    MyFormComponent, // Add here (alphabetical)
     SubmitButton,
   },
   // ...
@@ -310,7 +320,7 @@ export const { useAppForm, withForm } = createFormHook({
 Add exports to `components/ui/form/index.ts`:
 
 ```typescript
-export { MyField, myFieldVariants } from "./my-field";
+export { MyField, myFieldVariants } from './my-field';
 ```
 
 Keep exports in alphabetical order.

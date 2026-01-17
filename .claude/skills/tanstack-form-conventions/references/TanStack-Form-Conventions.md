@@ -61,16 +61,13 @@ components/
 Use the custom `useAppForm` hook for all forms:
 
 ```typescript
-import { useAppForm } from "@/lib/forms";
-import {
-  type CreateProjectFormValues,
-  createProjectSchema,
-} from "@/lib/validations/project";
+import { useAppForm } from '@/lib/forms';
+import { type CreateProjectFormValues, createProjectSchema } from '@/lib/validations/project';
 
 const form = useAppForm({
   defaultValues: {
-    description: "",
-    name: "",
+    description: '',
+    name: '',
   },
   onSubmit: async ({ value }) => {
     await onSubmit(value);
@@ -83,11 +80,11 @@ const form = useAppForm({
 
 ### Required Configuration Options
 
-| Option          | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| `defaultValues` | Initial form values matching the validation schema   |
-| `onSubmit`      | Async callback receiving `{ value }` with form data  |
-| `validators`    | Object with `onSubmit` key containing Zod schema     |
+| Option          | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `defaultValues` | Initial form values matching the validation schema  |
+| `onSubmit`      | Async callback receiving `{ value }` with form data |
+| `validators`    | Object with `onSubmit` key containing Zod schema    |
 
 ### Default Values Rules
 
@@ -128,15 +125,15 @@ For single-line text input (text, email, password, URL).
 
 **Props**:
 
-| Prop          | Type                                   | Required | Description                    |
-| ------------- | -------------------------------------- | -------- | ------------------------------ |
-| `label`       | `string`                               | Yes      | Field label text               |
-| `placeholder` | `string`                               | No       | Input placeholder text         |
-| `description` | `string`                               | No       | Helper text below input        |
-| `type`        | `"text" \| "email" \| "password" \| "url"` | No   | Input type (default: "text")   |
-| `size`        | `"sm" \| "default" \| "lg"`            | No       | Field size variant             |
-| `disabled`    | `boolean`                              | No       | Disable the input              |
-| `className`   | `string`                               | No       | Additional CSS classes         |
+| Prop          | Type                                       | Required | Description                  |
+| ------------- | ------------------------------------------ | -------- | ---------------------------- |
+| `label`       | `string`                                   | Yes      | Field label text             |
+| `placeholder` | `string`                                   | No       | Input placeholder text       |
+| `description` | `string`                                   | No       | Helper text below input      |
+| `type`        | `"text" \| "email" \| "password" \| "url"` | No       | Input type (default: "text") |
+| `size`        | `"sm" \| "default" \| "lg"`                | No       | Field size variant           |
+| `disabled`    | `boolean`                                  | No       | Disable the input            |
+| `className`   | `string`                                   | No       | Additional CSS classes       |
 
 ### TextareaField
 
@@ -157,15 +154,15 @@ For multi-line text input.
 
 **Props**:
 
-| Prop          | Type                        | Required | Description                    |
-| ------------- | --------------------------- | -------- | ------------------------------ |
-| `label`       | `string`                    | Yes      | Field label text               |
-| `placeholder` | `string`                    | No       | Input placeholder text         |
-| `description` | `string`                    | No       | Helper text below input        |
+| Prop          | Type                        | Required | Description                         |
+| ------------- | --------------------------- | -------- | ----------------------------------- |
+| `label`       | `string`                    | Yes      | Field label text                    |
+| `placeholder` | `string`                    | No       | Input placeholder text              |
+| `description` | `string`                    | No       | Helper text below input             |
 | `rows`        | `number`                    | No       | Number of visible rows (default: 3) |
-| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant             |
-| `disabled`    | `boolean`                   | No       | Disable the input              |
-| `className`   | `string`                    | No       | Additional CSS classes         |
+| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant                  |
+| `disabled`    | `boolean`                   | No       | Disable the input                   |
+| `className`   | `string`                    | No       | Additional CSS classes              |
 
 ### SelectField
 
@@ -189,15 +186,15 @@ For dropdown selection from predefined options.
 
 **Props**:
 
-| Prop          | Type                        | Required | Description                       |
-| ------------- | --------------------------- | -------- | --------------------------------- |
-| `label`       | `string`                    | Yes      | Field label text                  |
+| Prop          | Type                        | Required | Description                          |
+| ------------- | --------------------------- | -------- | ------------------------------------ |
+| `label`       | `string`                    | Yes      | Field label text                     |
 | `options`     | `Array<SelectOption>`       | Yes      | Array of { label, value, disabled? } |
-| `placeholder` | `string`                    | No       | Placeholder when no selection     |
-| `description` | `string`                    | No       | Helper text below select          |
-| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant                |
-| `disabled`    | `boolean`                   | No       | Disable the select                |
-| `className`   | `string`                    | No       | Additional CSS classes            |
+| `placeholder` | `string`                    | No       | Placeholder when no selection        |
+| `description` | `string`                    | No       | Helper text below select             |
+| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant                   |
+| `disabled`    | `boolean`                   | No       | Disable the select                   |
+| `className`   | `string`                    | No       | Additional CSS classes               |
 
 **SelectOption Interface**:
 
@@ -226,13 +223,13 @@ For boolean toggle with checkbox UI.
 
 **Props**:
 
-| Prop          | Type                        | Required | Description                    |
-| ------------- | --------------------------- | -------- | ------------------------------ |
-| `label`       | `string`                    | Yes      | Field label text               |
-| `description` | `string`                    | No       | Helper text below checkbox     |
-| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant             |
-| `disabled`    | `boolean`                   | No       | Disable the checkbox           |
-| `className`   | `string`                    | No       | Additional CSS classes         |
+| Prop          | Type                        | Required | Description                |
+| ------------- | --------------------------- | -------- | -------------------------- |
+| `label`       | `string`                    | Yes      | Field label text           |
+| `description` | `string`                    | No       | Helper text below checkbox |
+| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant         |
+| `disabled`    | `boolean`                   | No       | Disable the checkbox       |
+| `className`   | `string`                    | No       | Additional CSS classes     |
 
 ### SwitchField
 
@@ -251,13 +248,13 @@ For boolean toggle with switch UI.
 
 **Props**:
 
-| Prop          | Type                        | Required | Description                    |
-| ------------- | --------------------------- | -------- | ------------------------------ |
-| `label`       | `string`                    | Yes      | Field label text               |
-| `description` | `string`                    | No       | Helper text below switch       |
-| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant             |
-| `disabled`    | `boolean`                   | No       | Disable the switch             |
-| `className`   | `string`                    | No       | Additional CSS classes         |
+| Prop          | Type                        | Required | Description              |
+| ------------- | --------------------------- | -------- | ------------------------ |
+| `label`       | `string`                    | Yes      | Field label text         |
+| `description` | `string`                    | No       | Helper text below switch |
+| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant       |
+| `disabled`    | `boolean`                   | No       | Disable the switch       |
+| `className`   | `string`                    | No       | Additional CSS classes   |
 
 ### NumberField
 
@@ -278,16 +275,16 @@ For numeric input with increment/decrement buttons.
 
 **Props**:
 
-| Prop          | Type                        | Required | Description                    |
-| ------------- | --------------------------- | -------- | ------------------------------ |
-| `label`       | `string`                    | Yes      | Field label text               |
-| `min`         | `number`                    | No       | Minimum allowed value          |
-| `max`         | `number`                    | No       | Maximum allowed value          |
+| Prop          | Type                        | Required | Description                           |
+| ------------- | --------------------------- | -------- | ------------------------------------- |
+| `label`       | `string`                    | Yes      | Field label text                      |
+| `min`         | `number`                    | No       | Minimum allowed value                 |
+| `max`         | `number`                    | No       | Maximum allowed value                 |
 | `step`        | `number`                    | No       | Increment/decrement step (default: 1) |
-| `description` | `string`                    | No       | Helper text below input        |
-| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant             |
-| `disabled`    | `boolean`                   | No       | Disable the input              |
-| `className`   | `string`                    | No       | Additional CSS classes         |
+| `description` | `string`                    | No       | Helper text below input               |
+| `size`        | `"sm" \| "default" \| "lg"` | No       | Field size variant                    |
+| `disabled`    | `boolean`                   | No       | Disable the input                     |
+| `className`   | `string`                    | No       | Additional CSS classes                |
 
 ---
 
@@ -299,14 +296,11 @@ Define Zod schemas in `lib/validations/{entity}.ts`:
 
 ```typescript
 // lib/validations/project.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createProjectSchema = z.object({
   description: z.string(),
-  name: z
-    .string()
-    .min(1, "Project name is required")
-    .max(255, "Project name is too long"),
+  name: z.string().min(1, 'Project name is required').max(255, 'Project name is too long'),
 });
 
 export type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
@@ -323,28 +317,28 @@ export type CreateProjectFormValues = z.infer<typeof createProjectSchema>;
 
 ```typescript
 // Required string
-name: z.string().min(1, "Name is required")
+name: z.string().min(1, 'Name is required');
 
 // Optional string (empty string allowed)
-description: z.string()
+description: z.string();
 
 // Required email
-email: z.string().min(1, "Email is required").email("Invalid email address")
+email: z.string().min(1, 'Email is required').email('Invalid email address');
 
 // Required URL
-url: z.string().min(1, "URL is required").url("Invalid URL")
+url: z.string().min(1, 'URL is required').url('Invalid URL');
 
 // Required number with range
-priority: z.number().min(1, "Minimum priority is 1").max(10, "Maximum priority is 10")
+priority: z.number().min(1, 'Minimum priority is 1').max(10, 'Maximum priority is 10');
 
 // Optional number (nullable)
-count: z.number().nullable()
+count: z.number().nullable();
 
 // Required boolean
-isEnabled: z.boolean()
+isEnabled: z.boolean();
 
 // Required select (non-empty string)
-category: z.string().min(1, "Please select a category")
+category: z.string().min(1, 'Please select a category');
 ```
 
 ---
@@ -460,6 +454,7 @@ export function CreateEntityForm({
 ### SubmitButton Component
 
 The `SubmitButton` component automatically handles:
+
 - Disabled state when form can't submit or is submitting
 - Loading text during submission
 - Proper button variants
@@ -488,12 +483,12 @@ The `SubmitButton` must be wrapped in `form.AppForm` to access form context:
 
 ### SubmitButton Props
 
-| Prop        | Type                        | Required | Description              |
-| ----------- | --------------------------- | -------- | ------------------------ |
-| `children`  | `ReactNode`                 | Yes      | Button label             |
-| `variant`   | `ButtonVariant`             | No       | Button style variant     |
-| `size`      | `"sm" \| "default" \| "lg"` | No       | Button size              |
-| `className` | `string`                    | No       | Additional CSS classes   |
+| Prop        | Type                        | Required | Description            |
+| ----------- | --------------------------- | -------- | ---------------------- |
+| `children`  | `ReactNode`                 | Yes      | Button label           |
+| `variant`   | `ButtonVariant`             | No       | Button style variant   |
+| `size`      | `"sm" \| "default" \| "lg"` | No       | Button size            |
+| `className` | `string`                    | No       | Additional CSS classes |
 
 ---
 
@@ -530,7 +525,7 @@ const form = useAppForm({
       await onSubmit(value);
     } catch (error) {
       // This will display in FormError component
-      throw new Error("Failed to create project. Please try again.");
+      throw new Error('Failed to create project. Please try again.');
     }
   },
 });
@@ -554,11 +549,11 @@ interface {Entity}FormProps {
 
 ### Props Explanation
 
-| Prop           | Type                                    | Purpose                              |
-| -------------- | --------------------------------------- | ------------------------------------ |
-| `isSubmitting` | `boolean \| undefined`                  | External loading state (from dialog) |
-| `onCancel`     | `() => void`                            | Cancel button handler                |
-| `onSubmit`     | `(values) => Promise<void> \| void`     | Form submission handler              |
+| Prop           | Type                                | Purpose                              |
+| -------------- | ----------------------------------- | ------------------------------------ |
+| `isSubmitting` | `boolean \| undefined`              | External loading state (from dialog) |
+| `onCancel`     | `() => void`                        | Cancel button handler                |
+| `onSubmit`     | `(values) => Promise<void> \| void` | Form submission handler              |
 
 ### Why External isSubmitting?
 
@@ -678,14 +673,11 @@ export function CreateProjectForm({
 
 ```typescript
 // lib/validations/project.ts
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createProjectSchema = z.object({
   description: z.string(),
-  name: z
-    .string()
-    .min(1, "Project name is required")
-    .max(255, "Project name is too long"),
+  name: z.string().min(1, 'Project name is required').max(255, 'Project name is too long'),
 });
 
 export type CreateProjectFormValues = z.infer<typeof createProjectSchema>;

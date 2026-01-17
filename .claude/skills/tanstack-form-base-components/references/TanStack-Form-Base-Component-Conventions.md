@@ -81,26 +81,21 @@ Form components are form-level components that access overall form state. They:
 ### Required Imports
 
 ```typescript
-"use client";
+'use client';
 
-import type { ComponentProps } from "react"; // If needed for icon wrappers
+import type { ComponentProps } from 'react'; // If needed for icon wrappers
 
-import { SomeBaseUIComponent } from "@base-ui/react/component";
-import { cva, type VariantProps } from "class-variance-authority";
-import { SomeIcon } from "lucide-react";
-import { useId } from "react";
+import { SomeBaseUIComponent } from '@base-ui/react/component';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { SomeIcon } from 'lucide-react';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
 // OR for custom layouts:
-import {
-  descriptionVariants,
-  errorVariants,
-  getAriaDescribedBy,
-  labelVariants,
-} from "./field-wrapper";
+import { descriptionVariants, errorVariants, getAriaDescribedBy, labelVariants } from './field-wrapper';
 ```
 
 ### CVA Variant Definition
@@ -118,13 +113,13 @@ export const myFieldVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "h-9 px-3 text-sm",
-        lg: "h-10 px-4 text-base",
-        sm: "h-8 px-2 text-xs",
+        default: 'h-9 px-3 text-sm',
+        lg: 'h-10 px-4 text-base',
+        sm: 'h-8 px-2 text-xs',
       },
     },
   }
@@ -135,11 +130,11 @@ export const myFieldVariants = cva(
 
 All field components must support three size variants:
 
-| Size      | Typical Height | Text Size  | Padding     |
-| --------- | -------------- | ---------- | ----------- |
-| `sm`      | `h-8`          | `text-xs`  | `px-2`      |
-| `default` | `h-9`          | `text-sm`  | `px-3`      |
-| `lg`      | `h-10`         | `text-base`| `px-4`      |
+| Size      | Typical Height | Text Size   | Padding |
+| --------- | -------------- | ----------- | ------- |
+| `sm`      | `h-8`          | `text-xs`   | `px-2`  |
+| `default` | `h-9`          | `text-sm`   | `px-3`  |
+| `lg`      | `h-10`         | `text-base` | `px-4`  |
 
 ### Props Type Definition
 
@@ -235,6 +230,7 @@ const hasError = Boolean(error);
 ### Event Binding Patterns
 
 **Text inputs**:
+
 ```typescript
 onBlur={field.handleBlur}
 onChange={(e) => field.handleChange(e.target.value)}
@@ -242,12 +238,14 @@ value={field.state.value ?? ""}
 ```
 
 **Boolean inputs (checkbox, switch)**:
+
 ```typescript
 checked={field.state.value ?? false}
 onCheckedChange={(checked) => field.handleChange(checked)}
 ```
 
 **Number inputs**:
+
 ```typescript
 onBlur={field.handleBlur}
 onValueChange={(value) => field.handleChange(value)}
@@ -255,6 +253,7 @@ value={field.state.value}
 ```
 
 **Select inputs**:
+
 ```typescript
 onOpenChange={(open) => {
   if (!open) {
@@ -343,10 +342,10 @@ export function CheckboxField({
 
 When label is inline with input (checkbox, switch), add left padding to description/error:
 
-| Component   | Padding Class |
-| ----------- | ------------- |
-| Checkbox    | `pl-6`        |
-| Switch      | `pl-11`       |
+| Component | Padding Class |
+| --------- | ------------- |
+| Checkbox  | `pl-6`        |
+| Switch    | `pl-11`       |
 
 ---
 
@@ -527,6 +526,7 @@ aria-describedby={getAriaDescribedBy(
 ```
 
 This function returns:
+
 - `errorId` when there's an error
 - `descriptionId` when there's a description but no error
 - `undefined` when neither exists
@@ -547,26 +547,26 @@ Use Base UI primitives when:
 
 ```typescript
 // Checkbox
-import { Checkbox } from "@base-ui/react/checkbox";
+import { Checkbox } from '@base-ui/react/checkbox';
 // <Checkbox.Root>, <Checkbox.Indicator>
 
 // Switch
-import { Switch } from "@base-ui/react/switch";
+import { Switch } from '@base-ui/react/switch';
 // <Switch.Root>, <Switch.Thumb>
 
 // Select
-import { Select } from "@base-ui/react/select";
+import { Select } from '@base-ui/react/select';
 // <Select.Root>, <Select.Trigger>, <Select.Value>, <Select.Icon>
 // <Select.Portal>, <Select.Positioner>, <Select.Popup>
 // <Select.Item>, <Select.ItemIndicator>, <Select.ItemText>
 
 // NumberField
-import { NumberField } from "@base-ui/react/number-field";
+import { NumberField } from '@base-ui/react/number-field';
 // <NumberField.Root>, <NumberField.Group>
 // <NumberField.Decrement>, <NumberField.Input>, <NumberField.Increment>
 
 // Input (for simple text inputs)
-import { Input } from "@base-ui/react/input";
+import { Input } from '@base-ui/react/input';
 ```
 
 ### Base UI Data Attributes
@@ -604,12 +604,12 @@ data-ending-style:opacity-0
 Add field components to `fieldComponents` in `lib/forms/form-hook.ts`:
 
 ```typescript
-import { MyField } from "@/components/ui/form/my-field";
+import { MyField } from '@/components/ui/form/my-field';
 
 export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     CheckboxField,
-    MyField,        // Add new field component here
+    MyField, // Add new field component here
     NumberField: NumberFieldComponent,
     SelectField,
     SwitchField,
@@ -637,7 +637,7 @@ export const { useAppForm, withForm } = createFormHook({
   fieldContext,
   formComponents: {
     FormError,
-    MyFormComponent,  // Add new form component here
+    MyFormComponent, // Add new form component here
     SubmitButton,
   },
   formContext,
@@ -658,14 +658,10 @@ Export all new components and their variants from `components/ui/form/index.ts`:
 
 ```typescript
 // Export component and variants
-export { MyField, myFieldVariants } from "./my-field";
+export { MyField, myFieldVariants } from './my-field';
 
 // For components with multiple variants
-export {
-  MyField,
-  myFieldIndicatorVariants,
-  myFieldVariants,
-} from "./my-field";
+export { MyField, myFieldIndicatorVariants, myFieldVariants } from './my-field';
 ```
 
 ### Export Order

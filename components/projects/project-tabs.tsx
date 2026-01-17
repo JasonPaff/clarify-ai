@@ -1,15 +1,10 @@
-"use client";
+'use client';
 
-import { $path } from "next-typesafe-url";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import {
-  TabsIndicator,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { TabsIndicator, TabsList, TabsRoot, TabsTrigger } from '@/components/ui/tabs';
 
 interface ProjectTabsProps {
   projectId: number;
@@ -21,33 +16,32 @@ export function ProjectTabs({ projectId }: ProjectTabsProps) {
   const tabs = [
     {
       href: $path({
-        route: "/projects/[projectId]/features",
+        route: '/projects/[projectId]/features',
         routeParams: { projectId },
       }),
-      label: "Features",
-      value: "features",
+      label: 'Features',
+      value: 'features',
     },
     {
       href: $path({
-        route: "/projects/[projectId]/repositories",
+        route: '/projects/[projectId]/repositories',
         routeParams: { projectId },
       }),
-      label: "Repositories",
-      value: "repositories",
+      label: 'Repositories',
+      value: 'repositories',
     },
     {
       href: $path({
-        route: "/projects/[projectId]/settings",
+        route: '/projects/[projectId]/settings',
         routeParams: { projectId },
       }),
-      label: "Settings",
-      value: "settings",
+      label: 'Settings',
+      value: 'settings',
     },
   ] as const;
 
   // Determine active tab from pathname
-  const activeTab =
-    tabs.find((tab) => pathname.startsWith(tab.href))?.value ?? "features";
+  const activeTab = tabs.find((tab) => pathname.startsWith(tab.href))?.value ?? 'features';
 
   return (
     <TabsRoot value={activeTab}>

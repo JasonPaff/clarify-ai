@@ -32,9 +32,11 @@ This plan implements a modal dialog for creating new projects on the projects pa
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/ui/dialog.tsx` - Reusable dialog component with backdrop, popup, title, description, and close button sub-components
 
 **Changes:**
+
 - Import Dialog components from `@base-ui/react/dialog`
 - Define CVA variants for `dialogBackdropVariants` (overlay styling with opacity, blur)
 - Define CVA variants for `dialogPopupVariants` (sizing: sm, default, lg; rounded corners, shadow, background)
@@ -43,11 +45,13 @@ This plan implements a modal dialog for creating new projects on the projects pa
 - Add tw-animate-css utilities for open/close animations (animate-in, animate-out, fade-in, fade-out, zoom-in, zoom-out)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog component file created with proper TypeScript types
 - [ ] All CVA variants compile without errors
 - [ ] Component exports are properly typed with `ComponentPropsWithRef`
@@ -62,9 +66,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/validations/project.ts` - Zod schema for project creation form
 
 **Changes:**
+
 - Import `z` from Zod
 - Define `createProjectSchema` with:
   - `name`: `z.string().min(1, "Project name is required").max(255, "Project name is too long")`
@@ -73,11 +79,13 @@ pnpm lint && pnpm typecheck
 - Ensure schema alignment with `NewProject` type from `db/schema/projects.schema.ts`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema correctly validates required `name` field
 - [ ] Schema allows optional `description` field
 - [ ] Inferred type is compatible with `NewProject` type
@@ -92,9 +100,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/projects/create-project-form.tsx` - Form component for creating a new project
 
 **Changes:**
+
 - Import `useAppForm` from `lib/forms/form-hook.ts`
 - Import field components: `TextField`, `TextareaField`, `SubmitButton` from form infrastructure
 - Import `createProjectSchema` from validation schema file
@@ -107,11 +117,13 @@ pnpm lint && pnpm typecheck
 - Handle form submission to invoke the mutation function passed via props
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form renders name and description fields correctly
 - [ ] Validation errors display inline using field wrapper error states
 - [ ] Submit button shows loading state during submission
@@ -127,9 +139,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/projects/new-project-dialog.tsx` - Complete dialog component combining dialog UI and form
 
 **Changes:**
+
 - Import Dialog components from `components/ui/dialog.tsx`
 - Import `CreateProjectForm` component
 - Import `useCreateProject` from `hooks/queries/use-projects.ts`
@@ -148,11 +162,13 @@ pnpm lint && pnpm typecheck
 - Ensure proper focus management by leveraging Base UI's built-in dialog focus trap
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens and closes correctly
 - [ ] Form submission triggers project creation via IPC
 - [ ] Successful creation navigates to new project page
@@ -169,20 +185,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/page.tsx` - Integrate NewProjectDialog into page
 
 **Changes:**
+
 - Import `NewProjectDialog` component
 - Replace header action Button with `NewProjectDialog` component, passing Button as trigger child
 - Replace empty state action Button with `NewProjectDialog` component, passing Button as trigger child
 - Ensure both trigger buttons maintain existing styling and icon (Plus icon)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Header "New Project" button opens dialog
 - [ ] Empty state "Create your first project" button opens dialog
 - [ ] Dialog functionality works correctly from both entry points
@@ -198,22 +218,27 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/ui/index.ts` - UI components barrel export (if not exists, create; otherwise modify)
 
 **Files to Modify:**
+
 - `components/projects/index.ts` - Add NewProjectDialog export (create if not exists)
 
 **Changes:**
+
 - Export all dialog components and variants from `components/ui/dialog.tsx`
 - Export `NewProjectDialog` from projects components index
 - Export `CreateProjectForm` for potential reuse
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog components importable from `@/components/ui`
 - [ ] Project dialog components importable from `@/components/projects`
 - [ ] All validation commands pass
@@ -227,9 +252,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None (testing step)
 
 **Changes:**
+
 - Run `pnpm electron:dev` to start the application
 - Navigate to Projects page
 - Test dialog opening from header button
@@ -241,11 +268,13 @@ pnpm lint && pnpm typecheck
 - Test keyboard navigation (Tab through form fields)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens with smooth animation
 - [ ] Form validation prevents empty name submission
 - [ ] Error messages display correctly
@@ -271,16 +300,19 @@ pnpm lint && pnpm typecheck
 ## Notes
 
 **Architecture Decisions:**
+
 - Dialog component is created as a reusable primitive in `components/ui/` to allow future reuse for other dialogs (confirmation, edit, delete)
 - Form component separated from dialog for potential standalone use and testing
 - Zod schema placed in `lib/validations/` to establish a pattern for form validations
 - Controlled dialog state managed within `NewProjectDialog` component rather than lifting to page level
 
 **Assumptions Requiring Confirmation:**
+
 - Base UI Dialog handles focus trapping and restoration automatically (confirmed in documentation)
 - `useCreateProject` mutation returns the created project with its ID for navigation
 
 **Key File Dependencies:**
+
 - `db/schema/projects.schema.ts` - Defines `NewProject` type
 - `hooks/queries/use-projects.ts` - Provides `useCreateProject` mutation
 - `lib/forms/form-hook.ts` - Provides `useAppForm` and form context

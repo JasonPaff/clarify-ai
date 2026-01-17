@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Select } from "@base-ui/react/select";
-import { cva, type VariantProps } from "class-variance-authority";
-import { Check, ChevronDown } from "lucide-react";
-import { useId } from "react";
+import { Select } from '@base-ui/react/select';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Check, ChevronDown } from 'lucide-react';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
+import { useFieldContext } from '@/lib/forms/form-hook';
 
-import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
 
 export const selectTriggerVariants = cva(
   `
@@ -19,13 +19,13 @@ export const selectTriggerVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "h-9 px-3 text-sm",
-        lg: "h-10 px-4 text-base",
-        sm: "h-8 px-2 text-xs",
+        default: 'h-9 px-3 text-sm',
+        lg: 'h-10 px-4 text-base',
+        sm: 'h-8 px-2 text-xs',
       },
     },
   }
@@ -40,13 +40,13 @@ export const selectPopupVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "text-sm",
-        lg: "text-base",
-        sm: "text-xs",
+        default: 'text-sm',
+        lg: 'text-base',
+        sm: 'text-xs',
       },
     },
   }
@@ -61,13 +61,13 @@ export const selectItemVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "text-sm",
-        lg: "text-base",
-        sm: "text-xs",
+        default: 'text-sm',
+        lg: 'text-base',
+        sm: 'text-xs',
       },
     },
   }
@@ -94,7 +94,7 @@ export function SelectField({
   disabled,
   label,
   options,
-  placeholder = "Select an option",
+  placeholder = 'Select an option',
   size,
 }: SelectFieldProps) {
   const field = useFieldContext<string>();
@@ -124,23 +124,18 @@ export function SelectField({
             field.handleBlur();
           }
         }}
-        onValueChange={(value) => field.handleChange(value ?? "")}
+        onValueChange={(value) => field.handleChange(value ?? '')}
         value={field.state.value}
       >
         <Select.Trigger
-          aria-describedby={getAriaDescribedBy(
-            descriptionId,
-            errorId,
-            Boolean(description),
-            hasError
-          )}
+          aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
           aria-invalid={hasError || undefined}
           className={selectTriggerVariants({ size })}
           id={id}
         >
           <Select.Value placeholder={placeholder} />
           <Select.Icon>
-            <ChevronDown aria-hidden={"true"} className={"size-4 opacity-50"} />
+            <ChevronDown aria-hidden={'true'} className={'size-4 opacity-50'} />
           </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
@@ -153,12 +148,10 @@ export function SelectField({
                   key={option.value}
                   value={option.value}
                 >
-                  <Select.ItemIndicator className={"absolute left-2"}>
-                    <Check className={"size-3.5"} />
+                  <Select.ItemIndicator className={'absolute left-2'}>
+                    <Check className={'size-3.5'} />
                   </Select.ItemIndicator>
-                  <Select.ItemText className={"pl-5"}>
-                    {option.label}
-                  </Select.ItemText>
+                  <Select.ItemText className={'pl-5'}>{option.label}</Select.ItemText>
                 </Select.Item>
               ))}
             </Select.Popup>

@@ -1,57 +1,57 @@
-"use client";
+'use client';
 
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
-export const fieldWrapperVariants = cva("flex flex-col gap-1.5", {
+export const fieldWrapperVariants = cva('flex flex-col gap-1.5', {
   defaultVariants: {
-    size: "default",
+    size: 'default',
   },
   variants: {
     size: {
-      default: "",
-      lg: "",
-      sm: "",
+      default: '',
+      lg: '',
+      sm: '',
     },
   },
 });
 
-export const labelVariants = cva("font-medium text-foreground", {
+export const labelVariants = cva('font-medium text-foreground', {
   defaultVariants: {
-    size: "default",
+    size: 'default',
   },
   variants: {
     size: {
-      default: "text-sm",
-      lg: "text-base",
-      sm: "text-xs",
+      default: 'text-sm',
+      lg: 'text-base',
+      sm: 'text-xs',
     },
   },
 });
 
-export const descriptionVariants = cva("text-muted-foreground", {
+export const descriptionVariants = cva('text-muted-foreground', {
   defaultVariants: {
-    size: "default",
+    size: 'default',
   },
   variants: {
     size: {
-      default: "text-sm",
-      lg: "text-sm",
-      sm: "text-xs",
+      default: 'text-sm',
+      lg: 'text-sm',
+      sm: 'text-xs',
     },
   },
 });
 
-export const errorVariants = cva("text-destructive", {
+export const errorVariants = cva('text-destructive', {
   defaultVariants: {
-    size: "default",
+    size: 'default',
   },
   variants: {
     size: {
-      default: "text-sm",
-      lg: "text-sm",
-      sm: "text-xs",
+      default: 'text-sm',
+      lg: 'text-sm',
+      sm: 'text-xs',
     },
   },
 });
@@ -90,12 +90,7 @@ export function FieldWrapper({
         </p>
       )}
       {error && (
-        <p
-          aria-live={"polite"}
-          className={errorVariants({ size })}
-          id={errorId}
-          role={"alert"}
-        >
+        <p aria-live={'polite'} className={errorVariants({ size })} id={errorId} role={'alert'}>
           {error}
         </p>
       )}
@@ -118,5 +113,5 @@ export function getAriaDescribedBy(
   } else if (hasDescription && descriptionId) {
     ids.push(descriptionId);
   }
-  return ids.length > 0 ? ids.join(" ") : undefined;
+  return ids.length > 0 ? ids.join(' ') : undefined;
 }

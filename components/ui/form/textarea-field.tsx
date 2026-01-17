@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { cva, type VariantProps } from "class-variance-authority";
-import { useId } from "react";
+import { cva, type VariantProps } from 'class-variance-authority';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
 
 export const textareaVariants = cva(
   `
@@ -20,13 +20,13 @@ export const textareaVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "min-h-20 px-3 py-2 text-sm",
-        lg: "min-h-24 px-4 py-3 text-base",
-        sm: "min-h-16 px-2 py-1.5 text-xs",
+        default: 'min-h-20 px-3 py-2 text-sm',
+        lg: 'min-h-24 px-4 py-3 text-base',
+        sm: 'min-h-16 px-2 py-1.5 text-xs',
       },
     },
   }
@@ -69,12 +69,7 @@ export function TextareaField({
       size={size}
     >
       <textarea
-        aria-describedby={getAriaDescribedBy(
-          descriptionId,
-          errorId,
-          Boolean(description),
-          hasError
-        )}
+        aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
         aria-invalid={hasError || undefined}
         className={cn(textareaVariants({ size }), className)}
         disabled={disabled}
@@ -84,7 +79,7 @@ export function TextareaField({
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
-        value={field.state.value ?? ""}
+        value={field.state.value ?? ''}
       />
     </FieldWrapper>
   );

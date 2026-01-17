@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle } from 'lucide-react';
 
-import { useFormContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFormContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
 type FormErrorProps = ClassName;
 
@@ -19,7 +19,7 @@ export function FormError({ className }: FormErrorProps) {
 
         return (
           <div
-            aria-live={"assertive"}
+            aria-live={'assertive'}
             className={cn(
               `
                 flex items-start gap-2 rounded-md border border-destructive/50
@@ -27,13 +27,10 @@ export function FormError({ className }: FormErrorProps) {
               `,
               className
             )}
-            role={"alert"}
+            role={'alert'}
           >
-            <AlertCircle
-              aria-hidden={"true"}
-              className={`mt-0.5 size-4 shrink-0`}
-            />
-            <div className={"flex flex-col gap-1"}>
+            <AlertCircle aria-hidden={'true'} className={`mt-0.5 size-4 shrink-0`} />
+            <div className={'flex flex-col gap-1'}>
               {errors.map((error, index) => (
                 <p key={index}>{error}</p>
               ))}

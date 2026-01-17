@@ -1,6 +1,6 @@
-import { app, ipcMain, type IpcMainInvokeEvent } from "electron";
+import { app, ipcMain, type IpcMainInvokeEvent } from 'electron';
 
-import { IpcChannels } from "./channels";
+import { IpcChannels } from './channels';
 
 export function registerAppHandlers(): void {
   ipcMain.handle(IpcChannels.app.getVersion, (): string => {
@@ -11,14 +11,7 @@ export function registerAppHandlers(): void {
     IpcChannels.app.getPath,
     (
       _event: IpcMainInvokeEvent,
-      name:
-        | "appData"
-        | "desktop"
-        | "documents"
-        | "downloads"
-        | "home"
-        | "temp"
-        | "userData"
+      name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'
     ): string => {
       return app.getPath(name);
     }

@@ -18,6 +18,7 @@ Use Skill tool: react-coding-conventions
 ```
 
 These load the complete conventions references that you MUST follow:
+
 - `tanstack-form-conventions` - Form hook setup, field components, validation patterns
 - `react-coding-conventions` - Code style, component structure, naming conventions, TypeScript patterns
 
@@ -37,6 +38,7 @@ When given a natural language request for a form, follow this workflow:
 ### Step 1: Load Conventions
 
 Invoke both convention skills to load all project conventions:
+
 1. `tanstack-form-conventions` - Form-specific patterns
 2. `react-coding-conventions` - General React/TypeScript patterns
 
@@ -64,15 +66,12 @@ Create or update the validation schema at `lib/validations/{entity}.ts`:
 **File Structure**:
 
 ```typescript
-import { z } from "zod";
+import { z } from 'zod';
 
 export const createEntitySchema = z.object({
   // Fields in alphabetical order
   description: z.string(),
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(255, "Name is too long"),
+  name: z.string().min(1, 'Name is required').max(255, 'Name is too long'),
 });
 
 export type CreateEntityFormValues = z.infer<typeof createEntitySchema>;
@@ -194,14 +193,14 @@ export function CreateEntityForm({
 
 Choose the correct field component for each field type:
 
-| Data Type | Component | Notes |
-|-----------|-----------|-------|
-| Short text | `TextField` | For names, titles, single-line input |
-| Long text | `TextareaField` | For descriptions, multi-line input |
-| Selection | `SelectField` | For dropdown choices with `options` prop |
-| Boolean toggle | `CheckboxField` | For checkbox-style boolean |
-| Boolean toggle | `SwitchField` | For switch-style boolean |
-| Number | `NumberField` | For numeric input with min/max/step |
+| Data Type      | Component       | Notes                                    |
+| -------------- | --------------- | ---------------------------------------- |
+| Short text     | `TextField`     | For names, titles, single-line input     |
+| Long text      | `TextareaField` | For descriptions, multi-line input       |
+| Selection      | `SelectField`   | For dropdown choices with `options` prop |
+| Boolean toggle | `CheckboxField` | For checkbox-style boolean               |
+| Boolean toggle | `SwitchField`   | For switch-style boolean                 |
+| Number         | `NumberField`   | For numeric input with min/max/step      |
 
 ### Step 7: Default Values
 

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Input } from "@base-ui/react/input";
-import { cva, type VariantProps } from "class-variance-authority";
-import { useId } from "react";
+import { Input } from '@base-ui/react/input';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { useId } from 'react';
 
-import { useFieldContext } from "@/lib/forms/form-hook";
-import { cn } from "@/lib/utils";
+import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from "./field-wrapper";
+import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
 
 export const inputVariants = cva(
   `
@@ -20,13 +20,13 @@ export const inputVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "h-9 px-3 text-sm",
-        lg: "h-10 px-4 text-base",
-        sm: "h-8 px-2 text-xs",
+        default: 'h-9 px-3 text-sm',
+        lg: 'h-10 px-4 text-base',
+        sm: 'h-8 px-2 text-xs',
       },
     },
   }
@@ -38,7 +38,7 @@ type TextFieldProps = ClassName &
     disabled?: boolean;
     label: string;
     placeholder?: string;
-    type?: "email" | "password" | "text" | "url";
+    type?: 'email' | 'password' | 'text' | 'url';
   };
 
 export function TextField({
@@ -48,7 +48,7 @@ export function TextField({
   label,
   placeholder,
   size,
-  type = "text",
+  type = 'text',
 }: TextFieldProps) {
   const field = useFieldContext<string>();
   const id = useId();
@@ -69,12 +69,7 @@ export function TextField({
       size={size}
     >
       <Input
-        aria-describedby={getAriaDescribedBy(
-          descriptionId,
-          errorId,
-          Boolean(description),
-          hasError
-        )}
+        aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
         aria-invalid={hasError || undefined}
         className={cn(inputVariants({ size }), className)}
         disabled={disabled}
@@ -84,7 +79,7 @@ export function TextField({
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder}
         type={type}
-        value={field.state.value ?? ""}
+        value={field.state.value ?? ''}
       />
     </FieldWrapper>
   );

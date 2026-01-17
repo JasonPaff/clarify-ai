@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { ArrowLeft } from "lucide-react";
-import { $path } from "next-typesafe-url";
-import { withLayoutParamValidation } from "next-typesafe-url/app/hoc";
-import Link from "next/link";
-import { use } from "react";
+import { ArrowLeft } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import { withLayoutParamValidation } from 'next-typesafe-url/app/hoc';
+import Link from 'next/link';
+import { use } from 'react';
 
-import type { LayoutProps } from "@/app/(app)/projects/[projectId]/(projectId)/route-type";
+import type { LayoutProps } from '@/app/(app)/projects/[projectId]/(projectId)/route-type';
 
-import { Layout } from "@/app/(app)/projects/[projectId]/(projectId)/route-type";
-import { PageHeader } from "@/components/layout/page-header";
-import { ProjectTabs } from "@/components/projects/project-tabs";
-import { IconButton } from "@/components/ui/icon-button";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Layout } from '@/app/(app)/projects/[projectId]/(projectId)/route-type';
+import { PageHeader } from '@/components/layout/page-header';
+import { ProjectTabs } from '@/components/projects/project-tabs';
+import { IconButton } from '@/components/ui/icon-button';
+import { Tooltip } from '@/components/ui/tooltip';
 
 type ProjectLayoutProps = LayoutProps & RequiredChildren;
 
@@ -26,22 +26,22 @@ function ProjectLayout({ children, routeParams }: ProjectLayoutProps) {
 
   return (
     <div>
-      <div className={"flex items-center gap-3"}>
-        <Tooltip content={"Back to projects"} side={"right"}>
-          <Link href={$path({ route: "/projects" })}>
+      <div className={'flex items-center gap-3'}>
+        <Tooltip content={'Back to projects'} side={'right'}>
+          <Link href={$path({ route: '/projects' })}>
             <IconButton>
-              <ArrowLeft className={"size-4"} />
+              <ArrowLeft className={'size-4'} />
             </IconButton>
           </Link>
         </Tooltip>
-        <PageHeader className={"mb-0 flex-1"} title={projectName} />
+        <PageHeader className={'mb-0 flex-1'} title={projectName} />
       </div>
 
-      <div className={"mt-4"}>
+      <div className={'mt-4'}>
         <ProjectTabs projectId={projectId} />
       </div>
 
-      <div className={"mt-6"}>{children}</div>
+      <div className={'mt-6'}>{children}</div>
     </div>
   );
 }

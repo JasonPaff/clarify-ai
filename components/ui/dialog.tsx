@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import type { ComponentPropsWithRef } from "react";
+import type { ComponentPropsWithRef } from 'react';
 
-import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import { cva, type VariantProps } from "class-variance-authority";
+import { Dialog as BaseDialog } from '@base-ui/react/dialog';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 export const DialogRoot = BaseDialog.Root;
 export const DialogTrigger = BaseDialog.Trigger;
@@ -20,13 +20,13 @@ export const dialogBackdropVariants = cva(
   `,
   {
     defaultVariants: {
-      blur: "default",
+      blur: 'default',
     },
     variants: {
       blur: {
-        default: "backdrop-blur-sm",
-        none: "",
-        strong: "backdrop-blur-md",
+        default: 'backdrop-blur-sm',
+        none: '',
+        strong: 'backdrop-blur-md',
       },
     },
   }
@@ -35,19 +35,8 @@ export const dialogBackdropVariants = cva(
 type DialogBackdropProps = ComponentPropsWithRef<typeof BaseDialog.Backdrop> &
   VariantProps<typeof dialogBackdropVariants>;
 
-export const DialogBackdrop = ({
-  blur,
-  className,
-  ref,
-  ...props
-}: DialogBackdropProps) => {
-  return (
-    <BaseDialog.Backdrop
-      className={cn(dialogBackdropVariants({ blur }), className)}
-      ref={ref}
-      {...props}
-    />
-  );
+export const DialogBackdrop = ({ blur, className, ref, ...props }: DialogBackdropProps) => {
+  return <BaseDialog.Backdrop className={cn(dialogBackdropVariants({ blur }), className)} ref={ref} {...props} />;
 };
 
 export const dialogPopupVariants = cva(
@@ -59,62 +48,34 @@ export const dialogPopupVariants = cva(
   `,
   {
     defaultVariants: {
-      size: "default",
+      size: 'default',
     },
     variants: {
       size: {
-        default: "w-full max-w-md p-6",
-        lg: "w-full max-w-lg p-8",
-        sm: "w-full max-w-sm p-4",
+        default: 'w-full max-w-md p-6',
+        lg: 'w-full max-w-lg p-8',
+        sm: 'w-full max-w-sm p-4',
       },
     },
   }
 );
 
-type DialogPopupProps = ComponentPropsWithRef<typeof BaseDialog.Popup> &
-  VariantProps<typeof dialogPopupVariants>;
+type DialogPopupProps = ComponentPropsWithRef<typeof BaseDialog.Popup> & VariantProps<typeof dialogPopupVariants>;
 
-export const DialogPopup = ({
-  className,
-  ref,
-  size,
-  ...props
-}: DialogPopupProps) => {
-  return (
-    <BaseDialog.Popup
-      className={cn(dialogPopupVariants({ size }), className)}
-      ref={ref}
-      {...props}
-    />
-  );
+export const DialogPopup = ({ className, ref, size, ...props }: DialogPopupProps) => {
+  return <BaseDialog.Popup className={cn(dialogPopupVariants({ size }), className)} ref={ref} {...props} />;
 };
 
 type DialogTitleProps = ComponentPropsWithRef<typeof BaseDialog.Title>;
 
 export const DialogTitle = ({ className, ref, ...props }: DialogTitleProps) => {
-  return (
-    <BaseDialog.Title
-      className={cn("text-lg font-semibold text-foreground", className)}
-      ref={ref}
-      {...props}
-    />
-  );
+  return <BaseDialog.Title className={cn('text-lg font-semibold text-foreground', className)} ref={ref} {...props} />;
 };
 
-type DialogDescriptionProps = ComponentPropsWithRef<
-  typeof BaseDialog.Description
->;
+type DialogDescriptionProps = ComponentPropsWithRef<typeof BaseDialog.Description>;
 
-export const DialogDescription = ({
-  className,
-  ref,
-  ...props
-}: DialogDescriptionProps) => {
+export const DialogDescription = ({ className, ref, ...props }: DialogDescriptionProps) => {
   return (
-    <BaseDialog.Description
-      className={cn("mt-2 text-sm text-muted-foreground", className)}
-      ref={ref}
-      {...props}
-    />
+    <BaseDialog.Description className={cn('mt-2 text-sm text-muted-foreground', className)} ref={ref} {...props} />
   );
 };
