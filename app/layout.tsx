@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 import "./globals.css";
 
@@ -26,7 +27,7 @@ type RootLayoutProps = RequiredChildren;
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang={"en"}>
+    <html lang={"en"} suppressHydrationWarning>
       <body
         className={`
           ${geistSans.variable}
@@ -37,7 +38,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         {/* base-ui requires this root class */}
         {/* eslint-disable-next-line better-tailwindcss/no-unknown-classes */}
         <div className={"root"}>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </QueryProvider>
         </div>
       </body>
     </html>

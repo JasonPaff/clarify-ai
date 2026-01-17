@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { ThemeSelector } from "@/components/ui/theme-selector";
 
 export default function SettingsPage() {
   return (
@@ -75,14 +76,7 @@ export default function SettingsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div
-              className={`
-                rounded-lg border border-dashed border-border p-8 text-center
-                text-sm text-muted-foreground
-              `}
-            >
-              Theme settings coming soon
-            </div>
+            <ThemeSelector />
           </CardContent>
         </Card>
 
