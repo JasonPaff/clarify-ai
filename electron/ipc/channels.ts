@@ -11,6 +11,13 @@ export const IpcChannels = {
       getById: 'db:projects:getById',
       update: 'db:projects:update',
     },
+    repositories: {
+      create: 'db:repositories:create',
+      delete: 'db:repositories:delete',
+      getById: 'db:repositories:getById',
+      getByProjectId: 'db:repositories:getByProjectId',
+      update: 'db:repositories:update',
+    },
   },
   dialog: {
     openDirectory: 'dialog:openDirectory',

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import type { NewProject, Project } from '../db/schema';
+import type { NewProject, NewRepository, Project, Repository } from '../db/schema';
 
 import { IpcChannels } from './ipc';
 
@@ -16,6 +16,13 @@ export interface ElectronAPI {
       getAll(): Promise<Array<Project>>;
       getById(id: number): Promise<Project | undefined>;
       update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
+    };
+    repositories: {
+      create(data: NewRepository): Promise<Repository>;
+      delete(id: number): Promise<boolean>;
+      getById(id: number): Promise<Repository | undefined>;
+      getByProjectId(projectId: number): Promise<Array<Repository>>;
+      update(id: number, data: Partial<NewRepository>): Promise<Repository | undefined>;
     };
   };
   dialog: {
@@ -66,6 +73,13 @@ const electronAPI: ElectronAPI = {
       getAll: () => ipcRenderer.invoke(IpcChannels.db.projects.getAll),
       getById: (id) => ipcRenderer.invoke(IpcChannels.db.projects.getById, id),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.projects.update, id, data),
+    },
+    repositories: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.repositories.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.repositories.delete, id),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.repositories.getById, id),
+      getByProjectId: (projectId) => ipcRenderer.invoke(IpcChannels.db.repositories.getByProjectId, projectId),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.repositories.update, id, data),
     },
   },
   dialog: {

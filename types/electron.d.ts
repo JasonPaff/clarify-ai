@@ -1,5 +1,6 @@
 // Re-export database types for renderer use
 export type { NewProject, Project } from '../db/types';
+export type { NewRepository, Repository } from '../db/types';
 
 export interface ElectronAPI {
   app: {
@@ -16,6 +17,16 @@ export interface ElectronAPI {
         id: number,
         data: Partial<import('../db/types').NewProject>
       ): Promise<import('../db/types').Project | undefined>;
+    };
+    repositories: {
+      create(data: import('../db/types').NewRepository): Promise<import('../db/types').Repository>;
+      delete(id: number): Promise<boolean>;
+      getById(id: number): Promise<import('../db/types').Repository | undefined>;
+      getByProjectId(projectId: number): Promise<Array<import('../db/types').Repository>>;
+      update(
+        id: number,
+        data: Partial<import('../db/types').NewRepository>
+      ): Promise<import('../db/types').Repository | undefined>;
     };
   };
   dialog: {

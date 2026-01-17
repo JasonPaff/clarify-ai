@@ -2,11 +2,12 @@ import type { BrowserWindow } from 'electron';
 
 import type { DrizzleDatabase } from '../../db';
 
-import { createProjectsRepository } from '../../db/repositories';
+import { createProjectsRepository, createRepositoriesRepository } from '../../db/repositories';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
 import { registerFsHandlers } from './fs.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
+import { registerRepositoriesHandlers } from './repositories.handlers';
 import { registerStoreHandlers } from './store.handlers';
 
 export { IpcChannels } from './channels';
@@ -27,4 +28,8 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // Database handlers - Projects
   const projectsRepository = createProjectsRepository(db);
   registerProjectsHandlers(projectsRepository);
+
+  // Database handlers - Repositories
+  const repositoriesRepository = createRepositoriesRepository(db);
+  registerRepositoriesHandlers(repositoriesRepository);
 }

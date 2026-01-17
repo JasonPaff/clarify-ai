@@ -49,11 +49,14 @@ A desktop application that uses AI to transform informal feature requests into a
 - **tailwind-merge** `^3.4.0` - Merge Tailwind classes intelligently
 - **tw-animate-css** `^1.4.0` - Animation utilities
 
-### State Management & Routing
+### State Management & Data Fetching
 
-- **Zustand** `^5.0.10` - Lightweight state management
-- **next-typesafe-url** `^6.1.0` - Type-safe routing with Zod validation
+- **@tanstack/react-query** `^5.90.18` - Server state management and caching
+- **@tanstack/react-query-devtools** `^5.91.2` - DevTools for debugging queries
+- **@tanstack/react-form** `^1.27.7` - Form state management
+- **@lukemorales/query-key-factory** `^1.3.4` - Type-safe query key generation
 - **nuqs** `^2.8.6` - Type-safe URL query state management
+- **next-typesafe-url** `^6.1.0` - Type-safe routing with Zod validation
 
 ### Validation
 
@@ -74,6 +77,7 @@ A desktop application that uses AI to transform informal feature requests into a
 ### Utilities
 
 - **date-fns** `^4.1.0` - Date manipulation
+- **react-error-boundary** `^6.1.0` - Error boundary component
 - **concurrently** `^9.1.2` - Run multiple commands
 - **cross-env** `^7.0.3` - Cross-platform environment variables
 - **wait-on** `^8.0.3` - Wait for resources
@@ -86,10 +90,15 @@ A desktop application that uses AI to transform informal feature requests into a
 - Customizable prompt templates for each planning step
 - Local SQLite database for persistent project and plan storage
 - Native file system access for repository analysis
-- Collapsible sidebar navigation with Electron window controls
-- Dark/light theme support via CSS custom properties
+- Collapsible sidebar navigation with keyboard shortcut (Ctrl/Cmd+B)
+- Electron window controls with drag regions
+- Dark/light/system theme support via CSS custom properties
 - Type-safe routing with automatic parameter validation
 - IPC-based communication between Electron main and renderer processes
+- TanStack Query for optimistic updates and cache management
+- TanStack Form for declarative form handling with field components
+- Repository pattern for clean database abstraction
+- Query key factories for organized cache invalidation
 
 ## 4. Folder Structure
 
@@ -110,16 +119,24 @@ clarify-ai/
 │   ├── globals.css               # Global styles and CSS variables
 │   └── layout.tsx                # Root layout with fonts
 ├── components/
+│   ├── data/                     # Data-fetching components (QueryErrorBoundary)
 │   ├── features/                 # Feature-specific components
 │   ├── layout/                   # Layout components (AppShell, Sidebar, etc.)
 │   ├── projects/                 # Project-related components
+│   ├── providers/                # Context providers (QueryProvider, ThemeProvider)
+│   ├── skeletons/                # Loading skeleton components
 │   └── ui/                       # Reusable UI primitives
+│       └── form/                 # TanStack Form field components
 ├── db/
 │   ├── repositories/             # Repository pattern implementations
 │   ├── schema/                   # Drizzle schema definitions
 │   ├── index.ts                  # Database initialization
 │   └── types.ts                  # Type re-exports for renderer
 ├── docs/                         # Design documents and specs
+│   └── YYYY_MM_DD/               # Date-organized documentation
+│       ├── orchestration/        # AI orchestration outputs
+│       ├── plans/                # Implementation plans
+│       └── implementation/       # Implementation tracking
 ├── drizzle/                      # Database migrations
 ├── electron/
 │   ├── ipc/                      # IPC handlers organized by domain
@@ -128,14 +145,24 @@ clarify-ai/
 │   │   ├── dialog.handlers.ts    # File dialog handlers
 │   │   ├── fs.handlers.ts        # File system handlers
 │   │   ├── projects.handlers.ts  # Project CRUD handlers
-│   │   └── store.handlers.ts     # Electron store handlers
+│   │   ├── repositories.handlers.ts # Repository CRUD handlers
+│   │   ├── store.handlers.ts     # Electron store handlers
+│   │   └── index.ts              # Handler registration
 │   ├── main.ts                   # Electron main process entry
 │   └── preload.ts                # Context bridge and API exposure
-├── hooks/                        # React hooks (useElectron, etc.)
+├── hooks/                        # React hooks
+│   ├── queries/                  # TanStack Query hooks
+│   └── useElectron.ts            # Electron API hooks
 ├── lib/                          # Utility functions
+│   ├── forms/                    # TanStack Form configuration
+│   ├── queries/                  # Query key definitions
+│   ├── theme/                    # Theme constants
+│   ├── validations/              # Zod validation schemas
+│   └── utils.ts                  # Common utilities (cn)
 ├── public/                       # Static assets
-├── stores/                       # Zustand stores
 └── types/                        # Global type definitions
+    ├── component-types.ts        # Global component types
+    └── electron.d.ts             # Electron API type definitions
 ```
 
 ## 5. Architecture
@@ -144,10 +171,11 @@ clarify-ai/
 - **IPC Communication**: All native operations (file system, dialogs, database) go through typed IPC channels defined in `electron/ipc/channels.ts`
 - **Context Isolation**: Electron preload script exposes a limited, typed `electronAPI` to the renderer via contextBridge
 - **Repository Pattern**: Database operations abstracted through repository interfaces in `db/repositories/`
+- **TanStack Query**: Server state managed via TanStack Query with query key factories in `lib/queries/`; mutations handle cache invalidation
+- **TanStack Form**: Forms use `useAppForm` hook from `lib/forms/form-hook.ts` with pre-built field components
 - **Type-Safe Routing**: Routes use `next-typesafe-url` with Zod schemas in `route-type.ts` files for parameter validation
-- **Component Composition**: Base UI primitives wrapped with CVA variants for consistent styling
-- **State Management**: Zustand stores for client-side state; no server state (all data via Electron IPC)
-- **CSS Variables**: Theme colors defined in `globals.css` with light/dark mode via `prefers-color-scheme`
+- **Component Composition**: Base UI primitives from `@base-ui/react` wrapped with CVA variants for consistent styling
+- **CSS Variables**: Theme colors defined in `globals.css` with light/dark/system mode support via CSS classes
 - **Database Migrations**: Drizzle Kit generates SQL migrations in `drizzle/` directory; run automatically on app start
 
 ## 6. Development Commands
@@ -185,6 +213,20 @@ clarify-ai/
 - Global types available: `RequiredChildren`, `Children`, `ClassName`, `ButtonMouseEvent`
 - Add `"use client"` directive for client components; default to server components
 - Use `withParamValidation` HOC from `next-typesafe-url` for pages with dynamic params
+
+### Forms (TanStack Form)
+
+- Use `useAppForm` from `lib/forms/form-hook.ts` for all forms
+- Field components: `TextField`, `TextareaField`, `NumberField`, `SelectField`, `CheckboxField`, `SwitchField`
+- Form components: `SubmitButton`, `FormError`
+- Validation schemas in `lib/validations/` using Zod
+
+### Data Fetching (TanStack Query)
+
+- Query hooks in `hooks/queries/` directory
+- Query keys defined using `createQueryKeys` in `lib/queries/`
+- Use `useElectronDb()` hook to access Electron IPC database methods
+- Mutations must invalidate relevant query keys on success
 
 ### Styling
 
@@ -233,14 +275,24 @@ clarify-ai/
 - Don't define styles inline - use Tailwind classes or CSS variables
 - Don't create new components without variants - use CVA pattern
 - Don't skip migrations - always use `db:generate` and `db:migrate`
+- Don't use `eslint-disable` comments without justification
+- Don't use `ts-ignore` or `ts-expect-error` - fix the type issues properly
 
 ## 8. Project Documentation Conventions (Important)
 
-| Document Type       | Location               |
-| ------------------- | ---------------------- |
-| Design Documents    | `docs/`                |
-| Database Migrations | `drizzle/`             |
-| Type Definitions    | `types/`               |
-| Route Type Schemas  | `app/**/route-type.ts` |
+| Document Type             | Location                                          |
+| ------------------------- | ------------------------------------------------- |
+| Design Documents          | `docs/design-document.md`                         |
+| Orchestration Outputs     | `docs/YYYY_MM_DD/orchestration/<feature-name>/`   |
+| Implementation Plans      | `docs/YYYY_MM_DD/plans/<feature-name>-implementation-plan.md` |
+| Implementation Tracking   | `docs/YYYY_MM_DD/implementation/<feature-name>/`  |
+| Database Migrations       | `drizzle/`                                        |
+| Type Definitions          | `types/`                                          |
+| Route Type Schemas        | `app/**/route-type.ts`                            |
+| Validation Schemas        | `lib/validations/`                                |
 
 > **Note**: Always verify that target directories exist before creating new files. Use existing patterns in the codebase as templates for new additions.
+
+---
+
+**IMPORTANT**: These instructions OVERRIDE any default behavior. When working in this codebase, you MUST follow the rules, patterns, and conventions documented above exactly as written. The rules in Section 7 are strict requirements, not suggestions.

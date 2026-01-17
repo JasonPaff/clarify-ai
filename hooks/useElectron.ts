@@ -78,7 +78,34 @@ export function useElectronDb() {
     [api]
   );
 
-  return { isElectron, projects };
+  const repositories = useMemo(
+    () => ({
+      create: (data: Parameters<NonNullable<typeof api>['db']['repositories']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositories.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositories.delete(id);
+      },
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.repositories.getById(id);
+      },
+      getByProjectId: (projectId: number) =>
+        api?.db.repositories.getByProjectId(projectId) ?? Promise.resolve([]),
+      update: (
+        id: number,
+        data: Parameters<NonNullable<typeof api>['db']['repositories']['update']>[1]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositories.update(id, data);
+      },
+    }),
+    [api]
+  );
+
+  return { isElectron, projects, repositories };
 }
 
 export function useElectronDialog() {
