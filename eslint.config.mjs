@@ -2,7 +2,6 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
-import eslintJsxA11y from "eslint-plugin-jsx-a11y";
 import perfectionist from "eslint-plugin-perfectionist";
 import eslintReactSnob from "eslint-plugin-react-snob";
 import { defineConfig, globalIgnores } from "eslint/config";
@@ -21,7 +20,7 @@ const eslintConfig = defineConfig([
     // Electron build output:
     "electron-dist/**",
   ]),
-  eslintJsxA11y.flatConfigs.recommended,
+  // jsx-a11y is already included in eslint-config-next/core-web-vitals
   // TypeScript ESLint recommended and stylistic rules.
   tseslint.configs.recommended,
   tseslint.configs.stylistic,
