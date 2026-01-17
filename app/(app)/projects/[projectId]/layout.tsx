@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/layout/page-header';
 import { ProjectTabs } from '@/components/projects/project-tabs';
 import { IconButton } from '@/components/ui/icon-button';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useProject } from '@/hooks/queries/use-projects';
 
 type ProjectLayoutProps = LayoutProps & RequiredChildren;
 
@@ -21,8 +22,8 @@ export default withLayoutParamValidation(ProjectLayout, Layout);
 function ProjectLayout({ children, routeParams }: ProjectLayoutProps) {
   const { projectId } = use(routeParams);
 
-  // This will be replaced with actual project data fetching
-  const projectName = `Project ${projectId}`;
+  const { data: project } = useProject(projectId);
+  const projectName = project?.name ?? 'Loading...';
 
   return (
     <div>

@@ -13,7 +13,7 @@ async function ProjectPage({ routeParams }: ProjectPageProps): Promise<ReactNode
 
   redirect(
     $path({
-      route: '/projects/[projectId]',
+      route: '/projects/[projectId]/features',
       routeParams: { projectId },
     })
   );

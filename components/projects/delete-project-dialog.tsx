@@ -17,18 +17,29 @@ type DeleteProjectDialogProps = RequiredChildren & {
 
 export function DeleteProjectDialog({ children, project }: DeleteProjectDialogProps) {
   const [open, setOpen] = useState(false);
+  const [confirmationText, setConfirmationText] = useState('');
 
   const router = useRouter();
   const deleteProject = useDeleteProject();
 
+  const isConfirmed = confirmationText === project.name;
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setConfirmationText('');
+    }
+  };
+
   const handleDelete = async () => {
+    if (!isConfirmed) return;
     await deleteProject.mutateAsync(project.id);
     setOpen(false);
     router.push($path({ route: '/projects' }));
   };
 
   return (
-    <AlertDialog.Root onOpenChange={setOpen} open={open}>
+    <AlertDialog.Root onOpenChange={handleOpenChange} open={open}>
       <AlertDialog.Trigger nativeButton={false} render={<span className={'inline-flex'} />}>
         {children}
       </AlertDialog.Trigger>
@@ -64,9 +75,27 @@ export function DeleteProjectDialog({ children, project }: DeleteProjectDialogPr
           <p className={'mt-4 text-sm text-destructive'}>
             This action cannot be undone. All associated repositories and features will also be permanently deleted.
           </p>
+          <div className={'mt-4'}>
+            <label className={'block text-sm text-muted-foreground'} htmlFor={'confirm-delete'}>
+              Type <span className={'font-semibold text-foreground'}>{project.name}</span> to confirm
+            </label>
+            <input
+              autoComplete={'off'}
+              className={cn(
+                'mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground',
+                'placeholder:text-muted-foreground',
+                'focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none'
+              )}
+              id={'confirm-delete'}
+              onChange={(e) => setConfirmationText(e.target.value)}
+              placeholder={project.name}
+              type={'text'}
+              value={confirmationText}
+            />
+          </div>
           <div className={'mt-6 flex justify-end gap-3'}>
             <AlertDialog.Close render={<Button variant={'outline'} />}>Cancel</AlertDialog.Close>
-            <Button disabled={deleteProject.isPending} onClick={handleDelete} variant={'destructive'}>
+            <Button disabled={!isConfirmed || deleteProject.isPending} onClick={handleDelete} variant={'destructive'}>
               {deleteProject.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </div>

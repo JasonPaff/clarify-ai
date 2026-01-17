@@ -42,6 +42,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       '@typescript-eslint/array-type': 'off',
+      'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
       eqeqeq: 'error',
       'react-snob/no-inline-styles': 'off',
       'react-snob/require-boolean-prefix-is': 'off',
