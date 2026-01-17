@@ -57,7 +57,7 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
-      <DialogTrigger render={<span className={"inline-flex"} />}>
+      <DialogTrigger nativeButton={false} render={<span className={"inline-flex"} />}>
         {children}
       </DialogTrigger>
       <DialogPortal>
