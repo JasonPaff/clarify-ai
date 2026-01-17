@@ -27,3 +27,10 @@ export {
 } from "./switch-field";
 export { inputVariants, TextField } from "./text-field";
 export { TextareaField, textareaVariants } from "./textarea-field";
+export {
+  FocusProvider,
+  useFocusContext,
+} from "./focus-management/focus-context";
+export { useFocusManagement } from "./focus-management/use-focus-management";
+export { withFocusManagement } from "./focus-management/with-focus-management";
+export type { FocusRef } from "./focus-management/focus-context";
