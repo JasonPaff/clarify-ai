@@ -1,6 +1,7 @@
 "use client";
 
 import { Folder, HelpCircle, type LucideIcon, Settings } from "lucide-react";
+import { $path } from "next-typesafe-url";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,12 +17,12 @@ interface NavItem {
 }
 
 const mainNavItems: Array<NavItem> = [
-  { href: "/projects", icon: Folder, label: "Projects" },
+  { href: $path({ route: "/projects" }), icon: Folder, label: "Projects" },
 ];
 
 const bottomNavItems: Array<NavItem> = [
-  { href: "/settings", icon: Settings, label: "Settings" },
-  { href: "/help", icon: HelpCircle, label: "Help" },
+  { href: $path({ route: "/settings" }), icon: Settings, label: "Settings" },
+  { href: $path({ route: "/help" }), icon: HelpCircle, label: "Help" },
 ];
 
 interface NavItemLinkProps {
@@ -35,8 +36,11 @@ export function SidebarNav() {
   const { collapsed } = useSidebar();
 
   const isActive = (href: string) => {
-    if (href === "/projects") {
-      return pathname === "/projects" || pathname.startsWith("/projects/");
+    if (href === $path({ route: "/projects" })) {
+      return (
+        pathname === $path({ route: "/projects" }) ||
+        pathname.startsWith($path({ route: "/projects" }))
+      );
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
@@ -80,13 +84,13 @@ function NavItemLink({ active, collapsed, item }: NavItemLinkProps) {
           flex h-9 items-center gap-3 rounded-md px-3 text-sm font-medium
           transition-colors
         `,
-        active
-          ? "bg-accent text-accent-foreground"
-          : `
+        active && "bg-accent text-accent-foreground",
+        !active &&
+          `
             text-muted-foreground
             hover:bg-muted hover:text-foreground
           `,
-        collapsed && "justify-center px-0"
+        collapsed && "w-14 justify-center px-0"
       )}
       href={item.href}
     >

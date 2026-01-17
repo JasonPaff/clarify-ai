@@ -8,9 +8,14 @@ import {
   Search,
   Sparkles,
 } from "lucide-react";
+import { withParamValidation } from "next-typesafe-url/app/hoc";
 import Link from "next/link";
 import { type ReactNode, use, useState } from "react";
 
+import {
+  PageProps,
+  Route,
+} from "@/app/(app)/projects/[projectId]/features/[featureId]/route-type";
 import { WorkflowSteps } from "@/components/features/workflow-steps";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,18 +29,15 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip } from "@/components/ui/tooltip";
 
-interface FeatureWorkflowPageProps {
-  params: Promise<{ featureId: string; projectId: string }>;
-}
-
+type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ["entry", "refine", "research", "plan"] as const;
 
 type StepId = (typeof STEP_ORDER)[number];
 
-export default function FeatureWorkflowPage({
-  params,
-}: FeatureWorkflowPageProps) {
-  const { featureId, projectId } = use(params);
+export default withParamValidation(FeatureWorkflowPage, Route);
+
+function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
+  const { featureId, projectId } = use(routeParams);
   const [currentStep, setCurrentStep] = useState<StepId>("entry");
 
   // This will be replaced with actual feature data

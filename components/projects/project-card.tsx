@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight, Folder } from "lucide-react";
+import { $path } from "next-typesafe-url";
 import Link from "next/link";
 
 import {
@@ -14,7 +15,7 @@ import {
 interface ProjectCardProps {
   description?: string;
   featureCount?: number;
-  id: string;
+  id: number;
   name: string;
 }
 
@@ -25,7 +26,12 @@ export function ProjectCard({
   name,
 }: ProjectCardProps) {
   return (
-    <Link href={`/projects/${id}`}>
+    <Link
+      href={$path({
+        route: "/projects/[projectId]",
+        routeParams: { projectId: id },
+      })}
+    >
       <Card
         className={`
           cursor-pointer transition-shadow

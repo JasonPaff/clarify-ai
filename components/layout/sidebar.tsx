@@ -26,7 +26,10 @@ export function Sidebar() {
     >
       {/* Header with drag region for Electron */}
       <div
-        className={"drag-region flex h-12 items-center justify-between px-3"}
+        className={cn(
+          "drag-region flex h-12 items-center px-3",
+          collapsed ? "justify-center" : "justify-between"
+        )}
       >
         {!collapsed && (
           <span className={"no-drag text-sm font-semibold"}>Clarify AI</span>
@@ -48,7 +51,7 @@ export function Sidebar() {
       <Separator />
 
       {/* Navigation */}
-      <nav className={"flex-1 overflow-y-auto p-2"}>
+      <nav className={cn("flex-1 overflow-y-auto", collapsed ? "p-1" : "p-2")}>
         <SidebarNav />
       </nav>
     </aside>

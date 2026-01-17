@@ -1,5 +1,6 @@
 "use client";
 
+import { $path } from "next-typesafe-url";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/tabs";
 
 interface ProjectTabsProps {
-  projectId: string;
+  projectId: number;
 }
 
 export function ProjectTabs({ projectId }: ProjectTabsProps) {
@@ -19,17 +20,26 @@ export function ProjectTabs({ projectId }: ProjectTabsProps) {
 
   const tabs = [
     {
-      href: `/projects/${projectId}/features`,
+      href: $path({
+        route: "/projects/[projectId]/features",
+        routeParams: { projectId },
+      }),
       label: "Features",
       value: "features",
     },
     {
-      href: `/projects/${projectId}/repositories`,
+      href: $path({
+        route: "/projects/[projectId]/repositories",
+        routeParams: { projectId },
+      }),
       label: "Repositories",
       value: "repositories",
     },
     {
-      href: `/projects/${projectId}/settings`,
+      href: $path({
+        route: "/projects/[projectId]/settings",
+        routeParams: { projectId },
+      }),
       label: "Settings",
       value: "settings",
     },

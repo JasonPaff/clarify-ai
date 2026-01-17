@@ -1,10 +1,24 @@
+import "server-only";
+import { $path } from "next-typesafe-url";
+import { withParamValidation } from "next-typesafe-url/app/hoc";
 import { redirect } from "next/navigation";
+import { ReactNode } from "react";
 
-interface ProjectPageProps {
-  params: Promise<{ projectId: string }>;
+import { PageProps, Route } from "@/app/(app)/projects/[projectId]/route-type";
+
+type ProjectPageProps = PageProps;
+
+async function ProjectPage({
+  routeParams,
+}: ProjectPageProps): Promise<ReactNode> {
+  const { projectId } = await routeParams;
+
+  redirect(
+    $path({
+      route: "/projects/[projectId]",
+      routeParams: { projectId },
+    })
+  );
 }
 
-export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { projectId } = await params;
-  redirect(`/projects/${projectId}/features`);
-}
+export default withParamValidation(ProjectPage, Route);
