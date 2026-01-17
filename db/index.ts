@@ -1,10 +1,9 @@
-import Database from "better-sqlite3";
-import {
-  type BetterSQLite3Database,
-  drizzle,
-} from "drizzle-orm/better-sqlite3";
+import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-import * as schema from "./schema";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+
+import * as schema from "./schema/index";
 
 export type DrizzleDatabase = BetterSQLite3Database<typeof schema>;
 
@@ -34,5 +33,3 @@ export function initializeDatabase(dbPath: string): DrizzleDatabase {
   db = drizzle(sqlite, { schema });
   return db;
 }
-
-export * from "./schema";

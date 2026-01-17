@@ -1,40 +1,19 @@
-import { eq, sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  type IpcMainInvokeEvent,
-  type OpenDialogOptions,
-  type SaveDialogOptions,
-} from "electron";
+import { app, BrowserWindow } from "electron";
 import serve from "electron-serve";
-import Store from "electron-store";
-import * as fs from "fs/promises";
 import * as path from "path";
 
-import {
-  closeDatabase,
-  type DrizzleDatabase,
-  initializeDatabase,
-  type NewProject,
-  type Project,
-  projects,
-} from "../db";
+import { closeDatabase, type DrizzleDatabase, initializeDatabase } from "../db";
+import { registerAllHandlers } from "./ipc";
 
 const isDev = process.env.NODE_ENV === "development";
 const loadURL = isDev ? null : serve({ directory: "out" });
 
-// Database instance
-let db: DrizzleDatabase;
-
-interface StoreType {
-  delete(key: string): void;
-  get(key: string): unknown;
-  set(key: string, value: unknown): void;
+if (!process.env.APP_BASE_URL) {
+  throw new Error("APP_BASE_URL environment variable is not set");
 }
-const store = new Store() as unknown as StoreType;
+
+let db: DrizzleDatabase;
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -60,7 +39,7 @@ async function createWindow(): Promise<void> {
   });
 
   if (isDev) {
-    mainWindow.loadURL("http://localhost:3000");
+    await mainWindow.loadURL(process.env.APP_BASE_URL!);
     mainWindow.webContents.openDevTools();
   } else {
     await loadURL?.(mainWindow);
@@ -87,295 +66,11 @@ function initializeDb(): void {
   migrate(db, { migrationsFolder });
 }
 
-// Path validation to prevent directory traversal attacks
-function isValidPath(filePath: string): boolean {
-  const normalizedPath = path.normalize(filePath);
-  // Prevent paths that try to escape with ..
-  if (normalizedPath.includes("..")) {
-    return false;
-  }
-  return true;
-}
-
-// IPC Handlers for file system operations
-ipcMain.handle(
-  "fs:readFile",
-  async (
-    _event: IpcMainInvokeEvent,
-    filePath: string
-  ): Promise<{ content?: string; error?: string; success: boolean }> => {
-    if (!isValidPath(filePath)) {
-      return { error: "Invalid file path", success: false };
-    }
-    try {
-      const content = await fs.readFile(filePath, "utf-8");
-      return { content, success: true };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false,
-      };
-    }
-  }
-);
-
-ipcMain.handle(
-  "fs:writeFile",
-  async (
-    _event: IpcMainInvokeEvent,
-    filePath: string,
-    content: string
-  ): Promise<{ error?: string; success: boolean }> => {
-    if (!isValidPath(filePath)) {
-      return { error: "Invalid file path", success: false };
-    }
-    try {
-      await fs.writeFile(filePath, content, "utf-8");
-      return { success: true };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false,
-      };
-    }
-  }
-);
-
-ipcMain.handle(
-  "fs:readDirectory",
-  async (
-    _event: IpcMainInvokeEvent,
-    dirPath: string
-  ): Promise<{
-    entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
-    error?: string;
-    success: boolean;
-  }> => {
-    if (!isValidPath(dirPath)) {
-      return { error: "Invalid directory path", success: false };
-    }
-    try {
-      const dirents = await fs.readdir(dirPath, { withFileTypes: true });
-      const entries = dirents.map((dirent) => ({
-        isDirectory: dirent.isDirectory(),
-        isFile: dirent.isFile(),
-        name: dirent.name,
-      }));
-      return { entries, success: true };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false,
-      };
-    }
-  }
-);
-
-ipcMain.handle(
-  "fs:exists",
-  async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
-    if (!isValidPath(filePath)) {
-      return false;
-    }
-    try {
-      await fs.access(filePath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-);
-
-ipcMain.handle(
-  "fs:stat",
-  async (
-    _event: IpcMainInvokeEvent,
-    filePath: string
-  ): Promise<{
-    error?: string;
-    stats?: {
-      ctime: string;
-      isDirectory: boolean;
-      isFile: boolean;
-      mtime: string;
-      size: number;
-    };
-    success: boolean;
-  }> => {
-    if (!isValidPath(filePath)) {
-      return { error: "Invalid file path", success: false };
-    }
-    try {
-      const stats = await fs.stat(filePath);
-      return {
-        stats: {
-          ctime: stats.ctime.toISOString(),
-          isDirectory: stats.isDirectory(),
-          isFile: stats.isFile(),
-          mtime: stats.mtime.toISOString(),
-          size: stats.size,
-        },
-        success: true,
-      };
-    } catch (error) {
-      return {
-        error: error instanceof Error ? error.message : "Unknown error",
-        success: false,
-      };
-    }
-  }
-);
-
-// IPC Handlers for dialogs
-ipcMain.handle("dialog:openDirectory", async (): Promise<null | string> => {
-  const options: OpenDialogOptions = {
-    properties: ["openDirectory"],
-  };
-  const result = await dialog.showOpenDialog(mainWindow!, options);
-  if (result.canceled || result.filePaths.length === 0) {
-    return null;
-  }
-  return result.filePaths[0] ?? null;
-});
-
-ipcMain.handle(
-  "dialog:openFile",
-  async (
-    _event: IpcMainInvokeEvent,
-    filters?: Array<{ extensions: Array<string>; name: string }>
-  ): Promise<null | string> => {
-    const options: OpenDialogOptions = {
-      filters: filters ?? [{ extensions: ["*"], name: "All Files" }],
-      properties: ["openFile"],
-    };
-    const result = await dialog.showOpenDialog(mainWindow!, options);
-    if (result.canceled || result.filePaths.length === 0) {
-      return null;
-    }
-    return result.filePaths[0] ?? null;
-  }
-);
-
-ipcMain.handle(
-  "dialog:saveFile",
-  async (
-    _event: IpcMainInvokeEvent,
-    defaultPath?: string,
-    filters?: Array<{ extensions: Array<string>; name: string }>
-  ): Promise<null | string> => {
-    const options: SaveDialogOptions = {
-      defaultPath,
-      filters: filters ?? [{ extensions: ["*"], name: "All Files" }],
-    };
-    const result = await dialog.showSaveDialog(mainWindow!, options);
-    if (result.canceled || !result.filePath) {
-      return null;
-    }
-    return result.filePath;
-  }
-);
-
-// IPC Handlers for electron-store
-ipcMain.handle(
-  "store:get",
-  (_event: IpcMainInvokeEvent, key: string): unknown => {
-    return store.get(key);
-  }
-);
-
-ipcMain.handle(
-  "store:set",
-  (_event: IpcMainInvokeEvent, key: string, value: unknown): boolean => {
-    try {
-      store.set(key, value);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-);
-
-ipcMain.handle(
-  "store:delete",
-  (_event: IpcMainInvokeEvent, key: string): boolean => {
-    try {
-      store.delete(key);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-);
-
-// IPC Handlers for app info
-ipcMain.handle("app:getVersion", (): string => {
-  return app.getVersion();
-});
-
-ipcMain.handle(
-  "app:getPath",
-  (
-    _event: IpcMainInvokeEvent,
-    name:
-      | "appData"
-      | "desktop"
-      | "documents"
-      | "downloads"
-      | "home"
-      | "temp"
-      | "userData"
-  ): string => {
-    return app.getPath(name);
-  }
-);
-
-// IPC Handlers for database operations - Projects
-ipcMain.handle("db:projects:getAll", (): Array<Project> => {
-  return db.select().from(projects).all();
-});
-
-ipcMain.handle(
-  "db:projects:getById",
-  (_event: IpcMainInvokeEvent, id: number): Project | undefined => {
-    return db.select().from(projects).where(eq(projects.id, id)).get();
-  }
-);
-
-ipcMain.handle(
-  "db:projects:create",
-  (_event: IpcMainInvokeEvent, data: NewProject): Project => {
-    return db.insert(projects).values(data).returning().get();
-  }
-);
-
-ipcMain.handle(
-  "db:projects:update",
-  (
-    _event: IpcMainInvokeEvent,
-    id: number,
-    data: Partial<NewProject>
-  ): Project | undefined => {
-    return db
-      .update(projects)
-      .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
-      .where(eq(projects.id, id))
-      .returning()
-      .get();
-  }
-);
-
-ipcMain.handle(
-  "db:projects:delete",
-  (_event: IpcMainInvokeEvent, id: number): boolean => {
-    const result = db.delete(projects).where(eq(projects.id, id)).run();
-    return result.changes > 0;
-  }
-);
-
 // App lifecycle
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   initializeDb();
-  createWindow();
+  registerAllHandlers(db, () => mainWindow);
+  await createWindow();
 });
 
 app.on("window-all-closed", () => {
@@ -384,9 +79,9 @@ app.on("window-all-closed", () => {
   }
 });
 
-app.on("activate", () => {
+app.on("activate", async () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    await createWindow();
   }
 });
 

@@ -1,0 +1,31 @@
+import type { BrowserWindow } from "electron";
+
+import type { DrizzleDatabase } from "../../db";
+
+import { createProjectsRepository } from "../../db/repositories/projects.repository";
+import { registerAppHandlers } from "./app.handlers";
+import { registerDialogHandlers } from "./dialog.handlers";
+import { registerFsHandlers } from "./fs.handlers";
+import { registerProjectsHandlers } from "./projects.handlers";
+import { registerStoreHandlers } from "./store.handlers";
+
+export function registerAllHandlers(
+  db: DrizzleDatabase,
+  getMainWindow: () => BrowserWindow | null
+): void {
+  // File system handlers
+  registerFsHandlers();
+
+  // Dialog handlers (need window reference)
+  registerDialogHandlers(getMainWindow);
+
+  // Electron store handlers
+  registerStoreHandlers();
+
+  // App info handlers
+  registerAppHandlers();
+
+  // Database handlers - Projects
+  const projectsRepository = createProjectsRepository(db);
+  registerProjectsHandlers(projectsRepository);
+}

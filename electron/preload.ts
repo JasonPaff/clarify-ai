@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
+import type { NewProject, Project } from "../db/schema";
+
 export interface ElectronAPI {
   app: {
     getPath(
@@ -41,7 +43,6 @@ export interface ElectronAPI {
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
       error?: string;
-
       success: boolean;
     }>;
     readFile(
@@ -56,7 +57,6 @@ export interface ElectronAPI {
         mtime: string;
         size: number;
       };
-
       success: boolean;
     }>;
     writeFile(
@@ -69,20 +69,6 @@ export interface ElectronAPI {
     get<T>(key: string): Promise<T | undefined>;
     set(key: string, value: unknown): Promise<boolean>;
   };
-}
-
-export interface NewProject {
-  description?: null | string;
-  name: string;
-}
-
-// Database types (mirrors db/schema.ts)
-export interface Project {
-  createdAt: string;
-  description: null | string;
-  id: number;
-  name: string;
-  updatedAt: string;
 }
 
 const electronAPI: ElectronAPI = {

@@ -21,8 +21,8 @@ export default function ProjectSettingsPage() {
           <div className={"flex items-center gap-3"}>
             <div
               className={`
-              flex size-10 items-center justify-center rounded-lg bg-muted
-            `}
+                flex size-10 items-center justify-center rounded-lg bg-muted
+              `}
             >
               <Pencil className={"size-5 text-muted-foreground"} />
             </div>
@@ -35,9 +35,9 @@ export default function ProjectSettingsPage() {
         <CardContent>
           <div
             className={`
-            rounded-lg border border-dashed border-border p-8 text-center
-            text-sm text-muted-foreground
-          `}
+              rounded-lg border border-dashed border-border p-8 text-center
+              text-sm text-muted-foreground
+            `}
           >
             Project name and description editing coming soon
           </div>
@@ -52,9 +52,9 @@ export default function ProjectSettingsPage() {
           <div className={"flex items-center gap-3"}>
             <div
               className={`
-              flex size-10 items-center justify-center rounded-lg
-              bg-destructive/10
-            `}
+                flex size-10 items-center justify-center rounded-lg
+                bg-destructive/10
+              `}
             >
               <AlertTriangle className={"size-5 text-destructive"} />
             </div>
@@ -69,9 +69,9 @@ export default function ProjectSettingsPage() {
         <CardContent>
           <div
             className={`
-            flex items-center justify-between rounded-lg border border-border
-            p-4
-          `}
+              flex items-center justify-between rounded-lg border border-border
+              p-4
+            `}
           >
             <div>
               <p className={"text-sm font-medium"}>Delete this project</p>

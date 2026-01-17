@@ -1,16 +1,5 @@
-// Database types (mirrors db/schema.ts)
-export interface Project {
-  createdAt: string;
-  description: string | null;
-  id: number;
-  name: string;
-  updatedAt: string;
-}
-
-export interface NewProject {
-  description?: string | null;
-  name: string;
-}
+// Re-export database types for renderer use
+export type { NewProject, Project } from "../db/types";
 
 export interface ElectronAPI {
   app: {
@@ -28,11 +17,16 @@ export interface ElectronAPI {
   };
   db: {
     projects: {
-      create(data: NewProject): Promise<Project>;
+      create(
+        data: import("../db/types").NewProject
+      ): Promise<import("../db/types").Project>;
       delete(id: number): Promise<boolean>;
-      getAll(): Promise<Project[]>;
-      getById(id: number): Promise<Project | undefined>;
-      update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
+      getAll(): Promise<Array<import("../db/types").Project>>;
+      getById(id: number): Promise<import("../db/types").Project | undefined>;
+      update(
+        id: number,
+        data: Partial<import("../db/types").NewProject>
+      ): Promise<import("../db/types").Project | undefined>;
     };
   };
   dialog: {
