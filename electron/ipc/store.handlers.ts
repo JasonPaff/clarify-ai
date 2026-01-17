@@ -1,6 +1,8 @@
 import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import Store from "electron-store";
 
+import { IpcChannels } from "./channels";
+
 interface StoreType {
   delete(key: string): void;
   get(key: string): unknown;
@@ -11,14 +13,14 @@ const store = new Store() as unknown as StoreType;
 
 export function registerStoreHandlers(): void {
   ipcMain.handle(
-    "store:get",
+    IpcChannels.store.get,
     (_event: IpcMainInvokeEvent, key: string): unknown => {
       return store.get(key);
     }
   );
 
   ipcMain.handle(
-    "store:set",
+    IpcChannels.store.set,
     (_event: IpcMainInvokeEvent, key: string, value: unknown): boolean => {
       try {
         store.set(key, value);
@@ -30,7 +32,7 @@ export function registerStoreHandlers(): void {
   );
 
   ipcMain.handle(
-    "store:delete",
+    IpcChannels.store.delete,
     (_event: IpcMainInvokeEvent, key: string): boolean => {
       try {
         store.delete(key);

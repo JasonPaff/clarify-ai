@@ -2,12 +2,14 @@ import type { BrowserWindow } from "electron";
 
 import type { DrizzleDatabase } from "../../db";
 
-import { createProjectsRepository } from "../../db/repositories/projects.repository";
+import { createProjectsRepository } from "../../db/repositories";
 import { registerAppHandlers } from "./app.handlers";
 import { registerDialogHandlers } from "./dialog.handlers";
 import { registerFsHandlers } from "./fs.handlers";
 import { registerProjectsHandlers } from "./projects.handlers";
 import { registerStoreHandlers } from "./store.handlers";
+
+export { IpcChannels } from "./channels";
 
 export function registerAllHandlers(
   db: DrizzleDatabase,

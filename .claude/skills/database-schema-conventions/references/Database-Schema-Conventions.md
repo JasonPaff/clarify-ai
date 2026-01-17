@@ -161,7 +161,7 @@ Pattern: `{tablename}_{columnname}_idx`
   index("users_email_idx").on(table.email),
   index("users_created_at_idx").on(table.createdAt),
   index("feature_requests_project_id_idx").on(table.projectId),
-]
+];
 ```
 
 ### Type Names
@@ -185,35 +185,35 @@ export type FeatureRequest = typeof featureRequests.$inferSelect;
 
 ```typescript
 // Primary key (always auto-increment integer)
-id: integer("id").primaryKey({ autoIncrement: true })
+id: integer("id").primaryKey({ autoIncrement: true });
 
 // Required text
-name: text("name").notNull()
+name: text("name").notNull();
 
 // Optional text
-description: text("description")
+description: text("description");
 
 // Text with default
-status: text("status").notNull().default("pending")
+status: text("status").notNull().default("pending");
 
 // Unique constraint
-email: text("email").notNull().unique()
+email: text("email").notNull().unique();
 
 // Foreign key
 projectId: integer("project_id")
   .notNull()
-  .references(() => projects.id, { onDelete: "cascade" })
+  .references(() => projects.id, { onDelete: "cascade" });
 
 // Timestamps (always text for SQLite compatibility)
 createdAt: text("created_at")
   .default(sql`(CURRENT_TIMESTAMP)`)
-  .notNull()
+  .notNull();
 
 // Boolean (stored as integer in SQLite)
-isActive: integer("is_active", { mode: "boolean" }).notNull().default(true)
+isActive: integer("is_active", { mode: "boolean" }).notNull().default(true);
 
 // JSON data (stored as text)
-metadata: text("metadata", { mode: "json" }).$type<MetadataType>()
+metadata: text("metadata", { mode: "json" }).$type<MetadataType>();
 ```
 
 ### Enum-like Columns
@@ -222,7 +222,7 @@ Use text with union types:
 
 ```typescript
 // In schema
-status: text("status").notNull().default("draft")
+status: text("status").notNull().default("draft");
 
 // In TypeScript types (use the inferred type, or define explicitly if needed)
 type Status = "draft" | "pending" | "approved" | "rejected";
@@ -243,9 +243,7 @@ export const featureRequests = sqliteTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
   },
-  (table) => [
-    index("feature_requests_project_id_idx").on(table.projectId),
-  ]
+  (table) => [index("feature_requests_project_id_idx").on(table.projectId)]
 );
 ```
 
@@ -328,13 +326,13 @@ export function createUsersRepository(db: DrizzleDatabase): UsersRepository {
 
 ### Repository Method Signatures
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `create` | `(data: NewEntity): Entity` | Insert and return the created record |
-| `getById` | `(id: number): Entity \| undefined` | Find by primary key |
-| `getAll` | `(): Array<Entity>` | Return all records |
-| `update` | `(id: number, data: Partial<NewEntity>): Entity \| undefined` | Update and return |
-| `delete` | `(id: number): boolean` | Delete and return success status |
+| Method    | Signature                                                     | Description                          |
+| --------- | ------------------------------------------------------------- | ------------------------------------ |
+| `create`  | `(data: NewEntity): Entity`                                   | Insert and return the created record |
+| `getById` | `(id: number): Entity \| undefined`                           | Find by primary key                  |
+| `getAll`  | `(): Array<Entity>`                                           | Return all records                   |
+| `update`  | `(id: number, data: Partial<NewEntity>): Entity \| undefined` | Update and return                    |
+| `delete`  | `(id: number): boolean`                                       | Delete and return success status     |
 
 ### Additional Repository Methods
 

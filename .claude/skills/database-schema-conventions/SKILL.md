@@ -7,7 +7,7 @@ description: Enforces project database schema conventions automatically when cre
 
 ## Purpose
 
-This skill enforces the project database schema conventions automatically during database-related development. 
+This skill enforces the project database schema conventions automatically during database-related development.
 It ensures consistent schema design, repository patterns, and adherence to project-specific standards for
 all Drizzle ORM and SQLite work.
 

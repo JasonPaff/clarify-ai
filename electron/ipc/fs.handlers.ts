@@ -2,9 +2,11 @@ import { ipcMain, type IpcMainInvokeEvent } from "electron";
 import * as fs from "fs/promises";
 import * as path from "path";
 
+import { IpcChannels } from "./channels";
+
 export function registerFsHandlers(): void {
   ipcMain.handle(
-    "fs:readFile",
+    IpcChannels.fs.readFile,
     async (
       _event: IpcMainInvokeEvent,
       filePath: string
@@ -25,7 +27,7 @@ export function registerFsHandlers(): void {
   );
 
   ipcMain.handle(
-    "fs:writeFile",
+    IpcChannels.fs.writeFile,
     async (
       _event: IpcMainInvokeEvent,
       filePath: string,
@@ -47,7 +49,7 @@ export function registerFsHandlers(): void {
   );
 
   ipcMain.handle(
-    "fs:readDirectory",
+    IpcChannels.fs.readDirectory,
     async (
       _event: IpcMainInvokeEvent,
       dirPath: string
@@ -77,7 +79,7 @@ export function registerFsHandlers(): void {
   );
 
   ipcMain.handle(
-    "fs:exists",
+    IpcChannels.fs.exists,
     async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
       if (!isValidPath(filePath)) {
         return false;
@@ -92,7 +94,7 @@ export function registerFsHandlers(): void {
   );
 
   ipcMain.handle(
-    "fs:stat",
+    IpcChannels.fs.stat,
     async (
       _event: IpcMainInvokeEvent,
       filePath: string
@@ -135,9 +137,5 @@ export function registerFsHandlers(): void {
 // Path validation to prevent directory traversal attacks
 function isValidPath(filePath: string): boolean {
   const normalizedPath = path.normalize(filePath);
-  // Prevent paths that try to escape with ..
-  if (normalizedPath.includes("..")) {
-    return false;
-  }
-  return true;
+  return !normalizedPath.includes("..");
 }

@@ -2,6 +2,8 @@ import { contextBridge, ipcRenderer } from "electron";
 
 import type { NewProject, Project } from "../db/schema";
 
+import { IpcChannels } from "./ipc";
+
 export interface ElectronAPI {
   app: {
     getPath(
@@ -73,37 +75,41 @@ export interface ElectronAPI {
 
 const electronAPI: ElectronAPI = {
   app: {
-    getPath: (name) => ipcRenderer.invoke("app:getPath", name),
-    getVersion: () => ipcRenderer.invoke("app:getVersion"),
+    getPath: (name) => ipcRenderer.invoke(IpcChannels.app.getPath, name),
+    getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
     projects: {
-      create: (data) => ipcRenderer.invoke("db:projects:create", data),
-      delete: (id) => ipcRenderer.invoke("db:projects:delete", id),
-      getAll: () => ipcRenderer.invoke("db:projects:getAll"),
-      getById: (id) => ipcRenderer.invoke("db:projects:getById", id),
-      update: (id, data) => ipcRenderer.invoke("db:projects:update", id, data),
+      create: (data) =>
+        ipcRenderer.invoke(IpcChannels.db.projects.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.projects.delete, id),
+      getAll: () => ipcRenderer.invoke(IpcChannels.db.projects.getAll),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.projects.getById, id),
+      update: (id, data) =>
+        ipcRenderer.invoke(IpcChannels.db.projects.update, id, data),
     },
   },
   dialog: {
-    openDirectory: () => ipcRenderer.invoke("dialog:openDirectory"),
-    openFile: (filters) => ipcRenderer.invoke("dialog:openFile", filters),
+    openDirectory: () => ipcRenderer.invoke(IpcChannels.dialog.openDirectory),
+    openFile: (filters) =>
+      ipcRenderer.invoke(IpcChannels.dialog.openFile, filters),
     saveFile: (defaultPath, filters) =>
-      ipcRenderer.invoke("dialog:saveFile", defaultPath, filters),
+      ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
   },
   fs: {
-    exists: (path) => ipcRenderer.invoke("fs:exists", path),
-    readDirectory: (path) => ipcRenderer.invoke("fs:readDirectory", path),
-    readFile: (path) => ipcRenderer.invoke("fs:readFile", path),
-    stat: (path) => ipcRenderer.invoke("fs:stat", path),
+    exists: (path) => ipcRenderer.invoke(IpcChannels.fs.exists, path),
+    readDirectory: (path) =>
+      ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
+    readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),
+    stat: (path) => ipcRenderer.invoke(IpcChannels.fs.stat, path),
     writeFile: (path, content) =>
-      ipcRenderer.invoke("fs:writeFile", path, content),
+      ipcRenderer.invoke(IpcChannels.fs.writeFile, path, content),
   },
   store: {
-    delete: (key) => ipcRenderer.invoke("store:delete", key),
+    delete: (key) => ipcRenderer.invoke(IpcChannels.store.delete, key),
     get: <T>(key: string) =>
-      ipcRenderer.invoke("store:get", key) as Promise<T | undefined>,
-    set: (key, value) => ipcRenderer.invoke("store:set", key, value),
+      ipcRenderer.invoke(IpcChannels.store.get, key) as Promise<T | undefined>,
+    set: (key, value) => ipcRenderer.invoke(IpcChannels.store.set, key, value),
   },
 };
 

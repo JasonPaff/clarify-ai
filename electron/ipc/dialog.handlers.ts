@@ -7,25 +7,30 @@ import {
   type SaveDialogOptions,
 } from "electron";
 
+import { IpcChannels } from "./channels";
+
 export function registerDialogHandlers(
   getMainWindow: () => BrowserWindow | null
 ): void {
-  ipcMain.handle("dialog:openDirectory", async (): Promise<null | string> => {
-    const mainWindow = getMainWindow();
-    if (!mainWindow) return null;
+  ipcMain.handle(
+    IpcChannels.dialog.openDirectory,
+    async (): Promise<null | string> => {
+      const mainWindow = getMainWindow();
+      if (!mainWindow) return null;
 
-    const options: OpenDialogOptions = {
-      properties: ["openDirectory"],
-    };
-    const result = await dialog.showOpenDialog(mainWindow, options);
-    if (result.canceled || result.filePaths.length === 0) {
-      return null;
+      const options: OpenDialogOptions = {
+        properties: ["openDirectory"],
+      };
+      const result = await dialog.showOpenDialog(mainWindow, options);
+      if (result.canceled || result.filePaths.length === 0) {
+        return null;
+      }
+      return result.filePaths[0] ?? null;
     }
-    return result.filePaths[0] ?? null;
-  });
+  );
 
   ipcMain.handle(
-    "dialog:openFile",
+    IpcChannels.dialog.openFile,
     async (
       _event: IpcMainInvokeEvent,
       filters?: Array<{ extensions: Array<string>; name: string }>
@@ -46,7 +51,7 @@ export function registerDialogHandlers(
   );
 
   ipcMain.handle(
-    "dialog:saveFile",
+    IpcChannels.dialog.saveFile,
     async (
       _event: IpcMainInvokeEvent,
       defaultPath?: string,
