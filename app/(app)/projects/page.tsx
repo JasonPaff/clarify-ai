@@ -5,6 +5,7 @@ import { Fragment } from "react";
 
 import { QueryErrorBoundary } from "@/components/data/query-error-boundary";
 import { PageHeader } from "@/components/layout/page-header";
+import { NewProjectDialog } from "@/components/projects/new-project-dialog";
 import { ProjectCard } from "@/components/projects/project-card";
 import { ProjectsSkeleton } from "@/components/skeletons/projects-skeleton";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,12 @@ export default function ProjectsPage() {
     <Fragment>
       <PageHeader
         action={
-          <Button>
-            <Plus className={"size-4"} />
-            New Project
-          </Button>
+          <NewProjectDialog>
+            <Button>
+              <Plus className={"size-4"} />
+              New Project
+            </Button>
+          </NewProjectDialog>
         }
         description={"Manage your feature planning projects"}
         title={"Projects"}
@@ -43,10 +46,12 @@ function ProjectsContent() {
     return (
       <EmptyState
         action={
-          <Button>
-            <Plus className={"size-4"} />
-            Create your first project
-          </Button>
+          <NewProjectDialog>
+            <Button>
+              <Plus className={"size-4"} />
+              Create your first project
+            </Button>
+          </NewProjectDialog>
         }
         description={
           "Projects help you organize feature requests and implementation plans for your applications."

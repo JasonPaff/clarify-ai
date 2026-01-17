@@ -31,9 +31,7 @@ export function FormError({ className }: FormErrorProps) {
           >
             <AlertCircle
               aria-hidden={"true"}
-              className={`
-              mt-0.5 size-4 shrink-0
-            `}
+              className={`mt-0.5 size-4 shrink-0`}
             />
             <div className={"flex flex-col gap-1"}>
               {errors.map((error, index) => (
