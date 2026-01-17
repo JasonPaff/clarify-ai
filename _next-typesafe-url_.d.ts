@@ -11,7 +11,7 @@ declare module "@@@next-typesafe-url" {
   interface DynamicRouter {
     "/projects/[projectId]/features": InferRoute<import("./app/(app)/projects/[projectId]/features/route-type").RouteType>;
     "/projects/[projectId]/features/[featureId]": InferRoute<import("./app/(app)/projects/[projectId]/features/[featureId]/route-type").RouteType>;
-    "/projects/[projectId]": InferRoute<import("./app/(app)/projects/[projectId]/route-type").RouteType>;
+    "/projects/[projectId]": InferRoute<import("./app/(app)/projects/[projectId]/(projectId)/route-type").RouteType>;
     "/projects/[projectId]/repositories": InferRoute<import("./app/(app)/projects/[projectId]/repositories/route-type").RouteType>;
     "/projects/[projectId]/settings": InferRoute<import("./app/(app)/projects/[projectId]/settings/route-type").RouteType>;
   }

@@ -3,14 +3,15 @@
 import { FolderPlus, Plus } from "lucide-react";
 import { Fragment } from "react";
 
+import { QueryErrorBoundary } from "@/components/data/query-error-boundary";
 import { PageHeader } from "@/components/layout/page-header";
+import { ProjectCard } from "@/components/projects/project-card";
+import { ProjectsSkeleton } from "@/components/skeletons/projects-skeleton";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useProjects } from "@/hooks/queries/use-projects";
 
 export default function ProjectsPage() {
-  // This will be replaced with actual projects data
-  const hasProjects = false;
-
   return (
     <Fragment>
       <PageHeader
@@ -24,31 +25,54 @@ export default function ProjectsPage() {
         title={"Projects"}
       />
 
-      {hasProjects ? (
-        <div
-          className={`
-            grid gap-4
-            sm:grid-cols-2
-            lg:grid-cols-3
-          `}
-        >
-          {/* Project cards will go here */}
-        </div>
-      ) : (
-        <EmptyState
-          action={
-            <Button>
-              <Plus className={"size-4"} />
-              Create your first project
-            </Button>
-          }
-          description={
-            "Projects help you organize feature requests and implementation plans for your applications."
-          }
-          icon={<FolderPlus className={"size-6"} />}
-          title={"No projects yet"}
-        />
-      )}
+      <QueryErrorBoundary>
+        <ProjectsContent />
+      </QueryErrorBoundary>
     </Fragment>
+  );
+}
+
+function ProjectsContent() {
+  const { data: projects, isLoading } = useProjects();
+
+  if (isLoading || !projects) {
+    return <ProjectsSkeleton />;
+  }
+
+  if (projects.length === 0) {
+    return (
+      <EmptyState
+        action={
+          <Button>
+            <Plus className={"size-4"} />
+            Create your first project
+          </Button>
+        }
+        description={
+          "Projects help you organize feature requests and implementation plans for your applications."
+        }
+        icon={<FolderPlus className={"size-6"} />}
+        title={"No projects yet"}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`
+        grid gap-4
+        sm:grid-cols-2
+        lg:grid-cols-3
+      `}
+    >
+      {projects.map((project) => (
+        <ProjectCard
+          description={project.description ?? undefined}
+          id={project.id}
+          key={project.id}
+          name={project.name}
+        />
+      ))}
+    </div>
   );
 }

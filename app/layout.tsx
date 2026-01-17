@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { QueryProvider } from "@/components/providers/query-provider";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,7 +36,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
       >
         {/* base-ui requires this root class */}
         {/* eslint-disable-next-line better-tailwindcss/no-unknown-classes */}
-        <div className={"root"}>{children}</div>
+        <div className={"root"}>
+          <QueryProvider>{children}</QueryProvider>
+        </div>
       </body>
     </html>
   );

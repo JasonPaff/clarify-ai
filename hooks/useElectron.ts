@@ -59,6 +59,40 @@ export function useElectronApp() {
   };
 }
 
+export function useElectronDb() {
+  const { api, isElectron } = useElectron();
+
+  const projects = useMemo(
+    () => ({
+      create: (
+        data: Parameters<NonNullable<typeof api>["db"]["projects"]["create"]>[0]
+      ) => {
+        if (!api) throw new Error("Electron API not available");
+        return api.db.projects.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error("Electron API not available");
+        return api.db.projects.delete(id);
+      },
+      getAll: () => api?.db.projects.getAll() ?? Promise.resolve([]),
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.projects.getById(id);
+      },
+      update: (
+        id: number,
+        data: Parameters<NonNullable<typeof api>["db"]["projects"]["update"]>[1]
+      ) => {
+        if (!api) throw new Error("Electron API not available");
+        return api.db.projects.update(id, data);
+      },
+    }),
+    [api]
+  );
+
+  return { isElectron, projects };
+}
+
 export function useElectronDialog() {
   const { api, isElectron } = useElectron();
 

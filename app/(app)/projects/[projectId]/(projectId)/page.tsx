@@ -4,7 +4,10 @@ import { withParamValidation } from "next-typesafe-url/app/hoc";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
-import { PageProps, Route } from "@/app/(app)/projects/[projectId]/route-type";
+import {
+  PageProps,
+  Route,
+} from "@/app/(app)/projects/[projectId]/(projectId)/route-type";
 
 type ProjectPageProps = PageProps;
 
