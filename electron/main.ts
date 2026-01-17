@@ -40,7 +40,7 @@ async function createWindow(): Promise<void> {
 
   if (isDev) {
     await mainWindow.loadURL(process.env.APP_BASE_URL!);
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
   } else {
     await loadURL?.(mainWindow);
   }
