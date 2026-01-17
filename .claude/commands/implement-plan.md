@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:database-schema), Task(subagent_type:tanstack-query), Task(subagent_type:tanstack-form), Task(subagent_type:tanstack-form-base-components), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,pnpm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:database-schema), Task(subagent_type:tanstack-query), Task(subagent_type:tanstack-form), Task(subagent_type:tanstack-form-base-components), Task(subagent_type:ipc-handler), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,pnpm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
@@ -94,6 +94,7 @@ You do NOT implement code. Subagents implement code.
 | Agent                           | Domain                       | When to Use                                            |
 | ------------------------------- | ---------------------------- | ------------------------------------------------------ |
 | `database-schema`               | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`            |
+| `ipc-handler`                   | Electron IPC communication   | Files in `electron/ipc/`, `electron/preload.ts`, IPC hooks |
 | `tanstack-query`                | Data fetching & server state | Query hooks, mutations, cache management               |
 | `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas |
 | `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`              |
@@ -104,10 +105,11 @@ You do NOT implement code. Subagents implement code.
 ```
 1. IF files contain "db/schema/" AND end with ".schema.ts" → database-schema
 2. IF files contain "db/repositories/" → database-schema
-3. IF files involve TanStack Query hooks/mutations → tanstack-query
-4. IF files contain "components/ui/form/" (base field components) → tanstack-form-base-components
-5. IF step involves creating/modifying forms OR files contain "lib/validations/" → tanstack-form
-6. ELSE → general-purpose
+3. IF files contain "electron/ipc/" OR "electron/preload.ts" OR step involves IPC handlers → ipc-handler
+4. IF files involve TanStack Query hooks/mutations → tanstack-query
+5. IF files contain "components/ui/form/" (base field components) → tanstack-form-base-components
+6. IF step involves creating/modifying forms OR files contain "lib/validations/" → tanstack-form
+7. ELSE → general-purpose
 ```
 
 ---
