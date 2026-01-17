@@ -1,6 +1,6 @@
 // Re-export database types for renderer use
-export type { NewProject, Project } from '../db/types';
-export type { NewRepository, Repository } from '../db/types';
+export type { NewProject, Project } from '../db/schema/projects.schema';
+export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
 export interface ElectronAPI {
   app: {
@@ -9,24 +9,28 @@ export interface ElectronAPI {
   };
   db: {
     projects: {
-      create(data: import('../db/types').NewProject): Promise<import('../db/types').Project>;
+      create(
+        data: import('../db/schema/projects.schema').NewProject
+      ): Promise<import('../db/schema/projects.schema').Project>;
       delete(id: number): Promise<boolean>;
-      getAll(): Promise<Array<import('../db/types').Project>>;
-      getById(id: number): Promise<import('../db/types').Project | undefined>;
+      getAll(): Promise<Array<import('../db/schema/projects.schema').Project>>;
+      getById(id: number): Promise<import('../db/schema/projects.schema').Project | undefined>;
       update(
         id: number,
-        data: Partial<import('../db/types').NewProject>
-      ): Promise<import('../db/types').Project | undefined>;
+        data: Partial<import('../db/schema/projects.schema').NewProject>
+      ): Promise<import('../db/schema/projects.schema').Project | undefined>;
     };
     repositories: {
-      create(data: import('../db/types').NewRepository): Promise<import('../db/types').Repository>;
+      create(
+        data: import('../db/schema/repositories.schema').NewRepository
+      ): Promise<import('../db/schema/repositories.schema').Repository>;
       delete(id: number): Promise<boolean>;
-      getById(id: number): Promise<import('../db/types').Repository | undefined>;
-      getByProjectId(projectId: number): Promise<Array<import('../db/types').Repository>>;
+      getById(id: number): Promise<import('../db/schema/repositories.schema').Repository | undefined>;
+      getByProjectId(projectId: number): Promise<Array<import('../db/schema/repositories.schema').Repository>>;
       update(
         id: number,
-        data: Partial<import('../db/types').NewRepository>
-      ): Promise<import('../db/types').Repository | undefined>;
+        data: Partial<import('../db/schema/repositories.schema').NewRepository>
+      ): Promise<import('../db/schema/repositories.schema').Repository | undefined>;
     };
   };
   dialog: {

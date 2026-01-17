@@ -30,6 +30,7 @@
 **Interface**: `RepositoriesRepository`
 
 **Methods**:
+
 - `create(data: NewRepository): Promise<Repository>`
 - `delete(id: number): Promise<void>`
 - `getById(id: number): Promise<Repository | undefined>`

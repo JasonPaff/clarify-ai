@@ -2,12 +2,12 @@
 
 ## Step Metadata
 
-| Field | Value |
-|-------|-------|
-| **Step** | 2 - AI-Powered File Discovery |
-| **Status** | Completed |
-| **Started** | 2026-01-17 |
-| **Duration** | ~45 seconds |
+| Field        | Value                         |
+| ------------ | ----------------------------- |
+| **Step**     | 2 - AI-Powered File Discovery |
+| **Status**   | Completed                     |
+| **Started**  | 2026-01-17                    |
+| **Duration** | ~45 seconds                   |
 
 ## Input: Refined Feature Request
 
@@ -41,80 +41,80 @@ Use "very thorough" exploration to ensure comprehensive coverage.
 
 ### 1. REFERENCE FILES (Critical) - Existing Patterns to Follow
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `db/schema/projects.schema.ts` | Critical | Template for creating repositories.schema.ts. Shows Drizzle sqliteTable definition pattern, field structure, index creation, type exports |
-| `db/repositories/projects.repository.ts` | Critical | Template for creating repositories.repository.ts. Shows repository interface pattern with CRUD methods, function factory pattern |
-| `db/repositories/index.ts` | Critical | Must export repositories types and factory |
-| `db/schema/index.ts` | Critical | Must be updated to export repositories.schema for Drizzle |
+| File Path                                | Priority | Relevance                                                                                                                                 |
+| ---------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `db/schema/projects.schema.ts`           | Critical | Template for creating repositories.schema.ts. Shows Drizzle sqliteTable definition pattern, field structure, index creation, type exports |
+| `db/repositories/projects.repository.ts` | Critical | Template for creating repositories.repository.ts. Shows repository interface pattern with CRUD methods, function factory pattern          |
+| `db/repositories/index.ts`               | Critical | Must export repositories types and factory                                                                                                |
+| `db/schema/index.ts`                     | Critical | Must be updated to export repositories.schema for Drizzle                                                                                 |
 
 ### 2. ELECTRON IPC LAYER (Critical)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `electron/ipc/channels.ts` | Critical | Central IPC channel registry. Must add `db.repositories` object |
-| `electron/ipc/projects.handlers.ts` | Critical | Template for repositories.handlers.ts |
-| `electron/ipc/index.ts` | Critical | Central handler registration hub. Must register repositories handlers |
-| `electron/ipc/fs.handlers.ts` | High | Shows secure file system operations with path validation |
-| `electron/ipc/dialog.handlers.ts` | High | Shows `openDirectory()` handler pattern for repository path selection |
+| File Path                           | Priority | Relevance                                                             |
+| ----------------------------------- | -------- | --------------------------------------------------------------------- |
+| `electron/ipc/channels.ts`          | Critical | Central IPC channel registry. Must add `db.repositories` object       |
+| `electron/ipc/projects.handlers.ts` | Critical | Template for repositories.handlers.ts                                 |
+| `electron/ipc/index.ts`             | Critical | Central handler registration hub. Must register repositories handlers |
+| `electron/ipc/fs.handlers.ts`       | High     | Shows secure file system operations with path validation              |
+| `electron/ipc/dialog.handlers.ts`   | High     | Shows `openDirectory()` handler pattern for repository path selection |
 
 ### 3. ELECTRON PRELOAD & TYPE DEFINITIONS (Critical)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `electron/preload.ts` | Critical | Exposes IPC APIs to renderer. Must add repositories to db property |
+| File Path             | Priority | Relevance                                                                |
+| --------------------- | -------- | ------------------------------------------------------------------------ |
+| `electron/preload.ts` | Critical | Exposes IPC APIs to renderer. Must add repositories to db property       |
 | `types/electron.d.ts` | Critical | TypeScript global definition for window.electronAPI. Must mirror preload |
 
 ### 4. HOOKS & REACT QUERY (High)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `hooks/queries/use-projects.ts` | High | Template for repositories query hooks. Shows TanStack React Query patterns |
-| `lib/queries/projects.ts` | High | Query key factory pattern to follow |
-| `lib/queries/index.ts` | High | Must merge repositoryKeys into queries export |
-| `hooks/useElectron.ts` | High | Shows useElectronDb() pattern. Must extend with repositories |
+| File Path                       | Priority | Relevance                                                                  |
+| ------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `hooks/queries/use-projects.ts` | High     | Template for repositories query hooks. Shows TanStack React Query patterns |
+| `lib/queries/projects.ts`       | High     | Query key factory pattern to follow                                        |
+| `lib/queries/index.ts`          | High     | Must merge repositoryKeys into queries export                              |
+| `hooks/useElectron.ts`          | High     | Shows useElectronDb() pattern. Must extend with repositories               |
 
 ### 5. DATABASE INITIALIZATION (High)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `db/index.ts` | High | Database initialization and connection reference |
-| `drizzle.config.ts` | High | Configuration for Drizzle Kit migrations |
-| `drizzle/0000_flippant_ted_forrester.sql` | Medium | Shows generated SQL format reference |
+| File Path                                 | Priority | Relevance                                        |
+| ----------------------------------------- | -------- | ------------------------------------------------ |
+| `db/index.ts`                             | High     | Database initialization and connection reference |
+| `drizzle.config.ts`                       | High     | Configuration for Drizzle Kit migrations         |
+| `drizzle/0000_flippant_ted_forrester.sql` | Medium   | Shows generated SQL format reference             |
 
 ### 6. VALIDATION & FORMS (Medium)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `lib/validations/project.ts` | Medium | Zod schema validation patterns reference |
-| `lib/forms/form-hook.ts` | Medium | TanStack React Form setup reference |
+| File Path                    | Priority | Relevance                                |
+| ---------------------------- | -------- | ---------------------------------------- |
+| `lib/validations/project.ts` | Medium   | Zod schema validation patterns reference |
+| `lib/forms/form-hook.ts`     | Medium   | TanStack React Form setup reference      |
 
 ### 7. UI COMPONENTS (Medium)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `components/projects/project-tabs.tsx` | Medium | Routes to repositories page, shows tab navigation |
-| `components/projects/delete-project-dialog.tsx` | Medium | AlertDialog pattern for destructive actions reference |
-| `components/projects/new-project-dialog.tsx` | Medium | Dialog pattern with form submission reference |
-| `components/projects/create-project-form.tsx` | Medium | Form implementation reference |
+| File Path                                       | Priority | Relevance                                             |
+| ----------------------------------------------- | -------- | ----------------------------------------------------- |
+| `components/projects/project-tabs.tsx`          | Medium   | Routes to repositories page, shows tab navigation     |
+| `components/projects/delete-project-dialog.tsx` | Medium   | AlertDialog pattern for destructive actions reference |
+| `components/projects/new-project-dialog.tsx`    | Medium   | Dialog pattern with form submission reference         |
+| `components/projects/create-project-form.tsx`   | Medium   | Form implementation reference                         |
 
 ### 8. PAGES & ROUTING (High)
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `app/(app)/projects/[projectId]/repositories/page.tsx` | High | Implementation target - currently placeholder |
-| `app/(app)/projects/[projectId]/repositories/route-type.ts` | Medium | Type-safe route definition already set up |
-| `app/(app)/projects/[projectId]/features/page.tsx` | Medium | Similar placeholder structure reference |
-| `app/(app)/projects/page.tsx` | Medium | Full list page implementation reference |
+| File Path                                                   | Priority | Relevance                                     |
+| ----------------------------------------------------------- | -------- | --------------------------------------------- |
+| `app/(app)/projects/[projectId]/repositories/page.tsx`      | High     | Implementation target - currently placeholder |
+| `app/(app)/projects/[projectId]/repositories/route-type.ts` | Medium   | Type-safe route definition already set up     |
+| `app/(app)/projects/[projectId]/features/page.tsx`          | Medium   | Similar placeholder structure reference       |
+| `app/(app)/projects/page.tsx`                               | Medium   | Full list page implementation reference       |
 
 ### 9. OTHER REFERENCES
 
-| File Path | Priority | Relevance |
-|-----------|----------|-----------|
-| `types/component-types.ts` | Medium | Global type declarations reference |
-| `lib/utils.ts` | Low | Class name merging utility |
-| `components/providers/query-provider.tsx` | Medium | TanStack React Query client setup |
-| `electron/main.ts` | High | App initialization flow reference |
+| File Path                                 | Priority | Relevance                          |
+| ----------------------------------------- | -------- | ---------------------------------- |
+| `types/component-types.ts`                | Medium   | Global type declarations reference |
+| `lib/utils.ts`                            | Low      | Class name merging utility         |
+| `components/providers/query-provider.tsx` | Medium   | TanStack React Query client setup  |
+| `electron/main.ts`                        | High     | App initialization flow reference  |
 
 ---
 
@@ -122,39 +122,39 @@ Use "very thorough" exploration to ensure comprehensive coverage.
 
 All discovered files exist in the codebase:
 
-| File | Exists | Accessible |
-|------|--------|------------|
-| db/schema/projects.schema.ts | ✅ | ✅ |
-| db/repositories/projects.repository.ts | ✅ | ✅ |
-| db/repositories/index.ts | ✅ | ✅ |
-| db/schema/index.ts | ✅ | ✅ |
-| electron/ipc/channels.ts | ✅ | ✅ |
-| electron/ipc/projects.handlers.ts | ✅ | ✅ |
-| electron/ipc/index.ts | ✅ | ✅ |
-| electron/preload.ts | ✅ | ✅ |
-| types/electron.d.ts | ✅ | ✅ |
-| hooks/queries/use-projects.ts | ✅ | ✅ |
-| lib/queries/projects.ts | ✅ | ✅ |
-| lib/queries/index.ts | ✅ | ✅ |
-| hooks/useElectron.ts | ✅ | ✅ |
-| db/index.ts | ✅ | ✅ |
-| lib/validations/project.ts | ✅ | ✅ |
-| app/(app)/projects/[projectId]/repositories/page.tsx | ✅ | ✅ |
+| File                                                 | Exists | Accessible |
+| ---------------------------------------------------- | ------ | ---------- |
+| db/schema/projects.schema.ts                         | ✅     | ✅         |
+| db/repositories/projects.repository.ts               | ✅     | ✅         |
+| db/repositories/index.ts                             | ✅     | ✅         |
+| db/schema/index.ts                                   | ✅     | ✅         |
+| electron/ipc/channels.ts                             | ✅     | ✅         |
+| electron/ipc/projects.handlers.ts                    | ✅     | ✅         |
+| electron/ipc/index.ts                                | ✅     | ✅         |
+| electron/preload.ts                                  | ✅     | ✅         |
+| types/electron.d.ts                                  | ✅     | ✅         |
+| hooks/queries/use-projects.ts                        | ✅     | ✅         |
+| lib/queries/projects.ts                              | ✅     | ✅         |
+| lib/queries/index.ts                                 | ✅     | ✅         |
+| hooks/useElectron.ts                                 | ✅     | ✅         |
+| db/index.ts                                          | ✅     | ✅         |
+| lib/validations/project.ts                           | ✅     | ✅         |
+| app/(app)/projects/[projectId]/repositories/page.tsx | ✅     | ✅         |
 
 ---
 
 ## DISCOVERY STATISTICS
 
-| Metric | Value |
-|--------|-------|
-| **Total Files Discovered** | 26 |
-| **Critical Priority** | 9 |
-| **High Priority** | 9 |
-| **Medium Priority** | 7 |
-| **Low Priority** | 1 |
-| **Files to Create** | 4 (new schema, repository, handlers, hooks) |
-| **Files to Modify** | 8 (channels, indexes, preload, types, etc.) |
-| **Reference Files** | 14 |
+| Metric                     | Value                                       |
+| -------------------------- | ------------------------------------------- |
+| **Total Files Discovered** | 26                                          |
+| **Critical Priority**      | 9                                           |
+| **High Priority**          | 9                                           |
+| **Medium Priority**        | 7                                           |
+| **Low Priority**           | 1                                           |
+| **Files to Create**        | 4 (new schema, repository, handlers, hooks) |
+| **Files to Modify**        | 8 (channels, indexes, preload, types, etc.) |
+| **Reference Files**        | 14                                          |
 
 ---
 

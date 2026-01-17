@@ -9,12 +9,10 @@ import type { Repository } from '@/db/schema/repositories.schema';
 import { PageProps, Route } from '@/app/(app)/projects/[projectId]/repositories/route-type';
 import { QueryErrorBoundary } from '@/components/data/query-error-boundary';
 import { PageHeader } from '@/components/layout/page-header';
-import {
-  DeleteRepositoryDialog,
-  EditRepositoryDialog,
-  NewRepositoryDialog,
-  RepositoryCard,
-} from '@/components/repositories';
+import { DeleteRepositoryDialog } from '@/components/repositories/delete-repository-dialog';
+import { EditRepositoryDialog } from '@/components/repositories/edit-repository-dialog';
+import { NewRepositoryDialog } from '@/components/repositories/new-repository-dialog';
+import { RepositoryCard } from '@/components/repositories/repository-card';
 import { RepositoriesSkeleton } from '@/components/skeletons/repositories-skeleton';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';

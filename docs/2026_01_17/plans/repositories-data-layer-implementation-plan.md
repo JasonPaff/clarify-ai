@@ -453,25 +453,25 @@ pnpm db:generate && pnpm db:migrate && pnpm lint && pnpm typecheck
 
 ### Files to Create (7)
 
-| File | Purpose |
-|------|---------|
-| `db/schema/repositories.schema.ts` | Drizzle schema for repositories table |
-| `db/repositories/repositories.repository.ts` | Repository pattern implementation |
-| `db/types.ts` | Type re-exports for renderer |
-| `electron/ipc/repositories.handlers.ts` | IPC handlers for repository operations |
-| `lib/queries/repositories.ts` | Query key factory |
-| `lib/validations/repository.ts` | Zod validation schemas |
-| `hooks/queries/use-repositories.ts` | TanStack Query hooks |
+| File                                         | Purpose                                |
+| -------------------------------------------- | -------------------------------------- |
+| `db/schema/repositories.schema.ts`           | Drizzle schema for repositories table  |
+| `db/repositories/repositories.repository.ts` | Repository pattern implementation      |
+| `db/types.ts`                                | Type re-exports for renderer           |
+| `electron/ipc/repositories.handlers.ts`      | IPC handlers for repository operations |
+| `lib/queries/repositories.ts`                | Query key factory                      |
+| `lib/validations/repository.ts`              | Zod validation schemas                 |
+| `hooks/queries/use-repositories.ts`          | TanStack Query hooks                   |
 
 ### Files to Modify (9)
 
-| File | Changes |
-|------|---------|
-| `db/schema/index.ts` | Export repositories schema |
-| `db/repositories/index.ts` | Export repositories repository |
-| `electron/ipc/channels.ts` | Add db.repositories channels |
-| `electron/ipc/index.ts` | Register repositories handlers |
-| `electron/preload.ts` | Add repositories to ElectronAPI |
-| `types/electron.d.ts` | Add repositories interface |
-| `lib/queries/index.ts` | Merge repository keys |
-| `hooks/useElectron.ts` | Extend with repositories methods |
+| File                       | Changes                          |
+| -------------------------- | -------------------------------- |
+| `db/schema/index.ts`       | Export repositories schema       |
+| `db/repositories/index.ts` | Export repositories repository   |
+| `electron/ipc/channels.ts` | Add db.repositories channels     |
+| `electron/ipc/index.ts`    | Register repositories handlers   |
+| `electron/preload.ts`      | Add repositories to ElectronAPI  |
+| `types/electron.d.ts`      | Add repositories interface       |
+| `lib/queries/index.ts`     | Merge repository keys            |
+| `hooks/useElectron.ts`     | Extend with repositories methods |

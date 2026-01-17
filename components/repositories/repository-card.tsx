@@ -20,6 +20,8 @@ export function RepositoryCard({ fileCount, lastScannedAt, name, onDelete, onEdi
     ? `Last scanned ${formatDistanceToNow(new Date(lastScannedAt), { addSuffix: true })}`
     : 'Never scanned';
 
+  const files = fileCount !== null && ` • ${fileCount} ${fileCount === 1 ? 'file' : 'files'}`;
+
   return (
     <Card>
       <CardHeader className={'pb-2'}>
@@ -48,7 +50,7 @@ export function RepositoryCard({ fileCount, lastScannedAt, name, onDelete, onEdi
         </CardDescription>
         <p className={'mt-2 text-xs text-muted-foreground'}>
           {formattedLastScanned}
-          {fileCount != null && ` • ${fileCount} ${fileCount === 1 ? 'file' : 'files'}`}
+          {files}
         </p>
       </CardContent>
     </Card>

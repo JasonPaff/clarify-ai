@@ -1,9 +1,9 @@
 import { eq, sql } from 'drizzle-orm';
 
 import type { DrizzleDatabase } from '../index';
-import type { NewRepository, Repository } from '../schema';
+import type { NewRepository, Repository } from '../schema/repositories.schema';
 
-import { repositories } from '../schema';
+import { repositories } from '../schema/repositories.schema';
 
 export interface RepositoriesRepository {
   create(data: NewRepository): Repository;

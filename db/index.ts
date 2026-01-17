@@ -3,7 +3,10 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
-import * as schema from './schema/index';
+import * as projectsSchema from './schema/projects.schema';
+import * as repositoriesSchema from './schema/repositories.schema';
+
+const schema = { ...projectsSchema, ...repositoriesSchema };
 
 export type DrizzleDatabase = BetterSQLite3Database<typeof schema>;
 

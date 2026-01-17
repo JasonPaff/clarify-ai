@@ -18,51 +18,53 @@ Successfully implemented the complete database-to-UI data flow for managing code
 
 ## Files Created
 
-| File | Purpose |
-|------|---------|
-| `db/schema/repositories.schema.ts` | Drizzle schema for repositories table |
-| `db/repositories/repositories.repository.ts` | Repository pattern implementation |
-| `db/types.ts` | Type re-exports for renderer |
-| `electron/ipc/repositories.handlers.ts` | IPC handlers for repository operations |
-| `lib/queries/repositories.ts` | Query key factory |
-| `lib/validations/repository.ts` | Zod validation schemas |
-| `hooks/queries/use-repositories.ts` | TanStack Query hooks |
-| `drizzle/0000_faulty_madripoor.sql` | Database migration |
-| `docs/2026_01_17/implementation/repositories-data-layer/*` | Implementation logs |
+| File                                                       | Purpose                                |
+| ---------------------------------------------------------- | -------------------------------------- |
+| `db/schema/repositories.schema.ts`                         | Drizzle schema for repositories table  |
+| `db/repositories/repositories.repository.ts`               | Repository pattern implementation      |
+| `db/types.ts`                                              | Type re-exports for renderer           |
+| `electron/ipc/repositories.handlers.ts`                    | IPC handlers for repository operations |
+| `lib/queries/repositories.ts`                              | Query key factory                      |
+| `lib/validations/repository.ts`                            | Zod validation schemas                 |
+| `hooks/queries/use-repositories.ts`                        | TanStack Query hooks                   |
+| `drizzle/0000_faulty_madripoor.sql`                        | Database migration                     |
+| `docs/2026_01_17/implementation/repositories-data-layer/*` | Implementation logs                    |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `db/schema/index.ts` | Export repositories schema |
-| `db/repositories/index.ts` | Export repositories repository |
-| `electron/ipc/channels.ts` | Add db.repositories channels |
-| `electron/ipc/index.ts` | Register repositories handlers |
-| `electron/preload.ts` | Add repositories to ElectronAPI |
-| `types/electron.d.ts` | Add repositories interface |
-| `lib/queries/index.ts` | Merge repository keys |
-| `hooks/useElectron.ts` | Extend with repositories methods |
-| `drizzle.config.ts` | Fix schema path |
-| `drizzle/meta/_journal.json` | Updated migration journal |
-| `drizzle/meta/0000_snapshot.json` | Updated schema snapshot |
+| File                              | Changes                          |
+| --------------------------------- | -------------------------------- |
+| `db/schema/index.ts`              | Export repositories schema       |
+| `db/repositories/index.ts`        | Export repositories repository   |
+| `electron/ipc/channels.ts`        | Add db.repositories channels     |
+| `electron/ipc/index.ts`           | Register repositories handlers   |
+| `electron/preload.ts`             | Add repositories to ElectronAPI  |
+| `types/electron.d.ts`             | Add repositories interface       |
+| `lib/queries/index.ts`            | Merge repository keys            |
+| `hooks/useElectron.ts`            | Extend with repositories methods |
+| `drizzle.config.ts`               | Fix schema path                  |
+| `drizzle/meta/_journal.json`      | Updated migration journal        |
+| `drizzle/meta/0000_snapshot.json` | Updated schema snapshot          |
 
 ## Quality Gates
 
-| Gate | Status |
-|------|--------|
-| `pnpm typecheck` | PASS |
-| `pnpm lint` | PASS |
-| `pnpm db:migrate` | PASS |
+| Gate              | Status |
+| ----------------- | ------ |
+| `pnpm typecheck`  | PASS   |
+| `pnpm lint`       | PASS   |
+| `pnpm db:migrate` | PASS   |
 
 ## API Summary
 
 ### Database Schema
+
 - Table: `repositories`
 - Columns: `id`, `projectId`, `path`, `name`, `lastScannedAt`, `fileCount`, `createdAt`, `updatedAt`
 - Indexes: `repositories_project_id_idx`, `repositories_path_idx`
 - Foreign Key: `projectId` → `projects.id` (CASCADE DELETE)
 
 ### Available Hooks
+
 - `useRepositories(projectId)` - Fetch repositories by project
 - `useRepository(id)` - Fetch single repository
 - `useCreateRepository()` - Create repository mutation
@@ -70,5 +72,6 @@ Successfully implemented the complete database-to-UI data flow for managing code
 - `useDeleteRepository()` - Delete repository mutation
 
 ### Validation Schemas
+
 - `createRepositorySchema` - For creating repositories
 - `updateRepositorySchema` - For updating repositories

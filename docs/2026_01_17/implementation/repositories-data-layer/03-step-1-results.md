@@ -29,6 +29,7 @@
 **Table**: `repositories`
 
 **Columns**:
+
 - `id`: integer primary key, auto-increment
 - `projectId` (`project_id`): integer, foreign key to projects.id with cascade delete
 - `path`: text, not null
@@ -39,5 +40,6 @@
 - `updatedAt` (`updated_at`): text, default CURRENT_TIMESTAMP
 
 **Indexes**:
+
 - `repositories_project_id_idx`: on projectId
 - `repositories_path_idx`: on path

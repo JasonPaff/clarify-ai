@@ -22,6 +22,7 @@
 ## Channels Added
 
 Under `db.repositories`:
+
 - `create`: `db:repositories:create`
 - `delete`: `db:repositories:delete`
 - `getById`: `db:repositories:getById`

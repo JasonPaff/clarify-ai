@@ -124,12 +124,13 @@ export const IpcChannels = {
 
 ### Channel Naming Conventions
 
-| Pattern                          | Example                 | Use Case                     |
-| -------------------------------- | ----------------------- | ---------------------------- |
-| `{domain}:{action}`              | `app:getVersion`        | Simple domain operations     |
-| `{domain}:{subdomain}:{action}`  | `db:projects:create`    | Database entity operations   |
+| Pattern                         | Example              | Use Case                   |
+| ------------------------------- | -------------------- | -------------------------- |
+| `{domain}:{action}`             | `app:getVersion`     | Simple domain operations   |
+| `{domain}:{subdomain}:{action}` | `db:projects:create` | Database entity operations |
 
 **Rules**:
+
 - Use lowercase with colons as separators
 - Action names are camelCase: `getAll`, `getById`, `openDirectory`
 - Group related channels under domain objects
@@ -640,14 +641,14 @@ export function useElectronDialog() {
 
 ### Hook Naming Conventions
 
-| Hook Name             | Purpose                           |
-| --------------------- | --------------------------------- |
-| `useElectron`         | Base hook returning api and flag  |
-| `useElectronApp`      | App info methods                  |
-| `useElectronDb`       | Database entity access            |
-| `useElectronDialog`   | File/directory dialogs            |
-| `useElectronFs`       | File system operations            |
-| `useElectronStore`    | Persistent key-value storage      |
+| Hook Name           | Purpose                          |
+| ------------------- | -------------------------------- |
+| `useElectron`       | Base hook returning api and flag |
+| `useElectronApp`    | App info methods                 |
+| `useElectronDb`     | Database entity access           |
+| `useElectronDialog` | File/directory dialogs           |
+| `useElectronFs`     | File system operations           |
+| `useElectronStore`  | Persistent key-value storage     |
 
 ### Hook Rules
 

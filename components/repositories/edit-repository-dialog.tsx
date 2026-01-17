@@ -43,7 +43,12 @@ export function EditRepositoryDialog({
 
   const isControlled = controlledOpen !== undefined;
   const open = isControlled ? controlledOpen : uncontrolledOpen;
-  const setOpen = isControlled ? (onOpenChange ?? (() => {})) : setUncontrolledOpen;
+  const setOpen = isControlled
+    ? (onOpenChange ??
+      (() => {
+        /* empty on purpose */
+      }))
+    : setUncontrolledOpen;
 
   const updateRepository = useUpdateRepository();
 

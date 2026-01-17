@@ -1,17 +1,16 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useAppForm } from '@/lib/forms';
+import { useAppForm } from '@/lib/forms/form-hook';
 import { type CreateRepositoryFormValues, createRepositorySchema } from '@/lib/validations/repository';
 
 interface CreateRepositoryFormProps {
   isSubmitting?: boolean;
   onCancel: () => void;
   onSubmit: (values: CreateRepositoryFormValues) => Promise<void> | void;
-  projectId: number;
 }
 
-export function CreateRepositoryForm({ isSubmitting, onCancel, onSubmit, projectId: _projectId }: CreateRepositoryFormProps) {
+export function CreateRepositoryForm({ isSubmitting, onCancel, onSubmit }: CreateRepositoryFormProps) {
   const form = useAppForm({
     defaultValues: {
       name: '',

@@ -27,6 +27,7 @@
 ## Interface Methods Added
 
 Under `db.repositories`:
+
 - `create(data: NewRepository): Promise<Repository>`
 - `delete(id: number): Promise<void>`
 - `getById(id: number): Promise<Repository | undefined>`

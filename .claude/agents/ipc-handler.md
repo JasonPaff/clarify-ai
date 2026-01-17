@@ -58,6 +58,7 @@ Invoke the `ipc-handler-conventions` skill to load all project conventions.
 Add channels to `electron/ipc/channels.ts` following conventions:
 
 **For database entities**:
+
 ```typescript
 db: {
   entityName: {
@@ -71,6 +72,7 @@ db: {
 ```
 
 **For other domains**:
+
 ```typescript
 domain: {
   actionOne: 'domain:actionOne',
@@ -79,6 +81,7 @@ domain: {
 ```
 
 **Mandatory Requirements**:
+
 - Use lowercase with colons as separators
 - Action names are camelCase
 - Group related channels under domain objects
@@ -89,6 +92,7 @@ domain: {
 Create `electron/ipc/{domain}.handlers.ts`:
 
 **File Structure**:
+
 ```typescript
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
 
@@ -98,16 +102,14 @@ import type { NewEntity, Entity } from '../../db/schema';
 import { IpcChannels } from './channels';
 
 export function registerDomainHandlers(repository: SomeRepository): void {
-  ipcMain.handle(
-    IpcChannels.domain.action,
-    (_event: IpcMainInvokeEvent, arg: ArgType): ReturnType => {
-      return repository.method(arg);
-    }
-  );
+  ipcMain.handle(IpcChannels.domain.action, (_event: IpcMainInvokeEvent, arg: ArgType): ReturnType => {
+    return repository.method(arg);
+  });
 }
 ```
 
 **Mandatory Requirements**:
+
 - One file per domain
 - Export single `registerXxxHandlers(dependencies)` function
 - Use `ipcMain.handle()` exclusively (not send/on)
@@ -131,6 +133,7 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 ```
 
 **Mandatory Requirements**:
+
 - Create repository instances in `registerAllHandlers`
 - Pass dependencies as parameters to registration functions
 - Group with descriptive comments
@@ -141,6 +144,7 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 Add to `electron/preload.ts`:
 
 **Interface**:
+
 ```typescript
 export interface ElectronAPI {
   // ... existing domains
@@ -151,6 +155,7 @@ export interface ElectronAPI {
 ```
 
 **Implementation**:
+
 ```typescript
 const electronAPI: ElectronAPI = {
   // ... existing
@@ -161,6 +166,7 @@ const electronAPI: ElectronAPI = {
 ```
 
 **Mandatory Requirements**:
+
 - Mirror `IpcChannels` structure in interface
 - All methods return Promises
 - Use arrow functions for implementation
@@ -179,6 +185,7 @@ export interface ElectronAPI {
 ```
 
 **Mandatory Requirements**:
+
 - Keep in sync with `preload.ts`
 - Re-export schema types from `db/types` if needed
 - Use `import()` syntax for types when needed
@@ -204,6 +211,7 @@ export function useElectronDomain() {
 ```
 
 **For database entities with useElectronDb**:
+
 ```typescript
 export function useElectronDb() {
   const { api, isElectron } = useElectron();
@@ -220,11 +228,12 @@ export function useElectronDb() {
     [api]
   );
 
-  return { entities, isElectron, /* existing... */ };
+  return { entities, isElectron /* existing... */ };
 }
 ```
 
 **Mandatory Requirements**:
+
 - Include `'use client'` directive
 - Return `isElectron` flag
 - Check `api` availability before calls

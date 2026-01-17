@@ -1,12 +1,11 @@
 import 'dotenv/config';
-
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { app, BrowserWindow } from 'electron';
 import serve from 'electron-serve';
 import * as path from 'path';
 
 import { closeDatabase, type DrizzleDatabase, initializeDatabase } from '../db';
-import { registerAllHandlers } from './ipc';
+import { registerAllHandlers } from './ipc/register-handlers';
 
 const isDev = process.env.NODE_ENV === 'development';
 const loadURL = isDev ? null : serve({ directory: 'out' });

@@ -91,14 +91,14 @@ You do NOT implement code. Subagents implement code.
 
 ## Available Specialist Agents
 
-| Agent                           | Domain                       | When to Use                                            |
-| ------------------------------- | ---------------------------- | ------------------------------------------------------ |
-| `database-schema`               | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`            |
+| Agent                           | Domain                       | When to Use                                                |
+| ------------------------------- | ---------------------------- | ---------------------------------------------------------- |
+| `database-schema`               | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`                |
 | `ipc-handler`                   | Electron IPC communication   | Files in `electron/ipc/`, `electron/preload.ts`, IPC hooks |
-| `tanstack-query`                | Data fetching & server state | Query hooks, mutations, cache management               |
-| `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas |
-| `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`              |
-| `general-purpose`               | Everything else              | React components, pages, utilities, etc.               |
+| `tanstack-query`                | Data fetching & server state | Query hooks, mutations, cache management                   |
+| `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas     |
+| `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`                  |
+| `general-purpose`               | Everything else              | React components, pages, utilities, etc.                   |
 
 ## Step-Type Detection Rules
 

@@ -108,23 +108,28 @@ Score each gap/incomplete feature based on:
 ## Next Feature Recommendation
 
 ### Feature: [Feature Name]
+
 **Area**: [Section of design doc]
 **Priority**: [Why this is next]
 
 ### Current State
+
 - What exists: [Brief description of related implementation]
 - What's missing: [Specific gaps]
 
 ### Why This Feature Now
+
 1. [Dependency reasoning]
 2. [Logical progression reasoning]
 3. [Scope reasoning]
 
 ### Suggested Scope
+
 - [Specific, actionable items to implement]
 - [Bounded to bite-sized work]
 
 ### Unblocks
+
 - [What this enables next]
 ```
 
@@ -134,21 +139,26 @@ Score each gap/incomplete feature based on:
 ## Top 5 Feature Recommendations
 
 ### 1. [Feature Name] ⭐ (Recommended)
+
 **Why**: [1-2 sentence justification]
 **Scope**: [Brief scope description]
 **Unblocks**: [What it enables]
 
 ### 2. [Feature Name]
+
 **Why**: [1-2 sentence justification]
 **Scope**: [Brief scope description]
 
 ### 3. [Feature Name]
+
 ...
 
 ### 4. [Feature Name]
+
 ...
 
 ### 5. [Feature Name]
+
 ...
 ```
 
@@ -164,12 +174,14 @@ Score each gap/incomplete feature based on:
 Use this checklist to assess implementation status. Each area maps to sections in the design document.
 
 ### Core Infrastructure
+
 - [ ] Electron main process setup
 - [ ] IPC channel architecture
 - [ ] Database initialization and migrations
 - [ ] Preload/context bridge
 
 ### Projects (Section 3.4)
+
 - [ ] Project list view
 - [ ] Create new project modal
 - [ ] Project detail view with tabs
@@ -177,6 +189,7 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] Delete project with confirmation
 
 ### Repositories (Section 3.4)
+
 - [ ] Add repository via file picker
 - [ ] Repository list in project view
 - [ ] Remove repository
@@ -185,12 +198,14 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] File indexing and structure
 
 ### Feature Requests - Entry (Section 3.2, Phase 1)
+
 - [ ] Feature request list view
 - [ ] New feature request entry
 - [ ] Draft save/auto-save
 - [ ] Load previous as template
 
 ### Feature Requests - Workflow (Section 3.2, Phases 2-4)
+
 - [ ] Step 1: Feature Refinement UI
 - [ ] Step 2: File Discovery UI
 - [ ] Step 3: Plan Generation UI
@@ -198,6 +213,7 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] Back/forward navigation
 
 ### AI Integration (Section 4)
+
 - [ ] API key configuration
 - [ ] Model selection per step
 - [ ] Prompt customization
@@ -206,6 +222,7 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] Error handling/retry
 
 ### Orchestration (Section 4.1)
+
 - [ ] Step 1 execution (refine)
 - [ ] Step 2 execution (research)
 - [ ] Step 3 execution (plan)
@@ -213,6 +230,7 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] Non-linear workflow (go back)
 
 ### Settings (Section 6)
+
 - [ ] Global settings page
 - [ ] API key input
 - [ ] Default model selection
@@ -220,6 +238,7 @@ Use this checklist to assess implementation status. Each area maps to sections i
 - [ ] Project-specific settings
 
 ### Export (Section 5.3)
+
 - [ ] Markdown export
 - [ ] Copy to clipboard
 - [ ] PDF export

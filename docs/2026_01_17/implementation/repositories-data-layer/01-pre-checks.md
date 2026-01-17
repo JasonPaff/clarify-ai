@@ -25,6 +25,7 @@
 ## Files Summary
 
 **Files to Create (7)**:
+
 1. `db/schema/repositories.schema.ts`
 2. `db/repositories/repositories.repository.ts`
 3. `db/types.ts`
@@ -34,6 +35,7 @@
 7. `hooks/queries/use-repositories.ts`
 
 **Files to Modify (9)**:
+
 1. `db/schema/index.ts`
 2. `db/repositories/index.ts`
 3. `electron/ipc/channels.ts`

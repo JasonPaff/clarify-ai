@@ -21,10 +21,7 @@ export const repositories = sqliteTable(
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
   },
-  (table) => [
-    index('repositories_project_id_idx').on(table.projectId),
-    index('repositories_path_idx').on(table.path),
-  ]
+  (table) => [index('repositories_project_id_idx').on(table.projectId), index('repositories_path_idx').on(table.path)]
 );
 
 export type NewRepository = typeof repositories.$inferInsert;

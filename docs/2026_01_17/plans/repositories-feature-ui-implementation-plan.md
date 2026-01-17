@@ -31,9 +31,11 @@ Build a complete UI for managing code repositories associated with projects, fol
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\repository-card.tsx` - Repository card with name, path display, and action buttons
 
 **Changes:**
+
 - Create `RepositoryCardProps` interface with `id`, `name`, `path`, `lastScannedAt`, and optional `fileCount` properties
 - Add repository icon using GitBranch from lucide-react
 - Display repository name as title
@@ -45,11 +47,13 @@ Build a complete UI for managing code repositories associated with projects, fol
 - Follow ProjectCard component structure for layout and styling
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders with correct props
 - [ ] Repository icon, name, path, and timestamp display correctly
 - [ ] Edit and delete buttons are visible
@@ -64,20 +68,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\skeletons\repositories-skeleton.tsx` - Loading skeleton for repository cards
 
 **Changes:**
+
 - Create `RepositoriesSkeleton` function component
 - Use same grid layout as the repositories list (vertical stack with gap-4)
 - Render 3 placeholder divs with animate-pulse and bg-muted classes
 - Use appropriate height for repository card items (h-24 for compact cards)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton displays 3 animated placeholder items
 - [ ] Layout matches the repository list grid structure
 - [ ] All validation commands pass
@@ -91,9 +99,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\path-selector-field.tsx` - Custom field with text input and folder picker button
 
 **Changes:**
+
 - Create `PathSelectorFieldProps` interface extending standard field props (label, description, placeholder, disabled)
 - Use `useFieldContext<string>()` from TanStack Form to access field state
 - Import `useElectronDialog` hook for folder selection
@@ -104,11 +114,13 @@ pnpm lint && pnpm typecheck
 - Apply inputVariants styles to the text input portion
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Text input displays current path value
 - [ ] Browse button opens native folder picker
 - [ ] Selected folder path updates the field value
@@ -125,9 +137,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\create-repository-form.tsx` - Form for creating new repositories
 
 **Changes:**
+
 - Create `CreateRepositoryFormProps` interface with `isSubmitting`, `onCancel`, `onSubmit`, and `projectId` properties
 - Use `useAppForm` hook with `createRepositorySchema` validator
 - Set default values for name and path as empty strings
@@ -137,11 +151,13 @@ pnpm lint && pnpm typecheck
 - Follow CreateProjectForm structure for form layout and button placement
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form renders with name and path fields
 - [ ] Path selector integrates with folder picker
 - [ ] Form validation prevents empty submissions
@@ -157,9 +173,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\new-repository-dialog.tsx` - Dialog wrapper for create form
 
 **Changes:**
+
 - Create `NewRepositoryDialogProps` interface with `children` (trigger element) and `projectId` properties
 - Use useState for dialog open/close state
 - Import `useCreateRepository` mutation hook
@@ -171,11 +189,13 @@ pnpm lint && pnpm typecheck
 - Render CreateRepositoryForm with isSubmitting, onCancel, and onSubmit props
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens when trigger is clicked
 - [ ] Form renders inside dialog
 - [ ] Successful submission creates repository and closes dialog
@@ -192,9 +212,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\edit-repository-form.tsx` - Form for editing repositories
 
 **Changes:**
+
 - Create `EditRepositoryFormProps` interface with `isSubmitting`, `onCancel`, `onSubmit`, and `repository` (containing id, name, path) properties
 - Use `useAppForm` hook with `updateRepositorySchema` validator
 - Set default values from the existing repository data
@@ -204,11 +226,13 @@ pnpm lint && pnpm typecheck
 - Follow EditProjectForm structure for consistency
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form pre-populates with existing repository data
 - [ ] Both name and path can be modified
 - [ ] Form validation works correctly
@@ -223,9 +247,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\edit-repository-dialog.tsx` - Dialog wrapper for edit form
 
 **Changes:**
+
 - Create `EditRepositoryDialogProps` interface with `children` and `repository` (id, name, path) properties
 - Use useState for dialog open/close state
 - Import `useUpdateRepository` mutation hook
@@ -236,11 +262,13 @@ pnpm lint && pnpm typecheck
 - Render EditRepositoryForm with repository data
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens with pre-populated form
 - [ ] Successful submission updates repository and closes dialog
 - [ ] Cancel closes dialog without changes
@@ -255,9 +283,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\delete-repository-dialog.tsx` - Confirmation dialog for deletion
 
 **Changes:**
+
 - Create `DeleteRepositoryDialogProps` interface with `children` and `repository` (Repository type) properties
 - Use useState for dialog open state and confirmation text input
 - Import `useDeleteRepository` mutation hook
@@ -272,11 +302,13 @@ pnpm lint && pnpm typecheck
 - Reset confirmation text when dialog closes
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog requires typing exact repository name to enable delete
 - [ ] Delete button is disabled until confirmation matches
 - [ ] Successful deletion removes repository and closes dialog
@@ -292,9 +324,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\components\repositories\index.ts` - Barrel export file
 
 **Changes:**
+
 - Export CreateRepositoryForm from './create-repository-form'
 - Export DeleteRepositoryDialog from './delete-repository-dialog'
 - Export EditRepositoryDialog from './edit-repository-dialog'
@@ -304,11 +338,13 @@ pnpm lint && pnpm typecheck
 - Export RepositoryCard from './repository-card'
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All components are exported correctly
 - [ ] Imports work from '@/components/repositories'
 - [ ] All validation commands pass
@@ -322,9 +358,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\jasonpaff\dev\clarify-ai\app\(app)\projects\[projectId]\repositories\page.tsx` - Main repositories page
 
 **Changes:**
+
 - Add 'use client' directive and import `withParamValidation` from next-typesafe-url/app
 - Import Route and PageProps from './route-type'
 - Import PageHeader from '@/components/layout/page-header'
@@ -346,11 +384,13 @@ pnpm lint && pnpm typecheck
 - Export default with withParamValidation(Page, Route)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page loads with correct route params validation
 - [ ] Loading state shows skeleton
 - [ ] Empty state displays when no repositories

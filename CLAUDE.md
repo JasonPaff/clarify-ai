@@ -280,16 +280,16 @@ clarify-ai/
 
 ## 8. Project Documentation Conventions (Important)
 
-| Document Type             | Location                                          |
-| ------------------------- | ------------------------------------------------- |
-| Design Documents          | `docs/design-document.md`                         |
-| Orchestration Outputs     | `docs/YYYY_MM_DD/orchestration/<feature-name>/`   |
-| Implementation Plans      | `docs/YYYY_MM_DD/plans/<feature-name>-implementation-plan.md` |
-| Implementation Tracking   | `docs/YYYY_MM_DD/implementation/<feature-name>/`  |
-| Database Migrations       | `drizzle/`                                        |
-| Type Definitions          | `types/`                                          |
-| Route Type Schemas        | `app/**/route-type.ts`                            |
-| Validation Schemas        | `lib/validations/`                                |
+| Document Type           | Location                                                      |
+| ----------------------- | ------------------------------------------------------------- |
+| Design Documents        | `docs/design-document.md`                                     |
+| Orchestration Outputs   | `docs/YYYY_MM_DD/orchestration/<feature-name>/`               |
+| Implementation Plans    | `docs/YYYY_MM_DD/plans/<feature-name>-implementation-plan.md` |
+| Implementation Tracking | `docs/YYYY_MM_DD/implementation/<feature-name>/`              |
+| Database Migrations     | `drizzle/`                                                    |
+| Type Definitions        | `types/`                                                      |
+| Route Type Schemas      | `app/**/route-type.ts`                                        |
+| Validation Schemas      | `lib/validations/`                                            |
 
 > **Note**: Always verify that target directories exist before creating new files. Use existing patterns in the codebase as templates for new additions.
 

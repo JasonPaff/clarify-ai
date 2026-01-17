@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useAppForm } from '@/lib/forms';
+import { useAppForm } from '@/lib/forms/form-hook';
 import { type UpdateRepositoryFormValues, updateRepositorySchema } from '@/lib/validations/repository';
 
 interface EditRepositoryFormProps {

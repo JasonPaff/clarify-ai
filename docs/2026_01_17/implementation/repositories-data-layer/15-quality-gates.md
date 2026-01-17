@@ -4,11 +4,11 @@
 
 ## Results
 
-| Gate | Status |
-|------|--------|
-| `pnpm typecheck` | PASS |
-| `pnpm lint` | PASS |
-| `pnpm db:migrate` | PASS |
+| Gate              | Status |
+| ----------------- | ------ |
+| `pnpm typecheck`  | PASS   |
+| `pnpm lint`       | PASS   |
+| `pnpm db:migrate` | PASS   |
 
 ## Summary
 

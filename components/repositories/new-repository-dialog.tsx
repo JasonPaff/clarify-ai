@@ -68,7 +68,6 @@ export function NewRepositoryDialog({ children, projectId }: NewRepositoryDialog
               isSubmitting={createRepository.isPending}
               onCancel={handleCancel}
               onSubmit={handleSubmit}
-              projectId={projectId}
             />
           </div>
         </DialogPopup>

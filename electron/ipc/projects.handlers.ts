@@ -1,7 +1,7 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
 
-import type { ProjectsRepository } from '../../db/repositories';
-import type { NewProject, Project } from '../../db/schema';
+import type { ProjectsRepository } from '../../db/repositories/projects.repository';
+import type { NewProject, Project } from '../../db/schema/projects.schema';
 
 import { IpcChannels } from './channels';
 

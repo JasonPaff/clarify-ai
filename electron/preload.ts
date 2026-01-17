@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import type { NewProject, NewRepository, Project, Repository } from '../db/schema';
+import type { NewProject, Project } from '../db/schema/projects.schema';
+import type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
-import { IpcChannels } from './ipc';
+import { IpcChannels } from './ipc/channels';
 
 export interface ElectronAPI {
   app: {
