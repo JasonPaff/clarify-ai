@@ -40,7 +40,7 @@ export function EditRepositoryForm({ isSubmitting, onCancel, onSubmit, repositor
       <div className={'flex flex-col gap-4'}>
         {/* Form Fields */}
         <form.AppField name={'name'}>
-          {(field) => <field.TextField label={'Repository Name'} placeholder={'Enter repository name'} />}
+          {(field) => <field.TextField autoFocus label={'Repository Name'} placeholder={'Enter repository name'} />}
         </form.AppField>
 
         <form.AppField name={'path'}>

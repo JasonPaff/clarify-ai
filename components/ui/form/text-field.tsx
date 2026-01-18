@@ -34,6 +34,7 @@ export const inputVariants = cva(
 
 type TextFieldProps = ClassName &
   VariantProps<typeof inputVariants> & {
+    autoFocus?: boolean;
     description?: string;
     disabled?: boolean;
     label: string;
@@ -42,6 +43,7 @@ type TextFieldProps = ClassName &
   };
 
 export function TextField({
+  autoFocus,
   className,
   description,
   disabled,
@@ -71,6 +73,7 @@ export function TextField({
       <Input
         aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
         aria-invalid={hasError || undefined}
+        autoFocus={autoFocus}
         className={cn(inputVariants({ size }), className)}
         disabled={disabled}
         id={id}

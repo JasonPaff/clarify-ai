@@ -35,7 +35,7 @@ export function CreateRepositoryForm({ isSubmitting, onCancel, onSubmit }: Creat
       <div className={'flex flex-col gap-4'}>
         {/* Repository Name Field */}
         <form.AppField name={'name'}>
-          {(field) => <field.TextField label={'Repository Name'} placeholder={'Enter repository name'} />}
+          {(field) => <field.TextField autoFocus label={'Repository Name'} placeholder={'Enter repository name'} />}
         </form.AppField>
 
         {/* Repository Path Field */}

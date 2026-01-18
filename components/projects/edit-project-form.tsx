@@ -39,7 +39,7 @@ export function EditProjectForm({ isSubmitting, onCancel, onSubmit, project }: E
       <div className={'flex flex-col gap-4'}>
         {/* Form Fields */}
         <form.AppField name={'name'}>
-          {(field) => <field.TextField label={'Project Name'} placeholder={'Enter project name'} />}
+          {(field) => <field.TextField autoFocus label={'Project Name'} placeholder={'Enter project name'} />}
         </form.AppField>
 
         <form.AppField name={'description'}>

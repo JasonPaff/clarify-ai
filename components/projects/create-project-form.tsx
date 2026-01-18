@@ -37,7 +37,7 @@ export function CreateProjectForm({ isSubmitting, onCancel, onSubmit }: CreatePr
       <form.AppForm>
         <div className={'flex flex-col gap-4'}>
           <form.AppField name={'name'}>
-            {(field) => <field.TextField label={'Project Name'} placeholder={'Enter project name'} />}
+            {(field) => <field.TextField autoFocus label={'Project Name'} placeholder={'Enter project name'} />}
           </form.AppField>
 
           <form.AppField name={'description'}>
