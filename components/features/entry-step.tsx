@@ -3,7 +3,7 @@
 import type { ChangeEvent } from 'react';
 
 import { formatDistanceToNow } from 'date-fns';
-import { MessageSquareMore, Sparkles } from 'lucide-react';
+import { MessageSquareMore } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
-import { parseClarificationStatus } from '@/lib/validations/clarification';
 
 interface EntryStepProps {
   featureRequest: FeatureRequest;
@@ -32,9 +31,6 @@ export const EntryStep = ({ featureRequest }: EntryStepProps) => {
 
   const updateMutation = useUpdateFeatureRequest();
 
-  // Parse clarification status from feature request
-  const clarificationStatus = parseClarificationStatus(featureRequest.clarificationStatus);
-
   // Reset state when featureRequest changes
   if (featureRequest.id !== trackedFeatureId) {
     setTrackedFeatureId(featureRequest.id);
@@ -47,9 +43,6 @@ export const EntryStep = ({ featureRequest }: EntryStepProps) => {
   const isDirty = content !== originalContent;
   const isSaving = updateMutation.isPending;
   const hasContent = content.trim().length > 0;
-
-  // Determine if refine button should be enabled
-  const canRefine = clarificationStatus === 'completed' || clarificationStatus === 'skipped';
 
   const handleSave = useCallback(async () => {
     if (content === originalContent || updateMutation.isPending) return;
@@ -123,10 +116,6 @@ export const EntryStep = ({ featureRequest }: EntryStepProps) => {
           <Button disabled={isSaving} onClick={() => setShowClarification(true)} variant={'outline'}>
             <MessageSquareMore className={'size-4'} />
             Clarify Request
-          </Button>
-          <Button disabled={!canRefine} variant={'default'}>
-            <Sparkles className={'size-4'} />
-            Refine Requirements
           </Button>
         </div>
       )}

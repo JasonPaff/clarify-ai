@@ -175,18 +175,9 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
             </AlertDescription>
           </Alert>
 
-          <div className={'flex gap-2'}>
-            <Button
-              onClick={() => {
-                onComplete?.();
-              }}
-            >
-              Continue to Refine
-            </Button>
-            <Button onClick={resetClarification} variant={'outline'}>
-              Re-run Clarification
-            </Button>
-          </div>
+          <Button onClick={resetClarification} variant={'outline'}>
+            Re-run Clarification
+          </Button>
         </div>
       )}
     </div>
