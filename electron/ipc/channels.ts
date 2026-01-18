@@ -31,6 +31,7 @@ export const IpcChannels = {
       delete: 'db:projects:delete',
       getAll: 'db:projects:getAll',
       getById: 'db:projects:getById',
+      getFavorited: 'db:projects:getFavorited',
       update: 'db:projects:update',
     },
     repositories: {

@@ -10,6 +10,7 @@ export interface ProjectsRepository {
   delete(id: number): boolean;
   getAll(): Array<Project>;
   getById(id: number): Project | undefined;
+  getFavorited(): Array<Project>;
   update(id: number, data: Partial<NewProject>): Project | undefined;
 }
 
@@ -30,6 +31,10 @@ export function createProjectsRepository(db: DrizzleDatabase): ProjectsRepositor
 
     getById(id: number): Project | undefined {
       return db.select().from(projects).where(eq(projects.id, id)).get();
+    },
+
+    getFavorited(): Array<Project> {
+      return db.select().from(projects).where(eq(projects.isFavorited, true)).all();
     },
 
     update(id: number, data: Partial<NewProject>): Project | undefined {

@@ -62,6 +62,7 @@ export interface ElectronAPI {
       delete(id: number): Promise<boolean>;
       getAll(): Promise<Array<import('../db/schema/projects.schema').Project>>;
       getById(id: number): Promise<import('../db/schema/projects.schema').Project | undefined>;
+      getFavorited(): Promise<Array<import('../db/schema/projects.schema').Project>>;
       update(
         id: number,
         data: Partial<import('../db/schema/projects.schema').NewProject>

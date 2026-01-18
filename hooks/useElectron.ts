@@ -149,6 +149,7 @@ export function useElectronDb() {
         if (!api) return Promise.resolve(undefined);
         return api.db.projects.getById(id);
       },
+      getFavorited: () => api?.db.projects.getFavorited() ?? Promise.resolve([]),
       update: (id: number, data: Parameters<NonNullable<typeof api>['db']['projects']['update']>[1]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.projects.update(id, data);

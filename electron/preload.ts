@@ -41,6 +41,7 @@ export interface ElectronAPI {
       delete(id: number): Promise<boolean>;
       getAll(): Promise<Array<Project>>;
       getById(id: number): Promise<Project | undefined>;
+      getFavorited(): Promise<Array<Project>>;
       update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
     };
     repositories: {
@@ -129,6 +130,7 @@ const electronAPI: ElectronAPI = {
       delete: (id) => ipcRenderer.invoke(IpcChannels.db.projects.delete, id),
       getAll: () => ipcRenderer.invoke(IpcChannels.db.projects.getAll),
       getById: (id) => ipcRenderer.invoke(IpcChannels.db.projects.getById, id),
+      getFavorited: () => ipcRenderer.invoke(IpcChannels.db.projects.getFavorited),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.projects.update, id, data),
     },
     repositories: {

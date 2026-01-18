@@ -72,6 +72,7 @@ function ProjectsContent() {
         <ProjectCard
           description={project.description ?? undefined}
           id={project.id}
+          isFavorited={project.isFavorited ?? false}
           key={project.id}
           name={project.name}
         />

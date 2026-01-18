@@ -14,6 +14,10 @@ export function registerProjectsHandlers(projectsRepository: ProjectsRepository)
     return projectsRepository.getById(id);
   });
 
+  ipcMain.handle(IpcChannels.db.projects.getFavorited, (): Array<Project> => {
+    return projectsRepository.getFavorited();
+  });
+
   ipcMain.handle(IpcChannels.db.projects.create, (_event: IpcMainInvokeEvent, data: NewProject): Project => {
     return projectsRepository.create(data);
   });

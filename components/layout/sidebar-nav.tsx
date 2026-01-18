@@ -9,6 +9,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 import { useSidebar } from './sidebar-context';
+import { SidebarFavorites } from './sidebar-favorites';
 
 interface NavItem {
   href: string;
@@ -42,13 +43,20 @@ export function SidebarNav() {
 
   return (
     <div className={'flex h-full flex-col justify-between'}>
-      <ul className={'space-y-1'}>
-        {mainNavItems.map((item) => (
-          <li key={item.href}>
-            <NavItemLink active={isActive(item.href)} collapsed={collapsed} item={item} />
-          </li>
-        ))}
-      </ul>
+      {/* Top Navigation */}
+      <div>
+        {/* Main Nav Items */}
+        <ul className={'space-y-1'}>
+          {mainNavItems.map((item) => (
+            <li key={item.href}>
+              <NavItemLink active={isActive(item.href)} collapsed={collapsed} item={item} />
+            </li>
+          ))}
+        </ul>
+
+        {/* Favorites Section */}
+        <SidebarFavorites />
+      </div>
 
       <ul className={'space-y-1'}>
         {bottomNavItems.map((item) => (

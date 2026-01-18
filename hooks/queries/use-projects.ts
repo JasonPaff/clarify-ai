@@ -33,6 +33,35 @@ export function useDeleteProject() {
   });
 }
 
+export function useFavoritedProjects() {
+  const { isElectron, projects } = useElectronDb();
+
+  return useQuery({
+    ...projectKeys.favorited,
+    enabled: isElectron,
+    queryFn: () => projects.getFavorited(),
+  });
+}
+
+export function useFavoriteProject() {
+  const queryClient = useQueryClient();
+  const { projects } = useElectronDb();
+
+  return useMutation({
+    mutationFn: ({ id, isFavorited }: { id: number; isFavorited: boolean }) =>
+      projects.update(id, { isFavorited }),
+    onSuccess: (project) => {
+      if (project) {
+        // Update the detail cache with the new favorite state
+        queryClient.setQueryData(projectKeys.detail(project.id).queryKey, project);
+        // Invalidate both list and favorited queries
+        void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
+        void queryClient.invalidateQueries({ queryKey: projectKeys.favorited.queryKey });
+      }
+    },
+  });
+}
+
 export function useProject(id: number) {
   const { isElectron, projects } = useElectronDb();
 

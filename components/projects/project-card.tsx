@@ -4,16 +4,18 @@ import { ChevronRight, Folder } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import { FavoriteButton } from '@/components/projects/favorite-button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface ProjectCardProps {
   description?: string;
   featureCount?: number;
   id: number;
+  isFavorited?: boolean;
   name: string;
 }
 
-export function ProjectCard({ description, featureCount = 0, id, name }: ProjectCardProps) {
+export function ProjectCard({ description, featureCount = 0, id, isFavorited = false, name }: ProjectCardProps) {
   return (
     <Link
       className={`
@@ -33,6 +35,7 @@ export function ProjectCard({ description, featureCount = 0, id, name }: Project
       >
         <CardHeader className={'pb-2'}>
           <div className={'flex items-start justify-between'}>
+            {/* Icon */}
             <div
               className={`
                 flex size-10 items-center justify-center rounded-lg bg-muted
@@ -40,7 +43,12 @@ export function ProjectCard({ description, featureCount = 0, id, name }: Project
             >
               <Folder className={'size-5 text-muted-foreground'} />
             </div>
-            <ChevronRight className={'size-4 text-muted-foreground'} />
+
+            {/* Actions */}
+            <div className={'flex items-center gap-1'}>
+              <FavoriteButton id={id} isFavorited={isFavorited} />
+              <ChevronRight className={'size-4 text-muted-foreground'} />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
