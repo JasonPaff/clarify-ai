@@ -1,10 +1,10 @@
 ---
-allowed-tools: Task(subagent_type:implementation_planner), Task(subagent_type:file-discovery-agent), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
+allowed-tools: Task(subagent_type:clarification-agent), Task(subagent_type:implementation_planner), Task(subagent_type:file-discovery-agent), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*), AskUserQuestion(*)
 argument-hint: 'feature description'
-description: Generate detailed implementation plans through automated 3-step orchestration
+description: Generate detailed implementation plans through automated 3-4 step orchestration with optional clarification
 ---
 
-You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process.
+You are a streamlined feature planning orchestrator that creates detailed implementation plans through a 3-4 step process with optional clarification.
 
 @CLAUDE.MD
 
@@ -22,13 +22,78 @@ You are a streamlined feature planning orchestrator that creates detailed implem
 
 ## Workflow Overview
 
-When the user runs this command, execute this simple 3-step workflow:
+When the user runs this command, execute this workflow:
 
-1. **Feature Request Refinement**: Enhance the user request with project context
-2. **File Discovery**: Find all relevant files for the implementation
-3. **Implementation Planning**: Generate detailed Markdown implementation plan
+1. **Clarification** (Optional): Gather clarifying questions if request is ambiguous
+2. **Feature Request Refinement**: Enhance the user request with project context
+3. **File Discovery**: Find all relevant files for the implementation
+4. **Implementation Planning**: Generate detailed Markdown implementation plan
+
+### Clarification Skip Conditions
+
+The clarification step is automatically skipped when:
+
+- Clarification agent determines request is sufficiently detailed (ambiguity score >= 4/5)
+- Request explicitly references specific files, components, or patterns
+- Request includes clear technical implementation details
 
 ## Step-by-Step Execution
+
+### Step 0a: Feature Request Clarification (Conditional)
+
+**Objective**: Gather clarifying information for ambiguous or underspecified feature requests before refinement.
+
+**Process**:
+
+1. Record step start time with ISO timestamp
+2. Use Task tool with `subagent_type: "clarification-agent"`:
+   - Description: "Assess feature request clarity and generate targeted clarification questions"
+   - Pass: Original feature request from `$ARGUMENTS`
+   - **TIMEOUT**: Set 60-second timeout for exploration + question generation
+   - Agent performs light codebase exploration (reads CLAUDE.md, scans key directories)
+   - Agent assesses request ambiguity on a 1-5 scale
+   - If score >= 4: Agent returns `SKIP_CLARIFICATION` marker with reasoning
+   - If score < 4: Agent generates questions and uses AskUserQuestion tool directly
+
+3. **Conditional Branch**:
+
+   **IF `SKIP_CLARIFICATION` returned:**
+   - Log skip decision with reasoning
+   - Set `$ENHANCED_REQUEST` = `$ARGUMENTS` (original request unchanged)
+   - Save minimal `00a-clarification.md` noting skip decision
+   - Proceed directly to Step 1
+
+   **IF clarification questions asked:**
+   - User responds via AskUserQuestion interface
+   - Agent formats enhanced request with clarification context
+   - Set `$ENHANCED_REQUEST` = formatted output from clarification agent
+   - Save detailed `00a-clarification.md` with full Q&A
+
+4. **Build Enhanced Request** (when clarification gathered):
+   The clarification agent will format the enhanced request as:
+   ```
+   [Original request]
+
+   Additional context from clarification:
+   - [Key decision 1 from Q&A]
+   - [Key decision 2 from Q&A]
+   ```
+
+5. Record step end time and results
+
+6. **SAVE STEP 0a LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/00a-clarification.md` with:
+   - Step metadata (timestamps, duration, status: Completed/Skipped)
+   - Original request
+   - Codebase exploration summary (what was examined)
+   - Ambiguity assessment score and reasoning
+   - Questions generated (if any)
+   - User responses (if any)
+   - Skip decision and reason (if applicable)
+   - Final enhanced request passed to Step 1
+
+7. **CHECKPOINT**: Step 0a markdown log now available for review
+
+8. **Progress Marker**: Output `MILESTONE:STEP_0A_COMPLETE` or `MILESTONE:STEP_0A_SKIPPED`
 
 ### Step 1: Feature Request Refinement
 
@@ -46,7 +111,8 @@ When the user runs this command, execute this simple 3-step workflow:
    - **ERROR HANDLING**: If subagent fails, retry once with simplified prompt and log the failure
    - **TIMEOUT**: Set 30-second timeout for subagent response
    - **RETRY STRATEGY**: Maximum 2 attempts with exponential backoff
-   - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '$ARGUMENTS'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. Output ONLY the refined paragraph (200-500 words), nothing else."
+   - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '$ENHANCED_REQUEST'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. If clarification context is provided, incorporate those decisions into your refinement. Output ONLY the refined paragraph (200-500 words), nothing else."
+   - **NOTE**: `$ENHANCED_REQUEST` comes from Step 0a - either the original request (if clarification was skipped) or the original request plus clarification context (if questions were answered)
    - **CONSTRAINT**: Output must be single paragraph format only
    - **CONSTRAINT**: Refined request must be 2-4x original length (no excessive expansion)
    - **CONSTRAINT**: Preserve original intent and scope (no feature creep)
@@ -64,6 +130,7 @@ When the user runs this command, execute this simple 3-step workflow:
 7. **SAVE STEP 1 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/01-feature-refinement.md` with:
    - Step metadata (timestamps, duration, status)
    - Original request and context provided
+   - Clarification context (if gathered in Step 0a)
    - Complete agent prompt sent
    - Full agent response received
    - Refined feature request extracted
@@ -182,6 +249,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
 **Incremental Save Strategy**:
 
 - **Initial**: Create orchestration directory and index file with workflow overview
+- **After Step 0a**: Save `00a-clarification.md` with clarification details (or skip notation)
 - **After Step 1**: Save `01-feature-refinement.md` with complete step details
 - **After Step 2**: Save `02-file-discovery.md` with complete step details
 - **After Step 3**: Save `03-implementation-planning.md` with complete step details
@@ -192,6 +260,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
 - Implementation plan: `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md`
 - Orchestration logs: `docs/{YYYY_MM_DD}/orchestration/{feature-name}/`
   - `00-orchestration-index.md` - Workflow overview and navigation
+  - `00a-clarification.md` - Clarification Q&A or skip notation
   - `01-feature-refinement.md` - Step 1 detailed log
   - `02-file-discovery.md` - Step 2 detailed log
   - `03-implementation-planning.md` - Step 3 detailed log
@@ -205,6 +274,7 @@ Saved to: docs/{date}/plans/{feature-name}-implementation-plan.md
 ## Orchestration Logs
 Directory: docs/{date}/orchestration/{feature-name}/
 - 📄 00-orchestration-index.md - Workflow overview and navigation
+- 📄 00a-clarification.md - {Gathered X clarifications / Skipped - request was detailed}
 - 📄 01-feature-refinement.md - Refined request with project context
 - 📄 02-file-discovery.md - Discovered X files across Y directories
 - 📄 03-implementation-planning.md - Generated Z-step implementation plan
@@ -218,6 +288,7 @@ Execution time: X.X seconds
 
 - **CRITICAL**: Capture complete agent inputs and outputs (not summaries)
 - **CRITICAL**: Record precise timestamps for each step with ISO format
+- **CRITICAL**: Must use the clarification agent for step 0a
 - **CRITICAL**: Must use the file discovery agent for step 2
 - **CRITICAL**: Must use the implementation planner agent for step 3
 - **CRITICAL**: Validate and log all discovered file paths with existence checks
@@ -233,6 +304,12 @@ Execution time: X.X seconds
 
 **Enhanced Quality Gates**:
 
+- **Step 0a Success**: Clarification phase completed or appropriately skipped
+  - **Ambiguity Assessment**: Request scored on 1-5 scale with clear reasoning
+  - **Skip Decision**: If skipped, score must be >= 4 with valid justification
+  - **Question Quality**: If questions asked, they must be specific and actionable
+  - **User Responses**: If gathered, responses are incorporated into enhanced request
+  - **Logging**: Complete log saved with assessment, questions, and responses
 - **Step 1 Success**: Feature request successfully refined with project context
   - **Length Constraint**: Refined request must be 2-4x the length of original (not 10x+)
   - **Format Validation**: Output must be single paragraph without headers or sections
