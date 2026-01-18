@@ -13,7 +13,7 @@ export const switchVariants = cva(
   `
     relative inline-flex shrink-0 cursor-pointer rounded-full border-2
     border-transparent transition-colors duration-200 ease-in-out
-    focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none
+    focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:outline-none
     data-checked:bg-accent
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-unchecked:bg-muted

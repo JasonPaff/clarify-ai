@@ -70,7 +70,7 @@ function NavItemLink({ active, collapsed, item }: NavItemLinkProps) {
         `
           flex h-9 items-center gap-3 rounded-md px-3 text-sm font-medium
           transition-colors outline-none
-          focus-visible:ring-2 focus-visible:ring-accent
+          focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0
         `,
         active && 'bg-accent text-accent-foreground',
         !active &&

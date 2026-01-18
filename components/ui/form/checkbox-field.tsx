@@ -15,7 +15,7 @@ import { descriptionVariants, errorVariants, getAriaDescribedBy, labelVariants }
 export const checkboxVariants = cva(
   `
     flex items-center justify-center rounded-sm border
-    focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none
+    focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:outline-none
     data-checked:border-accent data-checked:bg-accent
     data-checked:text-accent-foreground
     data-disabled:cursor-not-allowed data-disabled:opacity-50

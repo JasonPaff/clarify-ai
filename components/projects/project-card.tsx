@@ -18,7 +18,7 @@ export function ProjectCard({ description, featureCount = 0, id, name }: Project
     <Link
       className={`
         block rounded-lg outline-none
-        focus-visible:ring-2 focus-visible:ring-accent
+        focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0
       `}
       href={$path({
         route: '/projects/[projectId]',

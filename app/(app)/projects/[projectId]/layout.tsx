@@ -3,7 +3,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { withLayoutParamValidation } from 'next-typesafe-url/app/hoc';
-import Link from 'next/link';
 import { use } from 'react';
 
 import type { LayoutProps } from '@/app/(app)/projects/[projectId]/(projectId)/route-type';
@@ -11,7 +10,7 @@ import type { LayoutProps } from '@/app/(app)/projects/[projectId]/(projectId)/r
 import { Layout } from '@/app/(app)/projects/[projectId]/(projectId)/route-type';
 import { PageHeader } from '@/components/layout/page-header';
 import { ProjectTabs } from '@/components/projects/project-tabs';
-import { IconButton } from '@/components/ui/icon-button';
+import { IconButtonLink } from '@/components/ui/icon-button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useProject } from '@/hooks/queries/use-projects';
 
@@ -29,11 +28,9 @@ function ProjectLayout({ children, routeParams }: ProjectLayoutProps) {
     <div>
       <div className={'flex items-center gap-3'}>
         <Tooltip content={'Back to projects'} side={'right'}>
-          <Link href={$path({ route: '/projects' })}>
-            <IconButton>
-              <ArrowLeft className={'size-4'} />
-            </IconButton>
-          </Link>
+          <IconButtonLink href={$path({ route: '/projects' })}>
+            <ArrowLeft className={'size-4'} />
+          </IconButtonLink>
         </Tooltip>
         <PageHeader className={'mb-0 flex-1'} title={projectName} />
       </div>

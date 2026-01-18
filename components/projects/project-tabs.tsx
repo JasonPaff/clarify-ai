@@ -47,8 +47,8 @@ export function ProjectTabs({ projectId }: ProjectTabsProps) {
     <TabsRoot value={activeTab}>
       <TabsList>
         {tabs.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value}>
-            <Link href={tab.href}>{tab.label}</Link>
+          <TabsTrigger key={tab.value} render={<Link href={tab.href} />} value={tab.value}>
+            {tab.label}
           </TabsTrigger>
         ))}
         <TabsIndicator />
