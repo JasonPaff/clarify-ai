@@ -5,11 +5,11 @@
 
 ## Git Safety Checks
 
-| Check | Status |
-|-------|--------|
-| Current Branch | `feat/feature-request-ui` |
-| Not on Main | PASS |
-| Uncommitted Changes | None |
+| Check               | Status                    |
+| ------------------- | ------------------------- |
+| Current Branch      | `feat/feature-request-ui` |
+| Not on Main         | PASS                      |
+| Uncommitted Changes | None                      |
 
 ## Plan Summary
 

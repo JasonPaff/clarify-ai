@@ -4,10 +4,10 @@
 
 ## Validation Results
 
-| Command | Status |
-|---------|--------|
-| `pnpm lint` | PASS |
-| `pnpm typecheck` | PASS |
+| Command          | Status |
+| ---------------- | ------ |
+| `pnpm lint`      | PASS   |
+| `pnpm typecheck` | PASS   |
 
 ## Quality Gate Status: PASSED
 
