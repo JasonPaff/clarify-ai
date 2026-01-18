@@ -132,55 +132,29 @@ export const ApiKeysSection = ({ className, ref, ...props }: ApiKeysSectionProps
   );
 };
 
-// Auto-opening dialog wrapper
-interface ApiKeyDialogAutoOpenProps {
-  existingKey: ApiKeyInfo;
-  mode: 'edit';
-  onOpenChange?: (isOpen: boolean) => void;
-}
-
 // Separate component for API keys content with edit functionality
 interface ApiKeysContentProps {
   apiKeys: Array<ApiKeyInfo>;
   onDelete: (provider: ApiKeyProvider) => void;
 }
 
-// Wrapper to handle edit dialog with auto-open behavior
-interface EditApiKeyDialogWrapperProps {
-  existingKey: ApiKeyInfo;
-  onClose: () => void;
-}
-
-function ApiKeyDialogAutoOpen({ existingKey, mode, onOpenChange }: ApiKeyDialogAutoOpenProps) {
-  return (
-    <ApiKeyDialog existingKey={existingKey} mode={mode}>
-      <button
-        className={'sr-only'}
-        onClick={() => onOpenChange?.(true)}
-        ref={(el) => {
-          if (el) {
-            el.click();
-          }
-        }}
-        type={'button'}
-      >
-        Edit API Key
-      </button>
-    </ApiKeyDialog>
-  );
-}
-
 function ApiKeysContent({ apiKeys, onDelete }: ApiKeysContentProps) {
-  const [editingProvider, setEditingProvider] = useState<ApiKeyProvider | null>(null);
-
-  const _editingKey = editingProvider ? apiKeys.find((key) => key.provider === editingProvider) : null;
+  const [editingKey, setEditingKey] = useState<ApiKeyInfo | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleEdit = (provider: ApiKeyProvider) => {
-    setEditingProvider(provider);
+    const keyEntry = apiKeys.find((key) => key.provider === provider);
+    if (keyEntry) {
+      setEditingKey(keyEntry);
+      setIsEditDialogOpen(true);
+    }
   };
 
-  const handleEditDialogClosed = () => {
-    setEditingProvider(null);
+  const handleEditDialogOpenChange = (isOpen: boolean) => {
+    setIsEditDialogOpen(isOpen);
+    if (!isOpen) {
+      setEditingKey(null);
+    }
   };
 
   return (
@@ -188,8 +162,15 @@ function ApiKeysContent({ apiKeys, onDelete }: ApiKeysContentProps) {
       {/* API Keys Table */}
       <ApiKeyTable apiKeys={apiKeys} onDelete={onDelete} onEdit={handleEdit} />
 
-      {/* Edit Dialog - renders when editingProvider is set */}
-      {_editingKey && <EditApiKeyDialogWrapper existingKey={_editingKey} onClose={handleEditDialogClosed} />}
+      {/* Edit Dialog (controlled) */}
+      {editingKey && (
+        <ApiKeyDialog
+          existingKey={editingKey}
+          mode={'edit'}
+          onOpenChange={handleEditDialogOpenChange}
+          open={isEditDialogOpen}
+        />
+      )}
     </Fragment>
   );
 }
@@ -229,22 +210,4 @@ function ApiKeysSkeleton() {
       </div>
     </div>
   );
-}
-
-function EditApiKeyDialogWrapper({ existingKey, onClose }: EditApiKeyDialogWrapperProps) {
-  const [isVisible, setIsVisible] = useState(true);
-
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      setIsVisible(false);
-      onClose();
-    }
-  };
-
-  if (!isVisible) {
-    return null;
-  }
-
-  // Render dialog with an invisible trigger that auto-clicks
-  return <ApiKeyDialogAutoOpen existingKey={existingKey} mode={'edit'} onOpenChange={handleOpenChange} />;
 }

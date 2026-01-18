@@ -14,7 +14,7 @@ export interface ElectronAPI {
     getAll(): Promise<Array<ApiKeyInfo>>;
     isEncryptionAvailable(): Promise<boolean>;
     set(input: SetApiKeyInput): Promise<{ error?: string; success: boolean }>;
-    test(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
+    test(provider: ApiKeyProvider, apiKey?: string): Promise<{ error?: string; success: boolean }>;
   };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
@@ -86,7 +86,7 @@ const electronAPI: ElectronAPI = {
     getAll: () => ipcRenderer.invoke(IpcChannels.apiKeys.getAll),
     isEncryptionAvailable: () => ipcRenderer.invoke(IpcChannels.apiKeys.isEncryptionAvailable),
     set: (input) => ipcRenderer.invoke(IpcChannels.apiKeys.set, input),
-    test: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider),
+    test: (provider, apiKey) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider, apiKey),
   },
   app: {
     getPath: (name) => ipcRenderer.invoke(IpcChannels.app.getPath, name),

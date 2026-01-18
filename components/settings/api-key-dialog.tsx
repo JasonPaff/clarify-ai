@@ -1,7 +1,6 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useState } from 'react';
 
 import type { ApiKeyInfo } from '@/types/electron';
 
@@ -16,18 +15,25 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
+import { useControllableState } from '@/hooks/use-controllable-state';
 
 import { ApiKeyForm } from './api-key-form';
 
 type ApiKeyDialogProps = Children & {
   existingKey?: ApiKeyInfo;
   mode: DialogMode;
+  onOpenChange?: (isOpen: boolean) => void;
+  open?: boolean;
 };
 
 type DialogMode = 'create' | 'edit';
 
-export function ApiKeyDialog({ children, existingKey, mode }: ApiKeyDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function ApiKeyDialog({ children, existingKey, mode, onOpenChange, open: controlledOpen }: ApiKeyDialogProps) {
+  const [isOpen, setIsOpen] = useControllableState({
+    defaultValue: false,
+    onChange: onOpenChange,
+    value: controlledOpen,
+  });
 
   const handleSuccess = () => {
     setIsOpen(false);
@@ -57,8 +63,8 @@ export function ApiKeyDialog({ children, existingKey, mode }: ApiKeyDialogProps)
 
   return (
     <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
-      {/* Dialog Trigger */}
-      <DialogTrigger>{children}</DialogTrigger>
+      {/* Dialog Trigger (only when children provided) */}
+      {children && <DialogTrigger>{children}</DialogTrigger>}
 
       {/* Dialog Portal */}
       <DialogPortal>

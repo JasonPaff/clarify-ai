@@ -1,7 +1,9 @@
 import { z } from 'zod';
 
-// API provider enum - supported AI providers
-const apiProviderSchema = z.enum(['anthropic', 'google', 'openai']);
+// API provider enum - supported AI providers (lowercase to match IPC handlers)
+const apiProviderSchema = z.enum(['anthropic', 'google', 'openai'], {
+  message: 'Provider is required',
+});
 
 // API key source enum - how the key was provided
 const apiKeySourceSchema = z.enum(['environment', 'user']);

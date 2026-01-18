@@ -67,9 +67,9 @@ export function useElectronApiKeys() {
   );
 
   const test = useCallback(
-    async (provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }> => {
+    async (provider: ApiKeyProvider, apiKey?: string): Promise<{ error?: string; success: boolean }> => {
       if (!api) return { error: 'Not running in Electron', success: false };
-      return api.apiKeys.test(provider);
+      return api.apiKeys.test(provider, apiKey);
     },
     [api]
   );

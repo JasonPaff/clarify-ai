@@ -73,6 +73,6 @@ export function useTestApiKey() {
   const { test } = useElectronApiKeys();
 
   return useMutation({
-    mutationFn: (provider: AiProvider) => test(provider),
+    mutationFn: ({ apiKey, provider }: { apiKey?: string; provider: AiProvider }) => test(provider, apiKey),
   });
 }

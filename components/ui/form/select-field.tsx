@@ -19,6 +19,9 @@ export const selectTriggerVariants = cva(
     focus:ring-2 focus:ring-accent focus:ring-offset-0 focus:outline-none
     data-disabled:cursor-not-allowed data-disabled:opacity-50
     data-popup-open:ring-2 data-popup-open:ring-accent data-popup-open:ring-offset-0
+    data-invalid:border-destructive
+    data-invalid:focus:ring-destructive
+    data-invalid:data-popup-open:ring-destructive
   `,
   {
     defaultVariants: {
@@ -34,11 +37,16 @@ export const selectTriggerVariants = cva(
   }
 );
 
+export const selectPositionerVariants = cva('z-100 outline-none', {
+  defaultVariants: {},
+  variants: {},
+});
+
 export const selectPopupVariants = cva(
   `
-    z-50 rounded-md border border-border bg-card p-1 shadow-md
-    transition-opacity duration-150 outline-none
-    data-ending-style:opacity-0
+    min-w-(--anchor-width) rounded-md border border-border bg-card p-1
+    shadow-md transition-opacity duration-150
+    outline-none data-ending-style:opacity-0
     data-starting-style:opacity-0
   `,
   {
@@ -123,6 +131,7 @@ export function SelectField({
       {/* Select */}
       <Select.Root
         disabled={isDisabled}
+        modal={false}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             field.handleBlur();
@@ -131,28 +140,30 @@ export function SelectField({
         onValueChange={(value) => field.handleChange(value ?? '')}
         value={field.state.value}
       >
-        <Select.Trigger className={selectTriggerVariants({ size })}>
+        <Select.Trigger className={selectTriggerVariants({ size })} data-invalid={_hasError || undefined}>
           <Select.Value placeholder={placeholder} />
           <Select.Icon>
             <ChevronDown aria-hidden={'true'} className={'size-4 opacity-50'} />
           </Select.Icon>
         </Select.Trigger>
         <Select.Portal>
-          <Select.Positioner>
+          <Select.Positioner alignItemWithTrigger={false} className={selectPositionerVariants()} sideOffset={4}>
             <Select.Popup className={selectPopupVariants({ size })}>
-              {options.map((option) => (
-                <Select.Item
-                  className={selectItemVariants({ size })}
-                  disabled={option.isDisabled}
-                  key={option.value}
-                  value={option.value}
-                >
-                  <Select.ItemIndicator className={'absolute left-2'}>
-                    <Check className={'size-3.5'} />
-                  </Select.ItemIndicator>
-                  <Select.ItemText className={'pl-5'}>{option.label}</Select.ItemText>
-                </Select.Item>
-              ))}
+              <Select.List>
+                {options.map((option) => (
+                  <Select.Item
+                    className={selectItemVariants({ size })}
+                    disabled={option.isDisabled}
+                    key={option.value}
+                    value={option.value}
+                  >
+                    <Select.ItemIndicator className={'absolute left-2'}>
+                      <Check className={'size-3.5'} />
+                    </Select.ItemIndicator>
+                    <Select.ItemText className={'pl-5'}>{option.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Select.List>
             </Select.Popup>
           </Select.Positioner>
         </Select.Portal>

@@ -123,7 +123,7 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
 
       {/* Actions */}
       <div className={'flex justify-end gap-1'}>
-        {_isUserKey && (
+        {_isUserKey && entry.isConfigured && (
           <Fragment>
             <IconButton aria-label={`Edit ${providerDisplayName} API key`} onClick={onEdit} type={'button'}>
               <Pencil className={'size-4'} />
@@ -133,7 +133,9 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
             </IconButton>
           </Fragment>
         )}
-        {!_isUserKey && <span className={'px-2 text-xs text-muted-foreground/50'}>Read-only</span>}
+        {!_isUserKey && entry.isConfigured && (
+          <span className={'px-2 text-xs text-muted-foreground/50'}>Read-only</span>
+        )}
       </div>
     </div>
   );

@@ -204,14 +204,17 @@ export function registerApiKeysHandlers(): void {
     IpcChannels.apiKeys.test,
     async (
       _event: IpcMainInvokeEvent,
-      provider: ApiKeyProvider
+      provider: ApiKeyProvider,
+      keyToTest?: string
     ): Promise<{ error?: string; provider: string; success: boolean }> => {
-      // Get the API key for this provider
-      const storedData = getStoredKeyData(provider);
-      let apiKey: null | string = null;
+      // Use provided key, or fall back to stored/env key
+      let apiKey: null | string = keyToTest ?? null;
 
-      if (storedData) {
-        apiKey = decryptStoredKey(storedData.encrypted);
+      if (!apiKey) {
+        const storedData = getStoredKeyData(provider);
+        if (storedData) {
+          apiKey = decryptStoredKey(storedData.encrypted);
+        }
       }
 
       if (!apiKey) {

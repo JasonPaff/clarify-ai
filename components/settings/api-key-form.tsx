@@ -33,7 +33,7 @@ interface CreateApiKeyFormContentProps {
   isTestLoading: boolean;
   onCancel: () => void;
   onSubmit: (values: CreateApiKeyFormValues) => Promise<void>;
-  onTestApiKey: (provider: ApiProvider) => Promise<{ error?: string; success: boolean }>;
+  onTestApiKey: (params: { apiKey?: string; provider: ApiProvider }) => Promise<{ error?: string; success: boolean }>;
   setTestResult: (result: null | { isSuccess: boolean; message: string }) => void;
   testResult: null | { isSuccess: boolean; message: string };
 }
@@ -47,7 +47,7 @@ interface EditApiKeyFormContentProps {
   isTestLoading: boolean;
   onCancel: () => void;
   onSubmit: (values: UpdateApiKeyFormValues) => Promise<void>;
-  onTestApiKey: (provider: ApiProvider) => Promise<{ error?: string; success: boolean }>;
+  onTestApiKey: (params: { apiKey?: string; provider: ApiProvider }) => Promise<{ error?: string; success: boolean }>;
   setTestResult: (result: null | { isSuccess: boolean; message: string }) => void;
   testResult: null | { isSuccess: boolean; message: string };
 }
@@ -149,9 +149,9 @@ function CreateApiKeyFormContent({
     },
   });
 
-  const handleTestConnection = useCallback(async () => {
-    const provider = form.getFieldValue('provider');
-    const apiKey = form.getFieldValue('apiKey');
+  const handleTestConnection = async () => {
+    // Access form values directly from state to ensure we get current values
+    const { apiKey, provider } = form.state.values;
 
     if (!provider || !apiKey) {
       setTestResult({ isSuccess: false, message: 'Please select a provider and enter an API key first' });
@@ -159,7 +159,7 @@ function CreateApiKeyFormContent({
     }
 
     try {
-      const result = await onTestApiKey(provider);
+      const result = await onTestApiKey({ apiKey, provider });
 
       if (result.success) {
         setTestResult({ isSuccess: true, message: 'Connection successful! API key is valid.' });
@@ -172,7 +172,7 @@ function CreateApiKeyFormContent({
         message: error instanceof Error ? error.message : 'Connection test failed',
       });
     }
-  }, [form, onTestApiKey, setTestResult]);
+  };
 
   return (
     <form
@@ -270,7 +270,7 @@ function EditApiKeyFormContent({
     },
   });
 
-  const handleTestConnection = useCallback(async () => {
+  const handleTestConnection = async () => {
     const provider = initialValues?.provider;
 
     if (!provider) {
@@ -278,8 +278,12 @@ function EditApiKeyFormContent({
       return;
     }
 
+    // Get the new API key from form if entered, otherwise test the saved key
+    const formApiKey = form.state.values.apiKey;
+    const apiKey = formApiKey || undefined;
+
     try {
-      const result = await onTestApiKey(provider);
+      const result = await onTestApiKey({ apiKey, provider });
 
       if (result.success) {
         setTestResult({ isSuccess: true, message: 'Connection successful! API key is valid.' });
@@ -292,7 +296,7 @@ function EditApiKeyFormContent({
         message: error instanceof Error ? error.message : 'Connection test failed',
       });
     }
-  }, [initialValues, onTestApiKey, setTestResult]);
+  };
 
   return (
     <form

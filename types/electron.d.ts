@@ -20,7 +20,8 @@ export interface ElectronAPI {
       input: import('../electron/ipc/api-keys.handlers').SetApiKeyInput
     ): Promise<{ error?: string; success: boolean }>;
     test(
-      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
+      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider,
+      apiKey?: string
     ): Promise<{ error?: string; success: boolean }>;
   };
   app: {
