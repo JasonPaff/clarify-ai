@@ -2,10 +2,12 @@ import type { BrowserWindow } from 'electron';
 
 import type { DrizzleDatabase } from '../../db';
 
+import { createFeatureRequestsRepository } from '../../db/repositories/feature-requests.repository';
 import { createProjectsRepository } from '../../db/repositories/projects.repository';
 import { createRepositoriesRepository } from '../../db/repositories/repositories.repository';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
+import { registerFeatureRequestsHandlers } from './feature-requests.handlers';
 import { registerFsHandlers } from './fs.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
 import { registerRepositoriesHandlers } from './repositories.handlers';
@@ -31,4 +33,8 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // Database handlers - Repositories
   const repositoriesRepository = createRepositoriesRepository(db);
   registerRepositoriesHandlers(repositoriesRepository);
+
+  // Database handlers - Feature Requests
+  const featureRequestsRepository = createFeatureRequestsRepository(db);
+  registerFeatureRequestsHandlers(featureRequestsRepository);
 }

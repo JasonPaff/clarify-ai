@@ -55,6 +55,30 @@ export function useElectronApp() {
 export function useElectronDb() {
   const { api, isElectron } = useElectron();
 
+  const featureRequests = useMemo(
+    () => ({
+      create: (data: Parameters<NonNullable<typeof api>['db']['featureRequests']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequests.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequests.delete(id);
+      },
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequests.getById(id);
+      },
+      getByProjectId: (projectId: number) =>
+        api?.db.featureRequests.getByProjectId(projectId) ?? Promise.resolve([]),
+      update: (id: number, data: Parameters<NonNullable<typeof api>['db']['featureRequests']['update']>[1]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequests.update(id, data);
+      },
+    }),
+    [api]
+  );
+
   const projects = useMemo(
     () => ({
       create: (data: Parameters<NonNullable<typeof api>['db']['projects']['create']>[0]) => {
@@ -101,7 +125,7 @@ export function useElectronDb() {
     [api]
   );
 
-  return { isElectron, projects, repositories };
+  return { featureRequests, isElectron, projects, repositories };
 }
 
 export function useElectronDialog() {

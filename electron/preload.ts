@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 import type { NewProject, Project } from '../db/schema/projects.schema';
 import type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
@@ -11,6 +12,13 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    featureRequests: {
+      create(data: NewFeatureRequest): Promise<FeatureRequest>;
+      delete(id: number): Promise<boolean>;
+      getById(id: number): Promise<FeatureRequest | undefined>;
+      getByProjectId(projectId: number): Promise<Array<FeatureRequest>>;
+      update(id: number, data: Partial<NewFeatureRequest>): Promise<FeatureRequest | undefined>;
+    };
     projects: {
       create(data: NewProject): Promise<Project>;
       delete(id: number): Promise<boolean>;
@@ -68,6 +76,13 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
+    featureRequests: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequests.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequests.delete, id),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequests.getById, id),
+      getByProjectId: (projectId) => ipcRenderer.invoke(IpcChannels.db.featureRequests.getByProjectId, projectId),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.featureRequests.update, id, data),
+    },
     projects: {
       create: (data) => ipcRenderer.invoke(IpcChannels.db.projects.create, data),
       delete: (id) => ipcRenderer.invoke(IpcChannels.db.projects.delete, id),

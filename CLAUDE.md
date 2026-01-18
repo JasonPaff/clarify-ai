@@ -277,6 +277,7 @@ clarify-ai/
 - Don't skip migrations - always use `db:generate` and `db:migrate`
 - Don't use `eslint-disable` comments without justification
 - Don't use `ts-ignore` or `ts-expect-error` - fix the type issues properly
+- Don't use barrel exports
 
 ## 8. Project Documentation Conventions (Important)
 

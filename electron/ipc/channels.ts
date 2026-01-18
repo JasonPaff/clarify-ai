@@ -4,6 +4,13 @@ export const IpcChannels = {
     getVersion: 'app:getVersion',
   },
   db: {
+    featureRequests: {
+      create: 'db:featureRequests:create',
+      delete: 'db:featureRequests:delete',
+      getById: 'db:featureRequests:getById',
+      getByProjectId: 'db:featureRequests:getByProjectId',
+      update: 'db:featureRequests:update',
+    },
     projects: {
       create: 'db:projects:create',
       delete: 'db:projects:delete',

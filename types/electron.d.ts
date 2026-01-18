@@ -1,4 +1,5 @@
 // Re-export database types for renderer use
+export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
@@ -8,6 +9,20 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    featureRequests: {
+      create(
+        data: import('../db/schema/feature-requests.schema').NewFeatureRequest
+      ): Promise<import('../db/schema/feature-requests.schema').FeatureRequest>;
+      delete(id: number): Promise<boolean>;
+      getById(id: number): Promise<import('../db/schema/feature-requests.schema').FeatureRequest | undefined>;
+      getByProjectId(
+        projectId: number
+      ): Promise<Array<import('../db/schema/feature-requests.schema').FeatureRequest>>;
+      update(
+        id: number,
+        data: Partial<import('../db/schema/feature-requests.schema').NewFeatureRequest>
+      ): Promise<import('../db/schema/feature-requests.schema').FeatureRequest | undefined>;
+    };
     projects: {
       create(
         data: import('../db/schema/projects.schema').NewProject
