@@ -10,22 +10,22 @@ Successfully implemented the ability for users to mark projects as favorites and
 
 ## Steps Completed
 
-| Step | Description | Specialist | Status |
-|------|-------------|------------|--------|
-| 1 | Add isFavorited Column to Projects Schema | database-schema | ✓ |
-| 2 | Generate Database Migration | general-purpose | ✓ |
-| 3 | Add getFavorited Query Key | tanstack-query | ✓ |
-| 4 | Add Repository Method for getFavorited | database-schema | ✓ |
-| 5 | Add IPC Channel and Handler | ipc-handler | ✓ |
-| 6 | Update Preload Script and Types | ipc-handler | ✓ |
-| 7 | Update useElectronDb Hook | tanstack-query | ✓ |
-| 8 | Create useFavoritedProjects Query Hook | tanstack-query | ✓ |
-| 9 | Create useFavoriteProject Mutation Hook | tanstack-query | ✓ |
-| 10 | Create FavoriteButton Component | frontend-component | ✓ |
-| 11 | Update ProjectCard with FavoriteButton | frontend-component | ✓ |
-| 12 | Update Projects Page | general-purpose | ✓ |
-| 13 | Create SidebarFavorites Component | frontend-component | ✓ |
-| 14 | Integrate SidebarFavorites into SidebarNav | frontend-component | ✓ |
+| Step | Description                                | Specialist         | Status |
+| ---- | ------------------------------------------ | ------------------ | ------ |
+| 1    | Add isFavorited Column to Projects Schema  | database-schema    | ✓      |
+| 2    | Generate Database Migration                | general-purpose    | ✓      |
+| 3    | Add getFavorited Query Key                 | tanstack-query     | ✓      |
+| 4    | Add Repository Method for getFavorited     | database-schema    | ✓      |
+| 5    | Add IPC Channel and Handler                | ipc-handler        | ✓      |
+| 6    | Update Preload Script and Types            | ipc-handler        | ✓      |
+| 7    | Update useElectronDb Hook                  | tanstack-query     | ✓      |
+| 8    | Create useFavoritedProjects Query Hook     | tanstack-query     | ✓      |
+| 9    | Create useFavoriteProject Mutation Hook    | tanstack-query     | ✓      |
+| 10   | Create FavoriteButton Component            | frontend-component | ✓      |
+| 11   | Update ProjectCard with FavoriteButton     | frontend-component | ✓      |
+| 12   | Update Projects Page                       | general-purpose    | ✓      |
+| 13   | Create SidebarFavorites Component          | frontend-component | ✓      |
+| 14   | Integrate SidebarFavorites into SidebarNav | frontend-component | ✓      |
 
 ## Files Created
 

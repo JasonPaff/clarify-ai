@@ -48,8 +48,7 @@ export function useFavoriteProject() {
   const { projects } = useElectronDb();
 
   return useMutation({
-    mutationFn: ({ id, isFavorited }: { id: number; isFavorited: boolean }) =>
-      projects.update(id, { isFavorited }),
+    mutationFn: ({ id, isFavorited }: { id: number; isFavorited: boolean }) => projects.update(id, { isFavorited }),
     onSuccess: (project) => {
       if (project) {
         // Update the detail cache with the new favorite state

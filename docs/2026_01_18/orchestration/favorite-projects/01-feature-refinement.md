@@ -11,6 +11,7 @@
 > As a user I would like to be able to tag my favorite projects so they are available on the sidebar for easy access
 >
 > Additional context from clarification:
+>
 > - Sidebar Placement: Above Projects link - A dedicated 'Favorites' section with starred projects listed above the main Projects navigation item
 > - Favorite Interaction: Star icon in project list - Clickable star icon next to each project name in the projects list page
 > - Display Limit: No limit - Show all favorited projects in the sidebar
@@ -49,13 +50,13 @@ Users should be able to mark their favorite projects with a star icon displayed 
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| Format | Single paragraph |
-| Length | ~280 words |
-| Intent preserved | Yes |
-| Clarification incorporated | Yes |
-| Technical details added | Yes (schema, IPC, mutation, cache invalidation) |
+| Check                      | Result                                          |
+| -------------------------- | ----------------------------------------------- |
+| Format                     | Single paragraph                                |
+| Length                     | ~280 words                                      |
+| Intent preserved           | Yes                                             |
+| Clarification incorporated | Yes                                             |
+| Technical details added    | Yes (schema, IPC, mutation, cache invalidation) |
 
 ## Refined Feature Request
 

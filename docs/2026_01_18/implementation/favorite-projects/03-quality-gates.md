@@ -5,11 +5,11 @@
 
 ## Validation Commands
 
-| Command | Status | Notes |
-|---------|--------|-------|
-| `pnpm lint --fix` | PASS | No errors |
-| `pnpm typecheck` | PASS | No errors |
-| `pnpm db:generate` | PASS | Migration 0003_stiff_dazzler.sql generated |
+| Command            | Status | Notes                                      |
+| ------------------ | ------ | ------------------------------------------ |
+| `pnpm lint --fix`  | PASS   | No errors                                  |
+| `pnpm typecheck`   | PASS   | No errors                                  |
+| `pnpm db:generate` | PASS   | Migration 0003_stiff_dazzler.sql generated |
 
 ## Quality Gate Checklist
 

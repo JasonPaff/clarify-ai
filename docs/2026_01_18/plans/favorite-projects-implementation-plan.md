@@ -44,18 +44,22 @@ Users should be able to mark their favorite projects with a star icon displayed 
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/schema/projects.schema.ts` - Add isFavorited integer column (SQLite boolean)
 
 **Changes:**
+
 - Add `isFavorited` column using `integer('is_favorited')` with default value of 0 and notNull constraint
 - Add index on `isFavorited` column for efficient querying of favorited projects
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file compiles without TypeScript errors
 - [ ] `isFavorited` field is present in `Project` and `NewProject` types via `$inferSelect`/`$inferInsert`
 - [ ] All validation commands pass
@@ -69,17 +73,21 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files Affected:**
+
 - `drizzle/` - New migration file will be generated
 
 **Changes:**
+
 - Run Drizzle Kit to generate migration from schema changes
 
 **Validation Commands:**
+
 ```bash
 pnpm db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file is generated in `drizzle/` directory
 
 ---
@@ -91,17 +99,21 @@ pnpm db:generate
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/queries/projects.ts` - Add `favorited` query key
 
 **Changes:**
+
 - Add `favorited` key to the `createQueryKeys` definition for favorited projects queries
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `projectKeys.favorited` is available and type-safe
 - [ ] All validation commands pass
 
@@ -114,18 +126,22 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/repositories/projects.repository.ts` - Add getFavorited method
 
 **Changes:**
+
 - Add `getFavorited(): Array<Project>` to the `ProjectsRepository` interface
 - Implement the method to query projects where `isFavorited` equals 1 (true)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `getFavorited` method is available on the repository interface
 - [ ] Method returns only projects where isFavorited is true
 - [ ] All validation commands pass
@@ -139,19 +155,23 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add getFavorited channel constant
 - `electron/ipc/projects.handlers.ts` - Add getFavorited handler
 
 **Changes:**
+
 - Add `getFavorited: 'db:projects:getFavorited'` to IpcChannels.db.projects
 - Add ipcMain.handle for the getFavorited channel that calls projectsRepository.getFavorited()
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] IpcChannels.db.projects.getFavorited constant exists
 - [ ] Handler is registered in registerProjectsHandlers function
 - [ ] All validation commands pass
@@ -165,19 +185,23 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Add getFavorited to db.projects object
 - `types/electron.d.ts` - Add getFavorited type definition
 
 **Changes:**
+
 - Add `getFavorited: () => ipcRenderer.invoke(IpcChannels.db.projects.getFavorited)` to preload electronAPI.db.projects
 - Add `getFavorited(): Promise<Array<Project>>` to ElectronAPI.db.projects interface in both files
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Preload script exposes getFavorited method
 - [ ] Type definitions include getFavorited with correct return type
 - [ ] All validation commands pass
@@ -191,18 +215,22 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/useElectron.ts` - Add getFavorited to projects useMemo
 
 **Changes:**
+
 - Add `getFavorited` method to the projects object that calls `api.db.projects.getFavorited()`
 - Handle the case when api is not available by returning empty array promise
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] useElectronDb().projects.getFavorited() is available
 - [ ] Method handles missing API gracefully
 - [ ] All validation commands pass
@@ -216,19 +244,23 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/queries/use-projects.ts` - Add useFavoritedProjects hook
 
 **Changes:**
+
 - Add `useFavoritedProjects` function that uses `useQuery` with `projectKeys.favorited`
 - Configure the query to use `projects.getFavorited()` as the query function
 - Enable query only when isElectron is true
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `useFavoritedProjects` hook is exported and usable
 - [ ] Hook returns correct data shape with loading/error states
 - [ ] All validation commands pass
@@ -242,20 +274,24 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/queries/use-projects.ts` - Add useFavoriteProject mutation hook
 
 **Changes:**
+
 - Add `useFavoriteProject` function that uses `useMutation` to update project's `isFavorited` field
 - Mutation function should accept `{ id: number; isFavorited: boolean }` and call `projects.update(id, { isFavorited })`
 - On success, invalidate both `projectKeys.list` and `projectKeys.favorited` query keys
 - Update the project detail cache with the new favorite state
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `useFavoriteProject` hook is exported and usable
 - [ ] Mutation properly invalidates list and favorited queries on success
 - [ ] All validation commands pass
@@ -269,9 +305,11 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/projects/favorite-button.tsx` - New favorite button component
 
 **Changes:**
+
 - Create FavoriteButton component accepting `id`, `isFavorited`, and optional className props
 - Use lucide-react `Star` icon with filled variant when favorited
 - Handle click event to call useFavoriteProject mutation with toggled state
@@ -280,11 +318,13 @@ pnpm lint --fix && pnpm typecheck
 - Use CVA pattern if variants are needed for different sizes
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] FavoriteButton component renders Star icon correctly
 - [ ] Filled star appears when isFavorited is true
 - [ ] Click toggles favorite state via mutation
@@ -300,20 +340,24 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/projects/project-card.tsx` - Add FavoriteButton
 
 **Changes:**
+
 - Add `isFavorited` boolean prop to ProjectCardProps interface
 - Import and render FavoriteButton in the card header area (replace or alongside ChevronRight)
 - Position the button appropriately within the existing layout
 - Pass id and isFavorited props to FavoriteButton
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] ProjectCard accepts isFavorited prop
 - [ ] FavoriteButton renders in the card header
 - [ ] Clicking star toggles favorite without navigating
@@ -328,17 +372,21 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/page.tsx` - Pass isFavorited prop
 
 **Changes:**
+
 - Add `isFavorited={project.isFavorited ?? false}` prop to ProjectCard in the map function
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Each ProjectCard receives correct isFavorited value
 - [ ] Favorite state persists across page refreshes
 - [ ] All validation commands pass
@@ -352,9 +400,11 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/layout/sidebar-favorites.tsx` - New favorites section component
 
 **Changes:**
+
 - Create SidebarFavorites component that uses useFavoritedProjects hook
 - Display "Favorites" section header with Star icon
 - Render list of favorited project links with proper styling matching existing nav items
@@ -364,11 +414,13 @@ pnpm lint --fix && pnpm typecheck
 - Use $path for type-safe navigation to project routes
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders favorited projects list
 - [ ] Links navigate to correct project pages
 - [ ] Collapsed state shows icons only with tooltips
@@ -384,19 +436,23 @@ pnpm lint --fix && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/layout/sidebar-nav.tsx` - Add SidebarFavorites
 
 **Changes:**
+
 - Import SidebarFavorites component
 - Render SidebarFavorites above the mainNavItems section
 - Ensure proper spacing between Favorites section and main navigation items
 
 **Validation Commands:**
+
 ```bash
 pnpm lint --fix && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Favorites section appears above Projects link in sidebar
 - [ ] Favorited projects are clickable and navigate correctly
 - [ ] Section disappears when no projects are favorited
