@@ -3,6 +3,10 @@
     "base-ui": {
       "type": "http",
       "url": "https://base-ui-mcp.polv.workers.dev/mcp"
+    },
+    "ai-elements": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "mcp-remote", "https://registry.ai-sdk.dev/api/mcp"]
     }
   }
 }

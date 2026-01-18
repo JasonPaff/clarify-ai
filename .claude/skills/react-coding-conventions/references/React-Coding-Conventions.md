@@ -128,6 +128,8 @@ export const ExampleComponent = ({ onSubmit, isDisabled = false }: ExampleProps)
 };
 ```
 
+Do not leave comments above the sections showing their order. Just put them in the right order.
+
 ---
 
 ## Naming Conventions
@@ -153,20 +155,6 @@ interface Props {
   disabled?: boolean;
   required?: boolean;
 }
-```
-
-### Derived Variables
-
-**Prefix with underscore (`_`) :**
-
-```tsx
-// ✅ Correct
-const _isSubmitReady = currentStep >= steps.length && !isLoading;
-const _hasNoResults = table.getRowModel().rows?.length === 0;
-
-// ❌ Incorrect
-const isSubmitReady = currentStep >= steps.length && !isLoading;
-const hasNoResults = table.getRowModel().rows?.length === 0;
 ```
 
 ### Function Naming
@@ -305,12 +293,6 @@ export const Form = ({ onSubmit }: FormProps) => {
 
 ### Rules for Conditional vs Ternary
 
-**Use `<Conditional>` component for:**
-
-- Complex boolean conditions
-- Multiple conditions combined with logical operators
-- Rendering complex components or multiple elements
-
 **Use ternary operators for:**
 
 - Simple string values
@@ -318,13 +300,6 @@ export const Form = ({ onSubmit }: FormProps) => {
 - Simple boolean checks
 
 ```tsx
-// ✅ Use Conditional component
-const _isDataReady = user && data && !isLoading && !error;
-
-<Conditional isCondition={_isDataReady}>
-  <ComplexDashboard />
-</Conditional>;
-
 // ✅ Use ternary for simple cases
 {
   isLoading ? 'Loading...' : 'Ready';
@@ -340,31 +315,22 @@ Extract complex logic to meaningful variable names:
 
 ```tsx
 // ✅ Correct
-const _isDataReady = user && data && !isLoading && !error;
-const _shouldShowEmptyState = !isLoading && !error && data?.length === 0;
+const isDataReady = user && data && !isLoading && !error;
+const shouldShowEmptyState = !isLoading && !error && data?.length === 0;
 
 return (
   <div>
-    <Conditional isCondition={_isDataReady}>
-      <DataDisplay data={data} />
-    </Conditional>
-
-    <Conditional isCondition={_shouldShowEmptyState}>
-      <EmptyState />
-    </Conditional>
+        {isDataReady && <DataDisplay data={data} />}
+        {shouldShowEmptyState && <EmptyState />}
   </div>
 );
 
 // ❌ Incorrect
 return (
   <div>
-    <Conditional isCondition={user && data && !isLoading && !error}>
-      <DataDisplay data={data} />
-    </Conditional>
+        {user && data && !isLoading && !error && <DataDisplay data={data} />}
 
-    <Conditional isCondition={!isLoading && !error && data?.length === 0}>
-      <EmptyState />
-    </Conditional>
+        {!isLoading && !error && data?.length === 0 && <EmptyState />}
   </div>
 );
 ```
@@ -491,7 +457,6 @@ className={cn(
 ### Essential Rules Summary
 
 1. **Boolean Naming**: All boolean props, state, and values must start with `is`
-2. **Derived Variables**: Prefix conditional rendering variables with `_`
 3. **No Complex JSX Conditions**: Extract to meaningful variable names
 4. **UI Block Comments**: Label individual UI sections for clarity
 5. **Consistent Handler Naming**: `handle` for internal, `on` for props

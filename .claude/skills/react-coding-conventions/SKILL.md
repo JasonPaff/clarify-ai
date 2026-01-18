@@ -70,15 +70,12 @@ When writing React code, ensure strict adherence to all conventions:
 **Naming Conventions**:
 
 - All boolean values must start with `is`: `isLoading`, `isVisible`, `isDisabled`
-- Derived conditional variables must use `_` prefix: `_isDataReady`, `_hasNoResults`
 - Event handlers use `handle` prefix: `handleSubmit`, `handleInputChange`
 - Callback props use `on` prefix: `onSubmit`, `onInputChange`
 
 **Conditional Rendering**:
 
-- Use `<Conditional>` component for complex boolean conditions or multiple elements
 - Use ternary operators for simple string values or single component swaps
-- Extract complex conditions to meaningful `_` prefixed variable names
 - Add UI block comments: `{/* Section Name */}`
 
 **TypeScript**:
@@ -96,7 +93,6 @@ After generating or modifying React code, immediately perform automatic validati
 2. **Identify issues**: Create a mental checklist of any violations found:
    - Quote usage (strings, imports, JSX attributes)
    - Boolean naming (missing `is` prefix)
-   - Derived variable naming (missing `_` prefix)
    - Component structure order
    - Conditional rendering patterns
    - Event handler naming
@@ -106,7 +102,6 @@ After generating or modifying React code, immediately perform automatic validati
 3. **Fix automatically**: Apply corrections immediately without asking for permission:
    - Correct quote usage throughout
    - Rename boolean variables to include `is` prefix
-   - Rename derived variables to include `_` prefix
    - Reorder component internals to match standard structure
    - Replace inline conditions with extracted `_` variables
    - Add `{/* Section */}` comments to UI blocks
@@ -124,7 +119,7 @@ After automatically fixing violations, provide a brief summary:
 ✓ React conventions enforced:
   - Fixed quote usage in JSX attributes
   - Renamed boolean variables: loading → isLoading
-  - Extracted derived conditions: _isFormValid
+  - Extracted derived conditions: isFormValid
   - Reordered component hooks structure
   - Added UI section comments
 ```

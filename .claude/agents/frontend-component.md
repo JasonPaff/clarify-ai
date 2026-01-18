@@ -175,7 +175,6 @@ export const FeatureComponent = ({ className, onAction, ref, title, ...props }: 
 - Use `ComponentPropsWithRef` for props typing
 - Combine with `VariantProps` when using CVA
 - Always use `cn()` for class merging
-- Always forward `ref` prop
 - Always accept `className` for overrides
 
 ### Step 7: Handle Compound Components
@@ -220,7 +219,7 @@ You MUST enforce all conventions from both skills:
 2. **CVA When Needed**: Use CVA only when component has multiple variants
 3. **Export Variants**: Separately export `componentVariants`
 4. **Props Interface**: Combine `ComponentPropsWithRef` with `VariantProps`
-5. **Ref Forwarding**: Always forward the `ref` prop
+5. **Ref Forwarding**: Never forward the `ref` prop it is not needed in React 19
 6. **cn() Utility**: Always use for class merging
 7. **CSS Variables**: Use tokens from `globals.css`, not hardcoded colors
 8. **Focus States**: Include `focus-visible:ring-2 focus-visible:ring-accent`
@@ -231,10 +230,9 @@ You MUST enforce all conventions from both skills:
 1. **Single Quotes**: For all strings and imports
 2. **JSX Curly Braces**: `className={'value'}` not `className="value"`
 3. **Boolean Naming**: Prefix with `is`: `isDisabled`, `isLoading`
-4. **Derived Variables**: Prefix with `_`: `_isReady`, `_hasError`
-5. **Handler Naming**: `handle` prefix: `handleClick`, `handleSubmit`
-6. **Alphabetized Props**: In JSX and interfaces
-7. **Named Exports**: No default exports
+4. **Handler Naming**: `handle` prefix: `handleClick`, `handleSubmit`
+5. **Alphabetized Props**: In JSX and interfaces
+6. **Named Exports**: No default exports
 
 ## Output Format
 
