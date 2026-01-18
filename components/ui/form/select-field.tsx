@@ -116,7 +116,7 @@ export function SelectField({
       size={size}
     >
       {/* Label - use nativeLabel={false} for button-based trigger */}
-      <Field.Label className={labelVariants({ size })} nativeLabel={false}>
+      <Field.Label className={labelVariants({ size })} nativeLabel={false} render={<span />}>
         {label}
       </Field.Label>
 

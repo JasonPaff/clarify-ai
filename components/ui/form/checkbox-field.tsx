@@ -84,7 +84,7 @@ export function CheckboxField({ className, description, isDisabled, label, size 
             <CheckIcon aria-hidden={'true'} size={size} />
           </Checkbox.Indicator>
         </Checkbox.Root>
-        <Field.Label className={labelVariants({ size })} nativeLabel={false}>
+        <Field.Label className={labelVariants({ size })} nativeLabel={false} render={<span />}>
           {label}
         </Field.Label>
       </Field.Item>

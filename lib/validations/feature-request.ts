@@ -4,7 +4,7 @@ import { z } from 'zod';
 const featureRequestStatusSchema = z.enum(['completed', 'draft', 'planning', 'refining', 'researching']);
 
 // Shared field validations for DRY compliance
-const featureRequestDescriptionSchema = z.string().optional();
+const featureRequestDescriptionSchema = z.string();
 
 const featureRequestTitleSchema = z.string().min(1, 'Title is required').max(255, 'Title is too long');
 
@@ -16,7 +16,7 @@ export const createFeatureRequestSchema = z.object({
 
 export type CreateFeatureRequestFormValues = z.infer<typeof createFeatureRequestSchema>;
 
-// Schema for updating an existing feature request
+// Schema for updating an existing feature request (API-level, allows partial updates)
 export const updateFeatureRequestSchema = z.object({
   description: featureRequestDescriptionSchema,
   status: featureRequestStatusSchema.optional(),
@@ -24,6 +24,15 @@ export const updateFeatureRequestSchema = z.object({
 });
 
 export type UpdateFeatureRequestFormValues = z.infer<typeof updateFeatureRequestSchema>;
+
+// Schema for the edit form (requires all fields since form always provides them)
+export const editFeatureRequestFormSchema = z.object({
+  description: featureRequestDescriptionSchema,
+  status: featureRequestStatusSchema,
+  title: featureRequestTitleSchema,
+});
+
+export type EditFeatureRequestFormValues = z.infer<typeof editFeatureRequestFormSchema>;
 
 // Export status schema for reuse in form components
 export const featureRequestStatuses = featureRequestStatusSchema.options;

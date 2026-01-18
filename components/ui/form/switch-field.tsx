@@ -98,7 +98,7 @@ export function SwitchField({ className, description, isDisabled, label, size }:
         >
           <Switch.Thumb className={switchThumbVariants({ size })} />
         </Switch.Root>
-        <Field.Label className={labelVariants({ size })} nativeLabel={false}>
+        <Field.Label className={labelVariants({ size })} nativeLabel={false} render={<span />}>
           {label}
         </Field.Label>
       </Field.Item>

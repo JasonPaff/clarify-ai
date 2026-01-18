@@ -1,31 +1,92 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, FileText, Lightbulb, Search, Sparkles } from 'lucide-react';
+import type { VariantProps } from 'class-variance-authority';
+import type { ReactNode } from 'react';
+
+import { ArrowLeft, ArrowRight, FileText, Lightbulb, Loader2, Search, Sparkles } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import Link from 'next/link';
-import { type ReactNode, use, useState } from 'react';
+import { use, useState } from 'react';
 
-import { PageProps, Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
+import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
+
+import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
+import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconButton } from '@/components/ui/icon-button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { cn } from '@/lib/utils';
 
 type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ['entry', 'refine', 'research', 'plan'] as const;
 
+type FeatureRequestStatus = 'completed' | 'draft' | 'planning' | 'refining' | 'researching';
+
 type StepId = (typeof STEP_ORDER)[number];
+
+const statusLabels: Record<FeatureRequestStatus, string> = {
+  completed: 'Completed',
+  draft: 'Draft',
+  planning: 'Planning',
+  refining: 'Refining',
+  researching: 'Researching',
+};
+
+const statusVariantMap: Record<FeatureRequestStatus, VariantProps<typeof badgeVariants>['variant']> = {
+  completed: 'completed',
+  draft: 'draft',
+  planning: 'planning',
+  refining: 'refining',
+  researching: 'researching',
+};
 
 export default withParamValidation(FeatureWorkflowPage, Route);
 
 function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   const { featureId, projectId } = use(routeParams);
+
   const [currentStep, setCurrentStep] = useState<StepId>('entry');
 
-  // This will be replaced with actual feature data
-  const featureName = `Feature ${featureId}`;
+  const { data: featureRequest, error, isLoading } = useFeatureRequest(featureId);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={'flex items-center justify-center py-12'}>
+        <Loader2 className={'size-6 animate-spin text-muted-foreground'} />
+      </div>
+    );
+  }
+
+  // Error or not found state
+  if (error || !featureRequest) {
+    return (
+      <div className={'space-y-6'}>
+        <div className={'flex items-center gap-3'}>
+          <Tooltip content={'Back to features'} side={'right'}>
+            <Link href={`/projects/${projectId}/features`}>
+              <IconButton>
+                <ArrowLeft className={'size-4'} />
+              </IconButton>
+            </Link>
+          </Tooltip>
+          <div>
+            <h1 className={'text-xl font-semibold'}>Feature not found</h1>
+            <p className={'text-sm text-muted-foreground'}>
+              {error?.message || 'The requested feature could not be found.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const featureName = featureRequest.title;
 
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   const canGoBack = currentIndex > 0;
@@ -76,14 +137,19 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       {/* Header */}
       <div className={'flex items-center gap-3'}>
         <Tooltip content={'Back to features'} side={'right'}>
-          <Link href={`/projects/${projectId}/features`}>
+          <Link href={$path({ route: '/projects/[projectId]/features', routeParams: { projectId } })}>
             <IconButton>
               <ArrowLeft className={'size-4'} />
             </IconButton>
           </Link>
         </Tooltip>
         <div>
-          <h1 className={'text-xl font-semibold'}>{featureName}</h1>
+          <div className={'flex items-center gap-2'}>
+            <h1 className={'text-xl font-semibold'}>{featureName}</h1>
+            <Badge variant={statusVariantMap[featureRequest.status as FeatureRequestStatus]}>
+              {statusLabels[featureRequest.status as FeatureRequestStatus]}
+            </Badge>
+          </div>
           <p className={'text-sm text-muted-foreground'}>Feature workflow</p>
         </div>
       </div>
@@ -101,11 +167,7 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       <Card>
         <CardHeader>
           <div className={'flex items-center gap-3'}>
-            <div
-              className={`
-                flex size-12 items-center justify-center rounded-lg bg-accent/10
-              `}
-            >
+            <div className={'flex size-12 items-center justify-center rounded-lg bg-accent/10'}>
               <div className={'text-accent'}>{current.icon}</div>
             </div>
             <div>
@@ -116,14 +178,25 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
         </CardHeader>
         <CardContent>
           <div
-            className={`
-              min-h-75 rounded-lg border border-dashed border-border p-8
-              text-center
-            `}
+            className={cn(
+              'min-h-75 rounded-lg border border-dashed border-border p-8',
+              currentStep === 'entry' && featureRequest.description ? 'text-left' : 'text-center'
+            )}
           >
-            <p className={'text-sm text-muted-foreground'}>
-              {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
-            </p>
+            {currentStep === 'entry' ? (
+              featureRequest.description ? (
+                <div className={'space-y-2'}>
+                  <p className={'text-sm font-medium text-foreground'}>Feature Description</p>
+                  <p className={'text-sm whitespace-pre-wrap text-muted-foreground'}>{featureRequest.description}</p>
+                </div>
+              ) : (
+                <p className={'text-sm text-muted-foreground'}>No description provided for this feature request.</p>
+              )
+            ) : (
+              <p className={'text-sm text-muted-foreground'}>
+                {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
