@@ -72,11 +72,7 @@ export function EditRepositoryDialog({
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
-      {children && (
-        <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
-          {children}
-        </DialogTrigger>
-      )}
+      {children && <DialogTrigger>{children}</DialogTrigger>}
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>

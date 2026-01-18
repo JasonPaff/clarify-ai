@@ -1,16 +1,22 @@
 'use client';
 
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, ReactElement } from 'react';
 
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { cloneElement } from 'react';
 
 import { cn } from '@/lib/utils';
 
 export const DialogRoot = BaseDialog.Root;
-export const DialogTrigger = BaseDialog.Trigger;
 export const DialogPortal = BaseDialog.Portal;
 export const DialogClose = BaseDialog.Close;
+
+type DialogTriggerProps = RequiredChildren;
+
+export const DialogTrigger = ({ children }: DialogTriggerProps) => {
+  return <BaseDialog.Trigger render={(props) => cloneElement(children as ReactElement<object>, props)} />;
+};
 
 export const dialogBackdropVariants = cva(
   `

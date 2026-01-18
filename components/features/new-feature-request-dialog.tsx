@@ -50,9 +50,7 @@ export function NewFeatureRequestDialog({ children, projectId }: NewFeatureReque
 
   return (
     <DialogRoot onOpenChange={setIsOpen} open={isOpen}>
-      <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>

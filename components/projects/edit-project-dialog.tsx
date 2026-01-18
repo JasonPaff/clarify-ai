@@ -56,9 +56,7 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
 
   return (
     <DialogRoot onOpenChange={setOpen} open={open}>
-      <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger>{children}</DialogTrigger>
       <DialogPortal>
         <DialogBackdrop />
         <DialogPopup>

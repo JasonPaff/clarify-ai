@@ -63,11 +63,7 @@ export function EditFeatureRequestDialog({
   return (
     <DialogRoot onOpenChange={setIsOpen} open={isOpen}>
       {/* Trigger */}
-      {children && (
-        <DialogTrigger nativeButton={false} render={<span className={'inline-flex'} />}>
-          {children}
-        </DialogTrigger>
-      )}
+      {children && <DialogTrigger>{children}</DialogTrigger>}
 
       {/* Dialog Content */}
       <DialogPortal>
