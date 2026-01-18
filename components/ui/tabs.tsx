@@ -25,6 +25,7 @@ type TabsTriggerProps = ComponentPropsWithRef<typeof BaseTabs.Tab>;
 export const TabsTrigger = ({ className, ref, ...props }: TabsTriggerProps) => {
   return (
     <BaseTabs.Tab
+      nativeButton={false}
       className={cn(
         `
           flex h-9 items-center justify-center px-3 text-sm font-medium

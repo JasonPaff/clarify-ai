@@ -7,7 +7,7 @@ import * as featuresSchema from './schema/feature-requests.schema';
 import * as projectsSchema from './schema/projects.schema';
 import * as repositoriesSchema from './schema/repositories.schema';
 
-export const schema = { ...projectsSchema, ...repositoriesSchema, ...featuresSchema };
+const schema = { ...projectsSchema, ...repositoriesSchema, ...featuresSchema };
 
 export type DrizzleDatabase = BetterSQLite3Database<typeof schema>;
 
