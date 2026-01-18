@@ -9,20 +9,24 @@
 ## Schema Details
 
 **Shared Field Schemas**:
+
 - `featureRequestTitleSchema`: string, min 1 (required), max 255 characters
 - `featureRequestDescriptionSchema`: string, optional
 - `featureRequestStatusSchema`: enum ('draft', 'refining', 'researching', 'planning', 'completed')
 
 **createFeatureRequestSchema**:
+
 - `title`: required string (1-255 chars)
 - `description`: optional string
 
 **updateFeatureRequestSchema**:
+
 - `title`: optional string (1-255 chars when provided)
 - `description`: optional string
 - `status`: optional enum
 
 **Exported Types**:
+
 - `CreateFeatureRequestFormValues`
 - `UpdateFeatureRequestFormValues`
 - `FeatureRequestStatus`

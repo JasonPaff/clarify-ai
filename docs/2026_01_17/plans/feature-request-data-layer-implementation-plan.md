@@ -26,25 +26,25 @@ This plan implements a complete data layer for feature requests functionality, f
 
 ### Files to Create
 
-| File | Purpose |
-|------|---------|
-| `db/schema/feature-requests.schema.ts` | Drizzle ORM schema for feature_requests table |
-| `db/repositories/feature-requests.repository.ts` | Repository with CRUD operations |
-| `electron/ipc/feature-requests.handlers.ts` | IPC handlers for main process |
-| `hooks/queries/use-feature-requests.ts` | TanStack Query hooks |
-| `lib/queries/feature-requests.ts` | Query key factory |
-| `lib/validations/feature-request.ts` | Zod validation schemas |
+| File                                             | Purpose                                       |
+| ------------------------------------------------ | --------------------------------------------- |
+| `db/schema/feature-requests.schema.ts`           | Drizzle ORM schema for feature_requests table |
+| `db/repositories/feature-requests.repository.ts` | Repository with CRUD operations               |
+| `electron/ipc/feature-requests.handlers.ts`      | IPC handlers for main process                 |
+| `hooks/queries/use-feature-requests.ts`          | TanStack Query hooks                          |
+| `lib/queries/feature-requests.ts`                | Query key factory                             |
+| `lib/validations/feature-request.ts`             | Zod validation schemas                        |
 
 ### Files to Modify
 
-| File | Changes |
-|------|---------|
-| `db/index.ts` | Import feature-requests schema |
-| `electron/ipc/channels.ts` | Add featureRequests channel constants |
-| `electron/ipc/register-handlers.ts` | Register feature-requests handlers |
-| `electron/preload.ts` | Expose featureRequests API |
-| `types/electron.d.ts` | Add featureRequests types |
-| `hooks/useElectron.ts` | Extend useElectronDb() |
+| File                                | Changes                               |
+| ----------------------------------- | ------------------------------------- |
+| `db/index.ts`                       | Import feature-requests schema        |
+| `electron/ipc/channels.ts`          | Add featureRequests channel constants |
+| `electron/ipc/register-handlers.ts` | Register feature-requests handlers    |
+| `electron/preload.ts`               | Expose featureRequests API            |
+| `types/electron.d.ts`               | Add featureRequests types             |
+| `hooks/useElectron.ts`              | Extend useElectronDb()                |
 
 ---
 
@@ -63,9 +63,11 @@ This plan implements a complete data layer for feature requests functionality, f
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/schema/feature-requests.schema.ts` - Drizzle schema defining the feature_requests table
 
 **Changes:**
+
 - Add `feature_requests` table definition using `sqliteTable`
 - Add fields: `id` (integer primary key), `createdAt` (text with CURRENT_TIMESTAMP default), `updatedAt` (text with CURRENT_TIMESTAMP default), `projectId` (integer foreign key to projects), `title` (text, required), `description` (text, optional), `status` (text for workflow stage tracking: 'draft' | 'refining' | 'researching' | 'planning' | 'completed')
 - Add optional fields for AI outputs: `refinedRequirements` (text), `researchFindings` (text), `implementationPlan` (text)
@@ -74,11 +76,13 @@ This plan implements a complete data layer for feature requests functionality, f
 - Export `NewFeatureRequest` and `FeatureRequest` types using `$inferInsert` and `$inferSelect`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file exists at specified path
 - [ ] Types are properly exported
 - [ ] Foreign key reference to projects table is defined with onDelete cascade
@@ -94,18 +98,22 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/index.ts` - Import feature-requests schema and add to combined schema object
 
 **Changes:**
+
 - Add import statement for `feature-requests.schema.ts`
 - Spread the imported schema into the combined `schema` object alongside existing schemas
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Feature requests schema is imported in db/index.ts
 - [ ] Schema is included in the combined schema object
 - [ ] All validation commands pass
@@ -119,18 +127,22 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files Created (by migration):**
+
 - `drizzle/XXXX_migration_name.sql` - Auto-generated migration file
 
 **Changes:**
+
 - Run `pnpm db:generate` to generate migration from schema diff
 - Verify generated SQL includes CREATE TABLE statement with all columns and indexes
 
 **Validation Commands:**
+
 ```bash
 pnpm db:generate && pnpm db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file is generated in drizzle/ directory
 - [ ] Migration includes correct CREATE TABLE statement
 - [ ] Migration runs successfully without errors
@@ -145,9 +157,11 @@ pnpm db:generate && pnpm db:migrate
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/repositories/feature-requests.repository.ts` - Repository with CRUD operations
 
 **Changes:**
+
 - Define `FeatureRequestsRepository` interface with methods: `create`, `getById`, `getByProjectId`, `update`, `delete`
 - Implement `createFeatureRequestsRepository` factory function accepting `DrizzleDatabase`
 - Implement `create` method using `db.insert().values().returning().get()`
@@ -157,11 +171,13 @@ pnpm db:generate && pnpm db:migrate
 - Implement `delete` method returning boolean based on changes count
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Repository file exists at specified path
 - [ ] Interface defines all CRUD methods with proper types
 - [ ] Factory function creates repository with database instance
@@ -177,18 +193,22 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add featureRequests channel definitions
 
 **Changes:**
+
 - Add `featureRequests` object to `IpcChannels.db` with channel strings for: `create`, `delete`, `getById`, `getByProjectId`, `update`
 - Follow naming pattern: `db:featureRequests:methodName`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All five channel constants are defined
 - [ ] Channel names follow established pattern
 - [ ] Channels are nested under IpcChannels.db.featureRequests
@@ -203,9 +223,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/feature-requests.handlers.ts` - IPC handler registration
 
 **Changes:**
+
 - Import `ipcMain` and `IpcMainInvokeEvent` from electron
 - Import repository types and IpcChannels
 - Create `registerFeatureRequestsHandlers` function accepting `FeatureRequestsRepository`
@@ -216,11 +238,13 @@ pnpm lint && pnpm typecheck
 - Register handler for `delete` channel
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Handler file exists at specified path
 - [ ] All five handlers are registered
 - [ ] Handlers use correct channel constants
@@ -236,20 +260,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/register-handlers.ts` - Import and call handler registration
 
 **Changes:**
+
 - Add import for `createFeatureRequestsRepository` from repository file
 - Add import for `registerFeatureRequestsHandlers` from handlers file
 - Create feature requests repository instance in `registerAllHandlers` function
 - Call `registerFeatureRequestsHandlers` with repository instance
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Imports are added for repository and handlers
 - [ ] Repository is instantiated in registerAllHandlers
 - [ ] Handler registration is called with repository
@@ -264,19 +292,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Add featureRequests to ElectronAPI and implementation
 
 **Changes:**
+
 - Add import for `NewFeatureRequest` and `FeatureRequest` types from schema
 - Add `featureRequests` object to `ElectronAPI` interface with typed method signatures
 - Add `featureRequests` implementation to `electronAPI` object using `ipcRenderer.invoke` with appropriate channels
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Types are imported from feature-requests schema
 - [ ] ElectronAPI interface includes featureRequests object
 - [ ] All five methods are defined with correct types
@@ -292,19 +324,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `types/electron.d.ts` - Add featureRequests types
 
 **Changes:**
+
 - Add type re-export for `NewFeatureRequest` and `FeatureRequest` from schema
 - Add `featureRequests` object to `ElectronAPI` interface matching preload.ts structure
 - Include all five method signatures with proper types using schema imports
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Types are re-exported from feature-requests schema
 - [ ] ElectronAPI interface includes featureRequests
 - [ ] Method signatures match preload.ts exactly
@@ -319,9 +355,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/useElectron.ts` - Add featureRequests to useElectronDb
 
 **Changes:**
+
 - Add `featureRequests` useMemo block following the repositories pattern
 - Implement `create` method with error throw if API unavailable
 - Implement `delete` method with error throw
@@ -331,11 +369,13 @@ pnpm lint && pnpm typecheck
 - Add featureRequests to the returned object
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] featureRequests object is created with useMemo
 - [ ] All five methods are implemented with proper error handling
 - [ ] Pattern matches existing repositories implementation
@@ -351,20 +391,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/feature-requests.ts` - Query key factory
 
 **Changes:**
+
 - Import `createQueryKeys` from `@lukemorales/query-key-factory`
 - Create `featureRequestKeys` using `createQueryKeys` with namespace 'featureRequests'
 - Define `byProject` key factory taking `projectId: number`
 - Define `detail` key factory taking `id: number`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query key factory file exists at specified path
 - [ ] Keys are created with 'featureRequests' namespace
 - [ ] byProject and detail key factories are defined
@@ -380,9 +424,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-feature-requests.ts` - TanStack Query hooks
 
 **Changes:**
+
 - Add 'use client' directive
 - Import required hooks from @tanstack/react-query
 - Import featureRequestKeys from query key factory
@@ -394,11 +440,13 @@ pnpm lint && pnpm typecheck
 - Create `useDeleteFeatureRequest()` mutation hook with query removal and invalidation
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook file exists at specified path
 - [ ] All five hooks are implemented
 - [ ] Queries use featureRequestKeys for cache keys
@@ -415,9 +463,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/validations/feature-request.ts` - Zod validation schemas
 
 **Changes:**
+
 - Import `z` from 'zod'
 - Create shared field schemas for title (required, max 255), description (optional), status (enum)
 - Create `createFeatureRequestSchema` with required title field
@@ -425,11 +475,13 @@ pnpm lint && pnpm typecheck
 - Export `CreateFeatureRequestFormValues` and `UpdateFeatureRequestFormValues` types
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schema file exists at specified path
 - [ ] Create and update schemas are defined
 - [ ] Types are exported using z.infer
@@ -450,16 +502,19 @@ pnpm lint && pnpm typecheck
 ## Notes
 
 **Architectural Decisions:**
+
 - Following exact patterns from repositories implementation to maintain codebase consistency
 - Using text type for status field to allow flexibility in workflow stages
 - Storing AI outputs as nullable text fields rather than separate tables for simplicity
 - Using cascade delete on project foreign key to clean up feature requests when projects are deleted
 
 **Assumptions Requiring Confirmation:**
+
 - Status field values: 'draft', 'refining', 'researching', 'planning', 'completed' (inferred from workflow steps)
 - AI output fields as nullable text (could alternatively be JSONB if structured data needed)
 
 **Order Dependencies:**
+
 - Step 1 (schema) must complete before Step 2 (db index update)
 - Steps 1-2 must complete before Step 3 (migration)
 - Step 4 (repository) depends on Step 3 (migration)

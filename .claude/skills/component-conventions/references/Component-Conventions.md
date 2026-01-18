@@ -141,8 +141,7 @@ type DialogTitleProps = ComponentPropsWithRef<typeof BaseDialog.Title>;
 
 ```tsx
 interface TooltipContentProps
-  extends ComponentPropsWithRef<typeof BaseTooltip.Popup>,
-    VariantProps<typeof tooltipVariants> {
+  extends ComponentPropsWithRef<typeof BaseTooltip.Popup>, VariantProps<typeof tooltipVariants> {
   sideOffset?: number;
 }
 ```
@@ -213,11 +212,11 @@ export const Button = ({ ... }: ButtonProps) => { /* ... */ };
 
 ### File Location
 
-| Component Type | Location | Example |
-|----------------|----------|---------|
-| UI Primitives | `components/ui/` | `components/ui/button.tsx` |
+| Component Type     | Location                         | Example                                         |
+| ------------------ | -------------------------------- | ----------------------------------------------- |
+| UI Primitives      | `components/ui/`                 | `components/ui/button.tsx`                      |
 | Feature Components | `components/features/{feature}/` | `components/features/projects/project-card.tsx` |
-| Layout Components | `components/layout/` | `components/layout/sidebar.tsx` |
+| Layout Components  | `components/layout/`             | `components/layout/sidebar.tsx`                 |
 
 ### File Naming
 
@@ -246,27 +245,27 @@ Use CSS custom properties defined in `globals.css`:
 
 ```tsx
 // ✅ Correct - Using CSS variable tokens
-'bg-accent text-accent-foreground'
-'border-border bg-background'
-'text-muted-foreground'
+'bg-accent text-accent-foreground';
+'border-border bg-background';
+'text-muted-foreground';
 
 // ❌ Incorrect - Hardcoded colors
-'bg-blue-500 text-white'
-'border-gray-200 bg-white'
+'bg-blue-500 text-white';
+'border-gray-200 bg-white';
 ```
 
 ### Common CSS Variable Tokens
 
-| Token | Usage |
-|-------|-------|
-| `bg-background` | Main background |
-| `bg-foreground` | Text on background |
-| `bg-accent` | Primary action color |
-| `bg-accent-foreground` | Text on accent |
-| `bg-muted` | Subtle background |
-| `text-muted-foreground` | Secondary text |
-| `border-border` | Default border color |
-| `bg-destructive` | Danger/error color |
+| Token                   | Usage                |
+| ----------------------- | -------------------- |
+| `bg-background`         | Main background      |
+| `bg-foreground`         | Text on background   |
+| `bg-accent`             | Primary action color |
+| `bg-accent-foreground`  | Text on accent       |
+| `bg-muted`              | Subtle background    |
+| `text-muted-foreground` | Secondary text       |
+| `border-border`         | Default border color |
+| `bg-destructive`        | Danger/error color   |
 
 ### Base UI Data Attributes
 
@@ -274,13 +273,13 @@ Use Base UI's data attributes for state styling:
 
 ```tsx
 // Disabled state
-'data-disabled:pointer-events-none data-disabled:opacity-50'
+'data-disabled:pointer-events-none data-disabled:opacity-50';
 
 // Open/closed state
-'data-open:rotate-180'
+'data-open:rotate-180';
 
 // Starting/ending animation states
-'data-starting-style:opacity-0 data-ending-style:opacity-0'
+'data-starting-style:opacity-0 data-ending-style:opacity-0';
 ```
 
 ---
@@ -320,7 +319,7 @@ export const DialogBackdrop = ({ blur, className, ref, ...props }: DialogBackdro
 Always include focus-visible styles:
 
 ```tsx
-'focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:outline-none'
+'focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:outline-none';
 ```
 
 ### Disabled States
@@ -328,7 +327,7 @@ Always include focus-visible styles:
 Use Base UI's data-disabled attribute:
 
 ```tsx
-'data-disabled:pointer-events-none data-disabled:opacity-50'
+'data-disabled:pointer-events-none data-disabled:opacity-50';
 ```
 
 ### ARIA Attributes

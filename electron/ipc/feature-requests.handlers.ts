@@ -34,10 +34,7 @@ export function registerFeatureRequestsHandlers(featureRequestsRepository: Featu
     }
   );
 
-  ipcMain.handle(
-    IpcChannels.db.featureRequests.delete,
-    (_event: IpcMainInvokeEvent, id: number): boolean => {
-      return featureRequestsRepository.delete(id);
-    }
-  );
+  ipcMain.handle(IpcChannels.db.featureRequests.delete, (_event: IpcMainInvokeEvent, id: number): boolean => {
+    return featureRequestsRepository.delete(id);
+  });
 }

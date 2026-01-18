@@ -29,59 +29,59 @@ Implement a complete data layer for the feature requests functionality, which cu
 
 #### Files to Modify
 
-| File Path | Relevance |
-|-----------|-----------|
-| `electron/ipc/channels.ts` | Must add `db.featureRequests` channel constants for all CRUD operations |
-| `electron/ipc/register-handlers.ts` | Must import and register feature-requests handlers |
-| `electron/preload.ts` | Must expose featureRequests API to renderer via contextBridge |
-| `types/electron.d.ts` | Must add featureRequests types to ElectronAPI interface |
-| `hooks/useElectron.ts` | Must extend useElectronDb() to include featureRequests operations |
-| `db/index.ts` | Must import feature-requests schema for Drizzle schema composition |
+| File Path                           | Relevance                                                               |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `electron/ipc/channels.ts`          | Must add `db.featureRequests` channel constants for all CRUD operations |
+| `electron/ipc/register-handlers.ts` | Must import and register feature-requests handlers                      |
+| `electron/preload.ts`               | Must expose featureRequests API to renderer via contextBridge           |
+| `types/electron.d.ts`               | Must add featureRequests types to ElectronAPI interface                 |
+| `hooks/useElectron.ts`              | Must extend useElectronDb() to include featureRequests operations       |
+| `db/index.ts`                       | Must import feature-requests schema for Drizzle schema composition      |
 
 #### Template/Reference Files (Critical Patterns)
 
-| File Path | Relevance |
-|-----------|-----------|
-| `db/schema/repositories.schema.ts` | Template for feature-requests.schema.ts - shows foreign key pattern, indexes, type exports |
-| `db/repositories/repositories.repository.ts` | Template for feature-requests.repository.ts - shows getByProjectId, CRUD methods |
-| `electron/ipc/repositories.handlers.ts` | Template for feature-requests.handlers.ts - shows IPC handler registration pattern |
-| `hooks/queries/use-repositories.ts` | Template for use-feature-requests.ts - shows TanStack Query hooks with cache invalidation |
-| `lib/queries/repositories.ts` | Template for feature-requests query keys using createQueryKeys factory |
-| `lib/validations/repository.ts` | Template for Zod validation schemas |
+| File Path                                    | Relevance                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `db/schema/repositories.schema.ts`           | Template for feature-requests.schema.ts - shows foreign key pattern, indexes, type exports |
+| `db/repositories/repositories.repository.ts` | Template for feature-requests.repository.ts - shows getByProjectId, CRUD methods           |
+| `electron/ipc/repositories.handlers.ts`      | Template for feature-requests.handlers.ts - shows IPC handler registration pattern         |
+| `hooks/queries/use-repositories.ts`          | Template for use-feature-requests.ts - shows TanStack Query hooks with cache invalidation  |
+| `lib/queries/repositories.ts`                | Template for feature-requests query keys using createQueryKeys factory                     |
+| `lib/validations/repository.ts`              | Template for Zod validation schemas                                                        |
 
 ### High Priority (Supporting/Integration)
 
-| File Path | Relevance |
-|-----------|-----------|
-| `db/schema/projects.schema.ts` | Reference for foreign key target table (projectId references projects.id) |
-| `db/repositories/projects.repository.ts` | Additional repository pattern reference |
-| `electron/ipc/projects.handlers.ts` | Additional IPC handler pattern reference |
-| `hooks/queries/use-projects.ts` | Additional TanStack Query hooks reference |
-| `lib/queries/projects.ts` | Additional query key factory reference |
-| `lib/validations/project.ts` | Additional Zod schema reference |
-| `drizzle.config.ts` | Drizzle Kit config - references db/schema/index.ts |
-| `electron/main.ts` | App initialization flow - shows handler registration sequence |
+| File Path                                | Relevance                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------- |
+| `db/schema/projects.schema.ts`           | Reference for foreign key target table (projectId references projects.id) |
+| `db/repositories/projects.repository.ts` | Additional repository pattern reference                                   |
+| `electron/ipc/projects.handlers.ts`      | Additional IPC handler pattern reference                                  |
+| `hooks/queries/use-projects.ts`          | Additional TanStack Query hooks reference                                 |
+| `lib/queries/projects.ts`                | Additional query key factory reference                                    |
+| `lib/validations/project.ts`             | Additional Zod schema reference                                           |
+| `drizzle.config.ts`                      | Drizzle Kit config - references db/schema/index.ts                        |
+| `electron/main.ts`                       | App initialization flow - shows handler registration sequence             |
 
 ### Medium Priority (Context/Related Files)
 
-| File Path | Relevance |
-|-----------|-----------|
-| `app/(app)/projects/[projectId]/features/page.tsx` | UI page that will consume feature request data |
-| `app/(app)/projects/[projectId]/features/route-type.ts` | Route type definition with projectId param |
-| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Individual feature workflow page |
-| `app/(app)/projects/[projectId]/features/[featureId]/route-type.ts` | Route type with featureId and projectId params |
-| `components/features/workflow-steps.tsx` | Workflow step definitions (Entry, Refine, Research, Plan) |
-| `lib/forms/form-hook.ts` | TanStack Form hook configuration |
-| `drizzle/0000_faulty_madripoor.sql` | Existing migration file - shows SQL generation format |
+| File Path                                                           | Relevance                                                 |
+| ------------------------------------------------------------------- | --------------------------------------------------------- |
+| `app/(app)/projects/[projectId]/features/page.tsx`                  | UI page that will consume feature request data            |
+| `app/(app)/projects/[projectId]/features/route-type.ts`             | Route type definition with projectId param                |
+| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx`      | Individual feature workflow page                          |
+| `app/(app)/projects/[projectId]/features/[featureId]/route-type.ts` | Route type with featureId and projectId params            |
+| `components/features/workflow-steps.tsx`                            | Workflow step definitions (Entry, Refine, Research, Plan) |
+| `lib/forms/form-hook.ts`                                            | TanStack Form hook configuration                          |
+| `drizzle/0000_faulty_madripoor.sql`                                 | Existing migration file - shows SQL generation format     |
 
 ### Low Priority (Nice to Have Context)
 
-| File Path | Relevance |
-|-----------|-----------|
-| `app/(app)/projects/[projectId]/layout.tsx` | Project layout using useProject hook |
-| `components/ui/form/text-field.tsx` | Form field component reference |
-| `components/ui/form/textarea-field.tsx` | Form field component reference |
-| `components/ui/form/select-field.tsx` | Form field component for status dropdown |
+| File Path                                   | Relevance                                |
+| ------------------------------------------- | ---------------------------------------- |
+| `app/(app)/projects/[projectId]/layout.tsx` | Project layout using useProject hook     |
+| `components/ui/form/text-field.tsx`         | Form field component reference           |
+| `components/ui/form/textarea-field.tsx`     | Form field component reference           |
+| `components/ui/form/select-field.tsx`       | Form field component for status dropdown |
 
 ## Architecture Insights
 
@@ -106,6 +106,7 @@ Implement a complete data layer for the feature requests functionality, which cu
 ### Existing Similar Functionality
 
 The repositories data layer provides an exact template - it has:
+
 - Foreign key to projects (projectId)
 - getByProjectId query method
 - Full CRUD operations

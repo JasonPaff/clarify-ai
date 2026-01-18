@@ -19,6 +19,7 @@ Feature request database/data layer
 ## Context Provided
 
 Project context from CLAUDE.md and package.json including:
+
 - Tech stack (Next.js, React, TypeScript, Drizzle ORM, SQLite, TanStack Query/Form)
 - Architecture patterns (Repository pattern, IPC handlers, query key factories)
 - Existing implementations (Projects and Repositories tables/handlers)

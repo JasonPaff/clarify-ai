@@ -4,10 +4,10 @@
 
 ## Results
 
-| Gate | Command | Result |
-|------|---------|--------|
-| ESLint | `pnpm lint` | ✅ PASS |
-| TypeScript | `pnpm typecheck` | ✅ PASS |
+| Gate             | Command                 | Result  |
+| ---------------- | ----------------------- | ------- |
+| ESLint           | `pnpm lint`             | ✅ PASS |
+| TypeScript       | `pnpm typecheck`        | ✅ PASS |
 | Electron Compile | `pnpm electron:compile` | ✅ PASS |
 
 ## Summary

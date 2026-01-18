@@ -69,8 +69,7 @@ export function useElectronDb() {
         if (!api) return Promise.resolve(undefined);
         return api.db.featureRequests.getById(id);
       },
-      getByProjectId: (projectId: number) =>
-        api?.db.featureRequests.getByProjectId(projectId) ?? Promise.resolve([]),
+      getByProjectId: (projectId: number) => api?.db.featureRequests.getByProjectId(projectId) ?? Promise.resolve([]),
       update: (id: number, data: Parameters<NonNullable<typeof api>['db']['featureRequests']['update']>[1]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.featureRequests.update(id, data);

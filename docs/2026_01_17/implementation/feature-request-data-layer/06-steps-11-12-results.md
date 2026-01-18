@@ -8,10 +8,10 @@ Both TanStack Query steps completed successfully.
 
 ## Steps Completed
 
-| Step | Title | Status |
-|------|-------|--------|
-| 11 | Create Feature Requests Query Key Factory | ✅ |
-| 12 | Create Feature Requests TanStack Query Hooks | ✅ |
+| Step | Title                                        | Status |
+| ---- | -------------------------------------------- | ------ |
+| 11   | Create Feature Requests Query Key Factory    | ✅     |
+| 12   | Create Feature Requests TanStack Query Hooks | ✅     |
 
 ## Files Created
 

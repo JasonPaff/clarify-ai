@@ -8,11 +8,11 @@
 
 ## Overview
 
-| Attribute | Value |
-|-----------|-------|
+| Attribute              | Value     |
+| ---------------------- | --------- |
 | **Estimated Duration** | 6-8 hours |
-| **Complexity** | Medium |
-| **Risk Level** | Low |
+| **Complexity**         | Medium    |
+| **Risk Level**         | Low       |
 
 ## Quick Summary
 
@@ -34,20 +34,24 @@ This plan implements a complete feature request management UI including a list p
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/ui/badge.tsx` - Reusable badge component with status variants
 
 **Changes:**
+
 - Create a Badge component using CVA pattern following existing UI component conventions
 - Define variants for each feature request status: `draft` (gray), `refining` (yellow), `researching` (blue), `planning` (purple), `completed` (green)
 - Use CSS variables from the theme system for consistent color coding
 - Export the component and variant types
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Badge component renders with correct styling for each status variant
 - [ ] Component follows CVA pattern consistent with other UI components
 - [ ] All validation commands pass
@@ -61,19 +65,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/skeletons/feature-requests-skeleton.tsx` - Loading skeleton for feature request cards
 
 **Changes:**
+
 - Create `FeatureRequestsSkeleton` component with animated placeholder cards
 - Use `animate-pulse` and `bg-muted` classes matching the `RepositoriesSkeleton` pattern
 - Display 3-4 placeholder cards with appropriate height for feature request card dimensions
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton renders with smooth pulse animation
 - [ ] Visual appearance matches the expected feature request card layout
 - [ ] All validation commands pass
@@ -87,9 +95,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/feature-request-card.tsx` - Card component for displaying feature request info
 
 **Changes:**
+
 - Create `FeatureRequestCard` component with props for title, description, status, createdAt, and action callbacks (onEdit, onDelete, onClick)
 - Display Lightbulb icon in the card header matching the feature icon pattern
 - Include status badge using the Badge component created in Step 1
@@ -99,11 +109,13 @@ pnpm lint && pnpm typecheck
 - Use Card, CardHeader, CardContent, CardTitle, CardDescription components
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Card displays all feature request information correctly
 - [ ] Status badge shows appropriate color for each status
 - [ ] Edit and delete buttons trigger callback functions
@@ -118,9 +130,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/create-feature-request-form.tsx` - Form for creating new feature requests
 
 **Changes:**
+
 - Create `CreateFeatureRequestForm` component with props for `onSubmit`, `onCancel`, and `isSubmitting`
 - Use `useAppForm` hook from `lib/forms/form-hook.ts`
 - Add TextField for title with autoFocus
@@ -129,11 +143,13 @@ pnpm lint && pnpm typecheck
 - Include Cancel and Submit buttons following the `CreateRepositoryForm` pattern
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form validates input according to Zod schema
 - [ ] Submit triggers onSubmit callback with form values
 - [ ] Cancel button triggers onCancel callback
@@ -148,9 +164,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/edit-feature-request-form.tsx` - Form for editing feature requests
 
 **Changes:**
+
 - Create `EditFeatureRequestForm` component with props for `featureRequest`, `onSubmit`, `onCancel`, and `isSubmitting`
 - Use `useAppForm` hook with defaultValues populated from the featureRequest prop
 - Add TextField for title with autoFocus
@@ -160,11 +178,13 @@ pnpm lint && pnpm typecheck
 - Include Cancel and Save buttons following the `EditRepositoryForm` pattern
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form pre-populates with existing feature request values
 - [ ] Status dropdown shows all valid status options
 - [ ] Form validates according to update schema
@@ -179,9 +199,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/new-feature-request-dialog.tsx` - Dialog for creating new feature requests
 
 **Changes:**
+
 - Create `NewFeatureRequestDialog` component with props for `projectId` and `children` (trigger element)
 - Use DialogRoot, DialogTrigger, DialogPortal, DialogBackdrop, DialogPopup, DialogTitle, DialogDescription, DialogClose components
 - Integrate `useCreateFeatureRequest` mutation hook
@@ -190,11 +212,13 @@ pnpm lint && pnpm typecheck
 - Include X button for closing in the top-right corner
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens when trigger is clicked
 - [ ] Form submission creates new feature request via mutation
 - [ ] Dialog closes on successful creation or cancel
@@ -209,9 +233,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/edit-feature-request-dialog.tsx` - Dialog for editing feature requests
 
 **Changes:**
+
 - Create `EditFeatureRequestDialog` component with props for `featureRequest`, `children`, `open`, and `onOpenChange`
 - Support both controlled and uncontrolled open state like `EditRepositoryDialog`
 - Integrate `useUpdateFeatureRequest` mutation hook
@@ -219,11 +245,13 @@ pnpm lint && pnpm typecheck
 - Close dialog on successful update
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog works in both controlled and uncontrolled modes
 - [ ] Form submission updates feature request via mutation
 - [ ] Dialog closes on successful update
@@ -238,9 +266,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/delete-feature-request-dialog.tsx` - Confirmation dialog for deletion
 
 **Changes:**
+
 - Create `DeleteFeatureRequestDialog` component using `@base-ui/react/alert-dialog`
 - Accept props for `featureRequest` (with id and title), `children`, `open`, and `onOpenChange`
 - Include type-to-confirm input requiring user to type the feature title
@@ -249,11 +279,13 @@ pnpm lint && pnpm typecheck
 - Include Cancel and Delete buttons with destructive variant
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog requires typing feature title to enable delete button
 - [ ] Delete button triggers mutation and closes dialog
 - [ ] Cancel clears confirmation input and closes dialog
@@ -268,9 +300,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/[projectId]/features/page.tsx` - Full implementation of features list page
 
 **Changes:**
+
 - Add `withParamValidation` HOC wrapper with Route import
 - Create `FeaturesContent` component that uses `useFeatureRequests(projectId)` hook
 - Display `FeatureRequestsSkeleton` during loading state
@@ -283,11 +317,13 @@ pnpm lint && pnpm typecheck
 - Make cards clickable to navigate to feature workflow page using Link
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page displays loading skeleton while fetching
 - [ ] Page displays empty state when no feature requests
 - [ ] Page displays list of feature request cards when data exists
@@ -304,9 +340,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` - Integrate with data layer
 
 **Changes:**
+
 - Import and use `useFeatureRequest(featureId)` hook to fetch feature request data
 - Replace hardcoded `featureName` with actual feature request title from data
 - Add loading state handling while feature request is being fetched
@@ -315,11 +353,13 @@ pnpm lint && pnpm typecheck
 - Display status badge showing current workflow status
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page fetches and displays actual feature request data
 - [ ] Title shows the real feature request title
 - [ ] Loading state is handled appropriately
@@ -335,18 +375,22 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None directly; this generates/updates type definition files
 
 **Changes:**
+
 - Run `pnpm next-typesafe-url` to regenerate route types
 - Verify generated types include features routes
 
 **Validation Commands:**
+
 ```bash
 pnpm next-typesafe-url && pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route types are regenerated successfully
 - [ ] Type checking passes with updated route types
 - [ ] All validation commands pass

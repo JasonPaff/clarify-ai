@@ -15,9 +15,7 @@ export interface ElectronAPI {
       ): Promise<import('../db/schema/feature-requests.schema').FeatureRequest>;
       delete(id: number): Promise<boolean>;
       getById(id: number): Promise<import('../db/schema/feature-requests.schema').FeatureRequest | undefined>;
-      getByProjectId(
-        projectId: number
-      ): Promise<Array<import('../db/schema/feature-requests.schema').FeatureRequest>>;
+      getByProjectId(projectId: number): Promise<Array<import('../db/schema/feature-requests.schema').FeatureRequest>>;
       update(
         id: number,
         data: Partial<import('../db/schema/feature-requests.schema').NewFeatureRequest>

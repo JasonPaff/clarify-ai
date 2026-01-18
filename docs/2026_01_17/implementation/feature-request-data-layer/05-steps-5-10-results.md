@@ -8,14 +8,14 @@ All six IPC layer steps completed successfully in a single batch.
 
 ## Steps Completed
 
-| Step | Title | Status |
-|------|-------|--------|
-| 5 | Add Feature Requests IPC Channel Constants | ✅ |
-| 6 | Create Feature Requests IPC Handlers | ✅ |
-| 7 | Register Feature Requests Handlers | ✅ |
-| 8 | Update Electron Preload Script | ✅ |
-| 9 | Update Electron Type Definitions | ✅ |
-| 10 | Extend useElectronDb Hook | ✅ |
+| Step | Title                                      | Status |
+| ---- | ------------------------------------------ | ------ |
+| 5    | Add Feature Requests IPC Channel Constants | ✅     |
+| 6    | Create Feature Requests IPC Handlers       | ✅     |
+| 7    | Register Feature Requests Handlers         | ✅     |
+| 8    | Update Electron Preload Script             | ✅     |
+| 9    | Update Electron Type Definitions           | ✅     |
+| 10   | Extend useElectronDb Hook                  | ✅     |
 
 ## Files Created
 
