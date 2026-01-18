@@ -15,6 +15,7 @@ export const featureRequests = sqliteTable(
     projectId: integer('project_id')
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
+    rawRequest: text('raw_request'),
     refinedRequirements: text('refined_requirements'),
     researchFindings: text('research_findings'),
     status: text('status').notNull().default('draft'),

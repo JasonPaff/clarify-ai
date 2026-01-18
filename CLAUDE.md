@@ -294,6 +294,22 @@ clarify-ai/
 
 > **Note**: Always verify that target directories exist before creating new files. Use existing patterns in the codebase as templates for new additions.
 
+## 9. Specialist Subagents
+
+Specialist subagents in `.claude/agents/` handle domain-specific implementation tasks. Use them when working in their respective domains.
+
+| Agent                           | Domain                       | When to Use                                                |
+| ------------------------------- | ---------------------------- | ---------------------------------------------------------- |
+| `database-schema`               | Database schemas & repos     | Files in `db/schema/` or `db/repositories/`                |
+| `ipc-handler`                   | Electron IPC communication   | Files in `electron/ipc/`, `electron/preload.ts`, IPC hooks |
+| `tanstack-query`                | Data fetching & server state | Query hooks, mutations, cache management                   |
+| `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas     |
+| `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`                  |
+| `frontend-component`            | UI & feature components      | UI primitives in `components/ui/`, feature components      |
+| `clarification-agent`           | Requirement gathering        | Gathering clarifying questions for ambiguous requests      |
+| `file-discovery-agent`          | File discovery               | Identifying all files relevant to a feature                |
+| `implementation-planner`        | Implementation planning      | Creating comprehensive implementation plans                |
+
 ---
 
 **IMPORTANT**: These instructions OVERRIDE any default behavior. When working in this codebase, you MUST follow the rules, patterns, and conventions documented above exactly as written. The rules in Section 7 are strict requirements, not suggestions.

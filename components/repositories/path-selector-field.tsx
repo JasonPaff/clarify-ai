@@ -3,13 +3,12 @@
 import type { VariantProps } from 'class-variance-authority';
 
 import { Field } from '@base-ui/react/field';
-import { Input } from '@base-ui/react/input';
 import { FolderOpen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { descriptionVariants, errorVariants, labelVariants } from '@/components/ui/form/field-wrapper';
 import { TanStackFieldRoot } from '@/components/ui/form/tanstack-field-root';
-import { inputVariants } from '@/components/ui/form/text-field';
+import { Input, inputVariants } from '@/components/ui/input';
 import { useElectronDialog } from '@/hooks/useElectron';
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
@@ -22,19 +21,19 @@ type PathSelectorFieldProps = ClassName &
     placeholder?: string;
   };
 
-export function PathSelectorField({
+export const PathSelectorField = ({
   className,
   description,
   isDisabled,
   label,
   placeholder,
   size,
-}: PathSelectorFieldProps) {
+}: PathSelectorFieldProps) => {
   const field = useFieldContext<string>();
   const { openDirectory } = useElectronDialog();
 
   const error = field.state.meta.errors[0]?.message;
-  const _hasError = Boolean(error);
+  const hasError = Boolean(error);
 
   const handleBrowseClick = async () => {
     const selectedPath = await openDirectory();
@@ -48,7 +47,7 @@ export function PathSelectorField({
       className={className}
       isDirty={field.state.meta.isDirty}
       isDisabled={isDisabled}
-      isInvalid={_hasError}
+      isInvalid={hasError}
       isTouched={field.state.meta.isTouched}
       name={field.name}
       size={size}
@@ -59,10 +58,13 @@ export function PathSelectorField({
       {/* Path Input with Browse Button */}
       <div className={'flex gap-2'}>
         <Input
-          className={cn(inputVariants({ size }), 'grow')}
+          className={cn('grow')}
+          disabled={isDisabled}
+          isInvalid={hasError}
           onBlur={field.handleBlur}
           onChange={(e) => field.handleChange(e.target.value)}
           placeholder={placeholder}
+          size={size}
           type={'text'}
           value={field.state.value ?? ''}
         />
@@ -79,16 +81,16 @@ export function PathSelectorField({
       </div>
 
       {/* Description */}
-      {description && !_hasError && (
+      {description && !hasError && (
         <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
       )}
 
       {/* Error */}
-      {_hasError && (
+      {hasError && (
         <Field.Error className={errorVariants({ size })} match={true}>
           {error}
         </Field.Error>
       )}
     </TanStackFieldRoot>
   );
-}
+};

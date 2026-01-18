@@ -1,63 +1,21 @@
 'use client';
 
 import type { VariantProps } from 'class-variance-authority';
-import type { ComponentProps } from 'react';
 
 import { Field } from '@base-ui/react/field';
-import { NumberField } from '@base-ui/react/number-field';
-import { cva } from 'class-variance-authority';
-import { Minus, Plus } from 'lucide-react';
 
+import {
+  NumberInputDecrement,
+  NumberInputField,
+  NumberInputGroup,
+  NumberInputIncrement,
+  NumberInputRoot,
+  numberInputVariants,
+} from '@/components/ui/number-input';
 import { useFieldContext } from '@/lib/forms/form-hook';
-import { cn } from '@/lib/utils';
 
 import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
 import { TanStackFieldRoot } from './tanstack-field-root';
-
-export const numberInputVariants = cva(
-  `
-    border-y border-border bg-transparent text-center text-foreground
-    tabular-nums
-    focus:z-10 focus:ring-2 focus:ring-accent focus:ring-offset-0 focus:outline-none
-    data-disabled:cursor-not-allowed data-disabled:opacity-50
-    data-invalid:border-destructive
-    data-invalid:focus:ring-destructive
-  `,
-  {
-    defaultVariants: {
-      size: 'default',
-    },
-    variants: {
-      size: {
-        default: 'h-9 w-20 text-sm',
-        lg: 'h-10 w-24 text-base',
-        sm: 'h-8 w-16 text-xs',
-      },
-    },
-  }
-);
-
-export const numberButtonVariants = cva(
-  `
-    flex items-center justify-center border border-border bg-muted
-    text-foreground select-none
-    hover:bg-muted/80
-    active:bg-muted/70
-    data-disabled:cursor-not-allowed data-disabled:opacity-50
-  `,
-  {
-    defaultVariants: {
-      size: 'default',
-    },
-    variants: {
-      size: {
-        default: 'size-9',
-        lg: 'size-10',
-        sm: 'size-8',
-      },
-    },
-  }
-);
 
 type NumberFieldComponentProps = ClassName &
   VariantProps<typeof numberInputVariants> & {
@@ -69,7 +27,7 @@ type NumberFieldComponentProps = ClassName &
     step?: number;
   };
 
-export function NumberFieldComponent({
+export const NumberFieldComponent = ({
   className,
   description,
   isDisabled,
@@ -78,18 +36,18 @@ export function NumberFieldComponent({
   min,
   size,
   step = 1,
-}: NumberFieldComponentProps) {
+}: NumberFieldComponentProps) => {
   const field = useFieldContext<null | number>();
 
   const error = field.state.meta.errors[0]?.message;
-  const _hasError = Boolean(error);
+  const hasError = Boolean(error);
 
   return (
     <TanStackFieldRoot
       className={className}
       isDirty={field.state.meta.isDirty}
       isDisabled={isDisabled}
-      isInvalid={_hasError}
+      isInvalid={hasError}
       isTouched={field.state.meta.isTouched}
       name={field.name}
       size={size}
@@ -98,7 +56,7 @@ export function NumberFieldComponent({
       <Field.Label className={labelVariants({ size })}>{label}</Field.Label>
 
       {/* Number Input */}
-      <NumberField.Root
+      <NumberInputRoot
         disabled={isDisabled}
         max={max}
         min={min}
@@ -106,42 +64,24 @@ export function NumberFieldComponent({
         step={step}
         value={field.state.value}
       >
-        <NumberField.Group className={'flex'}>
-          <NumberField.Decrement
-            aria-label={'Decrease value'}
-            className={cn(numberButtonVariants({ size }), 'rounded-l-md border-r-0')}
-          >
-            <MinusIcon aria-hidden={'true'} />
-          </NumberField.Decrement>
-          <NumberField.Input className={numberInputVariants({ size })} onBlur={field.handleBlur} />
-          <NumberField.Increment
-            aria-label={'Increase value'}
-            className={cn(numberButtonVariants({ size }), 'rounded-r-md border-l-0')}
-          >
-            <PlusIcon aria-hidden={'true'} />
-          </NumberField.Increment>
-        </NumberField.Group>
-      </NumberField.Root>
+        <NumberInputGroup>
+          <NumberInputDecrement size={size} />
+          <NumberInputField onBlur={field.handleBlur} size={size} />
+          <NumberInputIncrement size={size} />
+        </NumberInputGroup>
+      </NumberInputRoot>
 
       {/* Description */}
-      {description && !_hasError && (
+      {description && !hasError && (
         <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
       )}
 
       {/* Error */}
-      {_hasError && (
+      {hasError && (
         <Field.Error className={errorVariants({ size })} match={true}>
           {error}
         </Field.Error>
       )}
     </TanStackFieldRoot>
   );
-}
-
-function MinusIcon(props: ComponentProps<'svg'>) {
-  return <Minus className={'size-3.5'} {...props} />;
-}
-
-function PlusIcon(props: ComponentProps<'svg'>) {
-  return <Plus className={'size-3.5'} {...props} />;
-}
+};

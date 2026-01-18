@@ -6,6 +6,8 @@ const featureRequestStatusSchema = z.enum(['completed', 'draft', 'planning', 're
 // Shared field validations for DRY compliance
 const featureRequestDescriptionSchema = z.string();
 
+const featureRequestRawRequestSchema = z.string();
+
 const featureRequestTitleSchema = z.string().min(1, 'Title is required').max(255, 'Title is too long');
 
 // Schema for creating a new feature request
@@ -16,9 +18,17 @@ export const createFeatureRequestSchema = z.object({
 
 export type CreateFeatureRequestFormValues = z.infer<typeof createFeatureRequestSchema>;
 
+// Schema for the Entry step form
+export const entryStepFormSchema = z.object({
+  rawRequest: featureRequestRawRequestSchema,
+});
+
+export type EntryStepFormValues = z.infer<typeof entryStepFormSchema>;
+
 // Schema for updating an existing feature request (API-level, allows partial updates)
 export const updateFeatureRequestSchema = z.object({
   description: featureRequestDescriptionSchema,
+  rawRequest: featureRequestRawRequestSchema.optional(),
   status: featureRequestStatusSchema.optional(),
   title: featureRequestTitleSchema.optional(),
 });

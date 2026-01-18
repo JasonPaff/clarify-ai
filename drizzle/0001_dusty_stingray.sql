@@ -1,0 +1,1 @@
+ALTER TABLE `feature_requests` ADD `raw_request` text;

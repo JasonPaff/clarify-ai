@@ -12,6 +12,7 @@ import { use, useState } from 'react';
 import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
+import { EntryStep } from '@/components/features/entry-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,6 @@ import { IconButton } from '@/components/ui/icon-button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useFeatureRequest } from '@/hooks/queries/use-feature-requests';
-import { cn } from '@/lib/utils';
 
 type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ['entry', 'refine', 'research', 'plan'] as const;
@@ -177,27 +177,15 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <div
-            className={cn(
-              'min-h-75 rounded-lg border border-dashed border-border p-8',
-              currentStep === 'entry' && featureRequest.description ? 'text-left' : 'text-center'
-            )}
-          >
-            {currentStep === 'entry' ? (
-              featureRequest.description ? (
-                <div className={'space-y-2'}>
-                  <p className={'text-sm font-medium text-foreground'}>Feature Description</p>
-                  <p className={'text-sm whitespace-pre-wrap text-muted-foreground'}>{featureRequest.description}</p>
-                </div>
-              ) : (
-                <p className={'text-sm text-muted-foreground'}>No description provided for this feature request.</p>
-              )
-            ) : (
+          {currentStep === 'entry' ? (
+            <EntryStep featureRequest={featureRequest} />
+          ) : (
+            <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
               <p className={'text-sm text-muted-foreground'}>
                 {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
               </p>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
