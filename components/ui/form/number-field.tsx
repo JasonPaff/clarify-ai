@@ -82,7 +82,7 @@ export function NumberFieldComponent({
 
   const descriptionId = `${id}-description`;
   const errorId = `${id}-error`;
-  const error = field.state.meta.errors[0];
+  const error = field.state.meta.errors[0]?.message;
   const hasError = Boolean(error);
 
   return (

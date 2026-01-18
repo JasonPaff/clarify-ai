@@ -34,7 +34,7 @@ export function PathSelectorField({
 
   const descriptionId = `${id}-description`;
   const errorId = `${id}-error`;
-  const error = field.state.meta.errors[0];
+  const error = field.state.meta.errors[0]?.message;
   const _hasError = Boolean(error);
 
   const handleBrowseClick = async () => {

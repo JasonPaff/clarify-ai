@@ -1,8 +1,10 @@
 'use client';
 
+import type { CreateProjectFormValues } from '@/lib/validations/project';
+
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/lib/forms/form-hook';
-import { type CreateProjectFormValues, createProjectSchema } from '@/lib/validations/project';
+import { createProjectSchema } from '@/lib/validations/project';
 
 interface CreateProjectFormProps {
   isSubmitting?: boolean;
