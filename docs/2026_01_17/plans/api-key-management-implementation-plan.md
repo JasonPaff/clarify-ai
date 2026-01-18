@@ -35,18 +35,22 @@ This feature enables secure storage and validation of API keys for Claude (Anthr
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add apiKeys namespace with channels for getAll, get, set, delete, test, and checkEncryption
 
 **Changes:**
+
 - Add `apiKeys` object to `IpcChannels` with channels: `getAll`, `get`, `set`, `delete`, `test`, `isEncryptionAvailable`
 - Follow existing naming convention pattern (e.g., `apiKeys:getAll`, `apiKeys:set`)
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] IpcChannels object includes complete apiKeys namespace
 - [ ] All channel names follow existing naming convention
 - [ ] All validation commands pass
@@ -60,9 +64,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/validations/api-key.ts` - Zod schemas for API key forms
 
 **Changes:**
+
 - Define `ApiProvider` type enum: `'anthropic' | 'openai' | 'google'`
 - Create `ApiKeySource` type: `'user' | 'environment'`
 - Create `createApiKeySchema` with fields: provider (enum), apiKey (string, min 1), notes (optional string)
@@ -71,11 +77,13 @@ pnpm lint && pnpm typecheck
 - Export inferred types for form values
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All schemas properly validate provider, apiKey, and notes fields
 - [ ] Types are exported and importable from the module
 - [ ] All validation commands pass
@@ -89,9 +97,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/api-keys.handlers.ts` - IPC handlers for API key operations
 
 **Changes:**
+
 - Import `safeStorage` from electron and `Store` from electron-store
 - Implement `registerApiKeysHandlers()` function
 - Create handler for `isEncryptionAvailable` that returns `safeStorage.isEncryptionAvailable()`
@@ -105,11 +115,13 @@ pnpm lint && pnpm typecheck
 - Store keys in electron-store under `apiKeys.{provider}` namespace with structure: `{ encrypted: string, notes?: string, createdAt: string, updatedAt: string }`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Handler encrypts keys before storing in electron-store
 - [ ] Handler decrypts keys when needed for API calls
 - [ ] Handler detects and reports environment variable keys
@@ -125,9 +137,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `electron/ipc/api-keys.handlers.ts` - Add test connection implementation
 
 **Changes:**
+
 - Implement test function for Anthropic using a minimal messages API call (e.g., list models or minimal completion)
 - Implement test function for OpenAI using models.list() or minimal completion
 - Implement test function for Google AI using a minimal generateContent call
@@ -136,11 +150,13 @@ pnpm lint && pnpm typecheck
 - Use dynamic imports for SDK clients to avoid bundling issues
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Each provider has working test function
 - [ ] Errors are caught and returned with meaningful messages
 - [ ] Test does not consume significant API quota
@@ -155,18 +171,22 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/register-handlers.ts` - Import and call registerApiKeysHandlers
 
 **Changes:**
+
 - Import `registerApiKeysHandlers` from `./api-keys.handlers`
 - Call `registerApiKeysHandlers()` in the `registerAllHandlers` function
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] API keys handlers are registered on app startup
 - [ ] No circular dependency issues
 - [ ] All validation commands pass
@@ -180,9 +200,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `types/electron.d.ts` - Add apiKeys interface to ElectronAPI
 
 **Changes:**
+
 - Add `ApiProvider` type
 - Add `ApiKeySource` type
 - Add `ApiKeyEntry` interface for displayed key data
@@ -190,11 +212,13 @@ pnpm lint && pnpm typecheck
 - Add `apiKeys` object to ElectronAPI interface with methods: `getAll()`, `get(provider)`, `set(provider, key, notes?)`, `delete(provider)`, `test(provider)`, `isEncryptionAvailable()`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All method signatures are correctly typed
 - [ ] Types match the handler implementations
 - [ ] All validation commands pass
@@ -208,19 +232,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Add apiKeys object to electronAPI
 
 **Changes:**
+
 - Add `apiKeys` object to the `electronAPI` constant
 - Implement each method using `ipcRenderer.invoke()` with the corresponding channel
 - Match the interface defined in types/electron.d.ts
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All apiKeys methods are exposed via contextBridge
 - [ ] Methods use correct IPC channels
 - [ ] All validation commands pass
@@ -234,19 +262,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/useElectron.ts` - Add useElectronApiKeys hook
 
 **Changes:**
+
 - Add `useElectronApiKeys` function following the pattern of existing hooks
 - Implement memoized methods: `getAll`, `get`, `set`, `delete`, `test`, `isEncryptionAvailable`
 - Return the methods object along with `isElectron` boolean
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook follows existing useElectron pattern
 - [ ] All methods are properly memoized with useCallback
 - [ ] All validation commands pass
@@ -260,19 +292,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/api-keys.ts` - Query key factory for API keys
 
 **Changes:**
+
 - Import `createQueryKeys` from `@lukemorales/query-key-factory`
 - Create `apiKeyKeys` with queries: `list` (all keys), `detail` (by provider), `encryptionAvailable`
 - Follow the pattern from `lib/queries/projects.ts`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query keys follow existing pattern
 - [ ] Keys properly differentiate list and detail queries
 - [ ] All validation commands pass
@@ -286,9 +322,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-api-keys.ts` - TanStack Query hooks
 
 **Changes:**
+
 - Create `useApiKeys` query hook for fetching all configured keys
 - Create `useApiKey` query hook for fetching a specific provider's key
 - Create `useSetApiKey` mutation hook with cache invalidation
@@ -298,11 +336,13 @@ pnpm lint && pnpm typecheck
 - Follow patterns from `hooks/queries/use-projects.ts`
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hooks follow existing TanStack Query patterns
 - [ ] Mutations properly invalidate relevant queries
 - [ ] All validation commands pass
@@ -316,9 +356,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/ui/badge.tsx` - Add provider-specific variants
 
 **Changes:**
+
 - Add `anthropic` variant with appropriate coloring (coral/orange tones)
 - Add `openai` variant with appropriate coloring (green tones)
 - Add `google` variant with appropriate coloring (blue/multi tones)
@@ -326,11 +368,13 @@ pnpm lint && pnpm typecheck
 - Add `user` variant for user-provided key indicator
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Each provider has distinct, accessible color variant
 - [ ] Source type badges (environment/user) are distinguishable
 - [ ] All validation commands pass
@@ -344,9 +388,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/settings/api-key-table.tsx` - Table component
 
 **Changes:**
+
 - Create table with columns: Provider (with badge), Key (masked), Source (environment/user badge), Notes, Actions
 - Display provider name with colored badge
 - Show masked key value (last 4 characters visible)
@@ -357,11 +403,13 @@ pnpm lint && pnpm typecheck
 - Use existing Button component for actions
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table displays all key types (user and environment)
 - [ ] Keys are properly masked
 - [ ] Action buttons trigger appropriate callbacks
@@ -376,9 +424,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/settings/api-key-form.tsx` - Form component
 
 **Changes:**
+
 - Use `useAppForm` hook with createApiKeySchema or updateApiKeySchema
 - Create SelectField for provider selection (disabled in edit mode)
 - Create TextField for API key input with type="password" for masking
@@ -389,11 +439,13 @@ pnpm lint && pnpm typecheck
 - Handle loading states during test and submit
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form validates all required fields
 - [ ] Test connection provides immediate feedback
 - [ ] Form resets properly after successful submission
@@ -408,9 +460,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/settings/api-key-dialog.tsx` - Dialog component
 
 **Changes:**
+
 - Use existing Dialog components from `components/ui/dialog.tsx`
 - Accept mode prop: `'add' | 'edit'`
 - Accept optional existingKey prop for edit mode
@@ -420,11 +474,13 @@ pnpm lint && pnpm typecheck
 - Close dialog on successful form submission
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens and closes properly
 - [ ] Form submits and closes dialog on success
 - [ ] Edit mode pre-populates existing values
@@ -439,9 +495,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/settings/delete-api-key-dialog.tsx` - Delete confirmation dialog
 
 **Changes:**
+
 - Use AlertDialog from Base UI (follow pattern from delete-feature-request-dialog.tsx)
 - Accept apiKey prop with provider and display info
 - Show warning about deletion being permanent
@@ -450,11 +508,13 @@ pnpm lint && pnpm typecheck
 - Close dialog on successful deletion
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog warns user about permanent deletion
 - [ ] Delete button triggers mutation
 - [ ] Dialog closes after successful deletion
@@ -469,9 +529,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/settings/api-keys-section.tsx` - Main section component
 
 **Changes:**
+
 - Use useApiKeys hook to fetch all configured keys
 - Render "Add API Key" button that opens ApiKeyDialog in add mode
 - Render ApiKeyTable with configured keys
@@ -482,11 +544,13 @@ pnpm lint && pnpm typecheck
 - Show helpful message when no keys configured
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Section displays all configured keys
 - [ ] Add, edit, and delete operations work correctly
 - [ ] Loading and empty states are handled
@@ -501,19 +565,23 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/settings/page.tsx` - Replace placeholder with ApiKeysSection
 
 **Changes:**
+
 - Import ApiKeysSection from `@/components/settings/api-keys-section`
 - Replace the placeholder div inside CardContent with `<ApiKeysSection />`
 - Remove the hardcoded placeholder text
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Settings page renders ApiKeysSection
 - [ ] No console errors on page load
 - [ ] All validation commands pass
@@ -534,20 +602,24 @@ pnpm lint && pnpm typecheck
 ## Notes
 
 **Security Considerations:**
+
 - API keys are encrypted using Electron's safeStorage API which uses OS-level encryption (Keychain on macOS, Credential Manager on Windows)
 - Keys are stored as base64-encoded encrypted buffers in electron-store
 - Keys are only decrypted when needed for API calls, never exposed in plaintext to the renderer
 - The UI only receives masked key values (e.g., `...abc123`)
 
 **Environment Variable Names:**
+
 - Anthropic: `ANTHROPIC_API_KEY`
 - OpenAI: `OPENAI_API_KEY`
 - Google: `GOOGLE_GENERATIVE_AI_KEY`
 
 **Provider Test Endpoints:**
+
 - For testing, use the most lightweight API call available for each provider to minimize quota usage
 - Handle rate limits gracefully with appropriate error messages
 
 **Assumptions Requiring Confirmation:**
+
 - The three AI SDK packages (@ai-sdk/anthropic, @ai-sdk/openai, @ai-sdk/google) are already installed
 - The test connection calls can be made from the main process without CORS issues

@@ -73,6 +73,7 @@ The clarification step is automatically skipped when:
 
 4. **Build Enhanced Request** (when clarification gathered):
    After receiving user answers via AskUserQuestion, format the enhanced request as:
+
    ```
    [Original request]
 

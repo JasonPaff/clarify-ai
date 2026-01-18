@@ -41,9 +41,7 @@ export function useElectronApiKeys() {
   }, [api]);
 
   const get = useCallback(
-    async (
-      provider: ApiKeyProvider
-    ): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }> => {
+    async (provider: ApiKeyProvider): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }> => {
       if (!api) return { error: 'Not running in Electron' };
       return api.apiKeys.get(provider);
     },

@@ -12,11 +12,11 @@
 
 ## Query Keys Defined
 
-| Key | Purpose |
-|-----|---------|
-| `list` | All API keys query |
-| `detail(provider)` | Single provider key lookup |
-| `encryptionAvailable` | Encryption status query |
+| Key                   | Purpose                    |
+| --------------------- | -------------------------- |
+| `list`                | All API keys query         |
+| `detail(provider)`    | Single provider key lookup |
+| `encryptionAvailable` | Encryption status query    |
 
 ## Validation Results
 

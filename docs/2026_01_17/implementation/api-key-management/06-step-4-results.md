@@ -8,11 +8,11 @@
 
 ## Test Functions Implemented
 
-| Provider | Function | Model Used |
-|----------|----------|------------|
+| Provider  | Function             | Model Used              |
+| --------- | -------------------- | ----------------------- |
 | Anthropic | `testAnthropicKey()` | claude-3-haiku-20240307 |
-| OpenAI | `testOpenAIKey()` | gpt-4o-mini |
-| Google | `testGoogleKey()` | gemini-1.5-flash |
+| OpenAI    | `testOpenAIKey()`    | gpt-4o-mini             |
+| Google    | `testGoogleKey()`    | gemini-1.5-flash        |
 
 ## Key Implementation Details
 

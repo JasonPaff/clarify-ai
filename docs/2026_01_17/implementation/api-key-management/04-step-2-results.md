@@ -9,10 +9,12 @@
 ## Changes Made
 
 **Schemas**:
+
 - `createApiKeySchema` - For creating new API keys (provider, apiKey, notes)
 - `updateApiKeySchema` - For updating existing API keys (apiKey, notes)
 
 **Types**:
+
 - `ApiProvider`: `'anthropic' | 'google' | 'openai'`
 - `ApiKeySource`: `'environment' | 'user'`
 - `CreateApiKeyFormValues`: Inferred from createApiKeySchema
@@ -20,6 +22,7 @@
 - `ApiKeyEntry`: Interface for stored/displayed keys
 
 **Constants**:
+
 - `apiProviders`: Tuple for select field options
 - `apiKeySources`: Tuple for source options
 

@@ -10,8 +10,8 @@
 
 ```typescript
 interface ApiKeyDialogProps {
-  children: React.ReactNode;  // Trigger element
-  existingKey?: ApiKeyEntry;  // For edit mode
+  children: React.ReactNode; // Trigger element
+  existingKey?: ApiKeyEntry; // For edit mode
   mode: 'create' | 'edit';
 }
 ```

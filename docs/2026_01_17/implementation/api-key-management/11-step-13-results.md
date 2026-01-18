@@ -24,11 +24,11 @@ interface ApiKeyFormProps {
 
 ## Form Fields
 
-| Field | Component | Description |
-|-------|-----------|-------------|
-| `provider` | SelectField | AI provider selection (disabled in edit mode) |
-| `apiKey` | TextField (password) | Masked API key input |
-| `notes` | TextareaField | Optional notes |
+| Field      | Component            | Description                                   |
+| ---------- | -------------------- | --------------------------------------------- |
+| `provider` | SelectField          | AI provider selection (disabled in edit mode) |
+| `apiKey`   | TextField (password) | Masked API key input                          |
+| `notes`    | TextareaField        | Optional notes                                |
 
 ## Features
 

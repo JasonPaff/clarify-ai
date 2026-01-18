@@ -8,13 +8,13 @@
 
 ## Component Features
 
-| Column | Content |
-|--------|---------|
+| Column   | Content                                 |
+| -------- | --------------------------------------- |
 | Provider | Colored badge (anthropic/openai/google) |
-| API Key | Masked key value (monospace font) |
-| Source | Environment/user badge |
-| Notes | Truncated with tooltip |
-| Actions | Edit/Delete buttons (user keys only) |
+| API Key  | Masked key value (monospace font)       |
+| Source   | Environment/user badge                  |
+| Notes    | Truncated with tooltip                  |
+| Actions  | Edit/Delete buttons (user keys only)    |
 
 ## Key Behaviors
 

@@ -15,14 +15,14 @@
 
 ## IPC Handlers Summary
 
-| Channel | Handler | Description |
-|---------|---------|-------------|
-| `apiKeys:isEncryptionAvailable` | `isEncryptionAvailable` | Returns whether safeStorage encryption is available |
-| `apiKeys:getAll` | `getAll` | Returns list of all providers with masked keys and source info |
-| `apiKeys:get` | `get(provider)` | Returns decrypted key for API calls (user-stored or env var) |
-| `apiKeys:set` | `set(input)` | Encrypts and stores a key with optional notes |
-| `apiKeys:delete` | `delete(provider)` | Removes a stored key from electron-store |
-| `apiKeys:test` | - | NOT implemented (deferred to Step 4) |
+| Channel                         | Handler                 | Description                                                    |
+| ------------------------------- | ----------------------- | -------------------------------------------------------------- |
+| `apiKeys:isEncryptionAvailable` | `isEncryptionAvailable` | Returns whether safeStorage encryption is available            |
+| `apiKeys:getAll`                | `getAll`                | Returns list of all providers with masked keys and source info |
+| `apiKeys:get`                   | `get(provider)`         | Returns decrypted key for API calls (user-stored or env var)   |
+| `apiKeys:set`                   | `set(input)`            | Encrypts and stores a key with optional notes                  |
+| `apiKeys:delete`                | `delete(provider)`      | Removes a stored key from electron-store                       |
+| `apiKeys:test`                  | -                       | NOT implemented (deferred to Step 4)                           |
 
 ## Key Implementation Details
 

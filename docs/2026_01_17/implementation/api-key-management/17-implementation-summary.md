@@ -10,40 +10,40 @@ Successfully implemented the API Key Management feature, enabling users to secur
 
 ## Statistics
 
-| Metric | Value |
-|--------|-------|
-| Total Steps | 17 |
-| Steps Completed | 17 |
-| Success Rate | 100% |
-| Files Created | 11 |
-| Files Modified | 9 |
+| Metric          | Value |
+| --------------- | ----- |
+| Total Steps     | 17    |
+| Steps Completed | 17    |
+| Success Rate    | 100%  |
+| Files Created   | 11    |
+| Files Modified  | 9     |
 
 ## Files Created
 
-| File | Purpose |
-|------|---------|
-| `lib/validations/api-key.ts` | Zod validation schemas for API key forms |
-| `electron/ipc/api-keys.handlers.ts` | IPC handlers with safeStorage encryption |
-| `lib/queries/api-keys.ts` | TanStack Query key factory |
-| `hooks/queries/use-api-keys.ts` | TanStack Query hooks for API keys |
-| `components/settings/api-key-table.tsx` | Table displaying all API keys |
-| `components/settings/api-key-form.tsx` | Form for add/edit operations |
-| `components/settings/api-key-dialog.tsx` | Dialog wrapper for form |
-| `components/settings/delete-api-key-dialog.tsx` | Delete confirmation dialog |
-| `components/settings/api-keys-section.tsx` | Main orchestrating component |
+| File                                            | Purpose                                  |
+| ----------------------------------------------- | ---------------------------------------- |
+| `lib/validations/api-key.ts`                    | Zod validation schemas for API key forms |
+| `electron/ipc/api-keys.handlers.ts`             | IPC handlers with safeStorage encryption |
+| `lib/queries/api-keys.ts`                       | TanStack Query key factory               |
+| `hooks/queries/use-api-keys.ts`                 | TanStack Query hooks for API keys        |
+| `components/settings/api-key-table.tsx`         | Table displaying all API keys            |
+| `components/settings/api-key-form.tsx`          | Form for add/edit operations             |
+| `components/settings/api-key-dialog.tsx`        | Dialog wrapper for form                  |
+| `components/settings/delete-api-key-dialog.tsx` | Delete confirmation dialog               |
+| `components/settings/api-keys-section.tsx`      | Main orchestrating component             |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `electron/ipc/channels.ts` | Added apiKeys namespace |
-| `electron/ipc/register-handlers.ts` | Registered API keys handlers |
-| `electron/preload.ts` | Exposed apiKeys methods |
-| `types/electron.d.ts` | Added type definitions |
-| `hooks/useElectron.ts` | Added useElectronApiKeys hook |
-| `lib/queries/index.ts` | Added apiKeyKeys to merged export |
-| `components/ui/badge.tsx` | Added provider/source variants |
-| `app/(app)/settings/page.tsx` | Integrated ApiKeysSection |
+| File                                | Changes                           |
+| ----------------------------------- | --------------------------------- |
+| `electron/ipc/channels.ts`          | Added apiKeys namespace           |
+| `electron/ipc/register-handlers.ts` | Registered API keys handlers      |
+| `electron/preload.ts`               | Exposed apiKeys methods           |
+| `types/electron.d.ts`               | Added type definitions            |
+| `hooks/useElectron.ts`              | Added useElectronApiKeys hook     |
+| `lib/queries/index.ts`              | Added apiKeyKeys to merged export |
+| `components/ui/badge.tsx`           | Added provider/source variants    |
+| `app/(app)/settings/page.tsx`       | Integrated ApiKeysSection         |
 
 ## Key Features Implemented
 
@@ -57,9 +57,9 @@ Successfully implemented the API Key Management feature, enabling users to secur
 
 ## Quality Gates
 
-| Check | Status |
-|-------|--------|
-| pnpm lint | ✅ PASS |
+| Check          | Status  |
+| -------------- | ------- |
+| pnpm lint      | ✅ PASS |
 | pnpm typecheck | ✅ PASS |
 
 ## Architecture

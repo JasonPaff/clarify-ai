@@ -8,13 +8,13 @@
 
 ## Variants Added
 
-| Variant | Color | Purpose |
-|---------|-------|---------|
-| `anthropic` | orange-500 | Claude/Anthropic API |
-| `openai` | emerald-500 | OpenAI API |
-| `google` | blue-500 | Google AI API |
-| `environment` | cyan-500 | Environment variable source |
-| `user` | violet-500 | User-provided key source |
+| Variant       | Color       | Purpose                     |
+| ------------- | ----------- | --------------------------- |
+| `anthropic`   | orange-500  | Claude/Anthropic API        |
+| `openai`      | emerald-500 | OpenAI API                  |
+| `google`      | blue-500    | Google AI API               |
+| `environment` | cyan-500    | Environment variable source |
+| `user`        | violet-500  | User-provided key source    |
 
 ## Validation Results
 

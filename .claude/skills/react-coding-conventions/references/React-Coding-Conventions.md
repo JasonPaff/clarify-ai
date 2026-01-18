@@ -320,17 +320,17 @@ const shouldShowEmptyState = !isLoading && !error && data?.length === 0;
 
 return (
   <div>
-        {isDataReady && <DataDisplay data={data} />}
-        {shouldShowEmptyState && <EmptyState />}
+    {isDataReady && <DataDisplay data={data} />}
+    {shouldShowEmptyState && <EmptyState />}
   </div>
 );
 
 // ❌ Incorrect
 return (
   <div>
-        {user && data && !isLoading && !error && <DataDisplay data={data} />}
+    {user && data && !isLoading && !error && <DataDisplay data={data} />}
 
-        {!isLoading && !error && data?.length === 0 && <EmptyState />}
+    {!isLoading && !error && data?.length === 0 && <EmptyState />}
   </div>
 );
 ```
@@ -457,13 +457,13 @@ className={cn(
 ### Essential Rules Summary
 
 1. **Boolean Naming**: All boolean props, state, and values must start with `is`
-3. **No Complex JSX Conditions**: Extract to meaningful variable names
-4. **UI Block Comments**: Label individual UI sections for clarity
-5. **Consistent Handler Naming**: `handle` for internal, `on` for props
-6. **Proper TypeScript**: Use strict typing throughout
-7. **Component Organization**: Follow the 7-step internal structure
-8. **Accessibility First**: Include proper ARIA and semantic markup
-9. **Performance Considerations**: Use memoization appropriately
-10. **Error Handling**: Provide descriptive error messages
+2. **No Complex JSX Conditions**: Extract to meaningful variable names
+3. **UI Block Comments**: Label individual UI sections for clarity
+4. **Consistent Handler Naming**: `handle` for internal, `on` for props
+5. **Proper TypeScript**: Use strict typing throughout
+6. **Component Organization**: Follow the 7-step internal structure
+7. **Accessibility First**: Include proper ARIA and semantic markup
+8. **Performance Considerations**: Use memoization appropriately
+9. **Error Handling**: Provide descriptive error messages
 
 ---
