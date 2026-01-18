@@ -3,7 +3,26 @@ export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-req
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
+// Re-export API key types for renderer use
+export type { ApiKeyInfo, ApiKeyProvider, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
+
 export interface ElectronAPI {
+  apiKeys: {
+    delete(
+      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
+    ): Promise<{ error?: string; success: boolean }>;
+    get(
+      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
+    ): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }>;
+    getAll(): Promise<Array<import('../electron/ipc/api-keys.handlers').ApiKeyInfo>>;
+    isEncryptionAvailable(): Promise<boolean>;
+    set(
+      input: import('../electron/ipc/api-keys.handlers').SetApiKeyInput
+    ): Promise<{ error?: string; success: boolean }>;
+    test(
+      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
+    ): Promise<{ error?: string; success: boolean }>;
+  };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
     getVersion(): Promise<string>;

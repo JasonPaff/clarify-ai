@@ -3,10 +3,19 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 import type { NewProject, Project } from '../db/schema/projects.schema';
 import type { NewRepository, Repository } from '../db/schema/repositories.schema';
+import type { ApiKeyInfo, ApiKeyProvider, SetApiKeyInput } from './ipc/api-keys.handlers';
 
 import { IpcChannels } from './ipc/channels';
 
 export interface ElectronAPI {
+  apiKeys: {
+    delete(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
+    get(provider: ApiKeyProvider): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }>;
+    getAll(): Promise<Array<ApiKeyInfo>>;
+    isEncryptionAvailable(): Promise<boolean>;
+    set(input: SetApiKeyInput): Promise<{ error?: string; success: boolean }>;
+    test(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
+  };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
     getVersion(): Promise<string>;
@@ -71,6 +80,14 @@ export interface ElectronAPI {
 }
 
 const electronAPI: ElectronAPI = {
+  apiKeys: {
+    delete: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.delete, provider),
+    get: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.get, provider),
+    getAll: () => ipcRenderer.invoke(IpcChannels.apiKeys.getAll),
+    isEncryptionAvailable: () => ipcRenderer.invoke(IpcChannels.apiKeys.isEncryptionAvailable),
+    set: (input) => ipcRenderer.invoke(IpcChannels.apiKeys.set, input),
+    test: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider),
+  },
   app: {
     getPath: (name) => ipcRenderer.invoke(IpcChannels.app.getPath, name),
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),

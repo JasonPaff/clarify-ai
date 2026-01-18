@@ -1,4 +1,12 @@
 export const IpcChannels = {
+  apiKeys: {
+    delete: 'apiKeys:delete',
+    get: 'apiKeys:get',
+    getAll: 'apiKeys:getAll',
+    isEncryptionAvailable: 'apiKeys:isEncryptionAvailable',
+    set: 'apiKeys:set',
+    test: 'apiKeys:test',
+  },
   app: {
     getPath: 'app:getPath',
     getVersion: 'app:getVersion',

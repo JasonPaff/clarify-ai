@@ -24,6 +24,10 @@ export const badgeVariants = cva(
         sm: 'px-2 py-0.5 text-xs',
       },
       variant: {
+        anthropic: `
+          bg-orange-500/15 text-orange-700
+          dark:bg-orange-500/20 dark:text-orange-400
+        `,
         completed: `
           bg-green-500/15 text-green-700
           dark:bg-green-500/20 dark:text-green-400
@@ -34,6 +38,18 @@ export const badgeVariants = cva(
         draft: `
           bg-neutral-500/15 text-neutral-700
           dark:bg-neutral-500/20 dark:text-neutral-400
+        `,
+        environment: `
+          bg-cyan-500/15 text-cyan-700
+          dark:bg-cyan-500/20 dark:text-cyan-400
+        `,
+        google: `
+          bg-blue-500/15 text-blue-700
+          dark:bg-blue-500/20 dark:text-blue-400
+        `,
+        openai: `
+          bg-emerald-500/15 text-emerald-700
+          dark:bg-emerald-500/20 dark:text-emerald-400
         `,
         planning: `
           bg-purple-500/15 text-purple-700
@@ -46,6 +62,10 @@ export const badgeVariants = cva(
         researching: `
           bg-blue-500/15 text-blue-700
           dark:bg-blue-500/20 dark:text-blue-400
+        `,
+        user: `
+          bg-violet-500/15 text-violet-700
+          dark:bg-violet-500/20 dark:text-violet-400
         `,
       },
     },

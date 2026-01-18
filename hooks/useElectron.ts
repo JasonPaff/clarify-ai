@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 
-import type { ElectronAPI } from '@/types/electron';
+import type { ApiKeyInfo, ApiKeyProvider, ElectronAPI, SetApiKeyInput } from '@/types/electron';
 
 interface UseElectronResult {
   api: ElectronAPI | null;
@@ -25,6 +25,64 @@ export function useElectron(): UseElectronResult {
   }, []);
 
   return { api, isElectron };
+}
+
+export function useElectronApiKeys() {
+  const { api, isElectron } = useElectron();
+
+  const isEncryptionAvailable = useCallback(async (): Promise<boolean> => {
+    if (!api) return false;
+    return api.apiKeys.isEncryptionAvailable();
+  }, [api]);
+
+  const getAll = useCallback(async (): Promise<Array<ApiKeyInfo>> => {
+    if (!api) return [];
+    return api.apiKeys.getAll();
+  }, [api]);
+
+  const get = useCallback(
+    async (
+      provider: ApiKeyProvider
+    ): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }> => {
+      if (!api) return { error: 'Not running in Electron' };
+      return api.apiKeys.get(provider);
+    },
+    [api]
+  );
+
+  const set = useCallback(
+    async (input: SetApiKeyInput): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.apiKeys.set(input);
+    },
+    [api]
+  );
+
+  const deleteKey = useCallback(
+    async (provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.apiKeys.delete(provider);
+    },
+    [api]
+  );
+
+  const test = useCallback(
+    async (provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.apiKeys.test(provider);
+    },
+    [api]
+  );
+
+  return {
+    deleteKey,
+    get,
+    getAll,
+    isElectron,
+    isEncryptionAvailable,
+    set,
+    test,
+  };
 }
 
 export function useElectronApp() {
