@@ -8,8 +8,8 @@ import { FolderOpen } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { descriptionVariants, errorVariants, labelVariants } from '@/components/ui/form/field-wrapper';
-import { inputVariants } from '@/components/ui/form/text-field';
 import { TanStackFieldRoot } from '@/components/ui/form/tanstack-field-root';
+import { inputVariants } from '@/components/ui/form/text-field';
 import { useElectronDialog } from '@/hooks/useElectron';
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';

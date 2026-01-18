@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import type { VariantProps } from 'class-variance-authority';
 
 import { Field } from '@base-ui/react/field';
@@ -9,9 +8,9 @@ import { cn } from '@/lib/utils';
 
 import { fieldWrapperVariants } from './field-wrapper';
 
-type TanStackFieldRootProps = RequiredChildren &
+type TanStackFieldRootProps = ClassName &
+  RequiredChildren &
   VariantProps<typeof fieldWrapperVariants> & {
-    className?: string;
     isDirty?: boolean;
     isDisabled?: boolean;
     isInvalid?: boolean;

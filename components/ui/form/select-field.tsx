@@ -8,7 +8,6 @@ import { cva } from 'class-variance-authority';
 import { Check, ChevronDown } from 'lucide-react';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
-import { cn } from '@/lib/utils';
 
 import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
 import { TanStackFieldRoot } from './tanstack-field-root';
@@ -77,12 +76,6 @@ export const selectItemVariants = cva(
   }
 );
 
-interface SelectOption {
-  isDisabled?: boolean;
-  label: string;
-  value: string;
-}
-
 type SelectFieldProps = ClassName &
   VariantProps<typeof selectTriggerVariants> & {
     description?: string;
@@ -91,6 +84,12 @@ type SelectFieldProps = ClassName &
     options: Array<SelectOption>;
     placeholder?: string;
   };
+
+interface SelectOption {
+  isDisabled?: boolean;
+  label: string;
+  value: string;
+}
 
 export function SelectField({
   className,

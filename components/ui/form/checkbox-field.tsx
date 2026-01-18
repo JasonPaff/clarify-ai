@@ -1,7 +1,7 @@
 'use client';
 
-import type { ComponentProps } from 'react';
 import type { VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from 'react';
 
 import { Checkbox } from '@base-ui/react/checkbox';
 import { Field } from '@base-ui/react/field';
