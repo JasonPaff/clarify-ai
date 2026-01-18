@@ -4,6 +4,7 @@ import { PathSelectorField } from '@/components/repositories/path-selector-field
 import { CheckboxField } from '@/components/ui/form/checkbox-field';
 import { FormError } from '@/components/ui/form/form-error';
 import { NumberFieldComponent } from '@/components/ui/form/number-field';
+import { RadioField } from '@/components/ui/form/radio-field';
 import { SelectField } from '@/components/ui/form/select-field';
 import { SubmitButton } from '@/components/ui/form/submit-button';
 import { SwitchField } from '@/components/ui/form/switch-field';
@@ -17,6 +18,7 @@ export const { useAppForm, withForm } = createFormHook({
     CheckboxField,
     NumberField: NumberFieldComponent,
     PathSelectorField,
+    RadioField,
     SelectField,
     SwitchField,
     TextareaField,

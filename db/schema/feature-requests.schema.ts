@@ -6,6 +6,13 @@ import { projects } from './projects.schema';
 export const featureRequests = sqliteTable(
   'feature_requests',
   {
+    clarificationAnalysis: text('clarification_analysis'),
+    clarificationAnswers: text('clarification_answers'),
+    clarificationDetailScore: integer('clarification_detail_score'),
+    clarificationModel: text('clarification_model'),
+    clarificationPrompt: text('clarification_prompt'),
+    clarificationQuestions: text('clarification_questions'),
+    clarificationStatus: text('clarification_status'),
     createdAt: text('created_at')
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),

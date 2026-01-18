@@ -3,11 +3,19 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 import type { NewProject, Project } from '../db/schema/projects.schema';
 import type { NewRepository, Repository } from '../db/schema/repositories.schema';
+import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { ApiKeyInfo, ApiKeyProvider, SetApiKeyInput } from './ipc/api-keys.handlers';
 
 import { IpcChannels } from './ipc/channels';
 
 export interface ElectronAPI {
+  ai: {
+    clarification: {
+      cancel(): Promise<void>;
+      generate(request: ClarificationGenerateRequest): Promise<{ error?: string; success: boolean }>;
+      onStream(callback: (chunk: ClarificationStreamChunk) => void): () => void;
+    };
+  };
   apiKeys: {
     delete(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
     get(provider: ApiKeyProvider): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }>;
@@ -80,6 +88,22 @@ export interface ElectronAPI {
 }
 
 const electronAPI: ElectronAPI = {
+  ai: {
+    clarification: {
+      cancel: () => ipcRenderer.invoke(IpcChannels.ai.clarification.cancel),
+      generate: (request) => ipcRenderer.invoke(IpcChannels.ai.clarification.generate, request),
+      onStream: (callback) => {
+        const handler = (_event: Electron.IpcRendererEvent, chunk: ClarificationStreamChunk) => {
+          callback(chunk);
+        };
+        ipcRenderer.on(IpcChannels.ai.clarification.stream, handler);
+        // Return unsubscribe function
+        return () => {
+          ipcRenderer.removeListener(IpcChannels.ai.clarification.stream, handler);
+        };
+      },
+    },
+  },
   apiKeys: {
     delete: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.delete, provider),
     get: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.get, provider),

@@ -5,6 +5,7 @@ import type { DrizzleDatabase } from '../../db';
 import { createFeatureRequestsRepository } from '../../db/repositories/feature-requests.repository';
 import { createProjectsRepository } from '../../db/repositories/projects.repository';
 import { createRepositoriesRepository } from '../../db/repositories/repositories.repository';
+import { registerAiClarificationHandlers } from './ai-clarification.handlers';
 import { registerApiKeysHandlers } from './api-keys.handlers';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
@@ -29,6 +30,9 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 
   // API keys handlers (encryption via safeStorage)
   registerApiKeysHandlers();
+
+  // AI clarification handlers (need window reference for streaming)
+  registerAiClarificationHandlers(getMainWindow);
 
   // Database handlers - Projects
   const projectsRepository = createProjectsRepository(db);

@@ -1,7 +1,9 @@
 # Vercel AI SDK - Implementation Guide for Clarifying Questions Feature
 
 ## Project Context
+
 Building a clarifying questions feature for a feature request system using Vercel AI SDK. The feature will:
+
 - Generate clarifying questions from AI analysis of feature requests
 - Stream AI reasoning/thinking to the UI
 - Collect user answers via radio buttons + custom text input
@@ -46,6 +48,7 @@ export async function POST(req: Request) {
 ```
 
 **Key Properties:**
+
 - `result.textStream` - async iterable of text chunks
 - `result.fullStream` - all stream parts including tool calls
 - `result.text` - promise that resolves to full text when done
@@ -86,8 +89,8 @@ export default function Chat() {
         ))}
       </div>
       <form onSubmit={handleSubmit}>
-        <input 
-          value={input} 
+        <input
+          value={input}
           onChange={handleInputChange}
           placeholder="Type your message..."
         />
@@ -99,6 +102,7 @@ export default function Chat() {
 ```
 
 **Key Properties:**
+
 - `messages` - array of all messages (auto-updated as stream arrives)
 - `input` - current input value
 - `handleInputChange(e)` - event handler for input changes
@@ -108,10 +112,15 @@ export default function Chat() {
 - `reload()` - resend last message
 
 **Lifecycle Callbacks** (optional):
+
 ```typescript
 const { messages, input, handleInputChange, handleSubmit } = useChat({
-  onFinish: (message) => { /* called when stream ends */ },
-  onError: (error) => { /* called on error */ },
+  onFinish: (message) => {
+    /* called when stream ends */
+  },
+  onError: (error) => {
+    /* called on error */
+  },
 });
 ```
 
@@ -124,7 +133,7 @@ Simply rendering the `messages` array automatically displays streaming text as i
 ```typescript
 {messages.map(msg => (
   <div key={msg.id}>
-    <strong>{msg.role}:</strong> 
+    <strong>{msg.role}:</strong>
     <span>{msg.content}</span>  {/* Updates in real-time */}
   </div>
 ))}
@@ -152,8 +161,8 @@ export function StreamingText({ content, isStreaming }: StreamingTextProps) {
 
 // Usage
 const lastMessage = messages[messages.length - 1];
-<StreamingText 
-  content={lastMessage?.content || ''} 
+<StreamingText
+  content={lastMessage?.content || ''}
   isStreaming={isLoading}
 />
 ```
@@ -181,7 +190,7 @@ export async function POST(req: Request) {
       anthropic: {
         thinking: {
           type: 'enabled',
-          budgetTokens: 8192,  // max thinking tokens
+          budgetTokens: 8192, // max thinking tokens
           includeThoughts: true, // expose thinking to client
         },
       },
@@ -205,7 +214,7 @@ const result = streamText({
     google: {
       thinkingConfig: {
         type: 'enabled',
-        thinkingBudget: 8192,  // thinking tokens
+        thinkingBudget: 8192, // thinking tokens
         includeThoughts: true,
       },
     },
@@ -214,6 +223,7 @@ const result = streamText({
 ```
 
 **Documentation**:
+
 - Claude thinking: https://platform.claude.com/docs/en/guides/extended-thinking
 - Gemini thinking: https://ai.google.dev/gemini-2/docs/thinking-experimental
 
@@ -282,7 +292,7 @@ export default function ChatWithReasoning() {
             }
             return <p key={idx}>{part}</p>;
           })}
-          
+
           {/* Fallback for string content */}
           {typeof message.content === 'string' && (
             <p>{message.content}</p>
@@ -291,8 +301,8 @@ export default function ChatWithReasoning() {
       ))}
 
       <form onSubmit={handleSubmit}>
-        <input 
-          value={input} 
+        <input
+          value={input}
           onChange={handleInputChange}
           placeholder="Your message..."
         />
@@ -325,12 +335,14 @@ export const clarifyingQuestionsTool = tool({
       z.object({
         id: z.string(),
         question: z.string().describe('The full question text'),
-        options: z.array(
-          z.object({
-            label: z.string(),
-            value: z.string(),
-          })
-        ).describe('Pre-suggested options for the user'),
+        options: z
+          .array(
+            z.object({
+              label: z.string(),
+              value: z.string(),
+            })
+          )
+          .describe('Pre-suggested options for the user'),
         allowCustom: z.boolean().optional().describe('Allow user to provide custom answer'),
       })
     ),
@@ -444,7 +456,7 @@ export default function ClarifyRequest() {
           )}
         </div>
       ))}
-      
+
       <button onClick={() => submitAnswers()}>Save & Continue</button>
     </div>
   );
@@ -491,8 +503,14 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model,
-    messages: [{ /* ... */ }],
-    tools: { /* ... */ },
+    messages: [
+      {
+        /* ... */
+      },
+    ],
+    tools: {
+      /* ... */
+    },
   });
 
   return result.toDataStreamResponse();
@@ -506,6 +524,7 @@ export async function POST(req: Request) {
 Each provider has unique options. Examples:
 
 **Anthropic (Claude)**:
+
 ```typescript
 providerOptions: {
   anthropic: {
@@ -516,6 +535,7 @@ providerOptions: {
 ```
 
 **Google (Gemini)**:
+
 ```typescript
 providerOptions: {
   google: {
@@ -525,6 +545,7 @@ providerOptions: {
 ```
 
 **OpenAI**:
+
 ```typescript
 providerOptions: {
   openai: {
@@ -619,14 +640,14 @@ model FeatureRequest {
   title             String
   description       String
   createdAt         DateTime  @default(now())
-  
+
   // Clarification fields
   clarificationStatus  String?  // 'pending' | 'completed' | 'skipped'
   clarificationModel   String?  // which model was used
   clarificationAnalysis Json?   // AI's analysis findings
   clarificationQuestions Json?  // array of questions generated
   clarificationAnswers  Json?   // user's answers
-  
+
   // Other fields...
 }
 ```
@@ -664,22 +685,22 @@ export async function POST(req: Request) {
 // Helper to calculate request clarity score
 function calculateClarityScore(request: string): number {
   let score = 0;
-  
+
   // Check for acceptance criteria
   if (request.match(/acceptance criteri|should|must/i)) score += 1;
-  
+
   // Check for context
   if (request.length > 500) score += 1;
-  
+
   // Check for specific requirements
   if (request.match(/user flow|api|database|schema/i)) score += 1;
-  
+
   // Check for priority
   if (request.match(/priority|important|urgent/i)) score += 1;
-  
+
   // Check for acceptance/definition of done
   if (request.match(/done|complete|finished|success/i)) score += 1;
-  
+
   return Math.min(score, 5);
 }
 
@@ -715,27 +736,32 @@ export async function POST(req: Request) {
 ## Key Documentation Links for Your AI Agent
 
 **Core APIs:**
+
 - https://ai-sdk.dev/docs/reference/ai-sdk-core/stream-text
 - https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat
 - https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling
 
 **Thinking/Reasoning:**
+
 - https://ai-sdk.dev/docs/guides/extended-thinking
 - https://platform.claude.com/docs/en/guides/extended-thinking
 - https://ai.google.dev/gemini-2/docs/thinking-experimental
 
 **Providers:**
+
 - Anthropic: https://ai-sdk.dev/providers/ai-sdk-providers/anthropic
 - Google: https://ai-sdk.dev/providers/ai-sdk-providers/google
 - OpenAI: https://ai-sdk.dev/providers/ai-sdk-providers/openai
 - Mistral: https://ai-sdk.dev/providers/ai-sdk-providers/mistral
 
 **Advanced:**
+
 - Agents: https://vercel.com/kb/guide/how-to-build-ai-agents-with-vercel-and-the-ai-sdk
 - Tool Calling: https://vercel.com/academy/ai-sdk/tool-use
 - Streaming Responses: https://blog.logrocket.com/nextjs-vercel-ai-sdk-streaming/
 
 **Troubleshooting:**
+
 - Community: https://community.vercel.com
 - GitHub Issues: https://github.com/vercel/ai/issues
 

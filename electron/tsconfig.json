@@ -22,5 +22,5 @@
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"],
-  "references": [{ "path": "../db" }]
+  "references": [{ "path": "../db" }, { "path": "../lib/ai" }]
 }

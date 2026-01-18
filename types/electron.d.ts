@@ -3,10 +3,24 @@ export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-req
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 
+// Re-export AI clarification types for renderer use
+export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
+
 // Re-export API key types for renderer use
 export type { ApiKeyInfo, ApiKeyProvider, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
 
 export interface ElectronAPI {
+  ai: {
+    clarification: {
+      cancel(): Promise<void>;
+      generate(
+        request: import('../electron/ipc/ai-clarification.handlers').ClarificationGenerateRequest
+      ): Promise<{ error?: string; success: boolean }>;
+      onStream(
+        callback: (chunk: import('../electron/ipc/ai-clarification.handlers').ClarificationStreamChunk) => void
+      ): () => void;
+    };
+  };
   apiKeys: {
     delete(
       provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider

@@ -1,4 +1,11 @@
 export const IpcChannels = {
+  ai: {
+    clarification: {
+      cancel: 'ai:clarification:cancel',
+      generate: 'ai:clarification:generate',
+      stream: 'ai:clarification:stream',
+    },
+  },
   apiKeys: {
     delete: 'apiKeys:delete',
     get: 'apiKeys:get',

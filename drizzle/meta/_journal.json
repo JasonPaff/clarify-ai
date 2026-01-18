@@ -15,6 +15,13 @@
       "when": 1768754333976,
       "tag": "0001_dusty_stingray",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1768765936496,
+      "tag": "0002_familiar_phil_sheldon",
+      "breakpoints": true
     }
   ]
 }

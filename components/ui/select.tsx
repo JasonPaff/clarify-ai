@@ -12,9 +12,9 @@ export const selectTriggerVariants = cva(
   `
     inline-flex w-full items-center justify-between gap-2 rounded-md border
     border-border bg-transparent text-foreground
-    focus:ring-2 focus:ring-accent focus:ring-offset-0 focus:outline-none
+    focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-0 focus-visible:outline-none
     data-disabled:cursor-not-allowed data-disabled:opacity-50
-    data-invalid:border-destructive data-invalid:focus:ring-destructive data-popup-open:ring-2
+    data-invalid:border-destructive data-invalid:focus-visible:ring-destructive data-popup-open:ring-2
     data-popup-open:ring-accent data-popup-open:ring-offset-0 data-invalid:data-popup-open:ring-destructive
   `,
   {
@@ -128,6 +128,35 @@ export const SelectPopup = ({ className, ref, size, ...props }: SelectPopupProps
 
 /* List */
 export const SelectList = BaseSelect.List;
+
+/* Group */
+export const SelectGroup = BaseSelect.Group;
+
+/* Group Label */
+export const selectGroupLabelVariants = cva(
+  `
+    px-2 py-1.5 font-semibold text-muted-foreground select-none
+  `,
+  {
+    defaultVariants: {
+      size: 'default',
+    },
+    variants: {
+      size: {
+        default: 'text-xs',
+        lg: 'text-sm',
+        sm: 'text-xs',
+      },
+    },
+  }
+);
+
+type SelectGroupLabelProps = ComponentPropsWithRef<typeof BaseSelect.GroupLabel> &
+  VariantProps<typeof selectGroupLabelVariants>;
+
+export const SelectGroupLabel = ({ className, ref, size, ...props }: SelectGroupLabelProps) => {
+  return <BaseSelect.GroupLabel className={cn(selectGroupLabelVariants({ size }), className)} ref={ref} {...props} />;
+};
 
 /* Item */
 type SelectItemProps = ComponentPropsWithRef<typeof BaseSelect.Item> & VariantProps<typeof selectItemVariants>;
