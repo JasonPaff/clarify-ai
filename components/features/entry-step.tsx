@@ -1,8 +1,10 @@
 'use client';
 
+import type { ChangeEvent } from 'react';
+
 import { formatDistanceToNow } from 'date-fns';
-import { Loader2, MessageSquareMore, Save, Sparkles } from 'lucide-react';
-import { type ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { MessageSquareMore, Sparkles } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 
@@ -18,8 +20,10 @@ interface EntryStepProps {
 export const EntryStep = ({ featureRequest }: EntryStepProps) => {
   const [content, setContent] = useState(featureRequest.rawRequest ?? '');
   const [originalContent, setOriginalContent] = useState(featureRequest.rawRequest ?? '');
+  // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
+  // to ensure JavaScript parses it as UTC, not local time
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
-    featureRequest.rawRequest ? new Date(featureRequest.updatedAt) : null
+    featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null
   );
   const [trackedFeatureId, setTrackedFeatureId] = useState(featureRequest.id);
 
@@ -30,7 +34,7 @@ export const EntryStep = ({ featureRequest }: EntryStepProps) => {
     setTrackedFeatureId(featureRequest.id);
     setContent(featureRequest.rawRequest ?? '');
     setOriginalContent(featureRequest.rawRequest ?? '');
-    setLastSavedAt(featureRequest.rawRequest ? new Date(featureRequest.updatedAt) : null);
+    setLastSavedAt(featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null);
   }
 
   const isDirty = content !== originalContent;
@@ -100,10 +104,6 @@ export const EntryStep = ({ featureRequest }: EntryStepProps) => {
         {/* Save Status Row */}
         <div className={'flex items-center justify-between'}>
           <span className={'text-xs text-muted-foreground'}>{saveStatusText}</span>
-          <Button disabled={!isDirty || isSaving} onClick={() => void handleSave()} size={'sm'} variant={'outline'}>
-            {isSaving ? <Loader2 className={'size-4 animate-spin'} /> : <Save className={'size-4'} />}
-            Save
-          </Button>
         </div>
       </div>
 
