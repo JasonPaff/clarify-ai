@@ -1,13 +1,16 @@
 'use client';
 
+import type { VariantProps } from 'class-variance-authority';
+
+import { Field } from '@base-ui/react/field';
 import { Input } from '@base-ui/react/input';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { useId } from 'react';
+import { cva } from 'class-variance-authority';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
+import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
+import { TanStackFieldRoot } from './tanstack-field-root';
 
 export const inputVariants = cva(
   `
@@ -36,7 +39,7 @@ type TextFieldProps = ClassName &
   VariantProps<typeof inputVariants> & {
     autoFocus?: boolean;
     description?: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
     label: string;
     placeholder?: string;
     type?: 'email' | 'password' | 'text' | 'url';
@@ -46,44 +49,52 @@ export function TextField({
   autoFocus,
   className,
   description,
-  disabled,
+  isDisabled,
   label,
   placeholder,
   size,
   type = 'text',
 }: TextFieldProps) {
   const field = useFieldContext<string>();
-  const id = useId();
 
-  const descriptionId = `${id}-description`;
-  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0]?.message;
-  const hasError = Boolean(error);
+  const _hasError = Boolean(error);
 
   return (
-    <FieldWrapper
-      description={description}
-      descriptionId={descriptionId}
-      error={error}
-      errorId={errorId}
-      label={label}
-      labelFor={id}
+    <TanStackFieldRoot
+      className={className}
+      isDirty={field.state.meta.isDirty}
+      isDisabled={isDisabled}
+      isInvalid={_hasError}
+      isTouched={field.state.meta.isTouched}
+      name={field.name}
       size={size}
     >
+      {/* Label */}
+      <Field.Label className={labelVariants({ size })}>{label}</Field.Label>
+
+      {/* Input */}
       <Input
-        aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
-        aria-invalid={hasError || undefined}
         autoFocus={autoFocus}
-        className={cn(inputVariants({ size }), className)}
-        disabled={disabled}
-        id={id}
-        name={field.name}
+        className={cn(inputVariants({ size }))}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder}
         type={type}
         value={field.state.value ?? ''}
       />
-    </FieldWrapper>
+
+      {/* Description */}
+      {description && !_hasError && (
+        <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
+      )}
+
+      {/* Error */}
+      {_hasError && (
+        <Field.Error className={errorVariants({ size })} match={true}>
+          {error}
+        </Field.Error>
+      )}
+    </TanStackFieldRoot>
   );
 }

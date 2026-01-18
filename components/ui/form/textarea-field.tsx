@@ -1,12 +1,15 @@
 'use client';
 
-import { cva, type VariantProps } from 'class-variance-authority';
-import { useId } from 'react';
+import type { VariantProps } from 'class-variance-authority';
+
+import { Field } from '@base-ui/react/field';
+import { cva } from 'class-variance-authority';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
+import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
+import { TanStackFieldRoot } from './tanstack-field-root';
 
 export const textareaVariants = cva(
   `
@@ -15,8 +18,8 @@ export const textareaVariants = cva(
     placeholder:text-muted-foreground
     focus:ring-2 focus:ring-accent focus:ring-offset-0 focus:outline-none
     disabled:cursor-not-allowed disabled:opacity-50
-    aria-invalid:border-destructive
-    aria-invalid:focus:ring-destructive
+    data-invalid:border-destructive
+    data-invalid:focus:ring-destructive
   `,
   {
     defaultVariants: {
@@ -35,7 +38,7 @@ export const textareaVariants = cva(
 type TextareaFieldProps = ClassName &
   VariantProps<typeof textareaVariants> & {
     description?: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
     label: string;
     placeholder?: string;
     rows?: number;
@@ -44,43 +47,54 @@ type TextareaFieldProps = ClassName &
 export function TextareaField({
   className,
   description,
-  disabled,
+  isDisabled,
   label,
   placeholder,
   rows = 3,
   size,
 }: TextareaFieldProps) {
   const field = useFieldContext<string>();
-  const id = useId();
 
-  const descriptionId = `${id}-description`;
-  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0]?.message;
-  const hasError = Boolean(error);
+  const _hasError = Boolean(error);
 
   return (
-    <FieldWrapper
-      description={description}
-      descriptionId={descriptionId}
-      error={error}
-      errorId={errorId}
-      label={label}
-      labelFor={id}
+    <TanStackFieldRoot
+      className={className}
+      isDirty={field.state.meta.isDirty}
+      isDisabled={isDisabled}
+      isInvalid={_hasError}
+      isTouched={field.state.meta.isTouched}
+      name={field.name}
       size={size}
     >
+      {/* Label */}
+      <Field.Label className={labelVariants({ size })}>{label}</Field.Label>
+
+      {/* Textarea */}
       <textarea
-        aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
-        aria-invalid={hasError || undefined}
-        className={cn(textareaVariants({ size }), className)}
-        disabled={disabled}
-        id={id}
-        name={field.name}
+        className={cn(textareaVariants({ size }))}
+        data-disabled={isDisabled || undefined}
+        data-invalid={_hasError || undefined}
+        disabled={isDisabled}
         onBlur={field.handleBlur}
         onChange={(e) => field.handleChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         value={field.state.value ?? ''}
       />
-    </FieldWrapper>
+
+      {/* Description */}
+      {description && !_hasError && (
+        <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
+      )}
+
+      {/* Error */}
+      {_hasError && (
+        <Field.Error className={errorVariants({ size })} match={true}>
+          {error}
+        </Field.Error>
+      )}
+    </TanStackFieldRoot>
   );
 }

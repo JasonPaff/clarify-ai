@@ -1,13 +1,17 @@
 'use client';
 
+import type { VariantProps } from 'class-variance-authority';
+
+import { Field } from '@base-ui/react/field';
 import { Select } from '@base-ui/react/select';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { Check, ChevronDown } from 'lucide-react';
-import { useId } from 'react';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
+import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
+import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
+import { TanStackFieldRoot } from './tanstack-field-root';
 
 export const selectTriggerVariants = cva(
   `
@@ -73,66 +77,62 @@ export const selectItemVariants = cva(
   }
 );
 
+interface SelectOption {
+  isDisabled?: boolean;
+  label: string;
+  value: string;
+}
+
 type SelectFieldProps = ClassName &
   VariantProps<typeof selectTriggerVariants> & {
     description?: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
     label: string;
     options: Array<SelectOption>;
     placeholder?: string;
   };
 
-interface SelectOption {
-  disabled?: boolean;
-  label: string;
-  value: string;
-}
-
 export function SelectField({
   className,
   description,
-  disabled,
+  isDisabled,
   label,
   options,
   placeholder = 'Select an option',
   size,
 }: SelectFieldProps) {
   const field = useFieldContext<string>();
-  const id = useId();
 
-  const descriptionId = `${id}-description`;
-  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0]?.message;
-  const hasError = Boolean(error);
+  const _hasError = Boolean(error);
 
   return (
-    <FieldWrapper
+    <TanStackFieldRoot
       className={className}
-      description={description}
-      descriptionId={descriptionId}
-      error={error}
-      errorId={errorId}
-      label={label}
-      labelFor={id}
+      isDirty={field.state.meta.isDirty}
+      isDisabled={isDisabled}
+      isInvalid={_hasError}
+      isTouched={field.state.meta.isTouched}
+      name={field.name}
       size={size}
     >
+      {/* Label - use nativeLabel={false} for button-based trigger */}
+      <Field.Label className={labelVariants({ size })} nativeLabel={false}>
+        {label}
+      </Field.Label>
+
+      {/* Select */}
       <Select.Root
-        disabled={disabled}
-        name={field.name}
-        onOpenChange={(open) => {
-          if (!open) {
+        disabled={isDisabled}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) {
             field.handleBlur();
           }
         }}
         onValueChange={(value) => field.handleChange(value ?? '')}
         value={field.state.value}
       >
-        <Select.Trigger
-          aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
-          aria-invalid={hasError || undefined}
-          className={selectTriggerVariants({ size })}
-          id={id}
-        >
+        <Select.Trigger className={selectTriggerVariants({ size })}>
           <Select.Value placeholder={placeholder} />
           <Select.Icon>
             <ChevronDown aria-hidden={'true'} className={'size-4 opacity-50'} />
@@ -144,7 +144,7 @@ export function SelectField({
               {options.map((option) => (
                 <Select.Item
                   className={selectItemVariants({ size })}
-                  disabled={option.disabled}
+                  disabled={option.isDisabled}
                   key={option.value}
                   value={option.value}
                 >
@@ -158,6 +158,18 @@ export function SelectField({
           </Select.Positioner>
         </Select.Portal>
       </Select.Root>
-    </FieldWrapper>
+
+      {/* Description */}
+      {description && !_hasError && (
+        <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
+      )}
+
+      {/* Error */}
+      {_hasError && (
+        <Field.Error className={errorVariants({ size })} match={true}>
+          {error}
+        </Field.Error>
+      )}
+    </TanStackFieldRoot>
   );
 }

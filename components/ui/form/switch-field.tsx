@@ -1,13 +1,16 @@
 'use client';
 
+import type { VariantProps } from 'class-variance-authority';
+
+import { Field } from '@base-ui/react/field';
 import { Switch } from '@base-ui/react/switch';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { useId } from 'react';
+import { cva } from 'class-variance-authority';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
 
-import { descriptionVariants, errorVariants, getAriaDescribedBy, labelVariants } from './field-wrapper';
+import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
+import { TanStackFieldRoot } from './tanstack-field-root';
 
 export const switchVariants = cva(
   `
@@ -66,46 +69,51 @@ export const switchThumbVariants = cva(
 type SwitchFieldProps = ClassName &
   VariantProps<typeof switchVariants> & {
     description?: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
     label: string;
   };
 
-export function SwitchField({ className, description, disabled, label, size }: SwitchFieldProps) {
+export function SwitchField({ className, description, isDisabled, label, size }: SwitchFieldProps) {
   const field = useFieldContext<boolean>();
-  const id = useId();
 
-  const descriptionId = `${id}-description`;
-  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0]?.message;
-  const hasError = Boolean(error);
+  const _hasError = Boolean(error);
 
   return (
-    <div className={cn('flex flex-col gap-1', className)}>
-      <label className={'flex items-center gap-2'}>
+    <TanStackFieldRoot
+      className={className}
+      isDirty={field.state.meta.isDirty}
+      isDisabled={isDisabled}
+      isInvalid={_hasError}
+      isTouched={field.state.meta.isTouched}
+      name={field.name}
+      size={size}
+    >
+      {/* Switch with Inline Label */}
+      <Field.Item className={'flex items-center gap-2'}>
         <Switch.Root
-          aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
-          aria-invalid={hasError || undefined}
           checked={field.state.value ?? false}
           className={switchVariants({ size })}
-          disabled={disabled}
-          id={id}
-          name={field.name}
-          onCheckedChange={(checked) => field.handleChange(checked)}
+          onCheckedChange={(isChecked) => field.handleChange(isChecked)}
         >
           <Switch.Thumb className={switchThumbVariants({ size })} />
         </Switch.Root>
-        <span className={labelVariants({ size })}>{label}</span>
-      </label>
-      {description && !error && (
-        <p className={cn(descriptionVariants({ size }), 'pl-11')} id={descriptionId}>
-          {description}
-        </p>
+        <Field.Label className={labelVariants({ size })} nativeLabel={false}>
+          {label}
+        </Field.Label>
+      </Field.Item>
+
+      {/* Description */}
+      {description && !_hasError && (
+        <Field.Description className={cn(descriptionVariants({ size }), 'pl-11')}>{description}</Field.Description>
       )}
-      {error && (
-        <p aria-live={'polite'} className={cn(errorVariants({ size }), 'pl-11')} id={errorId} role={'alert'}>
+
+      {/* Error */}
+      {_hasError && (
+        <Field.Error className={cn(errorVariants({ size }), 'pl-11')} match={true}>
           {error}
-        </p>
+        </Field.Error>
       )}
-    </div>
+    </TanStackFieldRoot>
   );
 }

@@ -1,16 +1,18 @@
 'use client';
 
 import type { ComponentProps } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 
+import { Field } from '@base-ui/react/field';
 import { NumberField } from '@base-ui/react/number-field';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { Minus, Plus } from 'lucide-react';
-import { useId } from 'react';
 
 import { useFieldContext } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
 
-import { FieldWrapper, getAriaDescribedBy } from './field-wrapper';
+import { descriptionVariants, errorVariants, labelVariants } from './field-wrapper';
+import { TanStackFieldRoot } from './tanstack-field-root';
 
 export const numberInputVariants = cva(
   `
@@ -60,7 +62,7 @@ export const numberButtonVariants = cva(
 type NumberFieldComponentProps = ClassName &
   VariantProps<typeof numberInputVariants> & {
     description?: string;
-    disabled?: boolean;
+    isDisabled?: boolean;
     label: string;
     max?: number;
     min?: number;
@@ -70,7 +72,7 @@ type NumberFieldComponentProps = ClassName &
 export function NumberFieldComponent({
   className,
   description,
-  disabled,
+  isDisabled,
   label,
   max,
   min,
@@ -78,31 +80,28 @@ export function NumberFieldComponent({
   step = 1,
 }: NumberFieldComponentProps) {
   const field = useFieldContext<null | number>();
-  const id = useId();
 
-  const descriptionId = `${id}-description`;
-  const errorId = `${id}-error`;
   const error = field.state.meta.errors[0]?.message;
-  const hasError = Boolean(error);
+  const _hasError = Boolean(error);
 
   return (
-    <FieldWrapper
+    <TanStackFieldRoot
       className={className}
-      description={description}
-      descriptionId={descriptionId}
-      error={error}
-      errorId={errorId}
-      label={label}
-      labelFor={id}
+      isDirty={field.state.meta.isDirty}
+      isDisabled={isDisabled}
+      isInvalid={_hasError}
+      isTouched={field.state.meta.isTouched}
+      name={field.name}
       size={size}
     >
+      {/* Label */}
+      <Field.Label className={labelVariants({ size })}>{label}</Field.Label>
+
+      {/* Number Input */}
       <NumberField.Root
-        aria-invalid={hasError || undefined}
-        disabled={disabled}
-        id={id}
+        disabled={isDisabled}
         max={max}
         min={min}
-        name={field.name}
         onValueChange={(value) => field.handleChange(value)}
         step={step}
         value={field.state.value}
@@ -114,11 +113,7 @@ export function NumberFieldComponent({
           >
             <MinusIcon aria-hidden={'true'} />
           </NumberField.Decrement>
-          <NumberField.Input
-            aria-describedby={getAriaDescribedBy(descriptionId, errorId, Boolean(description), hasError)}
-            className={numberInputVariants({ size })}
-            onBlur={field.handleBlur}
-          />
+          <NumberField.Input className={numberInputVariants({ size })} onBlur={field.handleBlur} />
           <NumberField.Increment
             aria-label={'Increase value'}
             className={cn(numberButtonVariants({ size }), 'rounded-r-md border-l-0')}
@@ -127,7 +122,19 @@ export function NumberFieldComponent({
           </NumberField.Increment>
         </NumberField.Group>
       </NumberField.Root>
-    </FieldWrapper>
+
+      {/* Description */}
+      {description && !_hasError && (
+        <Field.Description className={descriptionVariants({ size })}>{description}</Field.Description>
+      )}
+
+      {/* Error */}
+      {_hasError && (
+        <Field.Error className={errorVariants({ size })} match={true}>
+          {error}
+        </Field.Error>
+      )}
+    </TanStackFieldRoot>
   );
 }
 
