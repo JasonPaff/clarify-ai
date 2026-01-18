@@ -53,7 +53,7 @@ The clarification step is automatically skipped when:
    - Agent performs light codebase exploration (reads CLAUDE.md, scans key directories)
    - Agent assesses request ambiguity on a 1-5 scale
    - If score >= 4: Agent returns `SKIP_CLARIFICATION` marker with reasoning
-   - If score < 4: Agent generates questions and uses AskUserQuestion tool directly
+   - If score < 4: Agent returns `QUESTIONS_FOR_USER` section with structured JSON questions
 
 3. **Conditional Branch**:
 
@@ -63,20 +63,22 @@ The clarification step is automatically skipped when:
    - Save minimal `00a-clarification.md` noting skip decision
    - Proceed directly to Step 1
 
-   **IF clarification questions asked:**
-   - User responds via AskUserQuestion interface
-   - Agent formats enhanced request with clarification context
-   - Set `$ENHANCED_REQUEST` = formatted output from clarification agent
+   **IF `QUESTIONS_FOR_USER` returned:**
+   - Parse the JSON questions array from the agent's response
+   - Use **AskUserQuestion** tool directly with the parsed questions
+   - Collect user responses
+   - Build enhanced request from original + user answers
+   - Set `$ENHANCED_REQUEST` = formatted enhanced request
    - Save detailed `00a-clarification.md` with full Q&A
 
 4. **Build Enhanced Request** (when clarification gathered):
-   The clarification agent will format the enhanced request as:
+   After receiving user answers via AskUserQuestion, format the enhanced request as:
    ```
    [Original request]
 
    Additional context from clarification:
-   - [Key decision 1 from Q&A]
-   - [Key decision 2 from Q&A]
+   - [Question 1]: [User's answer]
+   - [Question 2]: [User's answer]
    ```
 
 5. Record step end time and results
