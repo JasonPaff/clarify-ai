@@ -1,7 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
-
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -21,34 +19,16 @@ import { IconButton } from '@/components/ui/icon-button';
 
 import { ApiKeyForm } from './api-key-form';
 
-interface ApiKeyDialogProps {
-  children: ReactNode;
+type ApiKeyDialogProps = Children & {
   existingKey?: ApiKeyInfo;
   mode: DialogMode;
-}
+};
 
 type DialogMode = 'create' | 'edit';
 
 export function ApiKeyDialog({ children, existingKey, mode }: ApiKeyDialogProps) {
-  // useState hooks
   const [isOpen, setIsOpen] = useState(false);
 
-  // Derived values for conditional rendering
-  const _isEditMode = mode === 'edit';
-  const _dialogTitle = _isEditMode ? 'Edit API Key' : 'Add API Key';
-  const _dialogDescription = _isEditMode
-    ? 'Update the API key or notes for this provider.'
-    : 'Add a new API key for an AI provider.';
-
-  // Initial values for edit mode
-  const _initialValues = _isEditMode && existingKey
-    ? {
-        notes: existingKey.notes ?? '',
-        provider: existingKey.provider,
-      }
-    : undefined;
-
-  // Event handlers
   const handleSuccess = () => {
     setIsOpen(false);
   };
@@ -60,6 +40,20 @@ export function ApiKeyDialog({ children, existingKey, mode }: ApiKeyDialogProps)
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
   };
+
+  const _isEditMode = mode === 'edit';
+  const _dialogTitle = _isEditMode ? 'Edit API Key' : 'Add API Key';
+  const _dialogDescription = _isEditMode
+    ? 'Update the API key or notes for this provider.'
+    : 'Add a new API key for an AI provider.';
+
+  const _initialValues =
+    _isEditMode && existingKey
+      ? {
+          notes: existingKey.notes ?? '',
+          provider: existingKey.provider,
+        }
+      : undefined;
 
   return (
     <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
@@ -83,12 +77,7 @@ export function ApiKeyDialog({ children, existingKey, mode }: ApiKeyDialogProps)
 
           {/* Dialog Content */}
           <div className={'mt-6'}>
-            <ApiKeyForm
-              initialValues={_initialValues}
-              mode={mode}
-              onCancel={handleCancel}
-              onSuccess={handleSuccess}
-            />
+            <ApiKeyForm initialValues={_initialValues} mode={mode} onCancel={handleCancel} onSuccess={handleSuccess} />
           </div>
         </DialogPopup>
       </DialogPortal>

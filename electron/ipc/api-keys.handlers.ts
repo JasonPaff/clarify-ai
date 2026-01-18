@@ -1,4 +1,6 @@
-import { ipcMain, type IpcMainInvokeEvent, safeStorage } from 'electron';
+import type { IpcMainInvokeEvent } from 'electron';
+
+import { ipcMain, safeStorage } from 'electron';
 import Store from 'electron-store';
 
 import { IpcChannels } from './channels';
@@ -293,8 +295,7 @@ function getEnvApiKey(provider: ApiKeyProvider): string | undefined {
  */
 function getStoredKeyData(provider: ApiKeyProvider): StoredApiKeyData | undefined {
   const storeKey = getStoreKey(provider);
-  const data = store.get(storeKey) as StoredApiKeyData | undefined;
-  return data;
+  return store.get(storeKey) as StoredApiKeyData | undefined;
 }
 
 /**

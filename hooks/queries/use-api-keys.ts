@@ -2,9 +2,10 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import type { AiProvider } from '@/lib/queries/api-keys';
 import type { SetApiKeyInput } from '@/types/electron';
 
-import { type AiProvider, apiKeyKeys } from '@/lib/queries/api-keys';
+import { apiKeyKeys } from '@/lib/queries/api-keys';
 
 import { useElectronApiKeys } from '../useElectron';
 

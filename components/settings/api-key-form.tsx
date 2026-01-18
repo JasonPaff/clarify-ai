@@ -53,31 +53,27 @@ interface EditApiKeyFormContentProps {
 }
 
 export function ApiKeyForm({ initialValues, isSubmitting, mode, onCancel, onSuccess }: ApiKeyFormProps) {
-  // useState hooks
   const [testResult, setTestResult] = useState<null | { isSuccess: boolean; message: string }>(null);
 
-  // Other hooks
   const setApiKey = useSetApiKey();
   const testApiKey = useTestApiKey();
 
-  // Derived values for conditional rendering
   const _isCreateMode = mode === 'create';
   const _isTestLoading = testApiKey.isPending;
   const _isSubmitLoading = setApiKey.isPending || isSubmitting || false;
 
-  // Event handlers
   const handleSubmit = useCallback(
     async (values: CreateApiKeyFormValues | UpdateApiKeyFormValues) => {
+      const isCreateMode = mode === 'create';
+
       try {
-        const provider = _isCreateMode
-          ? (values as CreateApiKeyFormValues).provider
-          : initialValues?.provider;
+        const provider = isCreateMode ? (values as CreateApiKeyFormValues).provider : initialValues?.provider;
 
         if (!provider) {
           return;
         }
 
-        const apiKey = _isCreateMode
+        const apiKey = isCreateMode
           ? (values as CreateApiKeyFormValues).apiKey
           : (values as UpdateApiKeyFormValues).apiKey;
 
@@ -99,7 +95,7 @@ export function ApiKeyForm({ initialValues, isSubmitting, mode, onCancel, onSucc
         throw new Error(error instanceof Error ? error.message : 'Failed to save API key');
       }
     },
-    [_isCreateMode, initialValues?.provider, onSuccess, setApiKey]
+    [mode, initialValues?.provider, onSuccess, setApiKey]
   );
 
   if (_isCreateMode) {
@@ -190,23 +186,13 @@ function CreateApiKeyFormContent({
         {/* Provider Selection */}
         <form.AppField name={'provider'}>
           {(field) => (
-            <field.SelectField
-              label={'Provider'}
-              options={providerOptions}
-              placeholder={'Select an AI provider'}
-            />
+            <field.SelectField label={'Provider'} options={providerOptions} placeholder={'Select an AI provider'} />
           )}
         </form.AppField>
 
         {/* API Key Input */}
         <form.AppField name={'apiKey'}>
-          {(field) => (
-            <field.TextField
-              label={'API Key'}
-              placeholder={'Enter your API key'}
-              type={'password'}
-            />
-          )}
+          {(field) => <field.TextField label={'API Key'} placeholder={'Enter your API key'} type={'password'} />}
         </form.AppField>
 
         {/* Notes Input */}

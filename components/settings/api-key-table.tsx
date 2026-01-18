@@ -19,10 +19,6 @@ interface ApiKeyTableProps extends ComponentPropsWithRef<'div'> {
 }
 
 export const ApiKeyTable = ({ apiKeys, className, onDelete, onEdit, ref, ...props }: ApiKeyTableProps) => {
-  // Derived values for conditional rendering
-  const _hasApiKeys = apiKeys.length > 0;
-
-  // Event handlers
   const handleEditClick = (provider: ApiKeyProvider) => {
     onEdit?.(provider);
   };
@@ -31,12 +27,16 @@ export const ApiKeyTable = ({ apiKeys, className, onDelete, onEdit, ref, ...prop
     onDelete?.(provider);
   };
 
+  const _hasApiKeys = apiKeys.length > 0;
+
   return (
     <div className={cn('w-full', className)} ref={ref} {...props}>
       {/* Empty State */}
       {!_hasApiKeys && (
         <EmptyState
-          description={'Add API keys to enable AI-powered features like feature refinement and implementation planning.'}
+          description={
+            'Add API keys to enable AI-powered features like feature refinement and implementation planning.'
+          }
           icon={<Key className={'size-5'} />}
           title={'No API keys configured'}
         />
@@ -83,12 +83,10 @@ interface ApiKeyTableRowProps {
 }
 
 const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
-  // Derived values
+  const providerDisplayName = getProviderDisplayName(entry.provider);
+
   const _isUserKey = entry.source === 'user';
   const _hasNotes = entry.notes && entry.notes.trim().length > 0;
-
-  // Format provider name for display
-  const providerDisplayName = getProviderDisplayName(entry.provider);
 
   return (
     <div

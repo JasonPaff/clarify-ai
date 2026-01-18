@@ -19,20 +19,12 @@ import { DeleteApiKeyDialog } from './delete-api-key-dialog';
 type ApiKeysSectionProps = ComponentPropsWithRef<'div'>;
 
 export const ApiKeysSection = ({ className, ref, ...props }: ApiKeysSectionProps) => {
-  // useState hooks
   const [deletingKey, setDeletingKey] = useState<ApiKeyInfo | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Other hooks
   const apiKeysQuery = useApiKeys();
   const encryptionQuery = useEncryptionAvailable();
 
-  // Derived values for conditional rendering
-  const _isLoading = apiKeysQuery.isLoading || encryptionQuery.isLoading;
-  const _isEncryptionAvailable = encryptionQuery.data === true;
-  const _apiKeys = apiKeysQuery.data ?? [];
-
-  // Event handlers
   const handleDelete = (provider: ApiKeyProvider) => {
     const keyEntry = _apiKeys.find((key) => key.provider === provider);
     if (keyEntry) {
@@ -47,6 +39,10 @@ export const ApiKeysSection = ({ className, ref, ...props }: ApiKeysSectionProps
       setDeletingKey(null);
     }
   };
+
+  const _isLoading = apiKeysQuery.isLoading || encryptionQuery.isLoading;
+  const _isEncryptionAvailable = encryptionQuery.data === true;
+  const _apiKeys = apiKeysQuery.data ?? [];
 
   return (
     <Card className={cn(className)} ref={ref} {...props}>
@@ -92,8 +88,8 @@ export const ApiKeysSection = ({ className, ref, ...props }: ApiKeysSectionProps
             <div>
               <p className={'text-sm font-medium text-destructive'}>Encryption Not Available</p>
               <p className={'mt-1 text-sm text-muted-foreground'}>
-                Secure storage is not available on this system. API keys will be stored in plain text.
-                This may be a security risk.
+                Secure storage is not available on this system. API keys will be stored in plain text. This may be a
+                security risk.
               </p>
             </div>
           </div>
@@ -121,9 +117,7 @@ export const ApiKeysSection = ({ className, ref, ...props }: ApiKeysSectionProps
         )}
 
         {/* API Keys Content with Actions */}
-        {!_isLoading && !apiKeysQuery.isError && (
-          <ApiKeysContent apiKeys={_apiKeys} onDelete={handleDelete} />
-        )}
+        {!_isLoading && !apiKeysQuery.isError && <ApiKeysContent apiKeys={_apiKeys} onDelete={handleDelete} />}
 
         {/* Delete Dialog (controlled) */}
         {deletingKey && (
@@ -158,16 +152,12 @@ interface EditApiKeyDialogWrapperProps {
 }
 
 function ApiKeyDialogAutoOpen({ existingKey, mode, onOpenChange }: ApiKeyDialogAutoOpenProps) {
-  // Since ApiKeyDialog uses internal state, we need to trigger it manually
-  // We'll use a ref to click the hidden trigger button on mount
-
   return (
     <ApiKeyDialog existingKey={existingKey} mode={mode}>
       <button
         className={'sr-only'}
         onClick={() => onOpenChange?.(true)}
         ref={(el) => {
-          // Auto-click the trigger when mounted
           if (el) {
             el.click();
           }
@@ -181,15 +171,10 @@ function ApiKeyDialogAutoOpen({ existingKey, mode, onOpenChange }: ApiKeyDialogA
 }
 
 function ApiKeysContent({ apiKeys, onDelete }: ApiKeysContentProps) {
-  // useState hooks
   const [editingProvider, setEditingProvider] = useState<ApiKeyProvider | null>(null);
 
-  // Derived values
-  const _editingKey = editingProvider
-    ? apiKeys.find((key) => key.provider === editingProvider)
-    : null;
+  const _editingKey = editingProvider ? apiKeys.find((key) => key.provider === editingProvider) : null;
 
-  // Event handlers
   const handleEdit = (provider: ApiKeyProvider) => {
     setEditingProvider(provider);
   };
@@ -204,12 +189,7 @@ function ApiKeysContent({ apiKeys, onDelete }: ApiKeysContentProps) {
       <ApiKeyTable apiKeys={apiKeys} onDelete={onDelete} onEdit={handleEdit} />
 
       {/* Edit Dialog - renders when editingProvider is set */}
-      {_editingKey && (
-        <EditApiKeyDialogWrapper
-          existingKey={_editingKey}
-          onClose={handleEditDialogClosed}
-        />
-      )}
+      {_editingKey && <EditApiKeyDialogWrapper existingKey={_editingKey} onClose={handleEditDialogClosed} />}
     </Fragment>
   );
 }
@@ -235,10 +215,7 @@ function ApiKeysSkeleton() {
       {/* Table Rows Skeleton */}
       <div className={'divide-y divide-border rounded-b-lg border border-t-0 border-border'}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            className={'grid grid-cols-[1fr_1fr_auto_1fr_auto] items-center gap-4 px-4 py-3'}
-            key={i}
-          >
+          <div className={'grid grid-cols-[1fr_1fr_auto_1fr_auto] items-center gap-4 px-4 py-3'} key={i}>
             <div className={'h-6 w-24 animate-pulse rounded-full bg-muted'} />
             <div className={'h-5 w-32 animate-pulse rounded-sm bg-muted'} />
             <div className={'h-5 w-20 animate-pulse rounded-full bg-muted'} />
@@ -255,10 +232,8 @@ function ApiKeysSkeleton() {
 }
 
 function EditApiKeyDialogWrapper({ existingKey, onClose }: EditApiKeyDialogWrapperProps) {
-  // useState hooks
   const [isVisible, setIsVisible] = useState(true);
 
-  // Event handlers
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
       setIsVisible(false);
@@ -266,19 +241,10 @@ function EditApiKeyDialogWrapper({ existingKey, onClose }: EditApiKeyDialogWrapp
     }
   };
 
-  // Derived values
-  const _shouldRender = isVisible;
-
-  if (!_shouldRender) {
+  if (!isVisible) {
     return null;
   }
 
   // Render dialog with an invisible trigger that auto-clicks
-  return (
-    <ApiKeyDialogAutoOpen
-      existingKey={existingKey}
-      mode={'edit'}
-      onOpenChange={handleOpenChange}
-    />
-  );
+  return <ApiKeyDialogAutoOpen existingKey={existingKey} mode={'edit'} onOpenChange={handleOpenChange} />;
 }

@@ -15,26 +15,15 @@ type DeleteApiKeyDialogProps = Children & {
   open?: boolean;
 };
 
-export function DeleteApiKeyDialog({
-  apiKey,
-  children,
-  onOpenChange,
-  open: controlledOpen,
-}: DeleteApiKeyDialogProps) {
-  // useState hooks
+export function DeleteApiKeyDialog({ apiKey, children, onOpenChange, open: controlledOpen }: DeleteApiKeyDialogProps) {
   const [isOpen, setIsOpen] = useControllableState({
     defaultValue: false,
     onChange: onOpenChange,
     value: controlledOpen,
   });
 
-  // Other hooks
   const deleteApiKey = useDeleteApiKey();
 
-  // Derived values for conditional rendering
-  const _providerDisplayName = getProviderDisplayName(apiKey.provider);
-
-  // Event handlers
   const handleOpenChange = (isDialogOpen: boolean) => {
     setIsOpen(isDialogOpen);
   };
@@ -44,12 +33,12 @@ export function DeleteApiKeyDialog({
     setIsOpen(false);
   };
 
+  const _providerDisplayName = getProviderDisplayName(apiKey.provider);
+
   return (
     <AlertDialog.Root onOpenChange={handleOpenChange} open={isOpen}>
       {/* Trigger */}
-      {children && (
-        <AlertDialog.Trigger render={<span className={'inline-flex'} />}>{children}</AlertDialog.Trigger>
-      )}
+      {children && <AlertDialog.Trigger render={<span className={'inline-flex'} />}>{children}</AlertDialog.Trigger>}
 
       {/* Portal */}
       <AlertDialog.Portal>
@@ -81,9 +70,7 @@ export function DeleteApiKeyDialog({
           )}
         >
           {/* Title */}
-          <AlertDialog.Title className={'text-lg font-semibold text-foreground'}>
-            Delete API Key
-          </AlertDialog.Title>
+          <AlertDialog.Title className={'text-lg font-semibold text-foreground'}>Delete API Key</AlertDialog.Title>
 
           {/* Description */}
           <AlertDialog.Description className={'mt-2 text-sm text-muted-foreground'}>
@@ -93,8 +80,7 @@ export function DeleteApiKeyDialog({
 
           {/* Warning */}
           <p className={'mt-4 text-sm text-destructive'}>
-            This action cannot be undone. You will need to add the API key again to use{' '}
-            {_providerDisplayName} services.
+            This action cannot be undone. You will need to add the API key again to use {_providerDisplayName} services.
           </p>
 
           {/* Key Info */}
@@ -106,11 +92,7 @@ export function DeleteApiKeyDialog({
           {/* Actions */}
           <div className={'mt-6 flex justify-end gap-3'}>
             <AlertDialog.Close render={<Button variant={'outline'} />}>Cancel</AlertDialog.Close>
-            <Button
-              disabled={deleteApiKey.isPending}
-              onClick={handleDelete}
-              variant={'destructive'}
-            >
+            <Button disabled={deleteApiKey.isPending} onClick={handleDelete} variant={'destructive'}>
               {deleteApiKey.isPending ? 'Deleting...' : 'Delete'}
             </Button>
           </div>
