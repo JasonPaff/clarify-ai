@@ -5,6 +5,7 @@ export type { ApiKeyProvider } from '@/electron/ipc/lib/provider-types';
 
 // Model definition
 export interface AIModel {
+  contextLength?: null | number;
   id: string;
   name: string;
   supportsThinking?: boolean;

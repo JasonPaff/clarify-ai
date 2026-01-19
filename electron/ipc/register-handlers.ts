@@ -15,6 +15,7 @@ import { registerDialogHandlers } from './dialog.handlers';
 import { registerFeatureRequestRepositoriesHandlers } from './feature-request-repositories.handlers';
 import { registerFeatureRequestsHandlers } from './feature-requests.handlers';
 import { registerFsHandlers } from './fs.handlers';
+import { registerOpenRouterModelsHandlers } from './openrouter-models.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
 import { registerRepositoriesHandlers } from './repositories.handlers';
 import { registerRepositoryOverviewsHandlers } from './repository-overviews.handlers';
@@ -41,6 +42,9 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 
   // AI overview handlers (need window reference for streaming)
   registerAiOverviewHandlers(getMainWindow);
+
+  // OpenRouter models handlers (caching via electron-store)
+  registerOpenRouterModelsHandlers();
 
   // Database handlers - Projects
   const projectsRepository = createProjectsRepository(db);

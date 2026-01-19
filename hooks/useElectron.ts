@@ -7,10 +7,12 @@ import type {
   ApiKeyProvider,
   CollectRepositoryDataResult,
   ElectronAPI,
+  OpenRouterModel,
   ProviderCredentials,
   RepositoryOverviewGenerateRequest,
   RepositoryOverviewStreamChunk,
   SetApiKeyInput,
+  StoredOpenRouterModels,
 } from '@/types/electron';
 
 interface UseElectronResult {
@@ -407,6 +409,36 @@ export function useElectronFs() {
     readFile,
     stat,
     writeFile,
+  };
+}
+
+export function useElectronOpenRouterModels() {
+  const { api, isElectron } = useElectron();
+
+  const clear = useCallback(async (): Promise<boolean> => {
+    if (!api) return false;
+    return api.openRouterModels.clear();
+  }, [api]);
+
+  const fetch = useCallback(async (): Promise<{
+    error?: string;
+    models?: Array<OpenRouterModel>;
+    success: boolean;
+  }> => {
+    if (!api) return { error: 'Not running in Electron', success: false };
+    return api.openRouterModels.fetch();
+  }, [api]);
+
+  const get = useCallback(async (): Promise<null | StoredOpenRouterModels> => {
+    if (!api) return null;
+    return api.openRouterModels.get();
+  }, [api]);
+
+  return {
+    clear,
+    fetch,
+    get,
+    isElectron,
   };
 }
 

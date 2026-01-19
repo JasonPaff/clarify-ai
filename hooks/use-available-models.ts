@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import type { ApiKeyProvider } from '@/types/electron';
 
 import { useApiKeys } from '@/hooks/queries/use-api-keys';
+import { useOpenRouterModels } from '@/hooks/queries/use-openrouter-models';
 import { AI_MODELS, type AIModel, createModelId, type FullModelId } from '@/lib/ai/models';
 
 export interface AvailableModel extends AIModel {
@@ -22,9 +23,13 @@ interface UseAvailableModelsResult {
 /**
  * Hook that returns available AI models filtered by configured providers.
  * Only shows models for providers that have API keys configured.
+ * For OpenRouter, uses dynamically fetched models if available.
  */
 export function useAvailableModels(): UseAvailableModelsResult {
-  const { data: apiKeys, isLoading } = useApiKeys();
+  const { data: apiKeys, isLoading: isApiKeysLoading } = useApiKeys();
+  const { data: openRouterModelsData, isLoading: isOpenRouterLoading } = useOpenRouterModels();
+
+  const isLoading = isApiKeysLoading || isOpenRouterLoading;
 
   const configuredProviders = useMemo(() => {
     if (!apiKeys) return [];
@@ -34,6 +39,25 @@ export function useAvailableModels(): UseAvailableModelsResult {
   const models = useMemo(() => {
     const result: Array<AvailableModel> = [];
     for (const provider of configuredProviders) {
+      // For OpenRouter, use dynamic models if available, otherwise fallback to hardcoded
+      if (provider === 'openrouter') {
+        const dynamicModels = openRouterModelsData?.models;
+        if (dynamicModels && dynamicModels.length > 0) {
+          for (const model of dynamicModels) {
+            result.push({
+              contextLength: model.contextLength,
+              fullId: createModelId(provider, model.id),
+              id: model.id,
+              name: model.name,
+              provider,
+              supportsThinking: model.supportsThinking,
+            });
+          }
+          continue;
+        }
+      }
+
+      // Use hardcoded models for other providers (or OpenRouter fallback)
       const providerModels = AI_MODELS[provider];
       if (providerModels) {
         for (const model of providerModels) {
@@ -46,7 +70,7 @@ export function useAvailableModels(): UseAvailableModelsResult {
       }
     }
     return result;
-  }, [configuredProviders]);
+  }, [configuredProviders, openRouterModelsData]);
 
   const modelsByProvider = useMemo(() => {
     // Create a partial record that only contains entries for configured providers

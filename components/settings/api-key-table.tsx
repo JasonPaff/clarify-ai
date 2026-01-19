@@ -2,8 +2,8 @@
 
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import { Cloud, Globe, Key, Pencil, Power, PowerOff, Server, Trash2, Zap } from 'lucide-react';
-import { Fragment, useMemo } from 'react';
+import { Cloud, Globe, Key, Pencil, Power, PowerOff, RefreshCw, Server, Trash2, Zap } from 'lucide-react';
+import { Fragment, useMemo, useRef } from 'react';
 
 import type { ApiKeyInfo, ApiKeyProvider, ProviderCategory } from '@/types/electron';
 
@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { IconButton } from '@/components/ui/icon-button';
 import { useToggleApiKeyDisabled } from '@/hooks/queries/use-api-keys';
+import { useFetchOpenRouterModels } from '@/hooks/queries/use-openrouter-models';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { getProvidersByCategory, PROVIDER_CATEGORIES, PROVIDER_DISPLAY_NAMES } from '@/types/electron';
 
@@ -199,7 +201,10 @@ interface ApiKeyTableRowProps {
 }
 
 const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
+  const toast = useToast();
+  const loadingToastIdRef = useRef<null | string>(null);
   const toggleMutation = useToggleApiKeyDisabled();
+  const fetchOpenRouterMutation = useFetchOpenRouterModels();
   const providerDisplayName = getProviderDisplayName(entry.provider);
   const category = PROVIDER_CATEGORIES[entry.provider];
 
@@ -208,9 +213,57 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
   const _isDisabled = entry.isDisabled;
   const _isEnterprise = category === 'enterprise';
   const _isLocal = category === 'local';
+  const _canRefreshOpenRouter =
+    entry.provider === 'openrouter' && _isConfigured && _isUserKey && !_isDisabled;
 
   const handleToggleDisabled = () => {
     toggleMutation.mutate(entry.provider);
+  };
+
+  const handleRefreshOpenRouterModels = () => {
+    // Show loading toast
+    loadingToastIdRef.current = toast.add({
+      description: 'Fetching available models from OpenRouter...',
+      title: 'Refreshing OpenRouter models',
+      type: 'loading',
+    });
+
+    fetchOpenRouterMutation.mutate(undefined, {
+      onError: (error) => {
+        // Close loading toast
+        if (loadingToastIdRef.current) {
+          toast.close(loadingToastIdRef.current);
+          loadingToastIdRef.current = null;
+        }
+
+        // Show error toast
+        toast.error({
+          description: error instanceof Error ? error.message : 'An unexpected error occurred',
+          title: 'Failed to refresh models',
+        });
+      },
+      onSuccess: (result) => {
+        // Close loading toast
+        if (loadingToastIdRef.current) {
+          toast.close(loadingToastIdRef.current);
+          loadingToastIdRef.current = null;
+        }
+
+        if (result.success && result.models) {
+          // Show success toast with model count
+          toast.success({
+            description: `Found ${result.models.length} available models`,
+            title: 'OpenRouter models refreshed',
+          });
+        } else {
+          // Show error toast
+          toast.error({
+            description: result.error || 'Failed to fetch models',
+            title: 'Failed to refresh models',
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -262,6 +315,18 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
 
       {/* Actions */}
       <div className={'flex justify-end gap-1'}>
+        {/* OpenRouter refresh button */}
+        {_canRefreshOpenRouter && (
+          <IconButton
+            aria-label={'Refresh OpenRouter models'}
+            disabled={fetchOpenRouterMutation.isPending}
+            onClick={handleRefreshOpenRouterModels}
+            type={'button'}
+          >
+            <RefreshCw className={cn('size-4', fetchOpenRouterMutation.isPending && 'animate-spin')} />
+          </IconButton>
+        )}
+
         {_isUserKey && _isConfigured && (
           <Fragment>
             {/* Toggle button */}

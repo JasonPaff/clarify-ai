@@ -10,6 +10,7 @@ import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk }
 import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';
 import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
 import type { ApiKeyProvider, ProviderCredentials } from './ipc/lib/provider-types';
+import type { OpenRouterModel, StoredOpenRouterModels } from './ipc/openrouter-models.handlers';
 
 import { IpcChannels } from './ipc/channels';
 
@@ -111,6 +112,11 @@ export interface ElectronAPI {
       success: boolean;
     }>;
     writeFile(path: string, content: string): Promise<{ error?: string; success: boolean }>;
+  };
+  openRouterModels: {
+    clear(): Promise<boolean>;
+    fetch(): Promise<{ error?: string; models?: Array<OpenRouterModel>; success: boolean }>;
+    get(): Promise<null | StoredOpenRouterModels>;
   };
   store: {
     delete(key: string): Promise<boolean>;
@@ -231,6 +237,11 @@ const electronAPI: ElectronAPI = {
     readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),
     stat: (path) => ipcRenderer.invoke(IpcChannels.fs.stat, path),
     writeFile: (path, content) => ipcRenderer.invoke(IpcChannels.fs.writeFile, path, content),
+  },
+  openRouterModels: {
+    clear: () => ipcRenderer.invoke(IpcChannels.openRouterModels.clear),
+    fetch: () => ipcRenderer.invoke(IpcChannels.openRouterModels.fetch),
+    get: () => ipcRenderer.invoke(IpcChannels.openRouterModels.get),
   },
   store: {
     delete: (key) => ipcRenderer.invoke(IpcChannels.store.delete, key),

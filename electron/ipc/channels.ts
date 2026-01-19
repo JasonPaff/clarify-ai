@@ -75,6 +75,11 @@ export const IpcChannels = {
     stat: 'fs:stat',
     writeFile: 'fs:writeFile',
   },
+  openRouterModels: {
+    clear: 'openRouterModels:clear',
+    fetch: 'openRouterModels:fetch',
+    get: 'openRouterModels:get',
+  },
   store: {
     delete: 'store:delete',
     get: 'store:get',

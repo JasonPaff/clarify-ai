@@ -17,7 +17,6 @@ export type {
 export type { ApiKeyInfo, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
 // Re-export file system types for renderer use
 export type { CollectRepositoryDataResult, DetectedFramework, RepositoryData } from '../electron/ipc/fs.handlers';
-
 // Re-export provider types from centralized module (single source of truth)
 export type {
   ApiKeyProvider,
@@ -44,6 +43,9 @@ export {
   providerRequiresApiKey,
   validateProviderCredentials,
 } from '../electron/ipc/lib/provider-types';
+
+// Re-export OpenRouter models types for renderer use
+export type { OpenRouterModel, StoredOpenRouterModels } from '../electron/ipc/openrouter-models.handlers';
 
 /**
  * Electron API exposed to the renderer process via context bridge.
@@ -215,6 +217,19 @@ export interface ElectronAPI {
       success: boolean;
     }>;
     writeFile(path: string, content: string): Promise<{ error?: string; success: boolean }>;
+  };
+  /** OpenRouter models fetching and caching */
+  openRouterModels: {
+    /** Clear cached models */
+    clear(): Promise<boolean>;
+    /** Fetch models from OpenRouter API and cache them */
+    fetch(): Promise<{
+      error?: string;
+      models?: Array<import('../electron/ipc/openrouter-models.handlers').OpenRouterModel>;
+      success: boolean;
+    }>;
+    /** Get cached models (returns null if not cached) */
+    get(): Promise<import('../electron/ipc/openrouter-models.handlers').StoredOpenRouterModels | null>;
   };
   store: {
     delete(key: string): Promise<boolean>;

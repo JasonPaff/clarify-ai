@@ -3,6 +3,7 @@ import { inferQueryKeyStore, mergeQueryKeys } from '@lukemorales/query-key-facto
 import { apiKeyKeys } from './api-keys';
 import { featureRequestRepositoryKeys } from './feature-request-repositories';
 import { featureRequestKeys } from './feature-requests';
+import { openRouterModelsKeys } from './openrouter-models';
 import { projectKeys } from './projects';
 import { repositoryKeys } from './repositories';
 import { repositoryOverviewKeys } from './repository-overviews';
@@ -11,6 +12,7 @@ export const queries = mergeQueryKeys(
   apiKeyKeys,
   featureRequestKeys,
   featureRequestRepositoryKeys,
+  openRouterModelsKeys,
   projectKeys,
   repositoryKeys,
   repositoryOverviewKeys

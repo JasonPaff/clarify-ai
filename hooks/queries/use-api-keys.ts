@@ -6,8 +6,9 @@ import type { AiProvider } from '@/lib/queries/api-keys';
 import type { ProviderCredentials, SetApiKeyInput } from '@/types/electron';
 
 import { apiKeyKeys } from '@/lib/queries/api-keys';
+import { openRouterModelsKeys } from '@/lib/queries/openrouter-models';
 
-import { useElectronApiKeys } from '../useElectron';
+import { useElectronApiKeys, useElectronOpenRouterModels } from '../useElectron';
 
 export function useApiKey(provider: AiProvider) {
   const { get, isElectron } = useElectronApiKeys();
@@ -32,14 +33,21 @@ export function useApiKeys() {
 export function useDeleteApiKey() {
   const queryClient = useQueryClient();
   const { deleteKey } = useElectronApiKeys();
+  const { clear: clearOpenRouterModels } = useElectronOpenRouterModels();
 
   return useMutation({
     mutationFn: (provider: AiProvider) => deleteKey(provider),
-    onSuccess: (_result, provider) => {
+    onSuccess: async (_result, provider) => {
       // Remove the detail query for the deleted provider
       queryClient.removeQueries({ queryKey: apiKeyKeys.detail(provider).queryKey });
       // Invalidate the list query to refresh the API keys list
       void queryClient.invalidateQueries({ queryKey: apiKeyKeys.list.queryKey });
+
+      // Clear cached OpenRouter models when OpenRouter key is deleted
+      if (provider === 'openrouter') {
+        await clearOpenRouterModels();
+        void queryClient.invalidateQueries({ queryKey: openRouterModelsKeys.list.queryKey });
+      }
     },
   });
 }
@@ -57,14 +65,21 @@ export function useEncryptionAvailable() {
 export function useSetApiKey() {
   const queryClient = useQueryClient();
   const { set } = useElectronApiKeys();
+  const { fetch: fetchOpenRouterModels } = useElectronOpenRouterModels();
 
   return useMutation({
     mutationFn: (input: SetApiKeyInput) => set(input),
-    onSuccess: (_result, input) => {
+    onSuccess: async (_result, input) => {
       // Invalidate the specific provider's detail query
       void queryClient.invalidateQueries({ queryKey: apiKeyKeys.detail(input.provider).queryKey });
       // Invalidate the list query to refresh all API keys
       void queryClient.invalidateQueries({ queryKey: apiKeyKeys.list.queryKey });
+
+      // Auto-fetch OpenRouter models when OpenRouter key is added/updated
+      if (input.provider === 'openrouter') {
+        await fetchOpenRouterModels();
+        void queryClient.invalidateQueries({ queryKey: openRouterModelsKeys.list.queryKey });
+      }
     },
   });
 }
