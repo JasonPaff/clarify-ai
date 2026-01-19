@@ -175,39 +175,72 @@ function ApiKeysContent({ apiKeys, onDelete }: ApiKeysContentProps) {
   );
 }
 
-// Loading skeleton
+// Loading skeleton for categorized layout
 function ApiKeysSkeleton() {
   return (
-    <div className={'space-y-0'}>
-      {/* Table Header Skeleton */}
-      <div
-        className={`
-          grid grid-cols-[1fr_1fr_auto_1fr_auto] gap-4 rounded-t-lg border border-border
-          bg-muted/50 px-4 py-3
-        `}
-      >
-        <div className={'h-4 w-16 animate-pulse rounded-sm bg-muted'} />
-        <div className={'h-4 w-16 animate-pulse rounded-sm bg-muted'} />
-        <div className={'h-4 w-14 animate-pulse rounded-sm bg-muted'} />
-        <div className={'h-4 w-12 animate-pulse rounded-sm bg-muted'} />
-        <div className={'h-4 w-16 animate-pulse rounded-sm bg-muted'} />
-      </div>
-
-      {/* Table Rows Skeleton */}
-      <div className={'divide-y divide-border rounded-b-lg border border-t-0 border-border'}>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div className={'grid grid-cols-[1fr_1fr_auto_1fr_auto] items-center gap-4 px-4 py-3'} key={i}>
-            <div className={'h-6 w-24 animate-pulse rounded-full bg-muted'} />
-            <div className={'h-5 w-32 animate-pulse rounded-sm bg-muted'} />
-            <div className={'h-5 w-20 animate-pulse rounded-full bg-muted'} />
-            <div className={'h-5 w-28 animate-pulse rounded-sm bg-muted'} />
-            <div className={'flex justify-end gap-1'}>
-              <div className={'size-8 animate-pulse rounded-sm bg-muted'} />
-              <div className={'size-8 animate-pulse rounded-sm bg-muted'} />
+    <div className={'space-y-6'}>
+      {/* Category Skeletons - 4 categories */}
+      {Array.from({ length: 4 }).map((_, categoryIndex) => (
+        <div className={'space-y-3'} key={categoryIndex}>
+          {/* Category Header Skeleton */}
+          <div className={'flex items-center gap-2'}>
+            <div className={'size-6 animate-pulse rounded-md bg-muted'} />
+            <div className={'space-y-1'}>
+              <div className={'h-4 w-32 animate-pulse rounded-sm bg-muted'} />
+              <div className={'h-3 w-48 animate-pulse rounded-sm bg-muted'} />
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Category Table Skeleton */}
+          <div className={'overflow-hidden rounded-lg border border-border'}>
+            {/* Table Header Skeleton */}
+            <div
+              className={`
+                grid grid-cols-[1fr_minmax(120px,1fr)_auto_minmax(100px,1fr)_auto] gap-4 border-b
+                border-border bg-muted/50 px-4 py-2.5
+              `}
+            >
+              <div className={'h-3 w-16 animate-pulse rounded-sm bg-muted'} />
+              <div className={'h-3 w-20 animate-pulse rounded-sm bg-muted'} />
+              <div className={'h-3 w-14 animate-pulse rounded-sm bg-muted'} />
+              <div className={'h-3 w-24 animate-pulse rounded-sm bg-muted'} />
+              <div className={'h-3 w-14 animate-pulse rounded-sm bg-muted'} />
+            </div>
+
+            {/* Table Rows Skeleton - vary count by category position */}
+            <div className={'divide-y divide-border'}>
+              {Array.from({ length: getSkeletonRowCount(categoryIndex) }).map((_, rowIndex) => (
+                <div
+                  className={`
+                    grid grid-cols-[1fr_minmax(120px,1fr)_auto_minmax(100px,1fr)_auto] items-center
+                    gap-4 px-4 py-3
+                  `}
+                  key={rowIndex}
+                >
+                  <div className={'h-6 w-24 animate-pulse rounded-full bg-muted'} />
+                  <div className={'h-5 w-28 animate-pulse rounded-sm bg-muted'} />
+                  <div className={'h-5 w-16 animate-pulse rounded-full bg-muted'} />
+                  <div className={'h-5 w-20 animate-pulse rounded-sm bg-muted'} />
+                  <div className={'flex justify-end gap-1'}>
+                    <div className={'size-8 animate-pulse rounded-sm bg-muted'} />
+                    <div className={'size-8 animate-pulse rounded-sm bg-muted'} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Category Status Skeleton */}
+          <div className={'h-3 w-28 animate-pulse rounded-sm bg-muted'} />
+        </div>
+      ))}
     </div>
   );
+}
+
+/** Returns the number of skeleton rows based on category index */
+function getSkeletonRowCount(categoryIndex: number): number {
+  // Match expected provider counts: major=3, emerging=6, enterprise=2, local=1
+  const rowCounts = [3, 6, 2, 1];
+  return rowCounts[categoryIndex] ?? 2;
 }

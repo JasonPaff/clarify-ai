@@ -7,6 +7,7 @@ import type {
   ApiKeyProvider,
   CollectRepositoryDataResult,
   ElectronAPI,
+  ProviderCredentials,
   RepositoryOverviewGenerateRequest,
   RepositoryOverviewStreamChunk,
   SetApiKeyInput,
@@ -110,9 +111,9 @@ export function useElectronApiKeys() {
   );
 
   const test = useCallback(
-    async (provider: ApiKeyProvider, apiKey?: string): Promise<{ error?: string; success: boolean }> => {
+    async (provider: ApiKeyProvider, credentials?: ProviderCredentials): Promise<{ error?: string; success: boolean }> => {
       if (!api) return { error: 'Not running in Electron', success: false };
-      return api.apiKeys.test(provider, apiKey);
+      return api.apiKeys.test(provider, credentials);
     },
     [api]
   );

@@ -13,13 +13,44 @@ export type {
   RepositoryOverviewStreamChunk,
 } from '../electron/ipc/ai-overview.handlers';
 
-// Re-export API key types for renderer use
-export type { ApiKeyInfo, ApiKeyProvider, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
-
+// Re-export API key types for renderer use (excluding ApiKeyProvider and ProviderCredentials which come from provider-types)
+export type { ApiKeyInfo, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
 // Re-export file system types for renderer use
 export type { CollectRepositoryDataResult, DetectedFramework, RepositoryData } from '../electron/ipc/fs.handlers';
 
+// Re-export provider types from centralized module (single source of truth)
+export type {
+  ApiKeyProvider,
+  ProviderAuthType,
+  ProviderCategory,
+  ProviderConfig,
+  ProviderCredentials,
+} from '../electron/ipc/lib/provider-types';
+
+export {
+  ALL_PROVIDERS,
+  getMajorProviders,
+  getOptionalCredentialFields,
+  getProviderDisplayName,
+  getProviderEnvVar,
+  getProvidersByCategory,
+  getRequiredCredentialFields,
+  isValidProvider,
+  PROVIDER_CATEGORIES,
+  PROVIDER_CONFIGS,
+  PROVIDER_DISPLAY_NAMES,
+  PROVIDER_ENV_VARS,
+  providerRequiresAdditionalConfig,
+  providerRequiresApiKey,
+  validateProviderCredentials,
+} from '../electron/ipc/lib/provider-types';
+
+/**
+ * Electron API exposed to the renderer process via context bridge.
+ * Provides access to native capabilities, database operations, and AI functionality.
+ */
 export interface ElectronAPI {
+  /** AI-related operations including clarification and repository overview generation */
   ai: {
     clarification: {
       cancel(): Promise<void>;
@@ -40,21 +71,46 @@ export interface ElectronAPI {
       ): () => void;
     };
   };
+  /**
+   * API key management for AI providers.
+   * Supports multiple authentication types:
+   * - Standard API keys (most providers)
+   * - Azure OpenAI (endpoint + deployment name + API key)
+   * - AWS Bedrock (access key + secret key + region)
+   * - Ollama (endpoint only, no authentication required)
+   */
   apiKeys: {
+    /** Delete stored credentials for a provider */
     delete(
-      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
+      provider: import('../electron/ipc/lib/provider-types').ApiKeyProvider
     ): Promise<{ error?: string; success: boolean }>;
-    get(
-      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider
-    ): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }>;
+    /**
+     * Get credentials for a provider (decrypted for API calls).
+     * Returns the full ProviderCredentials object for complex auth types.
+     */
+    get(provider: import('../electron/ipc/lib/provider-types').ApiKeyProvider): Promise<{
+      /** Full credentials object including API key, endpoint, region, etc. */
+      credentials?: import('../electron/ipc/lib/provider-types').ProviderCredentials;
+      error?: string;
+      /** Backward compatible: API key value (same as credentials.apiKey) */
+      key?: string;
+      source?: 'environment' | 'user';
+    }>;
+    /** Get info for all configured providers (masked values for display) */
     getAll(): Promise<Array<import('../electron/ipc/api-keys.handlers').ApiKeyInfo>>;
+    /** Check if secure storage encryption is available on this system */
     isEncryptionAvailable(): Promise<boolean>;
+    /**
+     * Store credentials for a provider.
+     * Input includes all fields needed for the provider's auth type.
+     */
     set(
       input: import('../electron/ipc/api-keys.handlers').SetApiKeyInput
     ): Promise<{ error?: string; success: boolean }>;
+    /** Test credentials by making a minimal API call to the provider */
     test(
-      provider: import('../electron/ipc/api-keys.handlers').ApiKeyProvider,
-      apiKey?: string
+      provider: import('../electron/ipc/lib/provider-types').ApiKeyProvider,
+      credentials?: import('../electron/ipc/lib/provider-types').ProviderCredentials
     ): Promise<{ error?: string; success: boolean }>;
   };
   app: {

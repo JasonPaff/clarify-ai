@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import type { AiProvider } from '@/lib/queries/api-keys';
-import type { SetApiKeyInput } from '@/types/electron';
+import type { ProviderCredentials, SetApiKeyInput } from '@/types/electron';
 
 import { apiKeyKeys } from '@/lib/queries/api-keys';
 
@@ -73,6 +73,7 @@ export function useTestApiKey() {
   const { test } = useElectronApiKeys();
 
   return useMutation({
-    mutationFn: ({ apiKey, provider }: { apiKey?: string; provider: AiProvider }) => test(provider, apiKey),
+    mutationFn: ({ credentials, provider }: { credentials?: ProviderCredentials; provider: AiProvider }) =>
+      test(provider, credentials),
   });
 }

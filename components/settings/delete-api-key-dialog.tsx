@@ -2,12 +2,11 @@
 
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 
-import type { ApiKeyInfo } from '@/types/electron';
-
 import { Button } from '@/components/ui/button';
 import { useDeleteApiKey } from '@/hooks/queries/use-api-keys';
 import { useControllableState } from '@/hooks/use-controllable-state';
 import { cn } from '@/lib/utils';
+import { ApiKeyInfo, PROVIDER_DISPLAY_NAMES } from '@/types/electron';
 
 type DeleteApiKeyDialogProps = Children & {
   apiKey: ApiKeyInfo;
@@ -104,10 +103,5 @@ export function DeleteApiKeyDialog({ apiKey, children, onOpenChange, open: contr
 
 // Helper function to format provider names
 const getProviderDisplayName = (provider: ApiKeyInfo['provider']): string => {
-  const displayNames: Record<ApiKeyInfo['provider'], string> = {
-    anthropic: 'Anthropic',
-    google: 'Google',
-    openai: 'OpenAI',
-  };
-  return displayNames[provider];
+  return PROVIDER_DISPLAY_NAMES[provider];
 };
