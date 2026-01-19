@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
+import { useSetFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useControllableState } from '@/hooks/use-controllable-state';
 
@@ -44,6 +45,7 @@ export function EditFeatureRequestDialog({
   });
 
   const updateFeatureRequest = useUpdateFeatureRequest();
+  const setRepositories = useSetFeatureRequestRepositories();
 
   const handleSubmit = async (values: EditFeatureRequestFormValues) => {
     const updatedFeatureRequest = await updateFeatureRequest.mutateAsync({
@@ -56,6 +58,11 @@ export function EditFeatureRequestDialog({
     });
 
     if (updatedFeatureRequest) {
+      // Save repository associations (replaces existing)
+      await setRepositories.mutateAsync({
+        featureRequestId: featureRequest.id,
+        repositoryIds: values.repositoryIds,
+      });
       setIsOpen(false);
     }
   };

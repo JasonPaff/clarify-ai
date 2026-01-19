@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
+import { useSetFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCreateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 
 import { CreateFeatureRequestForm } from './create-feature-request-form';
@@ -31,6 +32,7 @@ export function NewFeatureRequestDialog({ children, projectId }: NewFeatureReque
   const [isOpen, setIsOpen] = useState(false);
 
   const createFeatureRequest = useCreateFeatureRequest();
+  const setRepositories = useSetFeatureRequestRepositories();
 
   const handleSubmit = async (values: CreateFeatureRequestFormValues) => {
     const featureRequest = await createFeatureRequest.mutateAsync({
@@ -40,6 +42,13 @@ export function NewFeatureRequestDialog({ children, projectId }: NewFeatureReque
     });
 
     if (featureRequest) {
+      // Save repository associations if any were selected
+      if (values.repositoryIds && values.repositoryIds.length > 0) {
+        await setRepositories.mutateAsync({
+          featureRequestId: featureRequest.id,
+          repositoryIds: values.repositoryIds,
+        });
+      }
       setIsOpen(false);
     }
   };
