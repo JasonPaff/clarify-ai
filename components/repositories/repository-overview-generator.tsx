@@ -247,7 +247,7 @@ export const RepositoryOverviewGenerator = ({
       {supportsThinking && hasReasoningContent && (
         <Reasoning isStreaming={isReasoningStreaming}>
           <ReasoningTrigger />
-          <ReasoningContent>{reasoningContent}</ReasoningContent>
+          <ReasoningContent className={'h-36'}>{reasoningContent}</ReasoningContent>
         </Reasoning>
       )}
 

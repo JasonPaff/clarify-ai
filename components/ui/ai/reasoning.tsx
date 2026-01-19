@@ -2,11 +2,13 @@
 
 import type { ComponentProps, ReactNode } from 'react';
 
-import { BrainIcon, ChevronDownIcon } from 'lucide-react';
-import { createContext, Fragment, memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDownIcon, BrainIcon, ChevronDownIcon } from 'lucide-react';
+import { createContext, Fragment, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Streamdown } from 'streamdown';
+import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom';
 
 import { Shimmer } from '@/components/ui/ai/shimmer';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useControllableState } from '@/hooks/use-controllable-state';
 import { cn } from '@/lib/utils';
@@ -156,17 +158,48 @@ export type ReasoningContentProps = ComponentProps<typeof CollapsibleContent> & 
 export const ReasoningContent = memo(({ children, className, ...props }: ReasoningContentProps) => (
   <CollapsibleContent
     className={cn(
-      'mt-4 max-h-36 overflow-y-auto text-sm text-muted-foreground outline-none',
+      'text-sm text-muted-foreground outline-none',
       'data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-top-2',
       'data-open:animate-in data-open:slide-in-from-top-2',
       className
     )}
     {...props}
   >
-    <Streamdown>{children}</Streamdown>
+    <StickToBottom className={'relative flex-1 overflow-y-hidden'} initial={'smooth'} resize={'smooth'}>
+      <StickToBottom.Content className={'flex flex-col'}>
+        <Streamdown>{children}</Streamdown>
+      </StickToBottom.Content>
+      <ReasoningScrollButton />
+    </StickToBottom>
   </CollapsibleContent>
 ));
+
+type ReasoningScrollButtonProps = ComponentProps<typeof Button>;
+
+export const ReasoningScrollButton = memo(({ className, ...props }: ReasoningScrollButtonProps) => {
+  const { isAtBottom, scrollToBottom } = useStickToBottomContext();
+
+  const handleScrollToBottom = useCallback(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
+
+  return (
+    !isAtBottom && (
+      <Button
+        className={cn('absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full', className)}
+        onClick={handleScrollToBottom}
+        size={'icon'}
+        type={'button'}
+        variant={'outline'}
+        {...props}
+      >
+        <ArrowDownIcon className={'size-4'} />
+      </Button>
+    )
+  );
+});
 
 Reasoning.displayName = 'Reasoning';
 ReasoningTrigger.displayName = 'ReasoningTrigger';
 ReasoningContent.displayName = 'ReasoningContent';
+ReasoningScrollButton.displayName = 'ReasoningScrollButton';
