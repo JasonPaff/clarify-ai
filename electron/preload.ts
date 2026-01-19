@@ -65,10 +65,7 @@ export interface ElectronAPI {
       deleteByRepositoryId(repositoryId: number): Promise<boolean>;
       getByRepositoryId(repositoryId: number): Promise<RepositoryOverview | undefined>;
       update(id: number, data: Partial<NewRepositoryOverview>): Promise<RepositoryOverview | undefined>;
-      upsert(
-        repositoryId: number,
-        data: Omit<NewRepositoryOverview, 'repositoryId'>
-      ): Promise<RepositoryOverview>;
+      upsert(repositoryId: number, data: Omit<NewRepositoryOverview, 'repositoryId'>): Promise<RepositoryOverview>;
     };
   };
   dialog: {
@@ -182,8 +179,7 @@ const electronAPI: ElectronAPI = {
       getByRepositoryId: (repositoryId) =>
         ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.getByRepositoryId, repositoryId),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.update, id, data),
-      upsert: (repositoryId, data) =>
-        ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.upsert, repositoryId, data),
+      upsert: (repositoryId, data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.upsert, repositoryId, data),
     },
   },
   dialog: {
@@ -192,8 +188,7 @@ const electronAPI: ElectronAPI = {
     saveFile: (defaultPath, filters) => ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
   },
   fs: {
-    collectRepositoryData: (repositoryPath) =>
-      ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),
+    collectRepositoryData: (repositoryPath) => ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),
     exists: (path) => ipcRenderer.invoke(IpcChannels.fs.exists, path),
     readDirectory: (path) => ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
     readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),

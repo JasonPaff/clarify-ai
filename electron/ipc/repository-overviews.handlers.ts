@@ -1,7 +1,7 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
 
-import type { RepositoryOverviewsRepository } from '../../db/repositories/repository-overviews.repository';
-import type { NewRepositoryOverview, RepositoryOverview } from '../../db/schema/repository-overviews.schema';
+import type { RepositoryOverviewsRepository } from '@/db/repositories/repository-overviews.repository';
+import type { NewRepositoryOverview, RepositoryOverview } from '@/db/schema/repository-overviews.schema';
 
 import { IpcChannels } from './channels';
 
@@ -10,7 +10,7 @@ export function registerRepositoryOverviewsHandlers(
 ): void {
   ipcMain.handle(
     IpcChannels.db.repositoryOverviews.getByRepositoryId,
-    (_event: IpcMainInvokeEvent, repositoryId: number): RepositoryOverview | null => {
+    (_event: IpcMainInvokeEvent, repositoryId: number): null | RepositoryOverview => {
       return repositoryOverviewsRepository.getByRepositoryId(repositoryId);
     }
   );
@@ -24,7 +24,7 @@ export function registerRepositoryOverviewsHandlers(
 
   ipcMain.handle(
     IpcChannels.db.repositoryOverviews.update,
-    (_event: IpcMainInvokeEvent, id: number, data: Partial<NewRepositoryOverview>): RepositoryOverview | null => {
+    (_event: IpcMainInvokeEvent, id: number, data: Partial<NewRepositoryOverview>): null | RepositoryOverview => {
       return repositoryOverviewsRepository.update(id, data);
     }
   );
@@ -40,12 +40,9 @@ export function registerRepositoryOverviewsHandlers(
     }
   );
 
-  ipcMain.handle(
-    IpcChannels.db.repositoryOverviews.delete,
-    (_event: IpcMainInvokeEvent, id: number): boolean => {
-      return repositoryOverviewsRepository.delete(id);
-    }
-  );
+  ipcMain.handle(IpcChannels.db.repositoryOverviews.delete, (_event: IpcMainInvokeEvent, id: number): boolean => {
+    return repositoryOverviewsRepository.delete(id);
+  });
 
   ipcMain.handle(
     IpcChannels.db.repositoryOverviews.deleteByRepositoryId,

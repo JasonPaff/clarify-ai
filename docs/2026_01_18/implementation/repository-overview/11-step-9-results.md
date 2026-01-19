@@ -12,11 +12,13 @@
 ## Component Features
 
 ### RepositoryOverviewDialog
+
 - Main dialog with generation and view modes
 - Auto-switches mode based on existing overview
 - Uses Base UI Dialog component
 
 ### RepositoryOverviewGenerator
+
 - Model selector dropdown
 - Optional custom prompt input
 - Real-time streaming output display
@@ -24,6 +26,7 @@
 - Actions: Generate, Cancel, Regenerate, Save Overview
 
 ### RepositoryOverviewViewer
+
 - Read-only text display (view mode)
 - Edit mode with markdown textarea
 - "Manually Edited" badge
@@ -32,6 +35,7 @@
 - Metadata display (dates, model)
 
 ### RepositoryOverviewMarkdown
+
 - Simple text renderer
 - Streaming indicator (animated cursor)
 
@@ -39,7 +43,7 @@
 
 ```typescript
 interface RepositoryOverviewDialogProps {
-  children: ReactNode;  // Trigger element
+  children: ReactNode; // Trigger element
   repositoryId: number;
   repositoryName: string;
   repositoryPath: string;

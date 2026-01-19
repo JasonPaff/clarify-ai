@@ -1,11 +1,12 @@
 'use client';
 
-import { AlertCircle, Loader2, RefreshCw, Save, X } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw, Save, Square } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
+import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,9 +14,8 @@ import { useElectronAiOverview } from '@/hooks/useElectron';
 import { cn } from '@/lib/utils';
 
 import { ModelSelector } from '../features/clarification/model-selector';
-import { RepositoryOverviewMarkdown } from './repository-overview-markdown';
 
-type GenerationStatus = 'complete' | 'error' | 'generating' | 'idle';
+type GenerationStatus = 'complete' | 'error' | 'generating' | 'idle' | 'stopped';
 
 type RepositoryOverviewGeneratorProps = ClassName & {
   onCancel: () => void;
@@ -74,6 +74,13 @@ export const RepositoryOverviewGenerator = ({
     };
   }, [handleStreamChunk, subscribeToStream]);
 
+  // Cancel any active generation when component unmounts (e.g., dialog closed)
+  useEffect(() => {
+    return () => {
+      cancel();
+    };
+  }, [cancel]);
+
   const handleGenerate = async () => {
     if (!selectedModel) return;
 
@@ -92,6 +99,12 @@ export const RepositoryOverviewGenerator = ({
       setError(result.error ?? 'Failed to start generation');
       setStatus('error');
     }
+  };
+
+  const handleStopGeneration = async () => {
+    await cancel();
+    setStatus('stopped');
+    // Keep the streaming content so user can read/save partial output
   };
 
   const handleCancelGeneration = async () => {
@@ -118,13 +131,14 @@ export const RepositoryOverviewGenerator = ({
 
   const isGenerating = status === 'generating';
   const isComplete = status === 'complete';
+  const isStopped = status === 'stopped';
   const isError = status === 'error';
   const isIdle = status === 'idle';
 
   const hasStreamingContent = streamingContent.length > 0;
-  const shouldShowContent = (isGenerating || isComplete || isError) && hasStreamingContent;
-  const isCompleteOrError = isComplete || isError;
-  const canSave = isComplete && hasStreamingContent;
+  const shouldShowContent = (isGenerating || isComplete || isStopped || isError) && hasStreamingContent;
+  const isFinishedState = isComplete || isStopped || isError;
+  const canSave = (isComplete || isStopped) && hasStreamingContent;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -186,15 +200,31 @@ export const RepositoryOverviewGenerator = ({
         </Alert>
       )}
 
-      {/* Streaming/Complete Content Display */}
-      {shouldShowContent && (
+      {/* Stopped State Indicator */}
+      {isStopped && (
         <div
           className={`
-            max-h-96 overflow-y-auto rounded-md border border-border bg-muted/30 p-4
+            flex items-center gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2
           `}
         >
-          <RepositoryOverviewMarkdown content={streamingContent} isStreaming={isGenerating} />
+          <Square className={'size-4 fill-amber-600 text-amber-600'} />
+          <span className={'text-sm text-amber-600'}>
+            Generation stopped - partial content shown below
+          </span>
         </div>
+      )}
+
+      {/* Streaming/Complete Content Display */}
+      {shouldShowContent && (
+        <Conversation className={'max-h-96 rounded-md border border-border bg-muted/30'}>
+          <ConversationContent className={'gap-0 p-4'}>
+            <div className={'text-sm/relaxed whitespace-pre-wrap text-foreground'}>
+              {streamingContent}
+              {isGenerating && <span className={'ml-0.5 animate-pulse'}>|</span>}
+            </div>
+          </ConversationContent>
+          <ConversationScrollButton />
+        </Conversation>
       )}
 
       {/* Generating State Placeholder */}
@@ -219,13 +249,18 @@ export const RepositoryOverviewGenerator = ({
         )}
 
         {isGenerating && (
-          <Button onClick={handleCancelGeneration} variant={'outline'}>
-            <X className={'mr-2 size-4'} />
-            Cancel
-          </Button>
+          <Fragment>
+            <Button onClick={handleCancelGeneration} variant={'ghost'}>
+              Cancel
+            </Button>
+            <Button onClick={handleStopGeneration} variant={'outline'}>
+              <Square className={'mr-2 size-4'} />
+              Stop
+            </Button>
+          </Fragment>
         )}
 
-        {isCompleteOrError && (
+        {isFinishedState && (
           <Fragment>
             <Button onClick={onCancel} variant={'ghost'}>
               Close

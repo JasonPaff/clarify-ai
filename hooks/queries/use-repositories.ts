@@ -70,10 +70,7 @@ export function useRepositories(projectId: number) {
  */
 export function useRepositoriesWithOverviewStatus(projectId: number) {
   const repositoriesQuery = useRepositories(projectId);
-  const repositoryIds = useMemo(
-    () => repositoriesQuery.data?.map((repo) => repo.id) ?? [],
-    [repositoriesQuery.data]
-  );
+  const repositoryIds = useMemo(() => repositoriesQuery.data?.map((repo) => repo.id) ?? [], [repositoriesQuery.data]);
   const overviewStatusesQuery = useRepositoryOverviewStatuses(repositoryIds);
 
   // Combine repositories with their overview statuses

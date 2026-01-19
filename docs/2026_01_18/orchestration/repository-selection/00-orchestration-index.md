@@ -7,6 +7,7 @@
 ## Workflow Overview
 
 This orchestration transforms the feature request through a multi-step AI workflow:
+
 1. Clarification (conditional) - Gather clarifying questions if needed
 2. Feature Refinement - Enhance request with project context
 3. File Discovery - Identify all relevant files
@@ -31,12 +32,12 @@ Add repository selection to the feature request workflow with the following appr
 
 ## Execution Summary
 
-| Step | Status | Details |
-|------|--------|---------|
-| 0a - Clarification | Skipped | Request scored 4/5 (sufficiently detailed) |
-| 1 - Refinement | Complete | Expanded to ~350 words with technical context |
-| 2 - File Discovery | Complete | 28+ files discovered across 12 directories |
-| 3 - Planning | Complete | 23-step implementation plan generated |
+| Step               | Status   | Details                                       |
+| ------------------ | -------- | --------------------------------------------- |
+| 0a - Clarification | Skipped  | Request scored 4/5 (sufficiently detailed)    |
+| 1 - Refinement     | Complete | Expanded to ~350 words with technical context |
+| 2 - File Discovery | Complete | 28+ files discovered across 12 directories    |
+| 3 - Planning       | Complete | 23-step implementation plan generated         |
 
 ## Output
 

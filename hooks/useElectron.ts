@@ -244,10 +244,7 @@ export function useElectronDb() {
         if (!api) return Promise.resolve(null);
         return api.db.repositoryOverviews.getByRepositoryId(repositoryId);
       },
-      update: (
-        id: number,
-        data: Parameters<NonNullable<typeof api>['db']['repositoryOverviews']['update']>[1]
-      ) => {
+      update: (id: number, data: Parameters<NonNullable<typeof api>['db']['repositoryOverviews']['update']>[1]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.repositoryOverviews.update(id, data);
       },

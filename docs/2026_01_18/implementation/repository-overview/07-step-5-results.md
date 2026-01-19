@@ -35,7 +35,7 @@ interface RepositoryWithOverviewStatus extends Repository {
 ```typescript
 const { data: repositories } = useRepositoriesWithOverviewStatus(projectId);
 
-repositories.forEach(repo => {
+repositories.forEach((repo) => {
   console.log(repo.overviewStatus.hasOverview);
   console.log(repo.overviewStatus.generatedAt);
   console.log(repo.overviewStatus.isManuallyEdited);

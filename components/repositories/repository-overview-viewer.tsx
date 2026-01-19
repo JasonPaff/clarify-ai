@@ -134,13 +134,9 @@ export const RepositoryOverviewViewer = ({
 
       {/* Metadata */}
       <div className={'flex flex-wrap gap-4 text-xs text-muted-foreground'}>
-        {overview.generatedAt && (
-          <span>Generated: {new Date(overview.generatedAt).toLocaleDateString()}</span>
-        )}
+        {overview.generatedAt && <span>Generated: {new Date(overview.generatedAt).toLocaleDateString()}</span>}
         {overview.modelId && <span>Model: {overview.modelId}</span>}
-        {overview.lastEditedAt && (
-          <span>Last edited: {new Date(overview.lastEditedAt).toLocaleDateString()}</span>
-        )}
+        {overview.lastEditedAt && <span>Last edited: {new Date(overview.lastEditedAt).toLocaleDateString()}</span>}
       </div>
     </div>
   );

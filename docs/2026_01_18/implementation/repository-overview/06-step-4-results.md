@@ -14,15 +14,17 @@
 ## Query Keys
 
 ```typescript
-repositoryOverviewKeys.byRepositoryId(repositoryId)
+repositoryOverviewKeys.byRepositoryId(repositoryId);
 ```
 
 ## Hooks Created
 
 ### Query Hook
+
 - `useRepositoryOverview(repositoryId)` - Fetch overview for a specific repository
 
 ### Mutation Hooks
+
 - `useCreateRepositoryOverview()` - Create new overview
 - `useUpdateRepositoryOverview()` - Update existing overview by ID
 - `useUpsertRepositoryOverview()` - Create or update by repository ID

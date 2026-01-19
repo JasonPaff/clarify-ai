@@ -17,11 +17,7 @@ export type {
 export type { ApiKeyInfo, ApiKeyProvider, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
 
 // Re-export file system types for renderer use
-export type {
-  CollectRepositoryDataResult,
-  DetectedFramework,
-  RepositoryData,
-} from '../electron/ipc/fs.handlers';
+export type { CollectRepositoryDataResult, DetectedFramework, RepositoryData } from '../electron/ipc/fs.handlers';
 
 export interface ElectronAPI {
   ai: {

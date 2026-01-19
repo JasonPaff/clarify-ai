@@ -29,10 +29,7 @@ export function useCreateRepositoryOverview() {
     mutationFn: (data: Parameters<typeof repositoryOverviews.create>[0]) => repositoryOverviews.create(data),
     onSuccess: (overview) => {
       if (overview) {
-        queryClient.setQueryData(
-          repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey,
-          overview
-        );
+        queryClient.setQueryData(repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey, overview);
       }
     },
   });
@@ -133,10 +130,7 @@ export function useUpdateRepositoryOverview() {
       repositoryOverviews.update(id, data),
     onSuccess: (overview) => {
       if (overview) {
-        queryClient.setQueryData(
-          repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey,
-          overview
-        );
+        queryClient.setQueryData(repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey, overview);
       }
     },
   });
@@ -156,10 +150,7 @@ export function useUpsertRepositoryOverview() {
     }) => repositoryOverviews.upsert(repositoryId, data),
     onSuccess: (overview) => {
       if (overview) {
-        queryClient.setQueryData(
-          repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey,
-          overview
-        );
+        queryClient.setQueryData(repositoryOverviewKeys.byRepositoryId(overview.repositoryId).queryKey, overview);
       }
     },
   });

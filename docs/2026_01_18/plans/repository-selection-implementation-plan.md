@@ -5,11 +5,11 @@
 
 ## Overview
 
-| Field | Value |
-|-------|-------|
-| Estimated Duration | 2-3 days |
-| Complexity | Medium-High |
-| Risk Level | Medium |
+| Field              | Value       |
+| ------------------ | ----------- |
+| Estimated Duration | 2-3 days    |
+| Complexity         | Medium-High |
+| Risk Level         | Medium      |
 
 ## Quick Summary
 
@@ -32,9 +32,11 @@ This feature adds repository selection to the feature request workflow by implem
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/schema/feature-request-repositories.schema.ts` - Junction table schema with composite unique constraint
 
 **Changes:**
+
 - Define `featureRequestRepositories` table with `id`, `featureRequestId`, `repositoryId`, `createdAt` columns
 - Add foreign key references to `feature_requests` and `repositories` with `onDelete: 'cascade'`
 - Add composite unique index on `featureRequestId` and `repositoryId` to prevent duplicates
@@ -42,11 +44,13 @@ This feature adds repository selection to the feature request workflow by implem
 - Export `FeatureRequestRepository` and `NewFeatureRequestRepository` types using `$inferSelect` and `$inferInsert`
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file exports table definition and inferred types
 - [ ] Foreign key references use cascade delete
 - [ ] Composite unique constraint prevents duplicate associations
@@ -63,20 +67,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/index.ts` - Import and spread the new schema
 - `drizzle.config.ts` - Add schema file path to the schema array
 
 **Changes:**
+
 - Import `* as featureRequestRepositoriesSchema` from the new schema file in `db/index.ts`
 - Spread `featureRequestRepositoriesSchema` into the combined schema object
 - Add `'./db/schema/feature-request-repositories.schema.ts'` to the schema array in `drizzle.config.ts`
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema is properly imported and merged in `db/index.ts`
 - [ ] Drizzle config includes the new schema file path
 - [ ] All validation commands pass
@@ -92,17 +100,21 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - Migration file in `drizzle/` (auto-generated)
 
 **Changes:**
+
 - Run `pnpm db:generate` to create migration SQL
 
 **Validation Commands:**
+
 ```bash
 pnpm db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file is generated in `drizzle/` directory
 - [ ] Migration creates `feature_request_repositories` table with correct schema
 - [ ] Foreign key constraints and indexes are included in migration
@@ -119,9 +131,11 @@ pnpm db:generate
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/repositories/feature-request-repositories.repository.ts` - Repository implementation
 
 **Changes:**
+
 - Define `FeatureRequestRepositoriesRepository` interface with methods: `getByFeatureRequestId`, `setForFeatureRequest`, `addToFeatureRequest`, `removeFromFeatureRequest`
 - Implement `createFeatureRequestRepositoriesRepository` factory function
 - `getByFeatureRequestId` returns array of repository IDs for a feature request
@@ -130,11 +144,13 @@ pnpm db:generate
 - `removeFromFeatureRequest` removes a single association
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Repository interface defines all required methods
 - [ ] Factory function returns properly typed repository object
 - [ ] `setForFeatureRequest` handles the "replace all" pattern efficiently
@@ -151,19 +167,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add new channel definitions
 
 **Changes:**
+
 - Add `featureRequestRepositories` object to `IpcChannels.db` namespace
 - Define channels: `getByFeatureRequestId`, `setForFeatureRequest`, `addToFeatureRequest`, `removeFromFeatureRequest`
 - Follow naming pattern: `'db:featureRequestRepositories:methodName'`
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New channels added alphabetically within `db` namespace
 - [ ] Channel names follow established naming convention
 - [ ] All validation commands pass
@@ -179,9 +199,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/feature-request-repositories.handlers.ts` - IPC handler registration
 
 **Changes:**
+
 - Import `FeatureRequestRepositoriesRepository` type from the repository file
 - Import `IpcChannels` for channel constants
 - Create `registerFeatureRequestRepositoriesHandlers` function taking repository as parameter
@@ -189,11 +211,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Each handler calls corresponding repository method with validated parameters
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Handler function exports with correct signature
 - [ ] All channels have corresponding handlers registered
 - [ ] Handlers properly delegate to repository methods
@@ -210,9 +234,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/register-handlers.ts` - Import and call new handler registration
 
 **Changes:**
+
 - Import `createFeatureRequestRepositoriesRepository` from the repository file
 - Import `registerFeatureRequestRepositoriesHandlers` from the handlers file
 - Create repository instance using `createFeatureRequestRepositoriesRepository(db)`
@@ -220,11 +246,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Add appropriate comment grouping like existing handlers
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Import statements added for repository and handlers
 - [ ] Repository created and handlers registered in correct order
 - [ ] Follows existing pattern with comment blocks
@@ -241,19 +269,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Add to ElectronAPI interface and implementation
 
 **Changes:**
+
 - Add `featureRequestRepositories` object to `ElectronAPI.db` interface with method signatures
 - Implement the methods in the `electronAPI` object using `ipcRenderer.invoke` with correct channels
 - Methods: `getByFeatureRequestId`, `setForFeatureRequest`, `addToFeatureRequest`, `removeFromFeatureRequest`
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Interface methods match handler signatures
 - [ ] Implementation uses correct IPC channels
 - [ ] Methods alphabetically sorted within `db.featureRequestRepositories`
@@ -270,19 +302,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `types/electron.d.ts` - Add type re-exports and interface
 
 **Changes:**
+
 - Add type re-exports for `FeatureRequestRepository` and `NewFeatureRequestRepository` from schema
 - Add `featureRequestRepositories` object to `ElectronAPI.db` interface matching preload
 - Use `import()` syntax for types like existing patterns
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Type exports added at top of file
 - [ ] Interface matches preload script exactly
 - [ ] Import syntax follows existing pattern
@@ -299,20 +335,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/useElectron.ts` - Add featureRequestRepositories to useElectronDb
 
 **Changes:**
+
 - Add `featureRequestRepositories` to the return object of `useElectronDb`
 - Create `useMemo` block similar to other entities
 - Implement wrapper methods: `getByFeatureRequestId`, `setForFeatureRequest`, `addToFeatureRequest`, `removeFromFeatureRequest`
 - Handle null API case appropriately
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook exports featureRequestRepositories in return object
 - [ ] Methods properly wrapped with API null checks
 - [ ] Follows existing memoization pattern
@@ -329,22 +369,27 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/feature-request-repositories.ts` - Query key factory
 
 **Files to Modify:**
+
 - `lib/queries/index.ts` - Merge new query keys
 
 **Changes:**
+
 - Create `featureRequestRepositoryKeys` using `createQueryKeys` with domain name `'featureRequestRepositories'`
 - Define key: `byFeatureRequest: (featureRequestId: number) => [featureRequestId]`
 - Import and add to `mergeQueryKeys` call in index.ts
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query key factory exports correctly
 - [ ] Keys merged into main queries object
 - [ ] Follows existing naming conventions
@@ -361,9 +406,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-feature-request-repositories.ts` - Query and mutation hooks
 
 **Changes:**
+
 - Create `useFeatureRequestRepositories(featureRequestId: number)` query hook
 - Create `useSetFeatureRequestRepositories()` mutation hook for replacing all associations
 - Create `useAddFeatureRequestRepository()` mutation hook for adding single association
@@ -371,11 +418,13 @@ pnpm run lint:fix && pnpm run typecheck
 - All mutations invalidate `byFeatureRequest` query key on success
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query hook returns repository IDs array with loading/error states
 - [ ] Mutation hooks properly invalidate caches
 - [ ] Hooks use `useElectronDb` for IPC access
@@ -392,22 +441,27 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/validations/feature-request-repositories.ts` - Validation schemas
 
 **Files to Modify:**
+
 - `lib/validations/feature-request.ts` - Extend existing schemas
 
 **Changes:**
+
 - Create `repositoryIdsSchema` as `z.array(z.number().int().positive()).optional()` for create/edit forms
 - Create `requiredRepositoryIdsSchema` as `z.array(z.number().int().positive()).min(1, 'At least one repository must be selected')` for research step
 - Add `repositoryIds` field to create/edit schemas using optional schema
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Optional schema allows empty array or undefined
 - [ ] Required schema enforces minimum 1 selection with error message
 - [ ] Existing form schemas extended with new field
@@ -424,9 +478,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `components/ui/form/multi-select-field.tsx` - Multi-select field component
 
 **Changes:**
+
 - Create `MultiSelectField` component following CheckboxField and SelectField patterns
 - Accept props: `label`, `description`, `options` (array of `{value, label}`), `isDisabled`, `size`
 - Use `useFieldContext<Array<number>>()` for array value type
@@ -435,11 +491,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Display validation error state using `TanStackFieldRoot` wrapper
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component accepts options array and manages array value state
 - [ ] Selection changes properly update form field value
 - [ ] Error state displays when validation fails
@@ -457,18 +515,22 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/forms/form-hook.ts` - Register new field component
 
 **Changes:**
+
 - Import `MultiSelectField` from the new component file
 - Add `MultiSelectField` to the `fieldComponents` object
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component imported at top of file
 - [ ] Component registered in fieldComponents alphabetically
 - [ ] All validation commands pass
@@ -484,9 +546,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/repository-selector.tsx` - Repository selector wrapper
 
 **Changes:**
+
 - Create `RepositorySelector` component accepting `projectId` and form field props
 - Fetch repositories using `useRepositories(projectId)` hook
 - Transform repository data to options format: `{ value: repository.id, label: repository.name }`
@@ -494,11 +558,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Render `MultiSelectField` with transformed options
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component fetches repositories for given project
 - [ ] Options formatted correctly for MultiSelectField
 - [ ] Loading and empty states handled
@@ -515,9 +581,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/features/create-feature-request-form.tsx` - Add repository selector
 
 **Changes:**
+
 - Add `projectId: number` to component props interface
 - Add `repositoryIds: []` to form default values
 - Update `onSubmit` type to include `repositoryIds: Array<number>`
@@ -525,11 +593,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Add description text indicating selection is optional
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form includes repository selection field
 - [ ] Selection is visually marked as optional
 - [ ] Submit values include repositoryIds array
@@ -546,20 +616,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/features/new-feature-request-dialog.tsx` - Handle repository associations
 
 **Changes:**
+
 - Import `useSetFeatureRequestRepositories` mutation hook
 - Update `handleSubmit` to save repository associations after creation
 - Pass `projectId` to `CreateFeatureRequestForm` component
 - Chain mutations: create feature request, then set repository associations
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Repository associations saved after feature request creation
 - [ ] ProjectId passed to form for repository fetching
 - [ ] All validation commands pass
@@ -575,20 +649,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/features/edit-feature-request-form.tsx` - Add repository selector
 
 **Changes:**
+
 - Add `projectId: number` and `initialRepositoryIds: Array<number>` to props interface
 - Add `repositoryIds` to form default values using `initialRepositoryIds` prop
 - Update `onSubmit` type to include `repositoryIds: Array<number>`
 - Add `form.AppField` for `repositoryIds` field
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form loads with existing repository selections
 - [ ] Selection changes tracked in form state
 - [ ] Submit values include updated repositoryIds
@@ -605,9 +683,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/features/edit-feature-request-dialog.tsx` - Handle repository associations
 
 **Changes:**
+
 - Add `projectId: number` to props interface
 - Import and use `useFeatureRequestRepositories` query hook
 - Import `useSetFeatureRequestRepositories` mutation hook
@@ -615,11 +695,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Update `handleSubmit` to save repository associations
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Current associations loaded when dialog opens
 - [ ] Updated associations saved on form submit
 - [ ] All validation commands pass
@@ -635,9 +717,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `components/features/research-step.tsx` - Research step component
 
 **Changes:**
+
 - Create `ResearchStep` component accepting `featureRequest` and `projectId` props
 - Fetch current repository associations using `useFeatureRequestRepositories`
 - Create form with `repositoryIds` field and required validation schema
@@ -646,11 +730,13 @@ pnpm run lint:fix && pnpm run typecheck
 - On selection change, persist to junction table
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Pre-populated with existing repository associations
 - [ ] Required validation prevents proceeding without selection
 - [ ] Selection changes persist to junction table
@@ -668,19 +754,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` - Integrate ResearchStep
 
 **Changes:**
+
 - Import `ResearchStep` component
 - Add conditional rendering for `currentStep === 'research'`
 - Render `ResearchStep` with `featureRequest` and `projectId` props
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Research step renders ResearchStep component
 - [ ] Component receives required props
 - [ ] All validation commands pass
@@ -696,18 +786,22 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Search for and update all usages of `EditFeatureRequestDialog`
 
 **Changes:**
+
 - Find all components that render `EditFeatureRequestDialog`
 - Add `projectId` prop to each usage
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All EditFeatureRequestDialog usages pass projectId
 - [ ] No TypeScript errors for missing required prop
 - [ ] All validation commands pass

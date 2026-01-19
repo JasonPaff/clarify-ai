@@ -45,6 +45,7 @@ interface RepositoryOverviewStreamChunk {
 ## React Hook
 
 `useElectronAiOverview()` returns:
+
 - `generate` - Start generation function
 - `cancel` - Cancel function
 - `subscribeToStream` - Subscribe to stream chunks

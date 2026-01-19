@@ -11,6 +11,7 @@ This feature enables users to generate AI-powered project overview documents fro
 ### 1.1 Core Concept
 
 A **Repository Overview** is an AI-generated markdown document that summarizes:
+
 - Project purpose and goals
 - Technology stack with versions
 - Key features and capabilities
@@ -22,12 +23,12 @@ This document serves as "codebase context" that can be injected into the refinem
 
 ### 1.2 Value Proposition
 
-| Without Overview | With Overview |
-|------------------|---------------|
-| Refinement step has no codebase context | AI understands tech stack, patterns, structure |
-| Generic clarifying questions | Context-aware questions specific to the codebase |
-| User must manually explain architecture | Overview provides structured project knowledge |
-| Each refinement starts from scratch | Reusable context across all feature requests |
+| Without Overview                        | With Overview                                    |
+| --------------------------------------- | ------------------------------------------------ |
+| Refinement step has no codebase context | AI understands tech stack, patterns, structure   |
+| Generic clarifying questions            | Context-aware questions specific to the codebase |
+| User must manually explain architecture | Overview provides structured project knowledge   |
+| Each refinement starts from scratch     | Reusable context across all feature requests     |
 
 ---
 
@@ -56,6 +57,7 @@ After connecting a repository, users see a repository card with a new "Generate 
 ```
 
 **States:**
+
 - No overview: "Generate Overview" button shown
 - Overview exists: "View Overview" and "Regenerate" options shown
 - Generating: Loading spinner with "Generating overview..." text
@@ -106,6 +108,7 @@ When starting clarification, users can select which repository contexts to inclu
 ### 2.3 Overview Viewer/Editor
 
 **Full Overview Modal:**
+
 - Read-only markdown preview (default)
 - "Edit" toggle switches to markdown editor
 - Manual edits saved separately from AI-generated content
@@ -153,12 +156,14 @@ export const repositoryOverviews = sqliteTable(
     lastEditedAt: text('last_edited_at'),
 
     // Standard timestamps
-    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
-    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).notNull(),
+    createdAt: text('created_at')
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
+    updatedAt: text('updated_at')
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
   },
-  (table) => [
-    index('repository_overviews_repository_id_idx').on(table.repositoryId),
-  ]
+  (table) => [index('repository_overviews_repository_id_idx').on(table.repositoryId)]
 );
 ```
 
@@ -178,6 +183,7 @@ export const repositoryOverviews = sqliteTable(
 ```
 
 **Recommendation:** Use separate `repository_overviews` table for:
+
 - Cleaner separation of concerns
 - Easier to add metadata fields later
 - Can track generation history if needed
@@ -414,19 +420,19 @@ Path: {{repositoryPath}}
 
 ### 5.1 New Components
 
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| `RepositoryOverviewDialog` | `components/repositories/` | Modal for generating/viewing overview |
-| `RepositoryOverviewPreview` | `components/repositories/` | Markdown preview of overview |
-| `RepositoryOverviewEditor` | `components/repositories/` | Markdown editor for manual edits |
+| Component                   | Location                             | Purpose                                   |
+| --------------------------- | ------------------------------------ | ----------------------------------------- |
+| `RepositoryOverviewDialog`  | `components/repositories/`           | Modal for generating/viewing overview     |
+| `RepositoryOverviewPreview` | `components/repositories/`           | Markdown preview of overview              |
+| `RepositoryOverviewEditor`  | `components/repositories/`           | Markdown editor for manual edits          |
 | `RepositoryContextSelector` | `components/features/clarification/` | Checkbox list for selecting repo contexts |
-| `AdditionalContextSelector` | `components/features/clarification/` | File picker for additional context files |
+| `AdditionalContextSelector` | `components/features/clarification/` | File picker for additional context files  |
 
 ### 5.2 Updated Components
 
-| Component | Changes |
-|-----------|---------|
-| `RepositoryCard` | Add overview status badge, generate/view buttons |
+| Component            | Changes                                                      |
+| -------------------- | ------------------------------------------------------------ |
+| `RepositoryCard`     | Add overview status badge, generate/view buttons             |
 | `ClarificationPanel` | Add repository context selection step before model selection |
 
 ### 5.3 Repository Card Enhancement
@@ -435,21 +441,23 @@ Path: {{repositoryPath}}
 // components/repositories/repository-card.tsx
 
 // Add to existing card actions
-{repository.overview ? (
-  <>
-    <Badge variant="success">Overview generated</Badge>
-    <Button variant="ghost" size="sm" onClick={onViewOverview}>
-      View
+{
+  repository.overview ? (
+    <>
+      <Badge variant="success">Overview generated</Badge>
+      <Button variant="ghost" size="sm" onClick={onViewOverview}>
+        View
+      </Button>
+      <Button variant="ghost" size="sm" onClick={onRegenerateOverview}>
+        Regenerate
+      </Button>
+    </>
+  ) : (
+    <Button variant="outline" size="sm" onClick={onGenerateOverview}>
+      Generate Overview
     </Button>
-    <Button variant="ghost" size="sm" onClick={onRegenerateOverview}>
-      Regenerate
-    </Button>
-  </>
-) : (
-  <Button variant="outline" size="sm" onClick={onGenerateOverview}>
-    Generate Overview
-  </Button>
-)}
+  );
+}
 ```
 
 ---
@@ -537,13 +545,13 @@ Users can add files from their computer as additional context:
 
 ### 7.2 Supported File Types
 
-| Type | Extensions | Handling |
-|------|------------|----------|
-| Markdown | `.md` | Direct inclusion |
-| Text | `.txt`, `.json`, `.yaml`, `.yml` | Direct inclusion |
-| Code | `.ts`, `.js`, `.tsx`, `.jsx`, `.py`, etc. | Direct inclusion |
-| PDF | `.pdf` | Text extraction (future enhancement) |
-| Images | `.png`, `.jpg` | Not supported (show warning) |
+| Type     | Extensions                                | Handling                             |
+| -------- | ----------------------------------------- | ------------------------------------ |
+| Markdown | `.md`                                     | Direct inclusion                     |
+| Text     | `.txt`, `.json`, `.yaml`, `.yml`          | Direct inclusion                     |
+| Code     | `.ts`, `.js`, `.tsx`, `.jsx`, `.py`, etc. | Direct inclusion                     |
+| PDF      | `.pdf`                                    | Text extraction (future enhancement) |
+| Images   | `.png`, `.jpg`                            | Not supported (show warning)         |
 
 ### 7.3 Size Limits
 
@@ -559,7 +567,7 @@ Users can add files from their computer as additional context:
   additionalContextFiles: JSON.stringify([
     { path: '/docs/spec.md', addedAt: '2026-01-18T10:00:00Z' },
     { path: '/design/api.yaml', addedAt: '2026-01-18T10:00:00Z' },
-  ])
+  ]);
 }
 
 // Content read fresh each time clarification runs
@@ -571,6 +579,7 @@ Users can add files from their computer as additional context:
 ## 8. Implementation Phases
 
 ### Phase 1: Database & Core Infrastructure
+
 1. Create `repository_overviews` table schema
 2. Create repository pattern for overviews
 3. Add IPC handlers for overview CRUD
@@ -578,6 +587,7 @@ Users can add files from their computer as additional context:
 5. Update repository queries to include overview status
 
 ### Phase 2: Overview Generation
+
 1. Implement repository data collection (file tree, configs)
 2. Create overview generation prompt template
 3. Implement streaming generation handler
@@ -585,6 +595,7 @@ Users can add files from their computer as additional context:
 5. Add generation action to repository card
 
 ### Phase 3: Overview Management UI
+
 1. Create overview viewer modal
 2. Create overview editor component
 3. Add regenerate functionality
@@ -592,12 +603,14 @@ Users can add files from their computer as additional context:
 5. Update repository card with overview status
 
 ### Phase 4: Clarification Integration
+
 1. Add repository context selector to clarification panel
 2. Update clarification prompt builder
 3. Update feature request schema for context tracking
 4. Wire up context selection to clarification flow
 
 ### Phase 5: Additional Context Files
+
 1. Create file picker component
 2. Implement file reading and validation
 3. Add storage for selected file references
@@ -609,32 +622,32 @@ Users can add files from their computer as additional context:
 
 ### 9.1 Answered by This Design
 
-| Question | Answer |
-|----------|--------|
-| When to generate? | Both: on repo connect AND from refinement step |
-| Where to store? | Database (`repository_overviews` table) |
+| Question                   | Answer                                                    |
+| -------------------------- | --------------------------------------------------------- |
+| When to generate?          | Both: on repo connect AND from refinement step            |
+| Where to store?            | Database (`repository_overviews` table)                   |
 | Only overview or any file? | Both: overview as primary, additional files as supplement |
 
 ### 9.2 Remaining Decisions
 
-| Question | Options | Recommendation |
-|----------|---------|----------------|
-| Auto-generate on repo connect? | Yes / No / Prompt user | **Prompt user** with "Generate overview now?" |
-| Overview edit history? | Track all versions / Just current + original | **Just current + original** (simpler) |
-| Shared overviews across projects? | Allow sharing / Repo-specific only | **Repo-specific only** (repos tied to projects) |
-| File content caching? | Cache in memory / Read fresh each time | **Read fresh** (files may change) |
+| Question                          | Options                                      | Recommendation                                  |
+| --------------------------------- | -------------------------------------------- | ----------------------------------------------- |
+| Auto-generate on repo connect?    | Yes / No / Prompt user                       | **Prompt user** with "Generate overview now?"   |
+| Overview edit history?            | Track all versions / Just current + original | **Just current + original** (simpler)           |
+| Shared overviews across projects? | Allow sharing / Repo-specific only           | **Repo-specific only** (repos tied to projects) |
+| File content caching?             | Cache in memory / Read fresh each time       | **Read fresh** (files may change)               |
 
 ---
 
 ## 10. Success Metrics
 
-| Metric | Measurement |
-|--------|-------------|
-| Overview generation rate | % of repositories with generated overviews |
-| Context usage rate | % of clarifications that include repository context |
+| Metric                            | Measurement                                                 |
+| --------------------------------- | ----------------------------------------------------------- |
+| Overview generation rate          | % of repositories with generated overviews                  |
+| Context usage rate                | % of clarifications that include repository context         |
 | Clarification quality improvement | User satisfaction with clarifying questions (future survey) |
-| Generation success rate | % of overview generations that complete successfully |
-| Time to generate | Average duration of overview generation |
+| Generation success rate           | % of overview generations that complete successfully        |
+| Time to generate                  | Average duration of overview generation                     |
 
 ---
 

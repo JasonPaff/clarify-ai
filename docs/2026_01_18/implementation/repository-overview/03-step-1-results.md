@@ -20,6 +20,7 @@
 **Table**: `repository_overviews`
 
 **Columns**:
+
 - `id`: integer, PRIMARY KEY, auto-increment
 - `repositoryId`: integer, NOT NULL, UNIQUE, FK to repositories.id with CASCADE delete
 - `content`: text, NOT NULL - AI-generated overview content
@@ -32,9 +33,11 @@
 - `updatedAt`: text, NOT NULL, default CURRENT_TIMESTAMP
 
 **Indexes**:
+
 - `repository_overviews_repository_id_idx` on repositoryId
 
 **Types Exported**:
+
 - `RepositoryOverview` (select type)
 - `NewRepositoryOverview` (insert type)
 

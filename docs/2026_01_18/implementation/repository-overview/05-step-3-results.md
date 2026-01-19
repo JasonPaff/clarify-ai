@@ -33,7 +33,7 @@ electronAPI.db.repositoryOverviews = {
   getByRepositoryId: (repositoryId) => Promise<RepositoryOverview | undefined>,
   update: (id, data) => Promise<RepositoryOverview | undefined>,
   upsert: (repositoryId, data) => Promise<RepositoryOverview>,
-}
+};
 ```
 
 ## React Hook Updated

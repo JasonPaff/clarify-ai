@@ -343,7 +343,10 @@ async function collectRepositoryData(repositoryPath: string): Promise<null | Rep
     }
 
     // Collect all data in parallel where possible
-    const [fileTreeResult, configFiles] = await Promise.all([buildFileTree(repositoryPath, 4), readConfigFiles(repositoryPath)]);
+    const [fileTreeResult, configFiles] = await Promise.all([
+      buildFileTree(repositoryPath, 4),
+      readConfigFiles(repositoryPath),
+    ]);
 
     // Detect framework from package.json
     const framework = detectFramework(configFiles.packageJson);
