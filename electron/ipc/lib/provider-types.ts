@@ -339,7 +339,7 @@ export function isValidProvider(value: string): value is ApiKeyProvider {
  * Check if a provider requires additional configuration beyond API key.
  */
 export function providerRequiresAdditionalConfig(provider: ApiKeyProvider): boolean {
-  return PROVIDER_CONFIGS[provider].requiresAdditionalConfig === true;
+  return PROVIDER_CONFIGS[provider].requiresAdditionalConfig ?? false;
 }
 
 /**
