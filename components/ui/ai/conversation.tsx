@@ -41,11 +41,7 @@ interface ConversationContentProps {
 }
 
 export const ConversationContent = ({ children, className }: ConversationContentProps) => {
-  return (
-    <StickToBottom.Content className={cn('flex flex-1 flex-col gap-8 overflow-y-auto p-4', className)}>
-      {children}
-    </StickToBottom.Content>
-  );
+  return <StickToBottom.Content className={cn('flex flex-col gap-8 p-4', className)}>{children}</StickToBottom.Content>;
 };
 
 type ConversationEmptyStateProps = Children<
@@ -63,11 +59,11 @@ export const ConversationEmptyState = ({
   icon,
   title = 'No messages yet',
 }: ConversationEmptyStateProps) => {
-  const _hasCustomContent = Boolean(children);
+  const hasCustomContent = Boolean(children);
 
   return (
     <div className={cn('flex size-full flex-col items-center justify-center gap-3 p-8 text-center', className)}>
-      {_hasCustomContent ? (
+      {hasCustomContent ? (
         children
       ) : (
         <Fragment>
@@ -94,21 +90,19 @@ export const ConversationScrollButton = ({ className, ref, ...props }: Conversat
     scrollToBottom();
   }, [scrollToBottom]);
 
-  if (isAtBottom) {
-    return null;
-  }
-
   return (
-    <Button
-      className={cn('absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full', className)}
-      onClick={handleScrollToBottom}
-      ref={ref}
-      size={'icon'}
-      type={'button'}
-      variant={'outline'}
-      {...props}
-    >
-      <ArrowDownIcon className={'size-4'} />
-    </Button>
+    !isAtBottom && (
+      <Button
+        className={cn('absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full', className)}
+        onClick={handleScrollToBottom}
+        ref={ref}
+        size={'icon'}
+        type={'button'}
+        variant={'outline'}
+        {...props}
+      >
+        <ArrowDownIcon className={'size-4'} />
+      </Button>
+    )
   );
 };

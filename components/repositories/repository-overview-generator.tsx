@@ -9,6 +9,7 @@ import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Message, MessageContent, MessageResponse } from '@/components/ui/message';
 import { Textarea } from '@/components/ui/textarea';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { cn } from '@/lib/utils';
@@ -208,20 +209,20 @@ export const RepositoryOverviewGenerator = ({
           `}
         >
           <Square className={'size-4 fill-amber-600 text-amber-600'} />
-          <span className={'text-sm text-amber-600'}>
-            Generation stopped - partial content shown below
-          </span>
+          <span className={'text-sm text-amber-600'}>Generation stopped - partial content shown below</span>
         </div>
       )}
 
       {/* Streaming/Complete Content Display */}
       {shouldShowContent && (
-        <Conversation className={'max-h-96 rounded-md border border-border bg-muted/30'}>
-          <ConversationContent className={'gap-0 p-4'}>
-            <div className={'text-sm/relaxed whitespace-pre-wrap text-foreground'}>
-              {streamingContent}
-              {isGenerating && <span className={'ml-0.5 animate-pulse'}>|</span>}
-            </div>
+        <Conversation className={'h-96 rounded-md border border-border bg-muted/30'}>
+          <ConversationContent>
+            <Message from={'assistant'}>
+              <MessageContent>
+                <MessageResponse>{streamingContent}</MessageResponse>
+                {isGenerating && <span className={'ml-0.5 animate-pulse'}>|</span>}
+              </MessageContent>
+            </Message>
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>
