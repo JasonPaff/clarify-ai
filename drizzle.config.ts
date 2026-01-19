@@ -10,5 +10,6 @@ export default defineConfig({
     './db/schema/projects.schema.ts',
     './db/schema/repositories.schema.ts',
     './db/schema/feature-requests.schema.ts',
+    './db/schema/repository-overviews.schema.ts',
   ],
 });

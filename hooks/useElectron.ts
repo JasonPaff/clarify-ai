@@ -2,7 +2,15 @@
 
 import { useCallback, useMemo } from 'react';
 
-import type { ApiKeyInfo, ApiKeyProvider, ElectronAPI, SetApiKeyInput } from '@/types/electron';
+import type {
+  ApiKeyInfo,
+  ApiKeyProvider,
+  CollectRepositoryDataResult,
+  ElectronAPI,
+  RepositoryOverviewGenerateRequest,
+  RepositoryOverviewStreamChunk,
+  SetApiKeyInput,
+} from '@/types/electron';
 
 interface UseElectronResult {
   api: ElectronAPI | null;
@@ -25,6 +33,43 @@ export function useElectron(): UseElectronResult {
   }, []);
 
   return { api, isElectron };
+}
+
+export function useElectronAiOverview() {
+  const { api, isElectron } = useElectron();
+
+  const generate = useCallback(
+    async (request: RepositoryOverviewGenerateRequest): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.ai.repositoryOverview.generate(request);
+    },
+    [api]
+  );
+
+  const cancel = useCallback(async (): Promise<void> => {
+    if (!api) return;
+    return api.ai.repositoryOverview.cancel();
+  }, [api]);
+
+  const subscribeToStream = useCallback(
+    (callback: (chunk: RepositoryOverviewStreamChunk) => void): (() => void) => {
+      if (!api) {
+        // Return a no-op unsubscribe function
+        return function noop() {
+          // No cleanup needed when api is not available
+        };
+      }
+      return api.ai.repositoryOverview.onStream(callback);
+    },
+    [api]
+  );
+
+  return {
+    cancel,
+    generate,
+    isElectron,
+    subscribeToStream,
+  };
 }
 
 export function useElectronApiKeys() {
@@ -181,7 +226,43 @@ export function useElectronDb() {
     [api]
   );
 
-  return { featureRequests, isElectron, projects, repositories };
+  const repositoryOverviews = useMemo(
+    () => ({
+      create: (data: Parameters<NonNullable<typeof api>['db']['repositoryOverviews']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositoryOverviews.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositoryOverviews.delete(id);
+      },
+      deleteByRepositoryId: (repositoryId: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositoryOverviews.deleteByRepositoryId(repositoryId);
+      },
+      getByRepositoryId: (repositoryId: number) => {
+        if (!api) return Promise.resolve(null);
+        return api.db.repositoryOverviews.getByRepositoryId(repositoryId);
+      },
+      update: (
+        id: number,
+        data: Parameters<NonNullable<typeof api>['db']['repositoryOverviews']['update']>[1]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositoryOverviews.update(id, data);
+      },
+      upsert: (
+        repositoryId: number,
+        data: Parameters<NonNullable<typeof api>['db']['repositoryOverviews']['upsert']>[1]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.repositoryOverviews.upsert(repositoryId, data);
+      },
+    }),
+    [api]
+  );
+
+  return { featureRequests, isElectron, projects, repositories, repositoryOverviews };
 }
 
 export function useElectronDialog() {
@@ -221,6 +302,14 @@ export function useElectronDialog() {
 
 export function useElectronFs() {
   const { api, isElectron } = useElectron();
+
+  const collectRepositoryData = useCallback(
+    async (repositoryPath: string): Promise<CollectRepositoryDataResult> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.fs.collectRepositoryData(repositoryPath);
+    },
+    [api]
+  );
 
   const readFile = useCallback(
     async (path: string): Promise<{ content?: string; error?: string; success: boolean }> => {
@@ -281,6 +370,7 @@ export function useElectronFs() {
   );
 
   return {
+    collectRepositoryData,
     exists,
     isElectron,
     readDirectory,

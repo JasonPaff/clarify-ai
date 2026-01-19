@@ -4,23 +4,21 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "lib": ["ES2022"],
-    "outDir": "../electron-dist/electron",
-    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "declaration": false,
-    "declarationMap": false,
-    "sourceMap": true,
-    "noEmitOnError": true,
+    "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./*"]
+    }
   },
-  "include": ["./**/*.ts"],
-  "exclude": ["node_modules"],
-  "references": [{ "path": "../db" }, { "path": "../lib/ai" }]
+  "include": ["./**/*.ts", "../db/**/*.ts", "../lib/ai/**/*.ts"],
+  "exclude": ["node_modules"]
 }

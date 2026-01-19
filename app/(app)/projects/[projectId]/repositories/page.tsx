@@ -16,7 +16,7 @@ import { RepositoryCard } from '@/components/repositories/repository-card';
 import { RepositoriesSkeleton } from '@/components/skeletons/repositories-skeleton';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { useRepositories } from '@/hooks/queries/use-repositories';
+import { useRepositoriesWithOverviewStatus } from '@/hooks/queries/use-repositories';
 
 type RepositoriesPageProps = PageProps;
 
@@ -24,13 +24,15 @@ function RepositoriesContent({ projectId }: { projectId: number }) {
   const [editingRepository, setEditingRepository] = useState<null | Pick<Repository, 'id' | 'name' | 'path'>>(null);
   const [deletingRepository, setDeletingRepository] = useState<null | Pick<Repository, 'id' | 'name'>>(null);
 
-  const { data: repositories = [], isLoading } = useRepositories(projectId);
+  const { data: repositories, isPending } = useRepositoriesWithOverviewStatus(projectId);
 
-  if (isLoading) {
+  if (isPending) {
     return <RepositoriesSkeleton />;
   }
 
-  if (!isLoading && repositories.length === 0) {
+  const isEmpty = !isPending && repositories.length === 0;
+
+  if (isEmpty) {
     return (
       <EmptyState
         action={
@@ -54,11 +56,13 @@ function RepositoriesContent({ projectId }: { projectId: number }) {
         {repositories.map((repository) => (
           <RepositoryCard
             fileCount={repository.fileCount}
+            id={repository.id}
             key={repository.id}
             lastScannedAt={repository.lastScannedAt}
             name={repository.name}
             onDelete={() => setDeletingRepository({ id: repository.id, name: repository.name })}
             onEdit={() => setEditingRepository({ id: repository.id, name: repository.name, path: repository.path })}
+            overviewStatus={repository.overviewStatus}
             path={repository.path}
           />
         ))}

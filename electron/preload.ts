@@ -3,8 +3,11 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 import type { NewProject, Project } from '../db/schema/projects.schema';
 import type { NewRepository, Repository } from '../db/schema/repositories.schema';
+import type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
+import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
 import type { ApiKeyInfo, ApiKeyProvider, SetApiKeyInput } from './ipc/api-keys.handlers';
+import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
 
 import { IpcChannels } from './ipc/channels';
 
@@ -14,6 +17,11 @@ export interface ElectronAPI {
       cancel(): Promise<void>;
       generate(request: ClarificationGenerateRequest): Promise<{ error?: string; success: boolean }>;
       onStream(callback: (chunk: ClarificationStreamChunk) => void): () => void;
+    };
+    repositoryOverview: {
+      cancel(): Promise<void>;
+      generate(request: RepositoryOverviewGenerateRequest): Promise<{ error?: string; success: boolean }>;
+      onStream(callback: (chunk: RepositoryOverviewStreamChunk) => void): () => void;
     };
   };
   apiKeys: {
@@ -51,6 +59,17 @@ export interface ElectronAPI {
       getByProjectId(projectId: number): Promise<Array<Repository>>;
       update(id: number, data: Partial<NewRepository>): Promise<Repository | undefined>;
     };
+    repositoryOverviews: {
+      create(data: NewRepositoryOverview): Promise<RepositoryOverview>;
+      delete(id: number): Promise<boolean>;
+      deleteByRepositoryId(repositoryId: number): Promise<boolean>;
+      getByRepositoryId(repositoryId: number): Promise<RepositoryOverview | undefined>;
+      update(id: number, data: Partial<NewRepositoryOverview>): Promise<RepositoryOverview | undefined>;
+      upsert(
+        repositoryId: number,
+        data: Omit<NewRepositoryOverview, 'repositoryId'>
+      ): Promise<RepositoryOverview>;
+    };
   };
   dialog: {
     openDirectory(): Promise<null | string>;
@@ -61,6 +80,7 @@ export interface ElectronAPI {
     ): Promise<null | string>;
   };
   fs: {
+    collectRepositoryData(repositoryPath: string): Promise<CollectRepositoryDataResult>;
     exists(path: string): Promise<boolean>;
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
@@ -104,6 +124,20 @@ const electronAPI: ElectronAPI = {
         };
       },
     },
+    repositoryOverview: {
+      cancel: () => ipcRenderer.invoke(IpcChannels.ai.repositoryOverview.cancel),
+      generate: (request) => ipcRenderer.invoke(IpcChannels.ai.repositoryOverview.generate, request),
+      onStream: (callback) => {
+        const handler = (_event: Electron.IpcRendererEvent, chunk: RepositoryOverviewStreamChunk) => {
+          callback(chunk);
+        };
+        ipcRenderer.on(IpcChannels.ai.repositoryOverview.stream, handler);
+        // Return unsubscribe function
+        return () => {
+          ipcRenderer.removeListener(IpcChannels.ai.repositoryOverview.stream, handler);
+        };
+      },
+    },
   },
   apiKeys: {
     delete: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.delete, provider),
@@ -140,6 +174,17 @@ const electronAPI: ElectronAPI = {
       getByProjectId: (projectId) => ipcRenderer.invoke(IpcChannels.db.repositories.getByProjectId, projectId),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.repositories.update, id, data),
     },
+    repositoryOverviews: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.delete, id),
+      deleteByRepositoryId: (repositoryId) =>
+        ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.deleteByRepositoryId, repositoryId),
+      getByRepositoryId: (repositoryId) =>
+        ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.getByRepositoryId, repositoryId),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.update, id, data),
+      upsert: (repositoryId, data) =>
+        ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.upsert, repositoryId, data),
+    },
   },
   dialog: {
     openDirectory: () => ipcRenderer.invoke(IpcChannels.dialog.openDirectory),
@@ -147,6 +192,8 @@ const electronAPI: ElectronAPI = {
     saveFile: (defaultPath, filters) => ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
   },
   fs: {
+    collectRepositoryData: (repositoryPath) =>
+      ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),
     exists: (path) => ipcRenderer.invoke(IpcChannels.fs.exists, path),
     readDirectory: (path) => ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
     readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),

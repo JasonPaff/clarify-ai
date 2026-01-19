@@ -2,12 +2,26 @@
 export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
+export type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
 
 // Re-export AI clarification types for renderer use
 export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
 
+// Re-export AI overview types for renderer use
+export type {
+  RepositoryOverviewGenerateRequest,
+  RepositoryOverviewStreamChunk,
+} from '../electron/ipc/ai-overview.handlers';
+
 // Re-export API key types for renderer use
 export type { ApiKeyInfo, ApiKeyProvider, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
+
+// Re-export file system types for renderer use
+export type {
+  CollectRepositoryDataResult,
+  DetectedFramework,
+  RepositoryData,
+} from '../electron/ipc/fs.handlers';
 
 export interface ElectronAPI {
   ai: {
@@ -18,6 +32,15 @@ export interface ElectronAPI {
       ): Promise<{ error?: string; success: boolean }>;
       onStream(
         callback: (chunk: import('../electron/ipc/ai-clarification.handlers').ClarificationStreamChunk) => void
+      ): () => void;
+    };
+    repositoryOverview: {
+      cancel(): Promise<void>;
+      generate(
+        request: import('../electron/ipc/ai-overview.handlers').RepositoryOverviewGenerateRequest
+      ): Promise<{ error?: string; success: boolean }>;
+      onStream(
+        callback: (chunk: import('../electron/ipc/ai-overview.handlers').RepositoryOverviewStreamChunk) => void
       ): () => void;
     };
   };
@@ -80,6 +103,24 @@ export interface ElectronAPI {
         data: Partial<import('../db/schema/repositories.schema').NewRepository>
       ): Promise<import('../db/schema/repositories.schema').Repository | undefined>;
     };
+    repositoryOverviews: {
+      create(
+        data: import('../db/schema/repository-overviews.schema').NewRepositoryOverview
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview>;
+      delete(id: number): Promise<boolean>;
+      deleteByRepositoryId(repositoryId: number): Promise<boolean>;
+      getByRepositoryId(
+        repositoryId: number
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | null>;
+      update(
+        id: number,
+        data: Partial<import('../db/schema/repository-overviews.schema').NewRepositoryOverview>
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | null>;
+      upsert(
+        repositoryId: number,
+        data: Omit<import('../db/schema/repository-overviews.schema').NewRepositoryOverview, 'repositoryId'>
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview>;
+    };
   };
   dialog: {
     openDirectory(): Promise<null | string>;
@@ -90,6 +131,9 @@ export interface ElectronAPI {
     ): Promise<null | string>;
   };
   fs: {
+    collectRepositoryData(
+      repositoryPath: string
+    ): Promise<import('../electron/ipc/fs.handlers').CollectRepositoryDataResult>;
     exists(path: string): Promise<boolean>;
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;

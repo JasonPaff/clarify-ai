@@ -8,7 +8,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "dev": "next dev --turbopack",
-    "electron:compile": "tsc -b electron/tsconfig.json && esbuild electron/preload.ts --bundle --platform=node --external:electron --outfile=electron-dist/electron/preload.js",
+    "electron:compile": "esbuild electron/main.ts --bundle --platform=node --target=node20 --external:electron --external:better-sqlite3 --external:electron-serve --external:electron-store --external:dotenv --external:drizzle-orm --outfile=electron-dist/electron/main.js && esbuild electron/preload.ts --bundle --platform=node --target=node20 --external:electron --outfile=electron-dist/electron/preload.js",
     "electron:build": "cross-env BUILD_TARGET=electron pnpm build && pnpm electron:compile",
     "electron:dev": "concurrently -k \"cross-env NODE_ENV=development pnpm dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "electron:dist": "pnpm electron:build && electron-builder",

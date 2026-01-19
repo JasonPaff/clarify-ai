@@ -1,26 +1,48 @@
 'use client';
 
-import { formatDistanceToNow } from 'date-fns';
-import { GitBranch, Pencil, Trash2 } from 'lucide-react';
+import { format, formatDistanceToNow } from 'date-fns';
+import { Check, Eye, FileText, GitBranch, Pencil, Sparkles, Trash2 } from 'lucide-react';
 
+import type { RepositoryOverviewStatus } from '@/hooks/queries/use-repository-overviews';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconButton } from '@/components/ui/icon-button';
 
+import { RepositoryOverviewDialog } from './repository-overview-dialog';
+
 interface RepositoryCardProps {
   fileCount?: null | number;
+  id: number;
   lastScannedAt: null | string;
   name: string;
   onDelete?: () => void;
   onEdit?: () => void;
+  overviewStatus: RepositoryOverviewStatus;
   path: string;
 }
 
-export function RepositoryCard({ fileCount, lastScannedAt, name, onDelete, onEdit, path }: RepositoryCardProps) {
+export function RepositoryCard({
+  fileCount,
+  id,
+  lastScannedAt,
+  name,
+  onDelete,
+  onEdit,
+  overviewStatus,
+  path,
+}: RepositoryCardProps) {
   const formattedLastScanned = lastScannedAt
     ? `Last scanned ${formatDistanceToNow(new Date(lastScannedAt), { addSuffix: true })}`
     : 'Never scanned';
 
   const files = fileCount !== null && ` • ${fileCount} ${fileCount === 1 ? 'file' : 'files'}`;
+
+  const hasOverview = overviewStatus.hasOverview;
+  const formattedGeneratedDate = overviewStatus.generatedAt
+    ? format(new Date(overviewStatus.generatedAt), 'MMM d, yyyy')
+    : null;
 
   return (
     <Card>
@@ -43,7 +65,9 @@ export function RepositoryCard({ fileCount, lastScannedAt, name, onDelete, onEdi
           </div>
         </div>
       </CardHeader>
+
       <CardContent>
+        {/* Repository Info */}
         <CardTitle className={'mb-1 text-base'}>{name}</CardTitle>
         <CardDescription className={'truncate text-xs'} title={path}>
           {path}
@@ -52,6 +76,37 @@ export function RepositoryCard({ fileCount, lastScannedAt, name, onDelete, onEdi
           {formattedLastScanned}
           {files}
         </p>
+
+        {/* Overview Status */}
+        <div className={'mt-3 flex items-center gap-2'}>
+          <FileText className={'size-3.5 text-muted-foreground'} />
+          <span className={'text-xs text-muted-foreground'}>Overview:</span>
+          {hasOverview ? (
+            <Badge size={'sm'} variant={'completed'}>
+              <Check className={'mr-1 size-3'} />
+              Generated ({formattedGeneratedDate})
+            </Badge>
+          ) : (
+            <span className={'text-xs text-muted-foreground'}>Not generated</span>
+          )}
+        </div>
+
+        {/* Overview Actions */}
+        <div className={'mt-4 flex gap-2'}>
+          <RepositoryOverviewDialog repositoryId={id} repositoryName={name} repositoryPath={path}>
+            {hasOverview ? (
+              <Button size={'sm'} variant={'outline'}>
+                <Eye className={'size-3.5'} />
+                View Overview
+              </Button>
+            ) : (
+              <Button size={'sm'} variant={'secondary'}>
+                <Sparkles className={'size-3.5'} />
+                Generate Overview
+              </Button>
+            )}
+          </RepositoryOverviewDialog>
+        </div>
       </CardContent>
     </Card>
   );

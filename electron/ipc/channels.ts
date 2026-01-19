@@ -5,6 +5,11 @@ export const IpcChannels = {
       generate: 'ai:clarification:generate',
       stream: 'ai:clarification:stream',
     },
+    repositoryOverview: {
+      cancel: 'ai:repositoryOverview:cancel',
+      generate: 'ai:repositoryOverview:generate',
+      stream: 'ai:repositoryOverview:stream',
+    },
   },
   apiKeys: {
     delete: 'apiKeys:delete',
@@ -41,6 +46,14 @@ export const IpcChannels = {
       getByProjectId: 'db:repositories:getByProjectId',
       update: 'db:repositories:update',
     },
+    repositoryOverviews: {
+      create: 'db:repositoryOverviews:create',
+      delete: 'db:repositoryOverviews:delete',
+      deleteByRepositoryId: 'db:repositoryOverviews:deleteByRepositoryId',
+      getByRepositoryId: 'db:repositoryOverviews:getByRepositoryId',
+      update: 'db:repositoryOverviews:update',
+      upsert: 'db:repositoryOverviews:upsert',
+    },
   },
   dialog: {
     openDirectory: 'dialog:openDirectory',
@@ -48,6 +61,7 @@ export const IpcChannels = {
     saveFile: 'dialog:saveFile',
   },
   fs: {
+    collectRepositoryData: 'fs:collectRepositoryData',
     exists: 'fs:exists',
     readDirectory: 'fs:readDirectory',
     readFile: 'fs:readFile',
