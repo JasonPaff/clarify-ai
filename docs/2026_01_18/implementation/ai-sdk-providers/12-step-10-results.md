@@ -34,12 +34,12 @@
 
 ## Provider Authentication Types
 
-| Auth Type | Providers | Fields Shown |
-|-----------|-----------|--------------|
-| api_key | anthropic, google, openai, mistral, cohere, xai, groq, deepseek, togetherai | API Key |
-| aws | bedrock | Access Key ID, Secret Access Key, Region |
-| azure | azure | API Key, Endpoint, Deployment Name |
-| none | ollama | Endpoint (optional) |
+| Auth Type | Providers                                                                   | Fields Shown                             |
+| --------- | --------------------------------------------------------------------------- | ---------------------------------------- |
+| api_key   | anthropic, google, openai, mistral, cohere, xai, groq, deepseek, togetherai | API Key                                  |
+| aws       | bedrock                                                                     | Access Key ID, Secret Access Key, Region |
+| azure     | azure                                                                       | API Key, Endpoint, Deployment Name       |
+| none      | ollama                                                                      | Endpoint (optional)                      |
 
 ## Notes
 

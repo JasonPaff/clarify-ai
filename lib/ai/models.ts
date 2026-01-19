@@ -1,7 +1,4 @@
-import {
-  type ApiKeyProvider,
-  PROVIDER_DISPLAY_NAMES,
-} from '@/electron/ipc/lib/provider-types';
+import { type ApiKeyProvider, PROVIDER_DISPLAY_NAMES } from '@/electron/ipc/lib/provider-types';
 
 // Re-export the canonical ApiKeyProvider type
 export type { ApiKeyProvider } from '@/electron/ipc/lib/provider-types';
@@ -36,7 +33,11 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
   ],
   bedrock: [
     // Anthropic models on Bedrock
-    { id: 'anthropic.claude-3-5-sonnet-20241022-v2:0', name: 'Claude 3.5 Sonnet v2 (Bedrock)', supportsThinking: false },
+    {
+      id: 'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      name: 'Claude 3.5 Sonnet v2 (Bedrock)',
+      supportsThinking: false,
+    },
     { id: 'anthropic.claude-3-5-haiku-20241022-v1:0', name: 'Claude 3.5 Haiku (Bedrock)', supportsThinking: false },
     { id: 'anthropic.claude-3-opus-20240229-v1:0', name: 'Claude 3 Opus (Bedrock)', supportsThinking: false },
     { id: 'anthropic.claude-3-sonnet-20240229-v1:0', name: 'Claude 3 Sonnet (Bedrock)', supportsThinking: false },
@@ -111,7 +112,11 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
   ],
   togetherai: [
     { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Instruct Turbo', supportsThinking: false },
-    { id: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', name: 'Llama 3.1 70B Instruct Turbo', supportsThinking: false },
+    {
+      id: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+      name: 'Llama 3.1 70B Instruct Turbo',
+      supportsThinking: false,
+    },
     { id: 'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo', name: 'Llama 3.1 8B Instruct Turbo', supportsThinking: false },
     { id: 'mistralai/Mixtral-8x22B-Instruct-v0.1', name: 'Mixtral 8x22B Instruct', supportsThinking: false },
     { id: 'mistralai/Mixtral-8x7B-Instruct-v0.1', name: 'Mixtral 8x7B Instruct', supportsThinking: false },

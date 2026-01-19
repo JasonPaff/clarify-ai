@@ -17,7 +17,13 @@ export interface RepositoryOverviewGenerateRequest {
 /** Stream chunk sent to renderer during overview generation */
 export interface RepositoryOverviewStreamChunk {
   content?: string;
-  type: 'error' | 'finish' | 'text';
+  type: 'error' | 'finish' | 'reasoning' | 'reasoning_end' | 'reasoning_start' | 'text';
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    reasoningTokens?: number;
+    totalTokens: number;
+  };
 }
 
 // Active abort controller for cancellation
@@ -90,10 +96,35 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
               };
               break;
 
-            case 'finish':
+            case 'finish': {
+              const usage = part.totalUsage;
               chunk = {
                 type: 'finish',
+                usage: usage
+                  ? {
+                      inputTokens: usage.inputTokens ?? 0,
+                      outputTokens: usage.outputTokens ?? 0,
+                      reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? undefined,
+                      totalTokens: usage.totalTokens ?? 0,
+                    }
+                  : undefined,
               };
+              break;
+            }
+
+            case 'reasoning-delta':
+              chunk = {
+                content: part.text,
+                type: 'reasoning',
+              };
+              break;
+
+            case 'reasoning-end':
+              chunk = { type: 'reasoning_end' };
+              break;
+
+            case 'reasoning-start':
+              chunk = { type: 'reasoning_start' };
               break;
 
             case 'text-delta':

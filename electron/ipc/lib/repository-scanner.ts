@@ -84,7 +84,9 @@ export async function scanRepository(repoPath: string, options: ScanOptions = {}
   const filteredTree = tree ? filterTreeWithIgnore(tree, ig, repoPath, stats) : null;
 
   // Render tree to ASCII
-  const fileTree = filteredTree ? renderTreeToAscii(filteredTree, path.basename(repoPath)) : path.basename(repoPath) + '/';
+  const fileTree = filteredTree
+    ? renderTreeToAscii(filteredTree, path.basename(repoPath))
+    : path.basename(repoPath) + '/';
 
   // Detect languages using linguist-js
   const languageResult = await detectLanguages(repoPath);

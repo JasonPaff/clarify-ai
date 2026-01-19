@@ -1,5 +1,7 @@
 'use client';
 
+import type { BundledLanguage, ShikiTransformer } from 'shiki';
+
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import {
   type ComponentProps,
@@ -10,7 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type BundledLanguage, codeToHtml, type ShikiTransformer } from 'shiki';
+import { codeToHtml } from 'shiki';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';

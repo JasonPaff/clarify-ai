@@ -34,9 +34,11 @@ This plan expands the AI provider ecosystem from 3 providers (Anthropic, Google,
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/lib/provider-types.ts` - Single source of truth for all provider-related types and constants
 
 **Files to Modify:**
+
 - `electron/ipc/api-keys.handlers.ts` - Import from centralized module
 - `electron/ipc/ai-clarification.handlers.ts` - Import from centralized module
 - `electron/ipc/ai-overview.handlers.ts` - Import from centralized module
@@ -45,6 +47,7 @@ This plan expands the AI provider ecosystem from 3 providers (Anthropic, Google,
 - `types/electron.d.ts` - Update type re-exports
 
 **Changes:**
+
 - Define `ApiKeyProvider` as a union type with all 12 providers
 - Define `ProviderCategory` type for UI grouping (major, emerging, local)
 - Define `ProviderConfig` interface with authentication requirements per provider
@@ -54,11 +57,13 @@ This plan expands the AI provider ecosystem from 3 providers (Anthropic, Google,
 - Export all types and constants for shared use
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All provider types defined in single location
 - [ ] No duplicate `ApiKeyProvider` definitions remain in codebase
 - [ ] All validation commands pass
@@ -72,13 +77,16 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/lib/provider-factory.ts` - Shared provider instantiation and API key retrieval
 
 **Files to Modify:**
+
 - `electron/ipc/ai-clarification.handlers.ts` - Import from factory module
 - `electron/ipc/ai-overview.handlers.ts` - Import from factory module
 
 **Changes:**
+
 - Create `createProvider()` function that handles all 12 providers with dynamic imports
 - Create `getApiKey()` function with support for provider-specific credential retrieval
 - Create `getProviderCredentials()` function for complex auth (AWS, Azure)
@@ -86,11 +94,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Add provider-specific configuration handling (endpoints, regions)
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Single `createProvider()` implementation used across all AI handlers
 - [ ] Single `getApiKey()` implementation for credential retrieval
 - [ ] Duplicated code removed from handler files
@@ -105,11 +115,13 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/lib/provider-types.ts` - Add extended credential interfaces
 - `electron/ipc/api-keys.handlers.ts` - Update storage and retrieval logic
 - `types/electron.d.ts` - Update `SetApiKeyInput` interface
 
 **Changes:**
+
 - Add `ProviderCredentials` interface with optional fields: `endpoint`, `region`, `deploymentName`, `accessKeyId`, `secretAccessKey`
 - Update `SetApiKeyInput` to include provider-specific fields
 - Update `StoredApiKeyData` to persist additional fields
@@ -117,11 +129,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Modify set/get handlers to handle extended credential storage
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Extended credential fields properly stored and retrieved
 - [ ] Backward compatible with existing 3-provider API keys
 - [ ] All validation commands pass
@@ -135,9 +149,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `package.json` - Add new dependencies
 
 **Changes:**
+
 - Add `@ai-sdk/mistral`
 - Add `@ai-sdk/cohere`
 - Add `@ai-sdk/amazon-bedrock`
@@ -149,11 +165,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Add `ollama-ai-provider` (recommended community package for Ollama integration)
 
 **Validation Commands:**
+
 ```bash
 pnpm install && pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new packages installed successfully
 - [ ] No peer dependency conflicts
 - [ ] All validation commands pass
@@ -167,9 +185,11 @@ pnpm install && pnpm run lint --fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `electron/ipc/lib/provider-factory.ts` - Add switch cases for all new providers
 
 **Changes:**
+
 - Add Mistral provider case using `createMistral` from `@ai-sdk/mistral`
 - Add Cohere provider case using `createCohere` from `@ai-sdk/cohere`
 - Add Amazon Bedrock provider case with AWS credential handling using `createAmazonBedrock` from `@ai-sdk/amazon-bedrock`
@@ -181,11 +201,13 @@ pnpm install && pnpm run lint --fix && pnpm run typecheck
 - Add Ollama provider case using `createOllama` from `ollama-ai-provider` (recommended community package with better integration than generic OpenAI-compatible approach)
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All 12 providers have factory implementations
 - [ ] Provider-specific configurations properly applied
 - [ ] Ollama works without API key requirement
@@ -200,9 +222,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `electron/ipc/api-keys.handlers.ts` - Add test functions and extend switch statement
 
 **Changes:**
+
 - Add `testMistralKey()` function
 - Add `testCohereKey()` function - **Note: Cohere has a different response format than OpenAI-compatible APIs; use their `/v2/chat` endpoint which returns `message.content[0].text` instead of `choices[0].message.content`**
 - Add `testBedrockCredentials()` function with AWS auth
@@ -215,11 +239,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Extend the test handler switch statement for all providers
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All providers have working test functions
 - [ ] Ollama test verifies endpoint connectivity without API key
 - [ ] Error messages are provider-appropriate
@@ -234,10 +260,12 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/ai/models.ts` - Add model entries for all new providers
 - `hooks/use-available-models.ts` - Update `modelsByProvider` initialization
 
 **Changes:**
+
 - Add Mistral models (mistral-large-latest, mistral-small-latest, codestral-latest, pixtral-large-latest, magistral-medium-2506, ministral-8b-latest)
 - Add Cohere models (command-r-plus, command-r, command-light, etc.)
 - Add Amazon Bedrock models (claude-3.5-sonnet, claude-3-opus, titan-text-express, nova-pro, etc.)
@@ -251,11 +279,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Update `modelsByProvider` to include all provider keys
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All providers have model definitions
 - [ ] Model selector shows correct models when provider is configured
 - [ ] All validation commands pass
@@ -269,9 +299,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/validations/api-key.ts` - Extend provider enum and add conditional schemas
 
 **Changes:**
+
 - Extend `apiProviderSchema` enum with all 12 providers
 - Add optional `endpoint` field schema for Azure, Ollama
 - Add optional `region` field schema for Amazon Bedrock
@@ -282,11 +314,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Update `CreateApiKeyFormValues` type to include extended fields
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All 12 providers valid in form submission
 - [ ] Provider-specific fields validated appropriately
 - [ ] Ollama allows empty API key with required endpoint
@@ -301,9 +335,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/ui/badge.tsx` - Add variant cases for 9 new providers
 
 **Changes:**
+
 - Add `mistral` variant (orange/red tones)
 - Add `cohere` variant (coral tones)
 - Add `bedrock` variant (AWS orange)
@@ -315,11 +351,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Add `ollama` variant (purple/local indicator)
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All providers have unique badge variants
 - [ ] Colors work in both light and dark mode
 - [ ] All validation commands pass
@@ -333,9 +371,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `components/settings/api-key-form.tsx` - Add conditional field rendering
 
 **Changes:**
+
 - Add provider category grouping in provider select dropdown
 - Add conditional `endpoint` TextField for Azure and Ollama
 - Add conditional `region` SelectField for Amazon Bedrock
@@ -346,11 +386,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Add helper text explaining each provider's requirements
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Correct fields appear for each provider type
 - [ ] Ollama form works without API key input
 - [ ] Azure form includes endpoint and deployment name
@@ -366,10 +408,12 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `components/settings/api-keys-section.tsx` - Add category grouping
 - `components/settings/api-key-table.tsx` - Update to support grouped display
 
 **Changes:**
+
 - Group providers by category in the display
 - Add category headers (Major Cloud Providers, Emerging Providers, Local/Self-Hosted)
 - Update table layout to show categories
@@ -377,11 +421,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Update skeleton loader for new layout
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Providers displayed in logical categories
 - [ ] Category headers clearly visible
 - [ ] All 12 providers shown in correct categories
@@ -396,21 +442,25 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Update type imports
 - `types/electron.d.ts` - Update exported types and interfaces
 
 **Changes:**
+
 - Update `SetApiKeyInput` type with extended fields
 - Update `ApiKeyInfo` type with extended configuration display
 - Ensure all new provider types are properly exported
 - Update ElectronAPI interface comments for clarity
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All types properly exported for renderer use
 - [ ] No type mismatches between main and renderer
 - [ ] All validation commands pass
@@ -424,9 +474,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None (testing only)
 
 **Changes:**
+
 - Test Groq provider (free tier available)
 - Test Ollama with local installation if available
 - Verify model selector shows correct models per configured provider
@@ -434,11 +486,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Test the three-step AI workflow with a new provider
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck && pnpm run electron:dev
 ```
 
 **Success Criteria:**
+
 - [ ] At least one new provider fully functional end-to-end
 - [ ] Model selector properly filters by configured providers
 - [ ] AI generation workflow works with new provider

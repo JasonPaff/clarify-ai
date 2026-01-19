@@ -260,9 +260,7 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
             </IconButton>
           </Fragment>
         )}
-        {!_isUserKey && _isConfigured && (
-          <span className={'px-2 text-xs text-muted-foreground/50'}>Read-only</span>
-        )}
+        {!_isUserKey && _isConfigured && <span className={'px-2 text-xs text-muted-foreground/50'}>Read-only</span>}
         {!_isConfigured && (
           <IconButton aria-label={`Configure ${providerDisplayName}`} onClick={onEdit} type={'button'}>
             <Pencil className={'size-4'} />
@@ -355,9 +353,7 @@ const ConfigurationDetails = ({ entry, isEnterprise, isLocal }: ConfigurationDet
       <span className={'truncate text-sm text-muted-foreground'} title={primaryDetail?.value}>
         {primaryDetail?.value}
       </span>
-      {details.length > 1 && (
-        <span className={'text-xs text-muted-foreground/70'}>+{details.length - 1} more</span>
-      )}
+      {details.length > 1 && <span className={'text-xs text-muted-foreground/70'}>+{details.length - 1} more</span>}
     </div>
   );
 };

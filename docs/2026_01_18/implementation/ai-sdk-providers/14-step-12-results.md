@@ -16,12 +16,15 @@
 ## Types Verified
 
 **SetApiKeyInput** includes:
+
 - key, provider, notes, endpoint, deploymentName, accessKeyId, secretAccessKey, region
 
 **ApiKeyInfo** includes:
+
 - maskedKey, source, isConfigured, endpoint, deploymentName, region, hasAwsCredentials, createdAt, updatedAt, notes
 
 **Exported from centralized module**:
+
 - ApiKeyProvider, ProviderCredentials, ProviderAuthType, ProviderCategory, ProviderConfig
 
 ## Validation Results

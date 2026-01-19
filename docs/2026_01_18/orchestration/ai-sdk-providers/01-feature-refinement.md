@@ -9,14 +9,17 @@
 ## Input
 
 ### Original Request
+
 > The app should support a lot more of the ai-sdk providers, all the popular ones should be supported.
 
 ### Clarification Context
+
 - Provider Priority: All categories - major cloud providers (Mistral, Cohere, Amazon Bedrock, Azure OpenAI), emerging providers (xAI, DeepSeek, Groq, Together AI), and local/self-hosted models
 - Scope: Comprehensive support for 8-10 new providers
 - Local Models: Yes, include Ollama with endpoint configuration (no API key needed, just localhost URL)
 
 ### Project Context Provided
+
 - Desktop app using Electron + Next.js with TypeScript
 - Uses Vercel AI SDK (ai package v6.0.39) for unified AI model interface with streaming
 - Currently has: @ai-sdk/anthropic, @ai-sdk/google, @ai-sdk/openai
@@ -40,11 +43,11 @@ Expand the AI provider ecosystem to support a comprehensive range of popular pro
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Request | 19 words |
-| Refined Request | 356 words |
-| Expansion Ratio | 18.7x |
+| Metric           | Value     |
+| ---------------- | --------- |
+| Original Request | 19 words  |
+| Refined Request  | 356 words |
+| Expansion Ratio  | 18.7x     |
 
 **Note**: The expansion ratio exceeds the 2-4x target but is justified given the comprehensive scope (8-10 providers across 3 categories) and the technical detail needed to capture authentication differences, UI requirements, and integration patterns.
 
@@ -53,6 +56,7 @@ Expand the AI provider ecosystem to support a comprehensive range of popular pro
 **Intent Preserved**: Yes - The core request to add more AI SDK providers is maintained.
 
 **Technical Context Added**:
+
 - Specific provider packages to install (@ai-sdk/mistral, @ai-sdk/cohere, etc.)
 - Authentication requirements per provider type
 - UI considerations for different credential types

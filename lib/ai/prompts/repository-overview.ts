@@ -1,4 +1,4 @@
-import type { RepositoryData } from '../../../types/electron.d';
+import type { RepositoryData } from '../../../types/electron';
 
 // Default prompt template for repository overview generation
 export const DEFAULT_REPOSITORY_OVERVIEW_PROMPT = `

@@ -20,7 +20,8 @@ export const shimmerVariants = cva(
     variants: {
       variant: {
         default: '',
-        muted: 'bg-[linear-gradient(90deg,var(--muted-foreground)_0%,var(--foreground)_50%,var(--muted-foreground)_100%)]',
+        muted:
+          'bg-[linear-gradient(90deg,var(--muted-foreground)_0%,var(--foreground)_50%,var(--muted-foreground)_100%)]',
       },
     },
   }

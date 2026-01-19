@@ -4,10 +4,10 @@
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| pnpm lint | PASS |
-| pnpm typecheck | PASS |
+| Check                 | Result                                    |
+| --------------------- | ----------------------------------------- |
+| pnpm lint             | PASS                                      |
+| pnpm typecheck        | PASS                                      |
 | pnpm electron:compile | PASS (main.js: 4.3MB, preload.js: 10.0KB) |
 
 ## Success Criteria
@@ -21,10 +21,12 @@
 ## Verification Details
 
 **Type Definitions (Single Source of Truth):**
+
 - `ApiKeyProvider` type: Defined only once in `electron/ipc/lib/provider-types.ts`
 - Other files properly re-export it
 
 **Implementation Functions (Single Source of Truth):**
+
 - `createProvider()`: Defined only once in `electron/ipc/lib/provider-factory.ts`
 - `getApiKey()`: Defined only once in `electron/ipc/lib/provider-factory.ts`
 - Both AI handlers import from the factory

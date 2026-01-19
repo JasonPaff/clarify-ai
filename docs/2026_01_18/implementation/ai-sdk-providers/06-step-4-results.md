@@ -4,17 +4,17 @@
 
 ## Packages Installed
 
-| Package | Version |
-|---------|---------|
-| `@ai-sdk/mistral` | ^3.0.9 |
-| `@ai-sdk/cohere` | ^3.0.8 |
+| Package                  | Version |
+| ------------------------ | ------- |
+| `@ai-sdk/mistral`        | ^3.0.9  |
+| `@ai-sdk/cohere`         | ^3.0.8  |
 | `@ai-sdk/amazon-bedrock` | ^4.0.19 |
-| `@ai-sdk/azure` | ^3.0.12 |
-| `@ai-sdk/xai` | ^3.0.26 |
-| `@ai-sdk/groq` | ^3.0.10 |
-| `@ai-sdk/deepseek` | ^2.0.8 |
-| `@ai-sdk/togetherai` | ^2.0.13 |
-| `ollama-ai-provider` | ^1.2.0 |
+| `@ai-sdk/azure`          | ^3.0.12 |
+| `@ai-sdk/xai`            | ^3.0.26 |
+| `@ai-sdk/groq`           | ^3.0.10 |
+| `@ai-sdk/deepseek`       | ^2.0.8  |
+| `@ai-sdk/togetherai`     | ^2.0.13 |
+| `ollama-ai-provider`     | ^1.2.0  |
 
 ## Validation Results
 

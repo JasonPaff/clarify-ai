@@ -4,17 +4,10 @@ import { useStore } from '@tanstack/react-form';
 import { Fragment, useCallback, useState } from 'react';
 
 import type { ApiKeyProvider, ProviderAuthType } from '@/electron/ipc/lib/provider-types';
-import type {
-  CreateExtendedApiKeyFormValues,
-  UpdateExtendedApiKeyFormValues,
-} from '@/lib/validations/api-key';
+import type { CreateExtendedApiKeyFormValues, UpdateExtendedApiKeyFormValues } from '@/lib/validations/api-key';
 
 import { Button } from '@/components/ui/button';
-import {
-  PROVIDER_CATEGORIES,
-  PROVIDER_CONFIGS,
-  PROVIDER_DISPLAY_NAMES,
-} from '@/electron/ipc/lib/provider-types';
+import { PROVIDER_CATEGORIES, PROVIDER_CONFIGS, PROVIDER_DISPLAY_NAMES } from '@/electron/ipc/lib/provider-types';
 import { useSetApiKey, useTestApiKey } from '@/hooks/queries/use-api-keys';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
@@ -183,9 +176,7 @@ export function ApiKeyForm({ initialValues, isSubmitting, mode, onCancel, onSucc
       const isCreate = mode === 'create';
 
       try {
-        const provider = isCreate
-          ? (values as CreateExtendedApiKeyFormValues).provider
-          : initialValues?.provider;
+        const provider = isCreate ? (values as CreateExtendedApiKeyFormValues).provider : initialValues?.provider;
 
         if (!provider) {
           return;
@@ -306,8 +297,7 @@ function CreateApiKeyFormContent({
   const shouldShowDeploymentName = isAzureAuth;
 
   const handleTestConnection = async () => {
-    const { accessKeyId, apiKey, deploymentName, endpoint, provider, region, secretAccessKey } =
-      form.state.values;
+    const { accessKeyId, apiKey, deploymentName, endpoint, provider, region, secretAccessKey } = form.state.values;
 
     if (!provider) {
       setTestResult({ isSuccess: false, message: 'Please select a provider first' });
@@ -373,11 +363,7 @@ function CreateApiKeyFormContent({
         {/* Provider Selection */}
         <form.AppField name={'provider'}>
           {(field) => (
-            <field.SelectField
-              label={'Provider'}
-              options={providerOptions}
-              placeholder={'Select an AI provider'}
-            />
+            <field.SelectField label={'Provider'} options={providerOptions} placeholder={'Select an AI provider'} />
           )}
         </form.AppField>
 
@@ -391,13 +377,7 @@ function CreateApiKeyFormContent({
         {/* API Key Input - for api_key and azure auth types */}
         {shouldShowApiKey && (
           <form.AppField name={'apiKey'}>
-            {(field) => (
-              <field.TextField
-                label={'API Key'}
-                placeholder={'Enter your API key'}
-                type={'password'}
-              />
-            )}
+            {(field) => <field.TextField label={'API Key'} placeholder={'Enter your API key'} type={'password'} />}
           </form.AppField>
         )}
 
@@ -412,11 +392,7 @@ function CreateApiKeyFormContent({
                     : 'Ollama endpoint URL (default: http://localhost:11434)'
                 }
                 label={'Endpoint URL'}
-                placeholder={
-                  isAzureAuth
-                    ? 'https://your-resource.openai.azure.com'
-                    : 'http://localhost:11434'
-                }
+                placeholder={isAzureAuth ? 'https://your-resource.openai.azure.com' : 'http://localhost:11434'}
                 type={'url'}
               />
             )}
@@ -440,12 +416,7 @@ function CreateApiKeyFormContent({
         {shouldShowAwsFields && (
           <Fragment>
             <form.AppField name={'accessKeyId'}>
-              {(field) => (
-                <field.TextField
-                  label={'AWS Access Key ID'}
-                  placeholder={'AKIAIOSFODNN7EXAMPLE'}
-                />
-              )}
+              {(field) => <field.TextField label={'AWS Access Key ID'} placeholder={'AKIAIOSFODNN7EXAMPLE'} />}
             </form.AppField>
 
             <form.AppField name={'secretAccessKey'}>
@@ -583,8 +554,7 @@ function EditApiKeyFormContent({
       return;
     }
 
-    const { accessKeyId, apiKey, deploymentName, endpoint, region, secretAccessKey } =
-      form.state.values;
+    const { accessKeyId, apiKey, deploymentName, endpoint, region, secretAccessKey } = form.state.values;
 
     try {
       const result = await onTestApiKey({
@@ -661,11 +631,7 @@ function EditApiKeyFormContent({
                     : 'Ollama endpoint URL (leave blank to keep existing)'
                 }
                 label={'Endpoint URL'}
-                placeholder={
-                  isAzureAuth
-                    ? 'https://your-resource.openai.azure.com'
-                    : 'http://localhost:11434'
-                }
+                placeholder={isAzureAuth ? 'https://your-resource.openai.azure.com' : 'http://localhost:11434'}
                 type={'url'}
               />
             )}
@@ -781,11 +747,7 @@ function EditApiKeyFormContent({
 function ProviderHelperText({ authType }: { authType: ProviderAuthType }) {
   switch (authType) {
     case 'api_key':
-      return (
-        <p className={'text-xs text-muted-foreground'}>
-          Enter your API key from the provider&apos;s dashboard.
-        </p>
-      );
+      return <p className={'text-xs text-muted-foreground'}>Enter your API key from the provider&apos;s dashboard.</p>;
     case 'aws':
       return (
         <p className={'text-xs text-muted-foreground'}>

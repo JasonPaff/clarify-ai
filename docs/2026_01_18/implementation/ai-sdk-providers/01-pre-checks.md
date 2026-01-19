@@ -15,6 +15,7 @@
 ## Plan Overview
 
 Expanding from 3 providers (Anthropic, Google, OpenAI) to 12 providers by adding:
+
 - Mistral
 - Cohere
 - Amazon Bedrock

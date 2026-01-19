@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-import {
-  ALL_PROVIDERS,
-  type ApiKeyProvider,
-  PROVIDER_CONFIGS,
-} from '@/electron/ipc/lib/provider-types';
+import { ALL_PROVIDERS, type ApiKeyProvider, PROVIDER_CONFIGS } from '@/electron/ipc/lib/provider-types';
 
 // Re-export the canonical ApiKeyProvider type
 export type { ApiKeyProvider } from '@/electron/ipc/lib/provider-types';

@@ -16,17 +16,17 @@
 
 ## Test Functions Added
 
-| Function | Provider | Description |
-|----------|----------|-------------|
-| `testMistralKey()` | mistral | Standard API key test |
-| `testCohereKey()` | cohere | Tests using `command-r` model |
-| `testBedrockCredentials()` | bedrock | AWS auth with credentials |
-| `testAzureKey()` | azure | Validates endpoint and tests |
-| `testXaiKey()` | xai | Standard API key test |
-| `testGroqKey()` | groq | Standard API key test |
-| `testDeepSeekKey()` | deepseek | Official SDK test |
-| `testTogetherAiKey()` | togetherai | Official SDK test |
-| `testOllamaConnection()` | ollama | Endpoint connectivity via `/api/tags` |
+| Function                   | Provider   | Description                           |
+| -------------------------- | ---------- | ------------------------------------- |
+| `testMistralKey()`         | mistral    | Standard API key test                 |
+| `testCohereKey()`          | cohere     | Tests using `command-r` model         |
+| `testBedrockCredentials()` | bedrock    | AWS auth with credentials             |
+| `testAzureKey()`           | azure      | Validates endpoint and tests          |
+| `testXaiKey()`             | xai        | Standard API key test                 |
+| `testGroqKey()`            | groq       | Standard API key test                 |
+| `testDeepSeekKey()`        | deepseek   | Official SDK test                     |
+| `testTogetherAiKey()`      | togetherai | Official SDK test                     |
+| `testOllamaConnection()`   | ollama     | Endpoint connectivity via `/api/tags` |
 
 ## Validation Results
 

@@ -1,12 +1,14 @@
 # Step 2: File Discovery
 
 ## Metadata
+
 - **Started**: 2026-01-18T00:02:00Z
 - **Completed**: 2026-01-18T00:03:00Z
 - **Status**: Completed
 - **Duration**: ~60 seconds
 
 ## Discovery Summary
+
 - **Total Files Discovered**: 42
 - **Critical Priority**: 12 files (7 new, 5 existing)
 - **High Priority**: 10 files (5 new, 5 existing)
@@ -17,48 +19,48 @@
 
 ### Critical Priority (Must Be Modified/Created)
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `db/schema/ai-usage-logs.schema.ts` | NEW | Schema for ai_usage_logs table |
-| `db/repositories/ai-usage-logs.repository.ts` | NEW | Repository pattern for CRUD operations |
-| `electron/ipc/ai-usage-logs.handlers.ts` | NEW | IPC handlers for usage log database access |
-| `electron/ipc/channels.ts` | MODIFY | Add IPC channel constants for usage logs |
-| `electron/ipc/register-handlers.ts` | MODIFY | Register new handlers |
-| `electron/ipc/ai-clarification.handlers.ts` | MODIFY | Integrate token capture after streaming |
-| `electron/ipc/ai-overview.handlers.ts` | MODIFY | Integrate token capture after streaming |
-| `lib/ai/models.ts` | MODIFY | Add pricing info for cost tier indicators |
-| `components/features/clarification/model-selector.tsx` | MODIFY | Add cost tier indicators with tooltips |
-| `app/(app)/projects/[projectId]/usage/page.tsx` | NEW | Usage page route |
-| `app/(app)/projects/[projectId]/usage/route-type.ts` | NEW | Route type schema |
-| `components/projects/project-tabs.tsx` | MODIFY | Add "Usage" tab |
+| File                                                   | Status | Purpose                                    |
+| ------------------------------------------------------ | ------ | ------------------------------------------ |
+| `db/schema/ai-usage-logs.schema.ts`                    | NEW    | Schema for ai_usage_logs table             |
+| `db/repositories/ai-usage-logs.repository.ts`          | NEW    | Repository pattern for CRUD operations     |
+| `electron/ipc/ai-usage-logs.handlers.ts`               | NEW    | IPC handlers for usage log database access |
+| `electron/ipc/channels.ts`                             | MODIFY | Add IPC channel constants for usage logs   |
+| `electron/ipc/register-handlers.ts`                    | MODIFY | Register new handlers                      |
+| `electron/ipc/ai-clarification.handlers.ts`            | MODIFY | Integrate token capture after streaming    |
+| `electron/ipc/ai-overview.handlers.ts`                 | MODIFY | Integrate token capture after streaming    |
+| `lib/ai/models.ts`                                     | MODIFY | Add pricing info for cost tier indicators  |
+| `components/features/clarification/model-selector.tsx` | MODIFY | Add cost tier indicators with tooltips     |
+| `app/(app)/projects/[projectId]/usage/page.tsx`        | NEW    | Usage page route                           |
+| `app/(app)/projects/[projectId]/usage/route-type.ts`   | NEW    | Route type schema                          |
+| `components/projects/project-tabs.tsx`                 | MODIFY | Add "Usage" tab                            |
 
 ### High Priority (Should Be Modified)
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `types/electron.d.ts` | MODIFY | Add ElectronAPI types for usage logs |
-| `electron/preload.ts` | MODIFY | Expose usage logs IPC methods |
-| `hooks/useElectron.ts` | MODIFY | Add useElectronDb extension |
-| `hooks/queries/use-ai-usage-logs.ts` | NEW | TanStack Query hooks |
-| `lib/queries/ai-usage-logs.ts` | NEW | Query key factory |
-| `lib/queries/index.ts` | MODIFY | Merge new query keys |
-| `db/index.ts` | MODIFY | Import new schema |
-| `components/ui/cost-confirmation-dialog.tsx` | NEW | Pre-operation confirmation dialog |
-| `components/ui/usage-footer.tsx` | NEW | Post-operation usage footer |
-| `lib/validations/ai-usage-log.ts` | NEW | Zod validation schemas |
+| File                                         | Status | Purpose                              |
+| -------------------------------------------- | ------ | ------------------------------------ |
+| `types/electron.d.ts`                        | MODIFY | Add ElectronAPI types for usage logs |
+| `electron/preload.ts`                        | MODIFY | Expose usage logs IPC methods        |
+| `hooks/useElectron.ts`                       | MODIFY | Add useElectronDb extension          |
+| `hooks/queries/use-ai-usage-logs.ts`         | NEW    | TanStack Query hooks                 |
+| `lib/queries/ai-usage-logs.ts`               | NEW    | Query key factory                    |
+| `lib/queries/index.ts`                       | MODIFY | Merge new query keys                 |
+| `db/index.ts`                                | MODIFY | Import new schema                    |
+| `components/ui/cost-confirmation-dialog.tsx` | NEW    | Pre-operation confirmation dialog    |
+| `components/ui/usage-footer.tsx`             | NEW    | Post-operation usage footer          |
+| `lib/validations/ai-usage-log.ts`            | NEW    | Zod validation schemas               |
 
 ### Medium Priority (May Need Updates)
 
-| File | Status | Purpose |
-|------|--------|---------|
-| `components/repositories/repository-overview-generator.tsx` | MODIFY | Integrate confirmation dialog and usage footer |
-| `components/features/clarification/clarification-panel.tsx` | MODIFY | Integrate confirmation dialog and usage footer |
-| `lib/ai/pricing.ts` | NEW | TokenLens integration utility |
-| `components/ui/tooltip.tsx` | REFERENCE | Tooltip component for cost hover |
-| `components/ui/dialog.tsx` | REFERENCE | Dialog patterns |
-| `components/ui/badge.tsx` | REFERENCE | Badge patterns for cost tier |
-| `hooks/use-clarification.ts` | MODIFY | Support usage data in callbacks |
-| `hooks/use-available-models.ts` | MODIFY | Include pricing info per model |
+| File                                                        | Status    | Purpose                                        |
+| ----------------------------------------------------------- | --------- | ---------------------------------------------- |
+| `components/repositories/repository-overview-generator.tsx` | MODIFY    | Integrate confirmation dialog and usage footer |
+| `components/features/clarification/clarification-panel.tsx` | MODIFY    | Integrate confirmation dialog and usage footer |
+| `lib/ai/pricing.ts`                                         | NEW       | TokenLens integration utility                  |
+| `components/ui/tooltip.tsx`                                 | REFERENCE | Tooltip component for cost hover               |
+| `components/ui/dialog.tsx`                                  | REFERENCE | Dialog patterns                                |
+| `components/ui/badge.tsx`                                   | REFERENCE | Badge patterns for cost tier                   |
+| `hooks/use-clarification.ts`                                | MODIFY    | Support usage data in callbacks                |
+| `hooks/use-available-models.ts`                             | MODIFY    | Include pricing info per model                 |
 
 ### Low Priority (Reference/Patterns)
 

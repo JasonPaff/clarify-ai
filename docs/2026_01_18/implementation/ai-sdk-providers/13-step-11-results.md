@@ -18,12 +18,12 @@
 
 ## Provider Categories
 
-| Category | Providers | Count |
-|----------|-----------|-------|
-| Major Cloud | anthropic, google, openai | 3 |
-| Emerging | mistral, cohere, xai, groq, deepseek, togetherai | 6 |
-| Enterprise | azure, bedrock | 2 |
-| Local/Self-Hosted | ollama | 1 |
+| Category          | Providers                                        | Count |
+| ----------------- | ------------------------------------------------ | ----- |
+| Major Cloud       | anthropic, google, openai                        | 3     |
+| Emerging          | mistral, cohere, xai, groq, deepseek, togetherai | 6     |
+| Enterprise        | azure, bedrock                                   | 2     |
+| Local/Self-Hosted | ollama                                           | 1     |
 
 ## Validation Results
 

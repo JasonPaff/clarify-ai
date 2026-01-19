@@ -8,10 +8,13 @@ import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
+import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
+import { UsageFooter } from '@/components/ui/ai/usage-footer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useElectronAiOverview } from '@/hooks/useElectron';
+import { getModelInfo } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
 
 import { ModelSelector } from '../features/clarification/model-selector';
@@ -47,6 +50,9 @@ export const RepositoryOverviewGenerator = ({
   const [isCustomPromptOpen, setIsCustomPromptOpen] = useState(false);
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [streamingContent, setStreamingContent] = useState('');
+  const [reasoningContent, setReasoningContent] = useState('');
+  const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
+  const [usageData, setUsageData] = useState<null | RepositoryOverviewStreamChunk['usage']>(null);
   const [error, setError] = useState<null | string>(null);
 
   const { cancel, generate, subscribeToStream } = useElectronAiOverview();
@@ -56,9 +62,25 @@ export const RepositoryOverviewGenerator = ({
       case 'error':
         setError(chunk.content ?? 'An error occurred during generation');
         setStatus('error');
+        setIsReasoningStreaming(false);
         break;
       case 'finish':
         setStatus('complete');
+        setIsReasoningStreaming(false);
+        if (chunk.usage) {
+          setUsageData(chunk.usage);
+        }
+        break;
+      case 'reasoning':
+        if (chunk.content) {
+          setReasoningContent((prev) => prev + chunk.content);
+        }
+        break;
+      case 'reasoning_end':
+        setIsReasoningStreaming(false);
+        break;
+      case 'reasoning_start':
+        setIsReasoningStreaming(true);
         break;
       case 'text':
         if (chunk.content) {
@@ -87,6 +109,8 @@ export const RepositoryOverviewGenerator = ({
 
     setStatus('generating');
     setStreamingContent('');
+    setReasoningContent('');
+    setUsageData(null);
     setError(null);
 
     const result = await generate({
@@ -117,6 +141,8 @@ export const RepositoryOverviewGenerator = ({
   const handleRegenerate = () => {
     setStatus('idle');
     setStreamingContent('');
+    setReasoningContent('');
+    setUsageData(null);
     setError(null);
   };
 
@@ -140,6 +166,10 @@ export const RepositoryOverviewGenerator = ({
   const shouldShowContent = (isGenerating || isComplete || isStopped || isError) && hasStreamingContent;
   const isFinishedState = isComplete || isStopped || isError;
   const canSave = (isComplete || isStopped) && hasStreamingContent;
+
+  const modelInfo = selectedModel ? getModelInfo(selectedModel) : undefined;
+  const supportsThinking = modelInfo?.supportsThinking ?? false;
+  const hasReasoningContent = reasoningContent.length > 0;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -213,6 +243,14 @@ export const RepositoryOverviewGenerator = ({
         </div>
       )}
 
+      {/* Reasoning/Thinking Display */}
+      {supportsThinking && hasReasoningContent && (
+        <Reasoning isStreaming={isReasoningStreaming}>
+          <ReasoningTrigger />
+          <ReasoningContent>{reasoningContent}</ReasoningContent>
+        </Reasoning>
+      )}
+
       {/* Streaming/Complete Content Display */}
       {shouldShowContent && (
         <Conversation className={'h-96 rounded-md border border-border bg-muted/30'}>
@@ -234,6 +272,16 @@ export const RepositoryOverviewGenerator = ({
           <Loader2 className={'size-4 animate-spin text-muted-foreground'} />
           <span className={'text-sm text-muted-foreground'}>Generating repository overview...</span>
         </div>
+      )}
+
+      {/* Token Usage Display */}
+      {isFinishedState && usageData && (
+        <UsageFooter
+          inputTokens={usageData.inputTokens}
+          outputTokens={usageData.outputTokens}
+          reasoningTokens={usageData.reasoningTokens}
+          totalTokens={usageData.totalTokens}
+        />
       )}
 
       {/* Action Buttons */}

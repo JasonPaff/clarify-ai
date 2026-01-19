@@ -69,7 +69,10 @@ const DEFAULT_OLLAMA_ENDPOINT = 'http://127.0.0.1:11434';
  * @returns A provider instance with a model factory function
  * @throws Error if the provider is unknown or required credentials are missing
  */
-export async function createProvider(provider: ApiKeyProvider, credentials: ProviderCredentials): Promise<ProviderInstance> {
+export async function createProvider(
+  provider: ApiKeyProvider,
+  credentials: ProviderCredentials
+): Promise<ProviderInstance> {
   const config = PROVIDER_CONFIGS[provider];
 
   // Validate required credentials based on auth type

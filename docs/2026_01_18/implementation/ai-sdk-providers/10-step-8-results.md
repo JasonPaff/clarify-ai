@@ -9,14 +9,17 @@
 ## Schema Summary
 
 **Legacy Schemas** (backward compatible):
+
 - `createApiKeySchema` - 3 major providers only
 - `updateApiKeySchema` - Basic update
 
 **Extended Schemas** (new multi-provider form):
+
 - `createExtendedApiKeySchema` - All 12 providers with conditional validation
 - `updateExtendedApiKeySchema` - Extended update with all credential fields
 
 **New Type Exports**:
+
 - `CreateExtendedApiKeyFormValues`
 - `UpdateExtendedApiKeyFormValues`
 - `allApiProvidersTuple` - Const tuple for form select options

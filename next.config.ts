@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   },
   output: isElectronBuild ? 'export' : undefined,
   trailingSlash: isElectronBuild,
+  transpilePackages: ['shiki', 'streamdown'],
 };
 
 export default nextConfig;

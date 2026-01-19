@@ -111,7 +111,10 @@ export function useElectronApiKeys() {
   );
 
   const test = useCallback(
-    async (provider: ApiKeyProvider, credentials?: ProviderCredentials): Promise<{ error?: string; success: boolean }> => {
+    async (
+      provider: ApiKeyProvider,
+      credentials?: ProviderCredentials
+    ): Promise<{ error?: string; success: boolean }> => {
       if (!api) return { error: 'Not running in Electron', success: false };
       return api.apiKeys.test(provider, credentials);
     },
