@@ -1,5 +1,7 @@
 'use client';
 
+import { Streamdown } from 'streamdown';
+
 import { cn } from '@/lib/utils';
 
 type RepositoryOverviewMarkdownProps = ClassName & {
@@ -8,8 +10,8 @@ type RepositoryOverviewMarkdownProps = ClassName & {
 };
 
 /**
- * Simple markdown text renderer for repository overview content.
- * Renders text with basic styling - for plain text display without markdown parsing.
+ * Markdown renderer for repository overview content.
+ * Uses Streamdown for proper markdown parsing and rendering.
  */
 export const RepositoryOverviewMarkdown = ({
   className,
@@ -21,11 +23,9 @@ export const RepositoryOverviewMarkdown = ({
   }
 
   return (
-    <div className={cn('max-w-none text-sm text-foreground', className)}>
-      <div className={'leading-relaxed wrap-break-word whitespace-pre-wrap'}>
-        {content}
-        {isStreaming && <span className={'ml-0.5 animate-pulse'}>|</span>}
-      </div>
+    <div className={cn('max-w-none text-sm text-foreground [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}>
+      <Streamdown>{content}</Streamdown>
+      {isStreaming && <span className={'ml-0.5 animate-pulse'}>|</span>}
     </div>
   );
 };
