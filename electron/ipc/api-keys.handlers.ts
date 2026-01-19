@@ -27,6 +27,8 @@ export interface ApiKeyInfo {
   /** Whether AWS credentials are configured (for Bedrock) */
   hasAwsCredentials?: boolean;
   isConfigured: boolean;
+  /** Whether this API key is disabled */
+  isDisabled: boolean;
   maskedKey: string;
   notes?: string;
   provider: ApiKeyProvider;
@@ -70,6 +72,8 @@ interface StoredApiKeyData {
   encryptedSecretAccessKey?: string;
   /** Endpoint URL for Azure/Ollama (stored as plaintext for display) */
   endpoint?: string;
+  /** Whether this API key is disabled (optional for backward compatibility) */
+  isDisabled?: boolean;
   notes?: string;
   /** AWS region for Bedrock (stored as plaintext for display) */
   region?: string;
@@ -124,6 +128,7 @@ export function registerApiKeysHandlers(): void {
       if (envKey) {
         result.push({
           isConfigured: true,
+          isDisabled: false,
           maskedKey: maskApiKey(envKey),
           provider,
           source: 'environment',
@@ -137,6 +142,7 @@ export function registerApiKeysHandlers(): void {
         result.push({
           ...envCredentials,
           isConfigured: true,
+          isDisabled: false,
           provider,
           source: 'environment',
         });
@@ -146,6 +152,7 @@ export function registerApiKeysHandlers(): void {
       // Not configured
       result.push({
         isConfigured: false,
+        isDisabled: false,
         maskedKey: '',
         provider,
         source: 'user',
@@ -172,6 +179,13 @@ export function registerApiKeysHandlers(): void {
       // Check for user-stored credentials first
       const storedData = getStoredKeyData(provider);
       if (storedData) {
+        // Check if disabled
+        if (storedData.isDisabled === true) {
+          return {
+            error: `API key for ${PROVIDER_DISPLAY_NAMES[provider]} is currently disabled`,
+          };
+        }
+
         const credentials = decryptStoredCredentials(storedData, config.authType);
         if (credentials) {
           return {
@@ -308,6 +322,35 @@ export function registerApiKeysHandlers(): void {
     }
   );
 
+  // Toggle API key disabled state
+  ipcMain.handle(
+    IpcChannels.apiKeys.toggleDisabled,
+    (_event: IpcMainInvokeEvent, provider: ApiKeyProvider): { error?: string; success: boolean } => {
+      try {
+        const storeKey = getStoreKey(provider);
+        const storedData = store.get(storeKey) as StoredApiKeyData | undefined;
+
+        if (!storedData) {
+          return { error: 'No stored credentials found for this provider', success: false };
+        }
+
+        const updatedData: StoredApiKeyData = {
+          ...storedData,
+          isDisabled: !(storedData.isDisabled ?? false),
+          updatedAt: new Date().toISOString(),
+        };
+
+        store.set(storeKey, updatedData);
+        return { success: true };
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error.message : 'Failed to toggle API key state',
+          success: false,
+        };
+      }
+    }
+  );
+
   // Test an API key by making a minimal API call
   ipcMain.handle(
     IpcChannels.apiKeys.test,
@@ -419,6 +462,7 @@ function buildApiKeyInfoFromStored(
       return {
         createdAt: storedData.createdAt,
         isConfigured: true,
+        isDisabled: storedData.isDisabled ?? false,
         maskedKey: maskApiKey(decryptedKey),
         notes: storedData.notes,
         provider,
@@ -436,6 +480,7 @@ function buildApiKeyInfoFromStored(
         createdAt: storedData.createdAt,
         hasAwsCredentials: true,
         isConfigured: true,
+        isDisabled: storedData.isDisabled ?? false,
         maskedKey: maskApiKey(decryptedAccessKeyId),
         notes: storedData.notes,
         provider,
@@ -455,6 +500,7 @@ function buildApiKeyInfoFromStored(
         deploymentName: storedData.deploymentName,
         endpoint: storedData.endpoint,
         isConfigured: true,
+        isDisabled: storedData.isDisabled ?? false,
         maskedKey: maskApiKey(decryptedKey),
         notes: storedData.notes,
         provider,
@@ -469,6 +515,7 @@ function buildApiKeyInfoFromStored(
         createdAt: storedData.createdAt,
         endpoint: storedData.endpoint ?? 'http://localhost:11434',
         isConfigured: true,
+        isDisabled: storedData.isDisabled ?? false,
         maskedKey: '', // No API key for Ollama
         notes: storedData.notes,
         provider,
@@ -602,6 +649,7 @@ function getEnvCredentials(provider: ApiKeyProvider): null | Omit<ApiKeyInfo, 'i
       if (accessKeyId && secretAccessKey && region) {
         return {
           hasAwsCredentials: true,
+          isDisabled: false,
           maskedKey: maskApiKey(accessKeyId),
           region,
         };
@@ -618,6 +666,7 @@ function getEnvCredentials(provider: ApiKeyProvider): null | Omit<ApiKeyInfo, 'i
         return {
           deploymentName,
           endpoint,
+          isDisabled: false,
           maskedKey: maskApiKey(apiKey),
         };
       }
@@ -763,7 +812,7 @@ async function testAnthropicKey(credentials: ProviderCredentials): Promise<TestR
 
     // Make a minimal API call with the smallest model and minimal tokens
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: anthropic('claude-3-haiku-20240307'),
       prompt: 'Hi',
     });
@@ -833,7 +882,7 @@ async function testAzureKey(credentials: ProviderCredentials): Promise<TestResul
     const deploymentName = credentials.deploymentName ?? 'gpt-4o-mini';
 
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: azure(deploymentName),
       prompt: 'Hi',
     });
@@ -892,7 +941,7 @@ async function testBedrockCredentials(credentials: ProviderCredentials): Promise
 
     // Use Claude Haiku on Bedrock as a lightweight test model
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: bedrock('anthropic.claude-3-haiku-20240307-v1:0'),
       prompt: 'Hi',
     });
@@ -931,7 +980,7 @@ async function testCohereKey(credentials: ProviderCredentials): Promise<TestResu
 
     // Use command-light for a minimal test
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: cohere('command-r'),
       prompt: 'Hi',
     });
@@ -968,7 +1017,7 @@ async function testDeepSeekKey(credentials: ProviderCredentials): Promise<TestRe
     const deepseek = createDeepSeek({ apiKey: credentials.apiKey });
 
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: deepseek('deepseek-chat'),
       prompt: 'Hi',
     });
@@ -1008,8 +1057,8 @@ async function testGoogleKey(credentials: ProviderCredentials): Promise<TestResu
 
     // Make a minimal API call with a small model and minimal tokens
     await generateText({
-      maxOutputTokens: 1,
-      model: google('gemini-1.5-flash'),
+      maxOutputTokens: 16,
+      model: google('gemini-2.0-flash'),
       prompt: 'Hi',
     });
 
@@ -1046,7 +1095,7 @@ async function testGroqKey(credentials: ProviderCredentials): Promise<TestResult
 
     // Use llama for a fast test
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: groq('llama-3.1-8b-instant'),
       prompt: 'Hi',
     });
@@ -1084,7 +1133,7 @@ async function testMistralKey(credentials: ProviderCredentials): Promise<TestRes
 
     // Use mistral-small for a fast test
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: mistral('mistral-small-latest'),
       prompt: 'Hi',
     });
@@ -1196,7 +1245,7 @@ async function testOpenAIKey(credentials: ProviderCredentials): Promise<TestResu
 
     // Make a minimal API call with a small model and minimal tokens
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: openai('gpt-4o-mini'),
       prompt: 'Hi',
     });
@@ -1234,7 +1283,7 @@ async function testOpenRouterKey(credentials: ProviderCredentials): Promise<Test
 
     // Use a fast, cost-effective model for testing
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: openrouter('meta-llama/llama-3.1-8b-instruct'),
       prompt: 'Hi',
     });
@@ -1272,7 +1321,7 @@ async function testTogetherAiKey(credentials: ProviderCredentials): Promise<Test
 
     // Use a small, fast model for testing
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: together('meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo'),
       prompt: 'Hi',
     });
@@ -1309,7 +1358,7 @@ async function testXaiKey(credentials: ProviderCredentials): Promise<TestResult>
     const xai = createXai({ apiKey: credentials.apiKey });
 
     await generateText({
-      maxOutputTokens: 1,
+      maxOutputTokens: 16,
       model: xai('grok-2'),
       prompt: 'Hi',
     });

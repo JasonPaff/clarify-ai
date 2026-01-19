@@ -28,7 +28,7 @@ export function useAvailableModels(): UseAvailableModelsResult {
 
   const configuredProviders = useMemo(() => {
     if (!apiKeys) return [];
-    return apiKeys.filter((key) => key.isConfigured).map((key) => key.provider);
+    return apiKeys.filter((key) => key.isConfigured && !key.isDisabled).map((key) => key.provider);
   }, [apiKeys]);
 
   const models = useMemo(() => {

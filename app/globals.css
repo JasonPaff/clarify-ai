@@ -6,6 +6,9 @@
   /* Sidebar dimensions (theme-independent) */
   --sidebar-width-expanded: 256px;
   --sidebar-width-collapsed: 64px;
+
+  /* Scrollbar dimensions */
+  --scrollbar-width: 8px;
 }
 
 /* Light mode colors - Baltimore Orioles inspired */
@@ -31,6 +34,10 @@
 
   --destructive: #b91c1c;
   --destructive-foreground: #ffffff;
+
+  --scrollbar-track: #f5f2ef;
+  --scrollbar-thumb: #d0c8c0;
+  --scrollbar-thumb-hover: #b8b0a8;
 }
 
 /* Dark mode via explicit class - Baltimore Orioles inspired */
@@ -55,6 +62,10 @@
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
+
+  --scrollbar-track: #1a1816;
+  --scrollbar-thumb: #3a3530;
+  --scrollbar-thumb-hover: #4a4540;
 }
 
 /* System mode: apply dark colors only when no explicit class is set - Baltimore Orioles inspired */
@@ -80,6 +91,10 @@
 
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
+
+    --scrollbar-track: #1a1816;
+    --scrollbar-thumb: #3a3530;
+    --scrollbar-thumb-hover: #4a4540;
   }
 }
 
@@ -131,6 +146,34 @@
 
 .no-drag {
   -webkit-app-region: no-drag;
+}
+
+/* Custom scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 /* Shimmer animation for text */

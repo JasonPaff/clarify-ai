@@ -2,7 +2,7 @@
 
 import type { ComponentPropsWithRef, ReactNode } from 'react';
 
-import { Cloud, Globe, Key, Pencil, Server, Trash2, Zap } from 'lucide-react';
+import { Cloud, Globe, Key, Pencil, Power, PowerOff, Server, Trash2, Zap } from 'lucide-react';
 import { Fragment, useMemo } from 'react';
 
 import type { ApiKeyInfo, ApiKeyProvider, ProviderCategory } from '@/types/electron';
@@ -10,6 +10,7 @@ import type { ApiKeyInfo, ApiKeyProvider, ProviderCategory } from '@/types/elect
 import { Badge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
 import { IconButton } from '@/components/ui/icon-button';
+import { useToggleApiKeyDisabled } from '@/hooks/queries/use-api-keys';
 import { cn } from '@/lib/utils';
 import { getProvidersByCategory, PROVIDER_CATEGORIES, PROVIDER_DISPLAY_NAMES } from '@/types/electron';
 
@@ -198,25 +199,36 @@ interface ApiKeyTableRowProps {
 }
 
 const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
+  const toggleMutation = useToggleApiKeyDisabled();
   const providerDisplayName = getProviderDisplayName(entry.provider);
   const category = PROVIDER_CATEGORIES[entry.provider];
 
   const _isUserKey = entry.source === 'user';
   const _isConfigured = entry.isConfigured;
+  const _isDisabled = entry.isDisabled;
   const _isEnterprise = category === 'enterprise';
   const _isLocal = category === 'local';
+
+  const handleToggleDisabled = () => {
+    toggleMutation.mutate(entry.provider);
+  };
 
   return (
     <div
       className={cn(
         'grid grid-cols-[1fr_minmax(120px,1fr)_auto_minmax(100px,1fr)_auto] items-center gap-4 px-4 py-3',
         'transition-colors hover:bg-muted/30',
-        !_isConfigured && 'opacity-60'
+        (!_isConfigured || _isDisabled) && 'opacity-60'
       )}
     >
       {/* Provider */}
       <div className={'flex items-center gap-2'}>
         <Badge variant={entry.provider}>{providerDisplayName}</Badge>
+        {_isDisabled && (
+          <Badge size={'sm'}>
+            Disabled
+          </Badge>
+        )}
       </div>
 
       {/* Credentials Display */}
@@ -252,9 +264,27 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
       <div className={'flex justify-end gap-1'}>
         {_isUserKey && _isConfigured && (
           <Fragment>
-            <IconButton aria-label={`Edit ${providerDisplayName} API key`} onClick={onEdit} type={'button'}>
+            {/* Toggle button */}
+            <IconButton
+              aria-label={_isDisabled ? `Enable ${providerDisplayName}` : `Disable ${providerDisplayName}`}
+              disabled={toggleMutation.isPending}
+              onClick={handleToggleDisabled}
+              type={'button'}
+            >
+              {_isDisabled ? <Power className={'size-4'} /> : <PowerOff className={'size-4'} />}
+            </IconButton>
+
+            {/* Edit button */}
+            <IconButton
+              aria-label={`Edit ${providerDisplayName} API key`}
+              disabled={_isDisabled}
+              onClick={onEdit}
+              type={'button'}
+            >
               <Pencil className={'size-4'} />
             </IconButton>
+
+            {/* Delete button */}
             <IconButton aria-label={`Delete ${providerDisplayName} API key`} onClick={onDelete} type={'button'}>
               <Trash2 className={'size-4'} />
             </IconButton>

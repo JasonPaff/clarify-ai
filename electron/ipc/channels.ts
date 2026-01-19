@@ -18,6 +18,7 @@ export const IpcChannels = {
     isEncryptionAvailable: 'apiKeys:isEncryptionAvailable',
     set: 'apiKeys:set',
     test: 'apiKeys:test',
+    toggleDisabled: 'apiKeys:toggleDisabled',
   },
   app: {
     getPath: 'app:getPath',

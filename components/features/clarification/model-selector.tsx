@@ -1,23 +1,33 @@
 'use client';
 
+import { useMemo, useState } from 'react';
+
 import type { FullModelId } from '@/lib/ai/models';
 import type { ApiKeyProvider } from '@/types/electron';
 
 import {
-  SelectGroup,
-  SelectGroupLabel,
-  SelectItem,
-  SelectList,
-  SelectPopup,
-  SelectPortal,
-  SelectPositioner,
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxGroupLabel,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxItemIndicator,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxPortal,
+  ComboboxPositioner,
+  ComboboxRoot,
+  ComboboxTrigger,
+} from '@/components/ui/combobox';
 import { useAvailableModels } from '@/hooks/use-available-models';
 import { PROVIDER_NAMES } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
+
+interface ModelOption {
+  group: string;
+  label: string;
+  value: string;
+}
 
 type ModelSelectorProps = ClassName & {
   isDisabled?: boolean;
@@ -26,76 +36,128 @@ type ModelSelectorProps = ClassName & {
 };
 
 /**
- * Dropdown selector for AI models, grouped by provider.
+ * Combobox selector for AI models, grouped by provider.
  * Only shows models for providers with configured API keys.
+ * Supports filtering by typing.
  */
 export const ModelSelector = ({ className, isDisabled, onValueChange, value }: ModelSelectorProps) => {
   const { configuredProviders, isLoading, modelsByProvider } = useAvailableModels();
+  const [inputValue, setInputValue] = useState('');
 
-  const handleValueChange = (newValue: null | string) => {
+  const handleValueChange = (newValue: ModelOption | null) => {
     if (newValue) {
-      onValueChange(newValue as FullModelId);
+      onValueChange(newValue.value as FullModelId);
     }
+    // Clear input when a selection is made
+    setInputValue('');
+  };
+
+  const handleInputValueChange = (newInputValue: string) => {
+    setInputValue(newInputValue);
   };
 
   const hasNoProviders = !isLoading && configuredProviders.length === 0;
 
-  // Build grouped options
-  const groupedOptions: Array<{
-    label: string;
-    options: Array<{ label: string; value: string }>;
-    provider: ApiKeyProvider;
-  }> = [];
-
-  for (const provider of configuredProviders) {
-    const models = modelsByProvider[provider];
-    if (models && models.length > 0) {
-      groupedOptions.push({
-        label: PROVIDER_NAMES[provider],
-        options: models.map((model) => ({
-          label: model.name,
-          value: model.fullId,
-        })),
-        provider,
-      });
+  // Flatten all options for the combobox with group info
+  const allOptions = useMemo(() => {
+    const options: Array<ModelOption> = [];
+    for (const provider of configuredProviders) {
+      const models = modelsByProvider[provider];
+      if (models && models.length > 0) {
+        const groupLabel = PROVIDER_NAMES[provider];
+        for (const model of models) {
+          options.push({
+            group: groupLabel,
+            label: model.name,
+            value: model.fullId,
+          });
+        }
+      }
     }
-  }
+    return options;
+  }, [configuredProviders, modelsByProvider]);
+
+  // Get unique groups in order
+  const groups = useMemo(() => {
+    const seen = new Set<string>();
+    const result: Array<{ label: string; provider: ApiKeyProvider }> = [];
+    for (const provider of configuredProviders) {
+      const models = modelsByProvider[provider];
+      if (models && models.length > 0) {
+        const label = PROVIDER_NAMES[provider];
+        if (!seen.has(label)) {
+          seen.add(label);
+          result.push({ label, provider });
+        }
+      }
+    }
+    return result;
+  }, [configuredProviders, modelsByProvider]);
+
+  // Find the selected option object
+  const selectedOption = useMemo(() => {
+    if (!value) return null;
+    return allOptions.find((opt) => opt.value === value) ?? null;
+  }, [allOptions, value]);
+
+  // Filter options based on input
+  const filteredOptions = useMemo(() => {
+    if (!inputValue) return allOptions;
+    const lowercaseInput = inputValue.toLowerCase();
+    return allOptions.filter(
+      (option) =>
+        option.label.toLowerCase().includes(lowercaseInput) || option.group.toLowerCase().includes(lowercaseInput)
+    );
+  }, [allOptions, inputValue]);
+
+  // Get filtered groups (only show groups that have matching options)
+  const filteredGroups = useMemo(() => {
+    return groups.filter((group) => filteredOptions.some((opt) => opt.group === group.label));
+  }, [filteredOptions, groups]);
 
   // Determine display value for placeholder states
   const getPlaceholder = () => {
     if (isLoading) return 'Loading models...';
     if (hasNoProviders) return 'No API keys configured';
-    return 'Select a model...';
+    return 'Search models...';
   };
 
   return (
-    <SelectRoot
+    <ComboboxRoot<ModelOption>
       disabled={isDisabled || isLoading || hasNoProviders}
+      onInputValueChange={handleInputValueChange}
       onValueChange={handleValueChange}
-      value={value ?? ''}
+      value={selectedOption}
     >
-      <SelectTrigger className={cn('w-full', className)}>
-        <SelectValue placeholder={getPlaceholder()} />
-      </SelectTrigger>
+      <div className={cn('relative w-full', className)}>
+        <ComboboxInput placeholder={getPlaceholder()} />
+        <div className={'absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-0.5'}>
+          <ComboboxTrigger />
+        </div>
+      </div>
 
-      <SelectPortal>
-        <SelectPositioner>
-          <SelectPopup>
-            <SelectList>
-              {groupedOptions.map((group) => (
-                <SelectGroup key={group.provider}>
-                  <SelectGroupLabel>{group.label}</SelectGroupLabel>
-                  {group.options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
+      <ComboboxPortal>
+        <ComboboxPositioner>
+          <ComboboxPopup>
+            <ComboboxList>
+              {filteredGroups.map((group) => (
+                <ComboboxGroup key={group.provider}>
+                  <ComboboxGroupLabel>{group.label}</ComboboxGroupLabel>
+                  {filteredOptions
+                    .filter((option) => option.group === group.label)
+                    .map((option) => (
+                      <ComboboxItem key={option.value} value={option}>
+                        <ComboboxItemIndicator />
+                        <span className={'col-start-2'}>{option.label}</span>
+                      </ComboboxItem>
+                    ))}
+                </ComboboxGroup>
               ))}
-            </SelectList>
-          </SelectPopup>
-        </SelectPositioner>
-      </SelectPortal>
-    </SelectRoot>
+            </ComboboxList>
+            <ComboboxEmpty>No models found</ComboboxEmpty>
+          </ComboboxPopup>
+        </ComboboxPositioner>
+      </ComboboxPortal>
+    </ComboboxRoot>
   );
 };

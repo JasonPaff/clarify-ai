@@ -77,3 +77,20 @@ export function useTestApiKey() {
       test(provider, credentials),
   });
 }
+
+export function useToggleApiKeyDisabled() {
+  const queryClient = useQueryClient();
+  const { toggleDisabled } = useElectronApiKeys();
+
+  return useMutation({
+    mutationFn: (provider: AiProvider) => toggleDisabled(provider),
+    onSuccess: (_result, provider) => {
+      void queryClient.invalidateQueries({
+        queryKey: apiKeyKeys.detail(provider).queryKey,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: apiKeyKeys.list.queryKey,
+      });
+    },
+  });
+}

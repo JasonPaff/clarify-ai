@@ -121,6 +121,14 @@ export function useElectronApiKeys() {
     [api]
   );
 
+  const toggleDisabled = useCallback(
+    async (provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.apiKeys.toggleDisabled(provider);
+    },
+    [api]
+  );
+
   return {
     deleteKey,
     get,
@@ -129,6 +137,7 @@ export function useElectronApiKeys() {
     isEncryptionAvailable,
     set,
     test,
+    toggleDisabled,
   };
 }
 

@@ -112,6 +112,10 @@ export interface ElectronAPI {
       provider: import('../electron/ipc/lib/provider-types').ApiKeyProvider,
       credentials?: import('../electron/ipc/lib/provider-types').ProviderCredentials
     ): Promise<{ error?: string; success: boolean }>;
+    /** Toggle the disabled state of stored credentials for a provider */
+    toggleDisabled(
+      provider: import('../electron/ipc/lib/provider-types').ApiKeyProvider
+    ): Promise<{ error?: string; success: boolean }>;
   };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;

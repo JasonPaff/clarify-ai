@@ -38,6 +38,7 @@ export interface ElectronAPI {
     isEncryptionAvailable(): Promise<boolean>;
     set(input: SetApiKeyInput): Promise<{ error?: string; success: boolean }>;
     test(provider: ApiKeyProvider, credentials?: ProviderCredentials): Promise<{ error?: string; success: boolean }>;
+    toggleDisabled(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
   };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
@@ -156,6 +157,7 @@ const electronAPI: ElectronAPI = {
     isEncryptionAvailable: () => ipcRenderer.invoke(IpcChannels.apiKeys.isEncryptionAvailable),
     set: (input) => ipcRenderer.invoke(IpcChannels.apiKeys.set, input),
     test: (provider, credentials) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider, credentials),
+    toggleDisabled: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.toggleDisabled, provider),
   },
   app: {
     getPath: (name) => ipcRenderer.invoke(IpcChannels.app.getPath, name),
