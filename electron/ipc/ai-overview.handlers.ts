@@ -6,6 +6,9 @@ import { IpcChannels } from './channels';
 import { collectRepositoryData } from './fs.handlers';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
 
+/** Default thinking budget in tokens for models that support extended thinking */
+const DEFAULT_THINKING_BUDGET = 10000;
+
 /** Request payload for generating repository overview */
 export interface RepositoryOverviewGenerateRequest {
   customPrompt?: string;
@@ -24,6 +27,42 @@ export interface RepositoryOverviewStreamChunk {
     reasoningTokens?: number;
     totalTokens: number;
   };
+}
+
+/** Provider type for API key providers */
+type ApiKeyProvider = 'anthropic' | 'google' | 'openai';
+
+/**
+ * Build provider options to enable thinking/reasoning for supported models
+ */
+function buildThinkingProviderOptions(
+  provider: ApiKeyProvider,
+  supportsThinking: boolean
+): Record<string, unknown> | undefined {
+  if (!supportsThinking) {
+    return undefined;
+  }
+
+  switch (provider) {
+    case 'anthropic':
+      return {
+        anthropic: {
+          thinking: { budgetTokens: DEFAULT_THINKING_BUDGET, type: 'enabled' },
+        },
+      };
+    case 'google':
+      return {
+        google: {
+          thinkingConfig: { includeThoughts: true, thinkingBudget: DEFAULT_THINKING_BUDGET },
+        },
+      };
+    case 'openai':
+      return {
+        openai: { reasoningEffort: 'medium' },
+      };
+    default:
+      return undefined;
+  }
 }
 
 // Active abort controller for cancellation
@@ -66,6 +105,7 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         // Dynamic imports for AI SDK
         const { streamText } = await import('ai');
         const { buildRepositoryOverviewPrompt } = await import('../../lib/ai/prompts/repository-overview');
+        const { getModelInfo } = await import('../../lib/ai/models');
 
         // Create the provider instance
         const providerInstance = await createProvider(provider, credentials);
@@ -73,12 +113,18 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         // Build the prompt
         const prompt = buildRepositoryOverviewPrompt(repoData, customPrompt);
 
+        // Check if the model supports thinking and build provider options
+        const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
+        const supportsThinking = modelInfo?.supportsThinking ?? false;
+        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, supportsThinking);
+
         // Stream the response
         const result = streamText({
           abortSignal: activeAbortController.signal,
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
-        });
+          ...(providerOptions && { providerOptions }),
+        } as Parameters<typeof streamText>[0]);
 
         // Process the stream and send chunks to renderer
         for await (const part of result.fullStream) {
