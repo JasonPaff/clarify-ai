@@ -49,7 +49,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
 
   for (const provider of configuredProviders) {
     const models = modelsByProvider[provider];
-    if (models.length > 0) {
+    if (models && models.length > 0) {
       groupedOptions.push({
         label: PROVIDER_NAMES[provider],
         options: models.map((model) => ({

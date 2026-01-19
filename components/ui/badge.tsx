@@ -28,9 +28,25 @@ export const badgeVariants = cva(
           bg-orange-500/15 text-orange-700
           dark:bg-orange-500/20 dark:text-orange-400
         `,
+        azure: `
+          bg-sky-500/15 text-sky-700
+          dark:bg-sky-500/20 dark:text-sky-400
+        `,
+        bedrock: `
+          bg-amber-500/15 text-amber-700
+          dark:bg-amber-500/20 dark:text-amber-400
+        `,
+        cohere: `
+          bg-rose-500/15 text-rose-700
+          dark:bg-rose-500/20 dark:text-rose-400
+        `,
         completed: `
           bg-green-500/15 text-green-700
           dark:bg-green-500/20 dark:text-green-400
+        `,
+        deepseek: `
+          bg-indigo-500/15 text-indigo-700
+          dark:bg-indigo-500/20 dark:text-indigo-400
         `,
         default: `
           bg-muted text-muted-foreground
@@ -46,6 +62,18 @@ export const badgeVariants = cva(
         google: `
           bg-blue-500/15 text-blue-700
           dark:bg-blue-500/20 dark:text-blue-400
+        `,
+        groq: `
+          bg-lime-500/15 text-lime-700
+          dark:bg-lime-500/20 dark:text-lime-400
+        `,
+        mistral: `
+          bg-red-500/15 text-red-700
+          dark:bg-red-500/20 dark:text-red-400
+        `,
+        ollama: `
+          bg-fuchsia-500/15 text-fuchsia-700
+          dark:bg-fuchsia-500/20 dark:text-fuchsia-400
         `,
         openai: `
           bg-emerald-500/15 text-emerald-700
@@ -63,9 +91,17 @@ export const badgeVariants = cva(
           bg-blue-500/15 text-blue-700
           dark:bg-blue-500/20 dark:text-blue-400
         `,
+        togetherai: `
+          bg-teal-500/15 text-teal-700
+          dark:bg-teal-500/20 dark:text-teal-400
+        `,
         user: `
           bg-violet-500/15 text-violet-700
           dark:bg-violet-500/20 dark:text-violet-400
+        `,
+        xai: `
+          bg-slate-500/15 text-slate-700
+          dark:bg-slate-500/20 dark:text-slate-400
         `,
       },
     },

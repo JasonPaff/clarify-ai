@@ -16,7 +16,7 @@ interface UseAvailableModelsResult {
   configuredProviders: Array<ApiKeyProvider>;
   isLoading: boolean;
   models: Array<AvailableModel>;
-  modelsByProvider: Record<ApiKeyProvider, Array<AvailableModel>>;
+  modelsByProvider: Partial<Record<ApiKeyProvider, Array<AvailableModel>>>;
 }
 
 /**
@@ -49,13 +49,13 @@ export function useAvailableModels(): UseAvailableModelsResult {
   }, [configuredProviders]);
 
   const modelsByProvider = useMemo(() => {
-    const result: Record<ApiKeyProvider, Array<AvailableModel>> = {
-      anthropic: [],
-      google: [],
-      openai: [],
-    };
+    // Create a partial record that only contains entries for configured providers
+    const result: Partial<Record<ApiKeyProvider, Array<AvailableModel>>> = {};
     for (const model of models) {
-      result[model.provider].push(model);
+      if (!result[model.provider]) {
+        result[model.provider] = [];
+      }
+      result[model.provider]!.push(model);
     }
     return result;
   }, [models]);

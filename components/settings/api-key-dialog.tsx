@@ -2,6 +2,7 @@
 
 import { X } from 'lucide-react';
 
+import type { MajorProvider } from '@/lib/validations/api-key';
 import type { ApiKeyInfo } from '@/types/electron';
 
 import {
@@ -53,11 +54,12 @@ export function ApiKeyDialog({ children, existingKey, mode, onOpenChange, open: 
     ? 'Update the API key or notes for this provider.'
     : 'Add a new API key for an AI provider.';
 
+  // Type assertion is safe because the API key management UI only displays major providers
   const _initialValues =
     _isEditMode && existingKey
       ? {
           notes: existingKey.notes ?? '',
-          provider: existingKey.provider,
+          provider: existingKey.provider as MajorProvider,
         }
       : undefined;
 

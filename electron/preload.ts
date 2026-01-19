@@ -6,8 +6,9 @@ import type { NewRepository, Repository } from '../db/schema/repositories.schema
 import type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
-import type { ApiKeyInfo, ApiKeyProvider, SetApiKeyInput } from './ipc/api-keys.handlers';
+import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';
 import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
+import type { ApiKeyProvider, ProviderCredentials } from './ipc/lib/provider-types';
 
 import { IpcChannels } from './ipc/channels';
 
@@ -26,11 +27,16 @@ export interface ElectronAPI {
   };
   apiKeys: {
     delete(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
-    get(provider: ApiKeyProvider): Promise<{ error?: string; key?: string; source?: 'environment' | 'user' }>;
+    get(provider: ApiKeyProvider): Promise<{
+      credentials?: ProviderCredentials;
+      error?: string;
+      key?: string;
+      source?: 'environment' | 'user';
+    }>;
     getAll(): Promise<Array<ApiKeyInfo>>;
     isEncryptionAvailable(): Promise<boolean>;
     set(input: SetApiKeyInput): Promise<{ error?: string; success: boolean }>;
-    test(provider: ApiKeyProvider, apiKey?: string): Promise<{ error?: string; success: boolean }>;
+    test(provider: ApiKeyProvider, credentials?: ProviderCredentials): Promise<{ error?: string; success: boolean }>;
   };
   app: {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
@@ -148,7 +154,7 @@ const electronAPI: ElectronAPI = {
     getAll: () => ipcRenderer.invoke(IpcChannels.apiKeys.getAll),
     isEncryptionAvailable: () => ipcRenderer.invoke(IpcChannels.apiKeys.isEncryptionAvailable),
     set: (input) => ipcRenderer.invoke(IpcChannels.apiKeys.set, input),
-    test: (provider, apiKey) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider, apiKey),
+    test: (provider, credentials) => ipcRenderer.invoke(IpcChannels.apiKeys.test, provider, credentials),
   },
   app: {
     getPath: (name) => ipcRenderer.invoke(IpcChannels.app.getPath, name),
