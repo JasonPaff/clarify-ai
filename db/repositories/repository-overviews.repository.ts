@@ -1,7 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
 
-import type { DrizzleDatabase } from '@/db';
-
+import type { DrizzleDatabase } from '../index';
 import type { NewRepositoryOverview, RepositoryOverview } from '../schema/repository-overviews.schema';
 
 import { repositoryOverviews } from '../schema/repository-overviews.schema';
@@ -10,8 +9,8 @@ export interface RepositoryOverviewsRepository {
   create(data: NewRepositoryOverview): RepositoryOverview;
   delete(id: number): boolean;
   deleteByRepositoryId(repositoryId: number): boolean;
-  getByRepositoryId(repositoryId: number): null | RepositoryOverview;
-  update(id: number, data: Partial<NewRepositoryOverview>): null | RepositoryOverview;
+  getByRepositoryId(repositoryId: number): RepositoryOverview | undefined;
+  update(id: number, data: Partial<NewRepositoryOverview>): RepositoryOverview | undefined;
   upsert(repositoryId: number, data: Omit<NewRepositoryOverview, 'repositoryId'>): RepositoryOverview;
 }
 
@@ -31,21 +30,17 @@ export function createRepositoryOverviewsRepository(db: DrizzleDatabase): Reposi
       return result.changes > 0;
     },
 
-    getByRepositoryId(repositoryId: number): null | RepositoryOverview {
-      return (
-        db.select().from(repositoryOverviews).where(eq(repositoryOverviews.repositoryId, repositoryId)).get() ?? null
-      );
+    getByRepositoryId(repositoryId: number): RepositoryOverview | undefined {
+      return db.select().from(repositoryOverviews).where(eq(repositoryOverviews.repositoryId, repositoryId)).get();
     },
 
-    update(id: number, data: Partial<NewRepositoryOverview>): null | RepositoryOverview {
-      return (
-        db
-          .update(repositoryOverviews)
-          .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
-          .where(eq(repositoryOverviews.id, id))
-          .returning()
-          .get() ?? null
-      );
+    update(id: number, data: Partial<NewRepositoryOverview>): RepositoryOverview | undefined {
+      return db
+        .update(repositoryOverviews)
+        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .where(eq(repositoryOverviews.id, id))
+        .returning()
+        .get();
     },
 
     upsert(repositoryId: number, data: Omit<NewRepositoryOverview, 'repositoryId'>): RepositoryOverview {

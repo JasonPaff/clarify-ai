@@ -1,65 +1,78 @@
-# Step 9 Results: Create generation dialog component
+# Step 9: Create generation dialog component
 
+**Specialist**: frontend-component
 **Status**: ✅ Success
+**Timestamp**: 2026-01-19
 
-## Files Created
+## Implementation Summary
 
-- `components/repositories/repository-overview-markdown.tsx` - Markdown/text renderer
-- `components/repositories/repository-overview-generator.tsx` - Generation UI with streaming
-- `components/repositories/repository-overview-viewer.tsx` - View/edit existing overview
-- `components/repositories/repository-overview-dialog.tsx` - Main dialog component
+**Status**: success
 
-## Component Features
+The dialog components were already fully implemented. The frontend-component agent verified all features.
 
-### RepositoryOverviewDialog
+**Files Verified**:
+- `components/repositories/repository-overview-dialog.tsx` - Dialog wrapper
+- `components/repositories/repository-overview-generator.tsx` - Generation UI
+- `components/repositories/repository-overview-viewer.tsx` - Viewer UI
+- `components/repositories/repository-overview-markdown.tsx` - Markdown renderer
 
-- Main dialog with generation and view modes
-- Auto-switches mode based on existing overview
-- Uses Base UI Dialog component
+**Validation Results**:
+- ✅ pnpm lint: PASS
+- ✅ pnpm typecheck: PASS
 
-### RepositoryOverviewGenerator
+**Success Criteria**:
+- [✓] Dialog component created with all required features
+- [✓] Real-time streaming display works (Conversation/Message components)
+- [✓] Model selection implemented (ModelSelector integration)
+- [✓] Save functionality integrated (useUpsertRepositoryOverview)
+- [✓] Proper error handling (Alert component)
+- [✓] Follows project component patterns (Base UI + CVA)
+- [✓] Accessible (Base UI primitives with ARIA support)
+- [✓] No linting or type errors
 
-- Model selector dropdown
-- Optional custom prompt input
-- Real-time streaming output display
-- Status states: idle, generating, complete, error
-- Actions: Generate, Cancel, Regenerate, Save Overview
+## Component Architecture
 
-### RepositoryOverviewViewer
-
-- Read-only text display (view mode)
-- Edit mode with markdown textarea
-- "Manually Edited" badge
-- Export as .md file
-- Regenerate button
-- Metadata display (dates, model)
-
-### RepositoryOverviewMarkdown
-
-- Simple text renderer
-- Streaming indicator (animated cursor)
-
-## Props Interface
-
-```typescript
-interface RepositoryOverviewDialogProps {
-  children: ReactNode; // Trigger element
-  repositoryId: number;
-  repositoryName: string;
-  repositoryPath: string;
-}
+```
+RepositoryOverviewDialog (wrapper)
+├── RepositoryOverviewGenerator (generation mode)
+│   ├── ModelSelector
+│   ├── Textarea (custom prompt)
+│   ├── Conversation/Message (streaming)
+│   ├── Reasoning (thinking display)
+│   └── UsageFooter (token usage)
+└── RepositoryOverviewViewer (view mode)
+    └── RepositoryOverviewMarkdown
 ```
 
-## Hooks Used
+## Features Implemented
 
-- `useRepositoryOverview()` - Query existing overview
-- `useUpsertRepositoryOverview()` - Save new overview
-- `useUpdateRepositoryOverview()` - Update existing
-- `useElectronAiOverview()` - AI streaming
-- `useElectronDialog()` - Save file dialog
-- `useElectronFs()` - Write exported file
+**Generation Mode**:
+- Model selection with defaults
+- Optional custom prompt (collapsible)
+- Repository path display
+- Real-time streaming with Conversation components
+- Thinking/reasoning display
+- Token usage tracking
+- Generate/Stop/Cancel/Regenerate buttons
+- Error handling with Alert
 
-## Validation Results
+**Viewer Mode**:
+- Markdown rendering of existing overview
+- Regenerate button
 
-- pnpm lint: ✅ PASS
-- pnpm typecheck: ✅ PASS
+**State Management**:
+- `idle`, `generating`, `complete`, `stopped`, `error` states
+- Accumulates streamed content
+- Model and custom prompt state
+- Automatic cleanup on unmount
+
+## Integration
+
+- ✅ `useElectronAiOverview()` hook for streaming
+- ✅ `useUpsertRepositoryOverview()` mutation for saving
+- ✅ `ModelSelector` from clarification feature
+- ✅ Conversation/Message components for streaming UI
+
+## Next Step
+
+Step 10: Update repository card with overview actions

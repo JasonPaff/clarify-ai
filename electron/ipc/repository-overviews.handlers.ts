@@ -10,7 +10,7 @@ export function registerRepositoryOverviewsHandlers(
 ): void {
   ipcMain.handle(
     IpcChannels.db.repositoryOverviews.getByRepositoryId,
-    (_event: IpcMainInvokeEvent, repositoryId: number): null | RepositoryOverview => {
+    (_event: IpcMainInvokeEvent, repositoryId: number): RepositoryOverview | undefined => {
       return repositoryOverviewsRepository.getByRepositoryId(repositoryId);
     }
   );
@@ -24,7 +24,7 @@ export function registerRepositoryOverviewsHandlers(
 
   ipcMain.handle(
     IpcChannels.db.repositoryOverviews.update,
-    (_event: IpcMainInvokeEvent, id: number, data: Partial<NewRepositoryOverview>): null | RepositoryOverview => {
+    (_event: IpcMainInvokeEvent, id: number, data: Partial<NewRepositoryOverview>): RepositoryOverview | undefined => {
       return repositoryOverviewsRepository.update(id, data);
     }
   );

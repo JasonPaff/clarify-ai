@@ -175,11 +175,11 @@ export interface ElectronAPI {
       deleteByRepositoryId(repositoryId: number): Promise<boolean>;
       getByRepositoryId(
         repositoryId: number
-      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | null>;
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | undefined>;
       update(
         id: number,
         data: Partial<import('../db/schema/repository-overviews.schema').NewRepositoryOverview>
-      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | null>;
+      ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview | undefined>;
       upsert(
         repositoryId: number,
         data: Omit<import('../db/schema/repository-overviews.schema').NewRepositoryOverview, 'repositoryId'>
