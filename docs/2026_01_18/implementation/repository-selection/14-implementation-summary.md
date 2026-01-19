@@ -16,21 +16,26 @@ Successfully implemented the feature request repository selection feature, allow
 ## Files Created (11 new files)
 
 ### Database Layer
+
 - `db/schema/feature-request-repositories.schema.ts` - Junction table schema
 - `db/repositories/feature-request-repositories.repository.ts` - Repository pattern
 - `drizzle/0005_white_night_thrasher.sql` - Database migration
 
 ### IPC Layer
+
 - `electron/ipc/feature-request-repositories.handlers.ts` - IPC handlers
 
 ### Query Layer
+
 - `lib/queries/feature-request-repositories.ts` - Query key factory
 - `hooks/queries/use-feature-request-repositories.ts` - TanStack Query hooks
 
 ### Validation Layer
+
 - `lib/validations/feature-request-repositories.ts` - Zod validation schemas
 
 ### UI Components
+
 - `components/ui/form/multi-select-field.tsx` - Reusable multi-select field
 - `components/features/repository-selector.tsx` - Repository selector wrapper
 - `components/features/research-step.tsx` - Research workflow step
@@ -38,30 +43,36 @@ Successfully implemented the feature request repository selection feature, allow
 ## Files Modified (17 files)
 
 ### Database Configuration
+
 - `db/index.ts` - Added schema import
 - `drizzle.config.ts` - Added schema path
 
 ### IPC Configuration
+
 - `electron/ipc/channels.ts` - Added channel definitions
 - `electron/ipc/register-handlers.ts` - Registered handlers
 - `electron/preload.ts` - Exposed API to renderer
 - `types/electron.d.ts` - Updated type definitions
 
 ### React Hooks
+
 - `hooks/useElectron.ts` - Added featureRequestRepositories methods
 - `lib/queries/index.ts` - Merged query keys
 
 ### Form Configuration
+
 - `lib/forms/form-hook.ts` - Registered MultiSelectField
 - `lib/validations/feature-request.ts` - Extended form schemas
 
 ### Feature Components
+
 - `components/features/create-feature-request-form.tsx` - Added repository selector
 - `components/features/edit-feature-request-form.tsx` - Added repository selector
 - `components/features/new-feature-request-dialog.tsx` - Passed projectId
 - `components/features/edit-feature-request-dialog.tsx` - Added repository props
 
 ### Pages
+
 - `app/(app)/projects/[projectId]/features/page.tsx` - Updated dialog usage
 - `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` - Added ResearchStep
 

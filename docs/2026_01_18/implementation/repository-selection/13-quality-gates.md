@@ -2,10 +2,10 @@
 
 ## Validation Results
 
-| Gate           | Status | Command            |
-| -------------- | ------ | ------------------ |
-| ESLint         | PASS   | `pnpm lint`        |
-| TypeScript     | PASS   | `pnpm typecheck`   |
+| Gate       | Status | Command          |
+| ---------- | ------ | ---------------- |
+| ESLint     | PASS   | `pnpm lint`      |
+| TypeScript | PASS   | `pnpm typecheck` |
 
 ## Summary
 

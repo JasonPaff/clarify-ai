@@ -11,16 +11,11 @@ export interface FeatureRequestRepositoriesRepository {
   setForFeatureRequest(featureRequestId: number, repositoryIds: Array<number>): void;
 }
 
-export function createFeatureRequestRepositoriesRepository(
-  db: DrizzleDatabase
-): FeatureRequestRepositoriesRepository {
+export function createFeatureRequestRepositoriesRepository(db: DrizzleDatabase): FeatureRequestRepositoriesRepository {
   return {
     addToFeatureRequest(featureRequestId: number, repositoryId: number): boolean {
       try {
-        db.insert(featureRequestRepositories)
-          .values({ featureRequestId, repositoryId })
-          .onConflictDoNothing()
-          .run();
+        db.insert(featureRequestRepositories).values({ featureRequestId, repositoryId }).onConflictDoNothing().run();
         return true;
       } catch {
         return false;

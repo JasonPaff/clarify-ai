@@ -157,7 +157,11 @@ const electronAPI: ElectronAPI = {
   db: {
     featureRequestRepositories: {
       addToFeatureRequest: (featureRequestId, repositoryId) =>
-        ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.addToFeatureRequest, featureRequestId, repositoryId),
+        ipcRenderer.invoke(
+          IpcChannels.db.featureRequestRepositories.addToFeatureRequest,
+          featureRequestId,
+          repositoryId
+        ),
       getByFeatureRequestId: (featureRequestId) =>
         ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.getByFeatureRequestId, featureRequestId),
       removeFromFeatureRequest: (featureRequestId, repositoryId) =>
@@ -167,7 +171,11 @@ const electronAPI: ElectronAPI = {
           repositoryId
         ),
       setForFeatureRequest: (featureRequestId, repositoryIds) =>
-        ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.setForFeatureRequest, featureRequestId, repositoryIds),
+        ipcRenderer.invoke(
+          IpcChannels.db.featureRequestRepositories.setForFeatureRequest,
+          featureRequestId,
+          repositoryIds
+        ),
     },
     featureRequests: {
       create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequests.create, data),
