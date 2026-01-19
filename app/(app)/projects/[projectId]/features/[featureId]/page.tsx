@@ -13,6 +13,7 @@ import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featu
 
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 import { EntryStep } from '@/components/features/entry-step';
+import { ResearchStep } from '@/components/features/research-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -179,6 +180,8 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
         <CardContent>
           {currentStep === 'entry' ? (
             <EntryStep featureRequest={featureRequest} />
+          ) : currentStep === 'research' ? (
+            <ResearchStep featureRequestId={featureId} projectId={projectId} />
           ) : (
             <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
               <p className={'text-sm text-muted-foreground'}>

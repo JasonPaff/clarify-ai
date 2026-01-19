@@ -62,6 +62,12 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    featureRequestRepositories: {
+      addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
+      getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;
+      removeFromFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
+      setForFeatureRequest(featureRequestId: number, repositoryIds: Array<number>): Promise<void>;
+    };
     featureRequests: {
       create(
         data: import('../db/schema/feature-requests.schema').NewFeatureRequest

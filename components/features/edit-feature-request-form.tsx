@@ -3,15 +3,18 @@
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { EditFeatureRequestFormValues, FeatureRequestStatus } from '@/lib/validations/feature-request';
 
+import { RepositorySelector } from '@/components/features/repository-selector';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { editFeatureRequestFormSchema, featureRequestStatuses } from '@/lib/validations/feature-request';
 
 interface EditFeatureRequestFormProps {
   featureRequest: Pick<FeatureRequest, 'description' | 'id' | 'status' | 'title'>;
+  initialRepositoryIds: Array<number>;
   isSubmitting?: boolean;
   onCancel: () => void;
   onSubmit: (values: EditFeatureRequestFormValues) => Promise<void> | void;
+  projectId: number;
 }
 
 const statusLabels: Record<FeatureRequestStatus, string> = {
@@ -29,13 +32,16 @@ const statusOptions = featureRequestStatuses.map((status) => ({
 
 export function EditFeatureRequestForm({
   featureRequest,
+  initialRepositoryIds,
   isSubmitting,
   onCancel,
   onSubmit,
+  projectId,
 }: EditFeatureRequestFormProps) {
   const form = useAppForm({
     defaultValues: {
       description: featureRequest.description ?? '',
+      repositoryIds: initialRepositoryIds,
       status: featureRequest.status as FeatureRequestStatus,
       title: featureRequest.title,
     },
@@ -83,6 +89,17 @@ export function EditFeatureRequestForm({
               label={'Status'}
               options={statusOptions}
               placeholder={'Select status'}
+            />
+          )}
+        </form.AppField>
+
+        {/* Repository Selection Field */}
+        <form.AppField name={'repositoryIds'}>
+          {() => (
+            <RepositorySelector
+              description={'Select repositories to analyze (optional)'}
+              label={'Target Repositories'}
+              projectId={projectId}
             />
           )}
         </form.AppField>

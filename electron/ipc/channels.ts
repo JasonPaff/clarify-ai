@@ -24,6 +24,12 @@ export const IpcChannels = {
     getVersion: 'app:getVersion',
   },
   db: {
+    featureRequestRepositories: {
+      addToFeatureRequest: 'db:featureRequestRepositories:addToFeatureRequest',
+      getByFeatureRequestId: 'db:featureRequestRepositories:getByFeatureRequestId',
+      removeFromFeatureRequest: 'db:featureRequestRepositories:removeFromFeatureRequest',
+      setForFeatureRequest: 'db:featureRequestRepositories:setForFeatureRequest',
+    },
     featureRequests: {
       create: 'db:featureRequests:create',
       delete: 'db:featureRequests:delete',

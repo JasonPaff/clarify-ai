@@ -73,6 +73,7 @@ export function NewFeatureRequestDialog({ children, projectId }: NewFeatureReque
               isSubmitting={createFeatureRequest.isPending}
               onCancel={handleCancel}
               onSubmit={handleSubmit}
+              projectId={projectId}
             />
           </div>
         </DialogPopup>

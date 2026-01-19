@@ -78,37 +78,30 @@ Organize component internals in this exact order:
 
 ```tsx
 export const ExampleComponent = ({ onSubmit, isDisabled = false }: ExampleProps) => {
-  // 1. useState hooks
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<FormData | null>(null);
 
-  // 2. Other hooks (useContext, useQuery, etc.)
   const { user } = useCurrentUser();
   const query = useGetData();
 
-  // 3. useMemo hooks
   const expensiveValue = useMemo(() => {
     return heavyCalculation(data);
   }, [data]);
 
-  // 4. useEffect hooks
   useEffect(() => {
     // effect logic
   }, [dependency]);
 
-  // 5. Utility functions
   const processData = (rawData: unknown): ProcessedData => {
     return transformData(rawData);
   };
 
-  // 6. Event handlers (prefixed with 'handle')
   const handleSubmit = useCallback(() => {
     if (data) onSubmit?.(data);
   }, [data, onSubmit]);
 
-  // 7. Derived values for conditional rendering (prefixed with '_')
-  const _isDataReady = user && data && !isLoading;
-  const _hasErrors = !isLoading && query.error;
+  const isDataReady = user && data && !isLoading;
+  const hasErrors = !isLoading && query.error;
 
   return (
     <div>
@@ -430,7 +423,7 @@ return (
     </div>
 
     {/* Data Display */}
-    <Conditional isCondition={_hasData}>
+    <Conditional isCondition={hasData}>
       <DataTable data={processedData} />
     </Conditional>
   </div>

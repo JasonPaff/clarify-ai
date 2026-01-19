@@ -23,15 +23,19 @@ import { EditFeatureRequestForm } from './edit-feature-request-form';
 
 type EditFeatureRequestDialogProps = Children & {
   featureRequest: Pick<FeatureRequest, 'description' | 'id' | 'status' | 'title'>;
+  initialRepositoryIds: Array<number>;
   onOpenChange?: (isOpen: boolean) => void;
   open?: boolean;
+  projectId: number;
 };
 
 export function EditFeatureRequestDialog({
   children,
   featureRequest,
+  initialRepositoryIds,
   onOpenChange,
   open: controlledOpen,
+  projectId,
 }: EditFeatureRequestDialogProps) {
   const [isOpen, setIsOpen] = useControllableState({
     defaultValue: false,
@@ -84,9 +88,11 @@ export function EditFeatureRequestDialog({
           <div className={'mt-6'}>
             <EditFeatureRequestForm
               featureRequest={featureRequest}
+              initialRepositoryIds={initialRepositoryIds}
               isSubmitting={updateFeatureRequest.isPending}
               onCancel={handleCancel}
               onSubmit={handleSubmit}
+              projectId={projectId}
             />
           </div>
         </DialogPopup>

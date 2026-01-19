@@ -2,6 +2,7 @@
 
 import type { CreateFeatureRequestFormValues } from '@/lib/validations/feature-request';
 
+import { RepositorySelector } from '@/components/features/repository-selector';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { createFeatureRequestSchema } from '@/lib/validations/feature-request';
@@ -10,12 +11,19 @@ interface CreateFeatureRequestFormProps {
   isSubmitting?: boolean;
   onCancel: () => void;
   onSubmit: (values: CreateFeatureRequestFormValues) => Promise<void> | void;
+  projectId: number;
 }
 
-export function CreateFeatureRequestForm({ isSubmitting, onCancel, onSubmit }: CreateFeatureRequestFormProps) {
+export function CreateFeatureRequestForm({
+  isSubmitting,
+  onCancel,
+  onSubmit,
+  projectId,
+}: CreateFeatureRequestFormProps) {
   const form = useAppForm({
     defaultValues: {
       description: '',
+      repositoryIds: [] as Array<number>,
       title: '',
     },
     onSubmit: async ({ value }) => {
@@ -50,6 +58,17 @@ export function CreateFeatureRequestForm({ isSubmitting, onCancel, onSubmit }: C
               label={'Description'}
               placeholder={'Describe your feature request...'}
               rows={4}
+            />
+          )}
+        </form.AppField>
+
+        {/* Repository Selection Field */}
+        <form.AppField name={'repositoryIds'}>
+          {() => (
+            <RepositorySelector
+              description={'Select repositories to analyze (optional)'}
+              label={'Target Repositories'}
+              projectId={projectId}
             />
           )}
         </form.AppField>

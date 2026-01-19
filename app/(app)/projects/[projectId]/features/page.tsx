@@ -19,9 +19,37 @@ import { PageHeader } from '@/components/layout/page-header';
 import { FeatureRequestsSkeleton } from '@/components/skeletons/feature-requests-skeleton';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useFeatureRequests } from '@/hooks/queries/use-feature-requests';
 
 type FeaturesPageProps = PageProps;
+
+function EditDialogWithData({
+  featureRequest,
+  onOpenChange,
+  projectId,
+}: {
+  featureRequest: Pick<FeatureRequest, 'description' | 'id' | 'status' | 'title'>;
+  onOpenChange: (isOpen: boolean) => void;
+  projectId: number;
+}) {
+  const { data: repositoryIds = [], isLoading } = useFeatureRequestRepositories(featureRequest.id);
+
+  // Wait for repository data to load before showing the dialog
+  if (isLoading) {
+    return null;
+  }
+
+  return (
+    <EditFeatureRequestDialog
+      featureRequest={featureRequest}
+      initialRepositoryIds={repositoryIds}
+      onOpenChange={onOpenChange}
+      open={true}
+      projectId={projectId}
+    />
+  );
+}
 
 function FeaturesContent({ projectId }: { projectId: number }) {
   const [editingFeatureRequest, setEditingFeatureRequest] = useState<null | Pick<
@@ -91,10 +119,10 @@ function FeaturesContent({ projectId }: { projectId: number }) {
       </div>
 
       {editingFeatureRequest && (
-        <EditFeatureRequestDialog
+        <EditDialogWithData
           featureRequest={editingFeatureRequest}
           onOpenChange={(open) => !open && setEditingFeatureRequest(null)}
-          open={true}
+          projectId={projectId}
         />
       )}
 

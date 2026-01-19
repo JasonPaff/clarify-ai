@@ -37,6 +37,12 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    featureRequestRepositories: {
+      addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
+      getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;
+      removeFromFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
+      setForFeatureRequest(featureRequestId: number, repositoryIds: Array<number>): Promise<void>;
+    };
     featureRequests: {
       create(data: NewFeatureRequest): Promise<FeatureRequest>;
       delete(id: number): Promise<boolean>;
@@ -149,6 +155,20 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
+    featureRequestRepositories: {
+      addToFeatureRequest: (featureRequestId, repositoryId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.addToFeatureRequest, featureRequestId, repositoryId),
+      getByFeatureRequestId: (featureRequestId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.getByFeatureRequestId, featureRequestId),
+      removeFromFeatureRequest: (featureRequestId, repositoryId) =>
+        ipcRenderer.invoke(
+          IpcChannels.db.featureRequestRepositories.removeFromFeatureRequest,
+          featureRequestId,
+          repositoryId
+        ),
+      setForFeatureRequest: (featureRequestId, repositoryIds) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRepositories.setForFeatureRequest, featureRequestId, repositoryIds),
+    },
     featureRequests: {
       create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequests.create, data),
       delete: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequests.delete, id),

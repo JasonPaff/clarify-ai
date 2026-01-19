@@ -2,6 +2,7 @@ import type { BrowserWindow } from 'electron';
 
 import type { DrizzleDatabase } from '../../db';
 
+import { createFeatureRequestRepositoriesRepository } from '../../db/repositories/feature-request-repositories.repository';
 import { createFeatureRequestsRepository } from '../../db/repositories/feature-requests.repository';
 import { createProjectsRepository } from '../../db/repositories/projects.repository';
 import { createRepositoriesRepository } from '../../db/repositories/repositories.repository';
@@ -11,6 +12,7 @@ import { registerAiOverviewHandlers } from './ai-overview.handlers';
 import { registerApiKeysHandlers } from './api-keys.handlers';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
+import { registerFeatureRequestRepositoriesHandlers } from './feature-request-repositories.handlers';
 import { registerFeatureRequestsHandlers } from './feature-requests.handlers';
 import { registerFsHandlers } from './fs.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
@@ -51,6 +53,10 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // Database handlers - Feature Requests
   const featureRequestsRepository = createFeatureRequestsRepository(db);
   registerFeatureRequestsHandlers(featureRequestsRepository);
+
+  // Database handlers - Feature Request Repositories (junction table)
+  const featureRequestRepositoriesRepository = createFeatureRequestRepositoriesRepository(db);
+  registerFeatureRequestRepositoriesHandlers(featureRequestRepositoriesRepository);
 
   // Database handlers - Repository Overviews
   const repositoryOverviewsRepository = createRepositoryOverviewsRepository(db);

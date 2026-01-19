@@ -156,6 +156,26 @@ export function useElectronApp() {
 export function useElectronDb() {
   const { api, isElectron } = useElectron();
 
+  const featureRequestRepositories = useMemo(
+    () => ({
+      addToFeatureRequest: (featureRequestId: number, repositoryId: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRepositories.addToFeatureRequest(featureRequestId, repositoryId);
+      },
+      getByFeatureRequestId: (featureRequestId: number) =>
+        api?.db.featureRequestRepositories.getByFeatureRequestId(featureRequestId) ?? Promise.resolve([]),
+      removeFromFeatureRequest: (featureRequestId: number, repositoryId: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRepositories.removeFromFeatureRequest(featureRequestId, repositoryId);
+      },
+      setForFeatureRequest: (featureRequestId: number, repositoryIds: Array<number>) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRepositories.setForFeatureRequest(featureRequestId, repositoryIds);
+      },
+    }),
+    [api]
+  );
+
   const featureRequests = useMemo(
     () => ({
       create: (data: Parameters<NonNullable<typeof api>['db']['featureRequests']['create']>[0]) => {
@@ -259,7 +279,7 @@ export function useElectronDb() {
     [api]
   );
 
-  return { featureRequests, isElectron, projects, repositories, repositoryOverviews };
+  return { featureRequestRepositories, featureRequests, isElectron, projects, repositories, repositoryOverviews };
 }
 
 export function useElectronDialog() {

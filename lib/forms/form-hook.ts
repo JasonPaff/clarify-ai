@@ -3,6 +3,7 @@ import { createFormHook, createFormHookContexts } from '@tanstack/react-form';
 import { PathSelectorField } from '@/components/repositories/path-selector-field';
 import { CheckboxField } from '@/components/ui/form/checkbox-field';
 import { FormError } from '@/components/ui/form/form-error';
+import { MultiSelectField } from '@/components/ui/form/multi-select-field';
 import { NumberFieldComponent } from '@/components/ui/form/number-field';
 import { RadioField } from '@/components/ui/form/radio-field';
 import { SelectField } from '@/components/ui/form/select-field';
@@ -16,6 +17,7 @@ export const { fieldContext, formContext, useFieldContext, useFormContext } = cr
 export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     CheckboxField,
+    MultiSelectField,
     NumberField: NumberFieldComponent,
     PathSelectorField,
     RadioField,

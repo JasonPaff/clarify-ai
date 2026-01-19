@@ -65,7 +65,7 @@ When writing React code, ensure strict adherence to all conventions:
   4. useEffect hooks
   5. Utility functions
   6. Event handlers (prefixed with `handle`)
-  7. Derived variables for conditional rendering (prefixed with `_`)
+  7. Derived variables for conditional rendering
 
 **Naming Conventions**:
 

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { repositoryIdsSchema } from './feature-request-repositories';
+
 // Status enum for feature request workflow stages
 const featureRequestStatusSchema = z.enum(['completed', 'draft', 'planning', 'refining', 'researching']);
 
@@ -13,6 +15,7 @@ const featureRequestTitleSchema = z.string().min(1, 'Title is required').max(255
 // Schema for creating a new feature request
 export const createFeatureRequestSchema = z.object({
   description: featureRequestDescriptionSchema,
+  repositoryIds: repositoryIdsSchema,
   title: featureRequestTitleSchema,
 });
 
@@ -38,6 +41,7 @@ export type UpdateFeatureRequestFormValues = z.infer<typeof updateFeatureRequest
 // Schema for the edit form (requires all fields since form always provides them)
 export const editFeatureRequestFormSchema = z.object({
   description: featureRequestDescriptionSchema,
+  repositoryIds: repositoryIdsSchema,
   status: featureRequestStatusSchema,
   title: featureRequestTitleSchema,
 });
