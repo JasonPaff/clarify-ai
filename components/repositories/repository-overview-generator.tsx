@@ -7,9 +7,9 @@ import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
+import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Message, MessageContent, MessageResponse } from '@/components/ui/message';
 import { Textarea } from '@/components/ui/textarea';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { cn } from '@/lib/utils';

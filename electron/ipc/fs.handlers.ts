@@ -3,6 +3,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 
 import { IpcChannels } from './channels';
+import { scanRepository } from './lib/repository-scanner';
 
 export interface CollectRepositoryDataResult {
   data?: RepositoryData;
@@ -29,69 +30,6 @@ export interface RepositoryData {
   tsConfig?: string;
 }
 
-// Common directories to ignore when building file tree
-const IGNORED_DIRECTORIES = new Set([
-  '.cache',
-  '.env',
-  '.git',
-  '.hg',
-  '.idea',
-  '.netlify',
-  '.next',
-  '.nuxt',
-  '.nyc_output',
-  '.output',
-  '.svn',
-  '.turbo',
-  '.venv',
-  '.vercel',
-  '.vscode',
-  '__pycache__',
-  'build',
-  'coverage',
-  'dist',
-  'env',
-  'node_modules',
-  'out',
-  'target',
-  'vendor',
-  'venv',
-]);
-
-// Language extensions mapping
-const LANGUAGE_EXTENSIONS: Record<string, string> = {
-  '.astro': 'Astro',
-  '.c': 'C',
-  '.cpp': 'C++',
-  '.cs': 'C#',
-  '.css': 'CSS',
-  '.go': 'Go',
-  '.h': 'C',
-  '.hpp': 'C++',
-  '.html': 'HTML',
-  '.java': 'Java',
-  '.js': 'JavaScript',
-  '.json': 'JSON',
-  '.jsx': 'JavaScript',
-  '.kt': 'Kotlin',
-  '.lua': 'Lua',
-  '.md': 'Markdown',
-  '.mjs': 'JavaScript',
-  '.php': 'PHP',
-  '.py': 'Python',
-  '.rb': 'Ruby',
-  '.rs': 'Rust',
-  '.scss': 'SCSS',
-  '.sql': 'SQL',
-  '.svelte': 'Svelte',
-  '.swift': 'Swift',
-  '.ts': 'TypeScript',
-  '.tsx': 'TypeScript',
-  '.vue': 'Vue',
-  '.yaml': 'YAML',
-  '.yml': 'YAML',
-};
-
 interface ConfigFiles {
   envExample?: string;
   packageJson?: string;
@@ -99,12 +37,47 @@ interface ConfigFiles {
   tsConfig?: string;
 }
 
-// Helper interfaces for file tree building
-interface FileTreeResult {
-  languageCounts: Map<string, number>;
-  totalDirectories: number;
-  totalFiles: number;
-  tree: string;
+/**
+ * Collects repository data for AI overview generation.
+ * Exported for use by ai-overview.handlers.ts
+ */
+export async function collectRepositoryData(repositoryPath: string): Promise<null | RepositoryData> {
+  try {
+    // Verify directory exists
+    const stats = await fs.stat(repositoryPath);
+    if (!stats.isDirectory()) {
+      return null;
+    }
+
+    // Collect all data in parallel where possible
+    const [scanResult, configFiles] = await Promise.all([
+      scanRepository(repositoryPath, { maxDepth: 4 }),
+      readConfigFiles(repositoryPath),
+    ]);
+
+    // Detect framework from package.json
+    const framework = detectFramework(configFiles.packageJson);
+    const hasTailwind = detectTailwind(configFiles.packageJson);
+    const hasTypeScript = configFiles.tsConfig !== undefined;
+
+    return {
+      envExample: configFiles.envExample,
+      fileTree: scanResult.fileTree,
+      framework,
+      hasTailwind,
+      hasTypeScript,
+      name: path.basename(repositoryPath),
+      packageJson: configFiles.packageJson,
+      path: repositoryPath,
+      primaryLanguages: scanResult.primaryLanguages,
+      readmeFile: configFiles.readmeFile,
+      totalDirectories: scanResult.totalDirectories,
+      totalFiles: scanResult.totalFiles,
+      tsConfig: configFiles.tsConfig,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export function registerFsHandlers(): void {
@@ -242,42 +215,10 @@ export function registerFsHandlers(): void {
       }
 
       try {
-        // Verify directory exists
-        const stats = await fs.stat(repositoryPath);
-        if (!stats.isDirectory()) {
-          return { error: 'Path is not a directory', success: false };
+        const data = await collectRepositoryData(repositoryPath);
+        if (!data) {
+          return { error: 'Failed to collect repository data', success: false };
         }
-
-        // Collect all data in parallel where possible
-        const [fileTreeResult, configFiles] = await Promise.all([
-          buildFileTree(repositoryPath, 4),
-          readConfigFiles(repositoryPath),
-        ]);
-
-        // Detect framework from package.json
-        const framework = detectFramework(configFiles.packageJson);
-        const hasTailwind = detectTailwind(configFiles.packageJson);
-        const hasTypeScript = configFiles.tsConfig !== undefined;
-
-        // Calculate primary languages from file tree stats
-        const primaryLanguages = getPrimaryLanguages(fileTreeResult.languageCounts);
-
-        const data: RepositoryData = {
-          envExample: configFiles.envExample,
-          fileTree: fileTreeResult.tree,
-          framework,
-          hasTailwind,
-          hasTypeScript,
-          name: path.basename(repositoryPath),
-          packageJson: configFiles.packageJson,
-          path: repositoryPath,
-          primaryLanguages,
-          readmeFile: configFiles.readmeFile,
-          totalDirectories: fileTreeResult.totalDirectories,
-          totalFiles: fileTreeResult.totalFiles,
-          tsConfig: configFiles.tsConfig,
-        };
-
         return { data, success: true };
       } catch (error) {
         return {
@@ -287,71 +228,6 @@ export function registerFsHandlers(): void {
       }
     }
   );
-}
-
-// Build ASCII file tree with depth limit
-async function buildFileTree(rootPath: string, maxDepth: number): Promise<FileTreeResult> {
-  const lines: Array<string> = [];
-  const languageCounts = new Map<string, number>();
-  let totalFiles = 0;
-  let totalDirectories = 0;
-
-  async function traverse(dirPath: string, prefix: string, depth: number): Promise<void> {
-    if (depth > maxDepth) {
-      return;
-    }
-
-    let entries: Array<{ isDirectory: boolean; name: string }>;
-    try {
-      const dirents = await fs.readdir(dirPath, { withFileTypes: true });
-      entries = dirents
-        .map((d) => ({ isDirectory: d.isDirectory(), name: d.name }))
-        .filter((e) => !IGNORED_DIRECTORIES.has(e.name) && !e.name.startsWith('.'))
-        .sort((a, b) => {
-          // Directories first, then alphabetically
-          if (a.isDirectory && !b.isDirectory) return -1;
-          if (!a.isDirectory && b.isDirectory) return 1;
-          return a.name.localeCompare(b.name);
-        });
-    } catch {
-      return;
-    }
-
-    for (let i = 0; i < entries.length; i++) {
-      const entry = entries[i];
-      if (!entry) continue;
-
-      const isLast = i === entries.length - 1;
-      const connector = isLast ? '└── ' : '├── ';
-      const newPrefix = isLast ? prefix + '    ' : prefix + '│   ';
-
-      lines.push(prefix + connector + entry.name);
-
-      if (entry.isDirectory) {
-        totalDirectories++;
-        await traverse(path.join(dirPath, entry.name), newPrefix, depth + 1);
-      } else {
-        totalFiles++;
-        // Track language counts
-        const ext = path.extname(entry.name).toLowerCase();
-        const language = LANGUAGE_EXTENSIONS[ext];
-        if (language) {
-          languageCounts.set(language, (languageCounts.get(language) ?? 0) + 1);
-        }
-      }
-    }
-  }
-
-  // Add root directory name
-  lines.push(path.basename(rootPath) + '/');
-  await traverse(rootPath, '', 1);
-
-  return {
-    languageCounts,
-    totalDirectories,
-    totalFiles,
-    tree: lines.join('\n'),
-  };
 }
 
 // Detect framework from package.json content
@@ -398,15 +274,6 @@ function detectTailwind(packageJsonContent?: string): boolean {
   } catch {
     return false;
   }
-}
-
-// Get primary languages sorted by file count
-function getPrimaryLanguages(languageCounts: Map<string, number>): Array<string> {
-  const entries = Array.from(languageCounts.entries());
-  entries.sort((a, b) => b[1] - a[1]);
-
-  // Return top 5 languages
-  return entries.slice(0, 5).map(([lang]) => lang);
 }
 
 // Path validation to prevent directory traversal attacks
