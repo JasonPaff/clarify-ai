@@ -65,7 +65,10 @@ export function useRepositoryOverview(repositoryId: number) {
   return useQuery({
     ...repositoryOverviewKeys.byRepositoryId(repositoryId),
     enabled: isElectron && repositoryId > 0,
-    queryFn: () => repositoryOverviews.getByRepositoryId(repositoryId),
+    queryFn: async () => {
+      const result = await repositoryOverviews.getByRepositoryId(repositoryId);
+      return result ?? null;
+    },
   });
 }
 
@@ -92,7 +95,10 @@ export function useRepositoryOverviewStatuses(repositoryIds: Array<number>) {
     queries: repositoryIds.map((repositoryId) => ({
       ...repositoryOverviewKeys.byRepositoryId(repositoryId),
       enabled: isElectron && repositoryId > 0,
-      queryFn: () => repositoryOverviews.getByRepositoryId(repositoryId),
+      queryFn: async () => {
+        const result = await repositoryOverviews.getByRepositoryId(repositoryId);
+        return result ?? null;
+      },
     })),
   });
 

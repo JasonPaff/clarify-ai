@@ -525,5 +525,6 @@ export function useUpdateProject() {
 8. **Type Inference**: Use `Parameters<typeof fn>` for mutation inputs
 9. **Cache Updates**: Use `setQueryData` for optimistic updates on mutations
 10. **Merged Exports**: All keys merged in `lib/queries/index.ts`
+11. **Query Functions**: Always return null or data, never undefined
 
 ---
