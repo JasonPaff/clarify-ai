@@ -79,6 +79,10 @@ export const badgeVariants = cva(
           bg-emerald-500/15 text-emerald-700
           dark:bg-emerald-500/20 dark:text-emerald-400
         `,
+        openrouter: `
+          bg-pink-500/15 text-pink-700
+          dark:bg-pink-500/20 dark:text-pink-400
+        `,
         planning: `
           bg-purple-500/15 text-purple-700
           dark:bg-purple-500/20 dark:text-purple-400

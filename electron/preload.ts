@@ -1,9 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
-import type { NewProject, Project } from '../db/schema/projects.schema';
-import type { NewRepository, Repository } from '../db/schema/repositories.schema';
-import type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
+import type { FeatureRequest, NewFeatureRequest } from '@/db/schema/feature-requests.schema';
+import type { NewProject, Project } from '@/db/schema/projects.schema';
+import type { NewRepository, Repository } from '@/db/schema/repositories.schema';
+import type { NewRepositoryOverview, RepositoryOverview } from '@/db/schema/repository-overviews.schema';
+
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
 import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';

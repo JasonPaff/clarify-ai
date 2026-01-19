@@ -378,6 +378,8 @@ export function registerApiKeysHandlers(): void {
             return await testOllamaConnection(credentials);
           case 'openai':
             return await testOpenAIKey(credentials);
+          case 'openrouter':
+            return await testOpenRouterKey(credentials);
           case 'togetherai':
             return await testTogetherAiKey(credentials);
           case 'xai':
@@ -1196,6 +1198,44 @@ async function testOpenAIKey(credentials: ProviderCredentials): Promise<TestResu
     await generateText({
       maxOutputTokens: 1,
       model: openai('gpt-4o-mini'),
+      prompt: 'Hi',
+    });
+
+    return { provider, success: true };
+  } catch (error) {
+    return {
+      error: parseApiError(error, displayName),
+      provider,
+      success: false,
+    };
+  }
+}
+
+/**
+ * Tests an OpenRouter API key using the official AI SDK provider
+ */
+async function testOpenRouterKey(credentials: ProviderCredentials): Promise<TestResult> {
+  const provider = 'openrouter';
+  const displayName = PROVIDER_DISPLAY_NAMES[provider];
+
+  if (!credentials.apiKey) {
+    return {
+      error: `API key is required for ${displayName}`,
+      provider,
+      success: false,
+    };
+  }
+
+  try {
+    const { createOpenRouter } = await import('@openrouter/ai-sdk-provider');
+    const { generateText } = await import('ai');
+
+    const openrouter = createOpenRouter({ apiKey: credentials.apiKey });
+
+    // Use a fast, cost-effective model for testing
+    await generateText({
+      maxOutputTokens: 1,
+      model: openrouter('meta-llama/llama-3.1-8b-instruct'),
       prompt: 'Hi',
     });
 

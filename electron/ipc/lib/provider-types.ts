@@ -27,6 +27,7 @@ export type ApiKeyProvider =
   | 'mistral'
   | 'ollama'
   | 'openai'
+  | 'openrouter'
   | 'togetherai'
   | 'xai';
 
@@ -89,6 +90,7 @@ export const ALL_PROVIDERS: ReadonlyArray<ApiKeyProvider> = [
   'mistral',
   'ollama',
   'openai',
+  'openrouter',
   'togetherai',
   'xai',
 ] as const;
@@ -108,6 +110,7 @@ export const PROVIDER_ENV_VARS: Record<ApiKeyProvider, string | undefined> = {
   mistral: 'MISTRAL_API_KEY',
   ollama: undefined, // No API key required for local Ollama
   openai: 'OPENAI_API_KEY',
+  openrouter: 'OPENROUTER_API_KEY',
   togetherai: 'TOGETHER_API_KEY',
   xai: 'XAI_API_KEY',
 };
@@ -126,6 +129,7 @@ export const PROVIDER_DISPLAY_NAMES: Record<ApiKeyProvider, string> = {
   mistral: 'Mistral AI',
   ollama: 'Ollama (Local)',
   openai: 'OpenAI',
+  openrouter: 'OpenRouter',
   togetherai: 'Together AI',
   xai: 'xAI (Grok)',
 };
@@ -144,6 +148,7 @@ export const PROVIDER_CATEGORIES: Record<ApiKeyProvider, ProviderCategory> = {
   mistral: 'emerging',
   ollama: 'local',
   openai: 'major',
+  openrouter: 'major',
   togetherai: 'emerging',
   xai: 'emerging',
 };
@@ -214,6 +219,12 @@ export const PROVIDER_CONFIGS: Record<ApiKeyProvider, ProviderConfig> = {
     category: 'major',
     displayName: 'OpenAI',
     envVar: 'OPENAI_API_KEY',
+  },
+  openrouter: {
+    authType: 'api_key',
+    category: 'major',
+    displayName: 'OpenRouter',
+    envVar: 'OPENROUTER_API_KEY',
   },
   togetherai: {
     authType: 'api_key',

@@ -110,6 +110,71 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
     { id: 'gpt-4o', name: 'GPT-4o', supportsThinking: false },
     { id: 'gpt-4o-mini', name: 'GPT-4o Mini', supportsThinking: false },
   ],
+  openrouter: [
+    // Anthropic models via OpenRouter
+    { id: 'anthropic/claude-sonnet-4', name: 'Claude Sonnet 4 (OpenRouter)', supportsThinking: true },
+    { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet (OpenRouter)', supportsThinking: false },
+    { id: 'anthropic/claude-3.5-haiku', name: 'Claude 3.5 Haiku (OpenRouter)', supportsThinking: false },
+    { id: 'anthropic/claude-3-opus', name: 'Claude 3 Opus (OpenRouter)', supportsThinking: false },
+
+    // OpenAI models via OpenRouter
+    { id: 'openai/gpt-4o', name: 'GPT-4o (OpenRouter)', supportsThinking: false },
+    { id: 'openai/gpt-4o-mini', name: 'GPT-4o Mini (OpenRouter)', supportsThinking: false },
+    { id: 'openai/gpt-4-turbo', name: 'GPT-4 Turbo (OpenRouter)', supportsThinking: false },
+    { id: 'openai/o1', name: 'o1 (OpenRouter)', supportsThinking: true },
+    { id: 'openai/o1-mini', name: 'o1 Mini (OpenRouter)', supportsThinking: true },
+    { id: 'openai/o3-mini', name: 'o3 Mini (OpenRouter)', supportsThinking: true },
+
+    // Google models via OpenRouter
+    { id: 'google/gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash (OpenRouter)', supportsThinking: false },
+    { id: 'google/gemini-pro-1.5', name: 'Gemini Pro 1.5 (OpenRouter)', supportsThinking: false },
+    { id: 'google/gemini-flash-1.5', name: 'Gemini Flash 1.5 (OpenRouter)', supportsThinking: false },
+
+    // Meta Llama models via OpenRouter
+    { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Llama 3.3 70B Instruct (OpenRouter)', supportsThinking: false },
+    { id: 'meta-llama/llama-3.1-405b-instruct', name: 'Llama 3.1 405B Instruct (OpenRouter)', supportsThinking: false },
+    { id: 'meta-llama/llama-3.1-70b-instruct', name: 'Llama 3.1 70B Instruct (OpenRouter)', supportsThinking: false },
+    { id: 'meta-llama/llama-3.1-8b-instruct', name: 'Llama 3.1 8B Instruct (OpenRouter)', supportsThinking: false },
+
+    // Mistral models via OpenRouter
+    { id: 'mistralai/mistral-large', name: 'Mistral Large (OpenRouter)', supportsThinking: false },
+    { id: 'mistralai/mistral-medium', name: 'Mistral Medium (OpenRouter)', supportsThinking: false },
+    { id: 'mistralai/mixtral-8x22b-instruct', name: 'Mixtral 8x22B Instruct (OpenRouter)', supportsThinking: false },
+    { id: 'mistralai/codestral-latest', name: 'Codestral (OpenRouter)', supportsThinking: false },
+
+    // DeepSeek models via OpenRouter
+    { id: 'deepseek/deepseek-chat', name: 'DeepSeek Chat (OpenRouter)', supportsThinking: false },
+    { id: 'deepseek/deepseek-r1', name: 'DeepSeek R1 (OpenRouter)', supportsThinking: true },
+    {
+      id: 'deepseek/deepseek-r1-distill-llama-70b',
+      name: 'DeepSeek R1 Distill Llama 70B (OpenRouter)',
+      supportsThinking: true,
+    },
+
+    // Qwen models via OpenRouter
+    { id: 'qwen/qwen-2.5-72b-instruct', name: 'Qwen 2.5 72B Instruct (OpenRouter)', supportsThinking: false },
+    { id: 'qwen/qwq-32b-preview', name: 'QwQ 32B Preview (OpenRouter)', supportsThinking: true },
+
+    // Cohere models via OpenRouter
+    { id: 'cohere/command-r-plus', name: 'Command R+ (OpenRouter)', supportsThinking: false },
+    { id: 'cohere/command-r', name: 'Command R (OpenRouter)', supportsThinking: false },
+
+    // xAI models via OpenRouter
+    { id: 'x-ai/grok-2', name: 'Grok 2 (OpenRouter)', supportsThinking: false },
+    { id: 'x-ai/grok-beta', name: 'Grok Beta (OpenRouter)', supportsThinking: false },
+
+    // Perplexity models via OpenRouter
+    {
+      id: 'perplexity/llama-3.1-sonar-huge-128k-online',
+      name: 'Sonar Huge 128K Online (OpenRouter)',
+      supportsThinking: false,
+    },
+    {
+      id: 'perplexity/llama-3.1-sonar-large-128k-online',
+      name: 'Sonar Large 128K Online (OpenRouter)',
+      supportsThinking: false,
+    },
+  ],
   togetherai: [
     { id: 'meta-llama/Llama-3.3-70B-Instruct-Turbo', name: 'Llama 3.3 70B Instruct Turbo', supportsThinking: false },
     {

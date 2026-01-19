@@ -178,6 +178,11 @@ export async function createProvider(
       const openai = createOpenAI({ apiKey: credentials.apiKey! });
       return { model: (modelId: string) => openai(modelId) };
     }
+    case 'openrouter': {
+      const { createOpenRouter } = await import('@openrouter/ai-sdk-provider');
+      const openrouter = createOpenRouter({ apiKey: credentials.apiKey! });
+      return { model: (modelId: string) => openrouter(modelId) };
+    }
     case 'togetherai': {
       const { createTogetherAI } = await import('@ai-sdk/togetherai');
       const togetherai = createTogetherAI({ apiKey: credentials.apiKey! });

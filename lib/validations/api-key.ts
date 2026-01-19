@@ -24,6 +24,7 @@ const ALL_PROVIDERS_TUPLE = [
   'mistral',
   'ollama',
   'openai',
+  'openrouter',
   'togetherai',
   'xai',
 ] as const;
