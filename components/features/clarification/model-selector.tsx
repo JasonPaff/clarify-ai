@@ -115,22 +115,22 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
     return groups.filter((group) => filteredOptions.some((opt) => opt.group === group.label));
   }, [filteredOptions, groups]);
 
-  // Determine display value for placeholder states
-  const getPlaceholder = () => {
+  const placeholder = useMemo(() => {
     if (isLoading) return 'Loading models...';
     if (hasNoProviders) return 'No API keys configured';
     return 'Search models...';
-  };
+  }, [isLoading, hasNoProviders]);
 
   return (
     <ComboboxRoot<ModelOption>
       disabled={isDisabled || isLoading || hasNoProviders}
+      items={filteredOptions}
       onInputValueChange={handleInputValueChange}
       onValueChange={handleValueChange}
       value={selectedOption}
     >
       <div className={cn('relative w-full', className)}>
-        <ComboboxInput placeholder={getPlaceholder()} />
+        <ComboboxInput placeholder={placeholder} />
         <div className={'absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-0.5'}>
           <ComboboxTrigger />
         </div>
@@ -139,6 +139,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
       <ComboboxPortal>
         <ComboboxPositioner>
           <ComboboxPopup>
+            <ComboboxEmpty>No models found</ComboboxEmpty>
             <ComboboxList>
               {filteredGroups.map((group) => (
                 <ComboboxGroup key={group.provider}>
@@ -154,7 +155,6 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
                 </ComboboxGroup>
               ))}
             </ComboboxList>
-            <ComboboxEmpty>No models found</ComboboxEmpty>
           </ComboboxPopup>
         </ComboboxPositioner>
       </ComboboxPortal>
