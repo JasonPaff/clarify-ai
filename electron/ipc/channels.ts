@@ -25,11 +25,32 @@ export const IpcChannels = {
     getVersion: 'app:getVersion',
   },
   db: {
+    featureRequestContextFiles: {
+      bulkCreate: 'db:featureRequestContextFiles:bulkCreate',
+      create: 'db:featureRequestContextFiles:create',
+      delete: 'db:featureRequestContextFiles:delete',
+      getByFeatureRequestId: 'db:featureRequestContextFiles:getByFeatureRequestId',
+      getByFeatureRequestIdAndType: 'db:featureRequestContextFiles:getByFeatureRequestIdAndType',
+      getById: 'db:featureRequestContextFiles:getById',
+      setIncludedInContext: 'db:featureRequestContextFiles:setIncludedInContext',
+      update: 'db:featureRequestContextFiles:update',
+    },
     featureRequestRepositories: {
       addToFeatureRequest: 'db:featureRequestRepositories:addToFeatureRequest',
       getByFeatureRequestId: 'db:featureRequestRepositories:getByFeatureRequestId',
       removeFromFeatureRequest: 'db:featureRequestRepositories:removeFromFeatureRequest',
       setForFeatureRequest: 'db:featureRequestRepositories:setForFeatureRequest',
+    },
+    featureRequestRuns: {
+      create: 'db:featureRequestRuns:create',
+      delete: 'db:featureRequestRuns:delete',
+      getByFeatureRequestId: 'db:featureRequestRuns:getByFeatureRequestId',
+      getByFeatureRequestIdAndStatus: 'db:featureRequestRuns:getByFeatureRequestIdAndStatus',
+      getByFeatureRequestIdAndStep: 'db:featureRequestRuns:getByFeatureRequestIdAndStep',
+      getById: 'db:featureRequestRuns:getById',
+      getLatestByFeatureRequestId: 'db:featureRequestRuns:getLatestByFeatureRequestId',
+      getLatestByFeatureRequestIdAndStep: 'db:featureRequestRuns:getLatestByFeatureRequestIdAndStep',
+      update: 'db:featureRequestRuns:update',
     },
     featureRequests: {
       create: 'db:featureRequests:create',
@@ -60,6 +81,15 @@ export const IpcChannels = {
       getByRepositoryId: 'db:repositoryOverviews:getByRepositoryId',
       update: 'db:repositoryOverviews:update',
       upsert: 'db:repositoryOverviews:upsert',
+    },
+    stepConfigurations: {
+      create: 'db:stepConfigurations:create',
+      delete: 'db:stepConfigurations:delete',
+      getByFeatureRequestId: 'db:stepConfigurations:getByFeatureRequestId',
+      getByFeatureRequestIdAndStep: 'db:stepConfigurations:getByFeatureRequestIdAndStep',
+      getById: 'db:stepConfigurations:getById',
+      update: 'db:stepConfigurations:update',
+      upsert: 'db:stepConfigurations:upsert',
     },
   },
   dialog: {

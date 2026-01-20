@@ -1,9 +1,25 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import type {
+  ContextFileType,
+  FeatureRequestContextFile,
+  NewFeatureRequestContextFile,
+} from '@/db/schema/feature-request-context-files.schema';
+import type {
+  FeatureRequestRun,
+  FeatureRequestRunStatus,
+  FeatureRequestRunStep,
+  NewFeatureRequestRun,
+} from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest, NewFeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { NewProject, Project } from '@/db/schema/projects.schema';
 import type { NewRepository, Repository } from '@/db/schema/repositories.schema';
 import type { NewRepositoryOverview, RepositoryOverview } from '@/db/schema/repository-overviews.schema';
+import type {
+  NewStepConfiguration,
+  StepConfiguration,
+  StepConfigurationStep,
+} from '@/db/schema/step-configurations.schema';
 
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
@@ -46,11 +62,44 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    featureRequestContextFiles: {
+      bulkCreate(data: Array<NewFeatureRequestContextFile>): Promise<Array<FeatureRequestContextFile>>;
+      create(data: NewFeatureRequestContextFile): Promise<FeatureRequestContextFile>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(featureRequestId: number): Promise<Array<FeatureRequestContextFile>>;
+      getByFeatureRequestIdAndType(
+        featureRequestId: number,
+        fileType: ContextFileType
+      ): Promise<Array<FeatureRequestContextFile>>;
+      getById(id: number): Promise<FeatureRequestContextFile | undefined>;
+      setIncludedInContext(id: number, includedInContext: boolean): Promise<FeatureRequestContextFile | undefined>;
+      update(id: number, data: Partial<NewFeatureRequestContextFile>): Promise<FeatureRequestContextFile | undefined>;
+    };
     featureRequestRepositories: {
       addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;
       removeFromFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       setForFeatureRequest(featureRequestId: number, repositoryIds: Array<number>): Promise<void>;
+    };
+    featureRequestRuns: {
+      create(data: NewFeatureRequestRun): Promise<FeatureRequestRun>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(featureRequestId: number): Promise<Array<FeatureRequestRun>>;
+      getByFeatureRequestIdAndStatus(
+        featureRequestId: number,
+        status: FeatureRequestRunStatus
+      ): Promise<Array<FeatureRequestRun>>;
+      getByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: FeatureRequestRunStep
+      ): Promise<Array<FeatureRequestRun>>;
+      getById(id: number): Promise<FeatureRequestRun | undefined>;
+      getLatestByFeatureRequestId(featureRequestId: number): Promise<FeatureRequestRun | undefined>;
+      getLatestByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: FeatureRequestRunStep
+      ): Promise<FeatureRequestRun | undefined>;
+      update(id: number, data: Partial<NewFeatureRequestRun>): Promise<FeatureRequestRun | undefined>;
     };
     featureRequests: {
       create(data: NewFeatureRequest): Promise<FeatureRequest>;
@@ -81,6 +130,22 @@ export interface ElectronAPI {
       getByRepositoryId(repositoryId: number): Promise<RepositoryOverview | undefined>;
       update(id: number, data: Partial<NewRepositoryOverview>): Promise<RepositoryOverview | undefined>;
       upsert(repositoryId: number, data: Omit<NewRepositoryOverview, 'repositoryId'>): Promise<RepositoryOverview>;
+    };
+    stepConfigurations: {
+      create(data: NewStepConfiguration): Promise<StepConfiguration>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(featureRequestId: number): Promise<Array<StepConfiguration>>;
+      getByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: StepConfigurationStep
+      ): Promise<StepConfiguration | undefined>;
+      getById(id: number): Promise<StepConfiguration | undefined>;
+      update(id: number, data: Partial<NewStepConfiguration>): Promise<StepConfiguration | undefined>;
+      upsert(
+        featureRequestId: number,
+        step: StepConfigurationStep,
+        data: Omit<NewStepConfiguration, 'featureRequestId' | 'step'>
+      ): Promise<StepConfiguration>;
     };
   };
   dialog: {
@@ -176,6 +241,23 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
+    featureRequestContextFiles: {
+      bulkCreate: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.bulkCreate, data),
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.delete, id),
+      getByFeatureRequestId: (featureRequestId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.getByFeatureRequestId, featureRequestId),
+      getByFeatureRequestIdAndType: (featureRequestId, fileType) =>
+        ipcRenderer.invoke(
+          IpcChannels.db.featureRequestContextFiles.getByFeatureRequestIdAndType,
+          featureRequestId,
+          fileType
+        ),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.getById, id),
+      setIncludedInContext: (id, includedInContext) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.setIncludedInContext, id, includedInContext),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.update, id, data),
+    },
     featureRequestRepositories: {
       addToFeatureRequest: (featureRequestId, repositoryId) =>
         ipcRenderer.invoke(
@@ -197,6 +279,26 @@ const electronAPI: ElectronAPI = {
           featureRequestId,
           repositoryIds
         ),
+    },
+    featureRequestRuns: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.delete, id),
+      getByFeatureRequestId: (featureRequestId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getByFeatureRequestId, featureRequestId),
+      getByFeatureRequestIdAndStatus: (featureRequestId, status) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getByFeatureRequestIdAndStatus, featureRequestId, status),
+      getByFeatureRequestIdAndStep: (featureRequestId, step) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getByFeatureRequestIdAndStep, featureRequestId, step),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getById, id),
+      getLatestByFeatureRequestId: (featureRequestId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getLatestByFeatureRequestId, featureRequestId),
+      getLatestByFeatureRequestIdAndStep: (featureRequestId, step) =>
+        ipcRenderer.invoke(
+          IpcChannels.db.featureRequestRuns.getLatestByFeatureRequestIdAndStep,
+          featureRequestId,
+          step
+        ),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.update, id, data),
     },
     featureRequests: {
       create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequests.create, data),
@@ -229,6 +331,18 @@ const electronAPI: ElectronAPI = {
         ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.getByRepositoryId, repositoryId),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.update, id, data),
       upsert: (repositoryId, data) => ipcRenderer.invoke(IpcChannels.db.repositoryOverviews.upsert, repositoryId, data),
+    },
+    stepConfigurations: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.delete, id),
+      getByFeatureRequestId: (featureRequestId) =>
+        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByFeatureRequestId, featureRequestId),
+      getByFeatureRequestIdAndStep: (featureRequestId, step) =>
+        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByFeatureRequestIdAndStep, featureRequestId, step),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getById, id),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.update, id, data),
+      upsert: (featureRequestId, step, data) =>
+        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.upsert, featureRequestId, step, data),
     },
   },
   dialog: {

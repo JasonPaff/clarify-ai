@@ -10,6 +10,7 @@
 Plan Phase 1 of the feature request workflow implementation from `docs/2026_01_20/plans/feature-request-workflow-implementation-order.md`
 
 Phase 1 includes:
+
 - 1.1 Run History Schema - Create `feature-request-runs.schema.ts` with fields for tracking AI runs per step
 - 1.2 Step Configuration Schema - Create `step-configurations.schema.ts` for per-step model/prompt settings
 - 1.3 Feature Request Schema Updates - Add `archivedAt`, `staleSteps` fields and update status enum
@@ -18,6 +19,7 @@ Phase 1 includes:
 ## Codebase Exploration Summary
 
 The clarification agent examined:
+
 - `CLAUDE.md` - Project conventions and rules
 - `db/schema/` directory - Existing schema patterns
 
@@ -34,6 +36,7 @@ The clarification agent examined:
 5. **Specific enum values** for status updates (`describing`, `clarifying`, `researching`, `planning`, `completed`)
 
 The existing codebase provides clear patterns to follow:
+
 - Schema files in `db/schema/` use Drizzle ORM with SQLite
 - All schemas include `id` (integer primary key), `createdAt`, `updatedAt` (text timestamps)
 - Foreign keys use `references()` with `onDelete: 'cascade'`
@@ -51,6 +54,7 @@ The implementation plan leaves no ambiguity about scope, approach, or technical 
 Since clarification was skipped, the enhanced request is the original request unchanged:
 
 > Plan Phase 1 of the feature request workflow implementation from docs/2026_01_20/plans/feature-request-workflow-implementation-order.md, which includes:
+>
 > - 1.1 Run History Schema
 > - 1.2 Step Configuration Schema
 > - 1.3 Feature Request Schema Updates

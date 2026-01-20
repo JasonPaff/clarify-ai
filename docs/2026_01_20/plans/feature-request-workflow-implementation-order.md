@@ -7,6 +7,7 @@ This document outlines the recommended order for implementing the feature reques
 ## Current State Summary
 
 **Already Implemented:**
+
 - Database schemas for feature requests and repository associations
 - Feature request CRUD operations (IPC + hooks + dialogs)
 - Entry step with auto-save
@@ -15,6 +16,7 @@ This document outlines the recommended order for implementing the feature reques
 - Basic workflow stepper UI
 
 **Needs Implementation:**
+
 - Rename steps to match design spec (Entry→Describe, Refine→Clarify, Research→Discover)
 - Run history system
 - Stale state tracking
@@ -29,7 +31,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 1: Foundation & Data Layer
 
-*Goal: Establish the data structures needed for the enhanced workflow*
+_Goal: Establish the data structures needed for the enhanced workflow_
 
 ### 1.1 Run History Schema
 
@@ -72,7 +74,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 2: IPC Layer Extensions
 
-*Goal: Expose new database operations and AI capabilities to the renderer*
+_Goal: Expose new database operations and AI capabilities to the renderer_
 
 ### 2.1 Run History IPC
 
@@ -117,7 +119,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 3: Query Hooks & State Management
 
-*Goal: Create React hooks for accessing new data*
+_Goal: Create React hooks for accessing new data_
 
 ### 3.1 Run History Hooks
 
@@ -153,7 +155,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 4: Core UI Components
 
-*Goal: Build reusable components for the workflow*
+_Goal: Build reusable components for the workflow_
 
 ### 4.1 Step Settings Panel
 
@@ -207,7 +209,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 5: Describe Step Enhancement
 
-*Goal: Upgrade the entry step to match the design spec*
+_Goal: Upgrade the entry step to match the design spec_
 
 ### 5.1 Rename & Restructure
 
@@ -244,7 +246,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 6: Clarify Step Enhancement
 
-*Goal: Upgrade the existing clarification step*
+_Goal: Upgrade the existing clarification step_
 
 ### 6.1 Rename & Integrate Settings
 
@@ -281,7 +283,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 7: Discover Step Implementation
 
-*Goal: Build the file discovery step from placeholder to full implementation*
+_Goal: Build the file discovery step from placeholder to full implementation_
 
 ### 7.1 Scope Selector UI
 
@@ -341,7 +343,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 8: Plan Step Implementation
 
-*Goal: Build the implementation plan generation step*
+_Goal: Build the implementation plan generation step_
 
 ### 8.1 Plan AI Integration
 
@@ -395,7 +397,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 9: Workflow Navigation & State
 
-*Goal: Implement the workflow-level behaviors*
+_Goal: Implement the workflow-level behaviors_
 
 ### 9.1 Stepper Enhancement
 
@@ -435,7 +437,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 10: Feature Request List & Management
 
-*Goal: Enhance the feature request list view*
+_Goal: Enhance the feature request list view_
 
 ### 10.1 Status Filter
 
@@ -470,7 +472,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 11: Create Dialog Enhancement
 
-*Goal: Update the creation flow*
+_Goal: Update the creation flow_
 
 ### 11.1 Dialog Fields
 
@@ -487,7 +489,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 12: Project Settings Extensions
 
-*Goal: Add project-level configuration for the workflow*
+_Goal: Add project-level configuration for the workflow_
 
 ### 12.1 Plan Export Folder Setting
 
@@ -505,7 +507,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 13: Polish & Edge Cases
 
-*Goal: Handle remaining details and edge cases*
+_Goal: Handle remaining details and edge cases_
 
 ### 13.1 Empty States
 
@@ -541,7 +543,7 @@ This document outlines the recommended order for implementing the feature reques
 
 ## Phase 14: Testing & Validation
 
-*Goal: Ensure everything works correctly*
+_Goal: Ensure everything works correctly_
 
 ### 14.1 Database Testing
 
@@ -591,19 +593,19 @@ This document outlines the recommended order for implementing the feature reques
 
 ### Estimated Scope
 
-| Phase | Size | Notes |
-|-------|------|-------|
-| 1 | Medium | Database schemas and migrations |
-| 2 | Medium | IPC handlers |
-| 3 | Small | Query hooks (straightforward) |
-| 4 | Large | Many new components |
-| 5 | Medium | Enhancing existing step |
-| 6 | Medium | Enhancing existing step |
-| 7 | Large | New AI integration + complex UI |
-| 8 | Large | New AI integration + rich editor |
-| 9 | Medium | Workflow state logic |
-| 10-12 | Small | Enhancements |
-| 13-14 | Medium | Polish and testing |
+| Phase | Size   | Notes                            |
+| ----- | ------ | -------------------------------- |
+| 1     | Medium | Database schemas and migrations  |
+| 2     | Medium | IPC handlers                     |
+| 3     | Small  | Query hooks (straightforward)    |
+| 4     | Large  | Many new components              |
+| 5     | Medium | Enhancing existing step          |
+| 6     | Medium | Enhancing existing step          |
+| 7     | Large  | New AI integration + complex UI  |
+| 8     | Large  | New AI integration + rich editor |
+| 9     | Medium | Workflow state logic             |
+| 10-12 | Small  | Enhancements                     |
+| 13-14 | Medium | Polish and testing               |
 
 ---
 

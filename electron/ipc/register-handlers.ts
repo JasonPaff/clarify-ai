@@ -1,24 +1,31 @@
 import type { BrowserWindow } from 'electron';
 
-import type { DrizzleDatabase } from '../../db';
+import type { DrizzleDatabase } from '@/db';
 
-import { createFeatureRequestRepositoriesRepository } from '../../db/repositories/feature-request-repositories.repository';
-import { createFeatureRequestsRepository } from '../../db/repositories/feature-requests.repository';
-import { createProjectsRepository } from '../../db/repositories/projects.repository';
-import { createRepositoriesRepository } from '../../db/repositories/repositories.repository';
-import { createRepositoryOverviewsRepository } from '../../db/repositories/repository-overviews.repository';
+import { createFeatureRequestContextFilesRepository } from '@/db/repositories/feature-request-context-files.repository';
+import { createFeatureRequestRepositoriesRepository } from '@/db/repositories/feature-request-repositories.repository';
+import { createFeatureRequestRunsRepository } from '@/db/repositories/feature-request-runs.repository';
+import { createFeatureRequestsRepository } from '@/db/repositories/feature-requests.repository';
+import { createProjectsRepository } from '@/db/repositories/projects.repository';
+import { createRepositoriesRepository } from '@/db/repositories/repositories.repository';
+import { createRepositoryOverviewsRepository } from '@/db/repositories/repository-overviews.repository';
+import { createStepConfigurationsRepository } from '@/db/repositories/step-configurations.repository';
+
 import { registerAiClarificationHandlers } from './ai-clarification.handlers';
 import { registerAiOverviewHandlers } from './ai-overview.handlers';
 import { registerApiKeysHandlers } from './api-keys.handlers';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
+import { registerFeatureRequestContextFilesHandlers } from './feature-request-context-files.handlers';
 import { registerFeatureRequestRepositoriesHandlers } from './feature-request-repositories.handlers';
+import { registerFeatureRequestRunsHandlers } from './feature-request-runs.handlers';
 import { registerFeatureRequestsHandlers } from './feature-requests.handlers';
 import { registerFsHandlers } from './fs.handlers';
 import { registerOpenRouterModelsHandlers } from './openrouter-models.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
 import { registerRepositoriesHandlers } from './repositories.handlers';
 import { registerRepositoryOverviewsHandlers } from './repository-overviews.handlers';
+import { registerStepConfigurationsHandlers } from './step-configurations.handlers';
 import { registerStoreHandlers } from './store.handlers';
 
 export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => BrowserWindow | null): void {
@@ -62,7 +69,19 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   const featureRequestRepositoriesRepository = createFeatureRequestRepositoriesRepository(db);
   registerFeatureRequestRepositoriesHandlers(featureRequestRepositoriesRepository);
 
+  // Database handlers - Feature Request Context Files
+  const featureRequestContextFilesRepository = createFeatureRequestContextFilesRepository(db);
+  registerFeatureRequestContextFilesHandlers(featureRequestContextFilesRepository);
+
   // Database handlers - Repository Overviews
   const repositoryOverviewsRepository = createRepositoryOverviewsRepository(db);
   registerRepositoryOverviewsHandlers(repositoryOverviewsRepository);
+
+  // Database handlers - Feature Request Runs
+  const featureRequestRunsRepository = createFeatureRequestRunsRepository(db);
+  registerFeatureRequestRunsHandlers(featureRequestRunsRepository);
+
+  // Database handlers - Step Configurations
+  const stepConfigurationsRepository = createStepConfigurationsRepository(db);
+  registerStepConfigurationsHandlers(stepConfigurationsRepository);
 }

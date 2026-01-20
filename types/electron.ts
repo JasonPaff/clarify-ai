@@ -1,8 +1,24 @@
 // Re-export database types for renderer use
+export type {
+  ContextFileType,
+  FeatureRequestContextFile,
+  NewFeatureRequestContextFile,
+} from '../db/schema/feature-request-context-files.schema';
+export type {
+  FeatureRequestRun,
+  FeatureRequestRunStatus,
+  FeatureRequestRunStep,
+  NewFeatureRequestRun,
+} from '../db/schema/feature-request-runs.schema';
 export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 export type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
+export type {
+  NewStepConfiguration,
+  StepConfiguration,
+  StepConfigurationStep,
+} from '../db/schema/step-configurations.schema';
 
 // Re-export AI clarification types for renderer use
 export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
@@ -125,11 +141,67 @@ export interface ElectronAPI {
   };
   /** Database operations for managing application data */
   db: {
+    featureRequestContextFiles: {
+      bulkCreate(
+        data: Array<import('../db/schema/feature-request-context-files.schema').NewFeatureRequestContextFile>
+      ): Promise<Array<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile>>;
+      create(
+        data: import('../db/schema/feature-request-context-files.schema').NewFeatureRequestContextFile
+      ): Promise<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(
+        featureRequestId: number
+      ): Promise<Array<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile>>;
+      getByFeatureRequestIdAndType(
+        featureRequestId: number,
+        fileType: import('../db/schema/feature-request-context-files.schema').ContextFileType
+      ): Promise<Array<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile>>;
+      getById(
+        id: number
+      ): Promise<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile | undefined>;
+      setIncludedInContext(
+        id: number,
+        includedInContext: boolean
+      ): Promise<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile | undefined>;
+      update(
+        id: number,
+        data: Partial<import('../db/schema/feature-request-context-files.schema').NewFeatureRequestContextFile>
+      ): Promise<import('../db/schema/feature-request-context-files.schema').FeatureRequestContextFile | undefined>;
+    };
     featureRequestRepositories: {
       addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;
       removeFromFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       setForFeatureRequest(featureRequestId: number, repositoryIds: Array<number>): Promise<void>;
+    };
+    featureRequestRuns: {
+      create(
+        data: import('../db/schema/feature-request-runs.schema').NewFeatureRequestRun
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(
+        featureRequestId: number
+      ): Promise<Array<import('../db/schema/feature-request-runs.schema').FeatureRequestRun>>;
+      getByFeatureRequestIdAndStatus(
+        featureRequestId: number,
+        status: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStatus
+      ): Promise<Array<import('../db/schema/feature-request-runs.schema').FeatureRequestRun>>;
+      getByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep
+      ): Promise<Array<import('../db/schema/feature-request-runs.schema').FeatureRequestRun>>;
+      getById(id: number): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
+      getLatestByFeatureRequestId(
+        featureRequestId: number
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
+      getLatestByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
+      update(
+        id: number,
+        data: Partial<import('../db/schema/feature-request-runs.schema').NewFeatureRequestRun>
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
     };
     featureRequests: {
       create(
@@ -185,6 +257,29 @@ export interface ElectronAPI {
         repositoryId: number,
         data: Omit<import('../db/schema/repository-overviews.schema').NewRepositoryOverview, 'repositoryId'>
       ): Promise<import('../db/schema/repository-overviews.schema').RepositoryOverview>;
+    };
+    stepConfigurations: {
+      create(
+        data: import('../db/schema/step-configurations.schema').NewStepConfiguration
+      ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration>;
+      delete(id: number): Promise<boolean>;
+      getByFeatureRequestId(
+        featureRequestId: number
+      ): Promise<Array<import('../db/schema/step-configurations.schema').StepConfiguration>>;
+      getByFeatureRequestIdAndStep(
+        featureRequestId: number,
+        step: import('../db/schema/step-configurations.schema').StepConfigurationStep
+      ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
+      getById(id: number): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
+      update(
+        id: number,
+        data: Partial<import('../db/schema/step-configurations.schema').NewStepConfiguration>
+      ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
+      upsert(
+        featureRequestId: number,
+        step: import('../db/schema/step-configurations.schema').StepConfigurationStep,
+        data: Omit<import('../db/schema/step-configurations.schema').NewStepConfiguration, 'featureRequestId' | 'step'>
+      ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration>;
     };
   };
   dialog: {

@@ -8,6 +8,7 @@
 ## Original Request
 
 Plan Phase 1 of the feature request workflow implementation from docs/2026_01_20/plans/feature-request-workflow-implementation-order.md, which includes:
+
 - 1.1 Run History Schema
 - 1.2 Step Configuration Schema
 - 1.3 Feature Request Schema Updates

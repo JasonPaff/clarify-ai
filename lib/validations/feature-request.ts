@@ -2,8 +2,29 @@ import { z } from 'zod';
 
 import { repositoryIdsSchema } from './feature-request-repositories';
 
-// Status enum for feature request workflow stages
-const featureRequestStatusSchema = z.enum(['completed', 'draft', 'planning', 'refining', 'researching']);
+/**
+ * Status enum for feature request workflow stages:
+ * - 'draft': Initial state, not yet started
+ * - 'refining': Currently running the refine step
+ * - 'refined': Refine step completed
+ * - 'researching': Currently running the research/file discovery step
+ * - 'researched': Research step completed
+ * - 'planning': Currently running the planning step
+ * - 'planned': Planning step completed
+ * - 'completed': All steps finished successfully
+ * - 'failed': An error occurred during processing
+ */
+const featureRequestStatusSchema = z.enum([
+  'completed',
+  'draft',
+  'failed',
+  'planned',
+  'planning',
+  'refined',
+  'refining',
+  'researched',
+  'researching',
+]);
 
 // Shared field validations for DRY compliance
 const featureRequestDescriptionSchema = z.string();

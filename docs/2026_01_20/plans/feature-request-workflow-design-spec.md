@@ -12,12 +12,12 @@ This document captures the complete design for the feature request workflow in C
 
 The workflow consists of 4 sequential steps:
 
-| Step | Name | Purpose |
-|------|------|---------|
-| 1 | **Describe** | User enters feature request with context |
-| 2 | **Clarify** | AI asks clarifying questions, user refines request |
-| 3 | **Discover** | AI scans repositories to find relevant files |
-| 4 | **Plan** | AI generates implementation plan |
+| Step | Name         | Purpose                                            |
+| ---- | ------------ | -------------------------------------------------- |
+| 1    | **Describe** | User enters feature request with context           |
+| 2    | **Clarify**  | AI asks clarifying questions, user refines request |
+| 3    | **Discover** | AI scans repositories to find relevant files       |
+| 4    | **Plan**     | AI generates implementation plan                   |
 
 ### Navigation
 
@@ -40,11 +40,13 @@ The workflow consists of 4 sequential steps:
 ### Creation
 
 Feature requests are created via a dialog with:
+
 - **Title** (required)
 - **Description** (optional)
 - **Repository selection** (at least one required - blocks creation without)
 
 After creation, the workflow opens to:
+
 - Step 1 (Describe) for new feature requests
 - Last active step for in-progress feature requests
 
@@ -102,6 +104,7 @@ Describing → Clarifying → Researching → Planning → Complete
 ### Flow Type
 
 **Hybrid approach**:
+
 1. AI generates all clarifying questions at once (user waits for all to stream)
 2. User answers complete set via form-style fields
 3. Explicit "Request more clarification" button for additional rounds
@@ -130,6 +133,7 @@ Describing → Clarifying → Researching → Planning → Complete
 ### Scope Selector
 
 Before running discovery, user can limit scope:
+
 - **Folder tree**: Visual tree with checkboxes to include/exclude directories
 - **Glob patterns**: Input field for patterns (e.g., `src/**/*.ts`)
 - **Per-repository**: Each repo has its own scope configuration
@@ -137,6 +141,7 @@ Before running discovery, user can limit scope:
 ### Output Format
 
 **Detailed cards** showing:
+
 - File path
 - Action needed (add/modify/review)
 - Reason for inclusion
@@ -145,6 +150,7 @@ Before running discovery, user can limit scope:
 - Relevant code snippets
 
 **Display behavior**:
+
 - Summary + expand: Key info visible (path, action, risk)
 - Click to expand for full details (dependencies, snippets, full reason)
 
@@ -160,6 +166,7 @@ Before running discovery, user can limit scope:
 ### Output Format
 
 **Rich markdown document** including:
+
 - Headers and sections
 - Step-by-step instructions
 - File paths and code snippets
@@ -168,6 +175,7 @@ Before running discovery, user can limit scope:
 ### Quality Gates
 
 Two types:
+
 1. **Automated commands**: Commands to run (e.g., `npm test`, `npm run build`)
 2. **Manual verification**: Human checkpoints describing what to verify
 
@@ -179,6 +187,7 @@ Two types:
 ### Export Options
 
 Three export formats available with equal prominence:
+
 1. Copy to clipboard (as markdown)
 2. Save as .md file to user-chosen location
 3. Save to project docs folder (configurable per-project in settings)
@@ -265,6 +274,7 @@ Each step has a collapsible settings panel containing:
 ## Confirmation Dialogs
 
 Required for all destructive actions:
+
 - Deleting a feature request
 - Restoring an old run version
 - Canceling a running AI operation
@@ -307,6 +317,7 @@ The following settings are configured at the project level:
 ### Stale Detection
 
 A step becomes stale when any preceding step's output changes:
+
 - If Describe changes → Clarify, Discover, Plan become stale
 - If Clarify changes → Discover, Plan become stale
 - If Discover changes → Plan becomes stale
@@ -315,21 +326,21 @@ A step becomes stale when any preceding step's output changes:
 
 ## UI/UX Summary
 
-| Aspect | Decision |
-|--------|----------|
-| Step navigation | Horizontal stepper, free navigation |
-| AI streaming | Always stream, show thinking |
-| Save behavior | Auto-save on change |
-| Model selection | Per-step with project persistence |
-| Prompt editing | Advanced mode (hidden by default) |
-| Q&A format | Form-style fields |
-| File cards | Summary + expand |
-| Run history | Dropdown with timestamps |
-| Stale indicator | Warning banner + stepper icons |
-| Keyboard shortcuts | None |
+| Aspect             | Decision                            |
+| ------------------ | ----------------------------------- |
+| Step navigation    | Horizontal stepper, free navigation |
+| AI streaming       | Always stream, show thinking        |
+| Save behavior      | Auto-save on change                 |
+| Model selection    | Per-step with project persistence   |
+| Prompt editing     | Advanced mode (hidden by default)   |
+| Q&A format         | Form-style fields                   |
+| File cards         | Summary + expand                    |
+| Run history        | Dropdown with timestamps            |
+| Stale indicator    | Warning banner + stepper icons      |
+| Keyboard shortcuts | None                                |
 
 ---
 
 ## Open Questions / Future Considerations
 
-*None identified during design session - all major decisions captured above.*
+_None identified during design session - all major decisions captured above._

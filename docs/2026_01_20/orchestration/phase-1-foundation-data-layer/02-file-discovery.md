@@ -22,47 +22,47 @@ Implement Phase 1 of the feature request workflow by creating four new database 
 
 ### Critical (Files that MUST be modified or serve as essential reference)
 
-| File Path | Action | Reason for Relevance |
-|-----------|--------|---------------------|
-| `db/schema/feature-requests.schema.ts` | Modify | Existing schema that needs updating with `archivedAt`, `staleSteps` fields and expanded status enum |
-| `db/index.ts` | Modify | Database initialization - must import and register new schemas |
-| `drizzle.config.ts` | Modify | Must add new schema file paths for migration generation |
-| `types/electron.ts` | Modify | Must export new types for renderer use (`FeatureRequestRun`, `StepConfiguration`, `FeatureRequestContextFile`) |
+| File Path                              | Action | Reason for Relevance                                                                                           |
+| -------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| `db/schema/feature-requests.schema.ts` | Modify | Existing schema that needs updating with `archivedAt`, `staleSteps` fields and expanded status enum            |
+| `db/index.ts`                          | Modify | Database initialization - must import and register new schemas                                                 |
+| `drizzle.config.ts`                    | Modify | Must add new schema file paths for migration generation                                                        |
+| `types/electron.ts`                    | Modify | Must export new types for renderer use (`FeatureRequestRun`, `StepConfiguration`, `FeatureRequestContextFile`) |
 
 ### High Priority (Files needed for implementation patterns)
 
-| File Path | Action | Reason for Relevance |
-|-----------|--------|---------------------|
-| `db/schema/repositories.schema.ts` | Reference | Reference pattern for schema with foreign keys and indexes |
-| `db/schema/repository-overviews.schema.ts` | Reference | Reference pattern for schema with unique constraints and model tracking |
-| `db/schema/feature-request-repositories.schema.ts` | Reference | Reference pattern for junction table with composite indexes |
-| `db/repositories/feature-requests.repository.ts` | Reference | Pattern for repository implementation - may need updates for new fields |
-| `db/repositories/repository-overviews.repository.ts` | Reference | Advanced repository pattern with upsert operation |
-| `electron/ipc/channels.ts` | Reference | IPC channel naming conventions (will need new channels for new schemas) |
-| `electron/ipc/register-handlers.ts` | Reference | Pattern for registering new repository handlers |
-| `electron/preload.ts` | Reference | Pattern for exposing new database operations to renderer |
-| `lib/validations/feature-request.ts` | Modify | Must update status enum to include new workflow states |
+| File Path                                            | Action    | Reason for Relevance                                                    |
+| ---------------------------------------------------- | --------- | ----------------------------------------------------------------------- |
+| `db/schema/repositories.schema.ts`                   | Reference | Reference pattern for schema with foreign keys and indexes              |
+| `db/schema/repository-overviews.schema.ts`           | Reference | Reference pattern for schema with unique constraints and model tracking |
+| `db/schema/feature-request-repositories.schema.ts`   | Reference | Reference pattern for junction table with composite indexes             |
+| `db/repositories/feature-requests.repository.ts`     | Reference | Pattern for repository implementation - may need updates for new fields |
+| `db/repositories/repository-overviews.repository.ts` | Reference | Advanced repository pattern with upsert operation                       |
+| `electron/ipc/channels.ts`                           | Reference | IPC channel naming conventions (will need new channels for new schemas) |
+| `electron/ipc/register-handlers.ts`                  | Reference | Pattern for registering new repository handlers                         |
+| `electron/preload.ts`                                | Reference | Pattern for exposing new database operations to renderer                |
+| `lib/validations/feature-request.ts`                 | Modify    | Must update status enum to include new workflow states                  |
 
 ### Medium Priority (Files for reference or context)
 
-| File Path | Action | Reason for Relevance |
-|-----------|--------|---------------------|
-| `db/schema/projects.schema.ts` | Reference | Base schema pattern with indexes |
-| `db/repositories/projects.repository.ts` | Reference | Simple repository pattern |
-| `electron/ipc/feature-requests.handlers.ts` | Reference | Pattern for feature request IPC handlers |
-| `hooks/useElectron.ts` | Reference | Pattern for useElectronDb hook (will need updates) |
-| `hooks/queries/use-feature-requests.ts` | Reference | TanStack Query pattern for feature requests |
-| `lib/queries/feature-requests.ts` | Reference | Query key pattern for feature requests |
-| `lib/queries/index.ts` | Reference | Query key merging pattern |
-| `drizzle/0005_white_night_thrasher.sql` | Reference | Latest migration showing SQL patterns |
+| File Path                                   | Action    | Reason for Relevance                               |
+| ------------------------------------------- | --------- | -------------------------------------------------- |
+| `db/schema/projects.schema.ts`              | Reference | Base schema pattern with indexes                   |
+| `db/repositories/projects.repository.ts`    | Reference | Simple repository pattern                          |
+| `electron/ipc/feature-requests.handlers.ts` | Reference | Pattern for feature request IPC handlers           |
+| `hooks/useElectron.ts`                      | Reference | Pattern for useElectronDb hook (will need updates) |
+| `hooks/queries/use-feature-requests.ts`     | Reference | TanStack Query pattern for feature requests        |
+| `lib/queries/feature-requests.ts`           | Reference | Query key pattern for feature requests             |
+| `lib/queries/index.ts`                      | Reference | Query key merging pattern                          |
+| `drizzle/0005_white_night_thrasher.sql`     | Reference | Latest migration showing SQL patterns              |
 
 ### Low Priority (May need updates in Phase 2)
 
-| File Path | Action | Reason for Relevance |
-|-----------|--------|---------------------|
+| File Path                                                    | Action    | Reason for Relevance              |
+| ------------------------------------------------------------ | --------- | --------------------------------- |
 | `db/repositories/feature-request-repositories.repository.ts` | Reference | Junction table repository pattern |
-| `db/repositories/repositories.repository.ts` | Reference | Basic repository pattern |
-| `electron/ipc/feature-request-repositories.handlers.ts` | Reference | Junction table handler pattern |
+| `db/repositories/repositories.repository.ts`                 | Reference | Basic repository pattern          |
+| `electron/ipc/feature-request-repositories.handlers.ts`      | Reference | Junction table handler pattern    |
 
 ## Architecture Insights
 
@@ -110,18 +110,19 @@ Implement Phase 1 of the feature request workflow by creating four new database 
 
 ## Files to Create
 
-| File Path | Purpose |
-|-----------|---------|
-| `db/schema/feature-request-runs.schema.ts` | Track AI execution runs per workflow step |
-| `db/schema/step-configurations.schema.ts` | Per-step model and prompt configuration overrides |
-| `db/schema/feature-request-context-files.schema.ts` | File attachments for feature requests |
-| `db/repositories/feature-request-runs.repository.ts` | Repository for run history CRUD |
-| `db/repositories/step-configurations.repository.ts` | Repository for step config CRUD |
-| `db/repositories/feature-request-context-files.repository.ts` | Repository for context files CRUD |
+| File Path                                                     | Purpose                                           |
+| ------------------------------------------------------------- | ------------------------------------------------- |
+| `db/schema/feature-request-runs.schema.ts`                    | Track AI execution runs per workflow step         |
+| `db/schema/step-configurations.schema.ts`                     | Per-step model and prompt configuration overrides |
+| `db/schema/feature-request-context-files.schema.ts`           | File attachments for feature requests             |
+| `db/repositories/feature-request-runs.repository.ts`          | Repository for run history CRUD                   |
+| `db/repositories/step-configurations.repository.ts`           | Repository for step config CRUD                   |
+| `db/repositories/feature-request-context-files.repository.ts` | Repository for context files CRUD                 |
 
 ## File Path Validation Results
 
 All discovered file paths validated to exist in the codebase:
+
 - db/schema/feature-requests.schema.ts - EXISTS
 - db/index.ts - EXISTS
 - drizzle.config.ts - EXISTS

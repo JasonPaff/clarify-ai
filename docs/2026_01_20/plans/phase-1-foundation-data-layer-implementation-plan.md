@@ -40,20 +40,24 @@
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/schema/feature-requests.schema.ts` - Add new fields and expand status values
 
 **Changes:**
+
 - Add `archivedAt` nullable text field for soft deletion timestamps
 - Add `staleSteps` text field to store JSON array of step identifiers needing re-run
 - Expand status field to support: 'draft', 'refining', 'refined', 'researching', 'researched', 'planning', 'planned', 'completed', 'failed'
 - Add index on `archivedAt` field for efficient filtering of archived records
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file compiles without TypeScript errors
 - [ ] New fields are properly typed with $inferSelect and $inferInsert
 - [ ] All validation commands pass
@@ -67,20 +71,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/schema/feature-request-runs.schema.ts` - New schema for run tracking
 
 **Changes:**
+
 - Define `featureRequestRuns` table with fields: id (primary key), featureRequestId (foreign key with cascade delete), step (text: 'refine' | 'research' | 'plan'), modelId (text), inputContent (text), outputContent (text), inputTokens (integer), outputTokens (integer), durationMs (integer), status (text: 'pending' | 'running' | 'completed' | 'failed'), errorMessage (text nullable), startedAt (text timestamp), completedAt (text timestamp nullable), createdAt, updatedAt
 - Add foreign key reference to featureRequests table with onDelete cascade
 - Create indexes on featureRequestId, step, and status fields
 - Export FeatureRequestRun and NewFeatureRequestRun types using $inferSelect and $inferInsert
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file follows existing patterns from repository-overviews.schema.ts
 - [ ] Foreign key relationship properly configured with cascade delete
 - [ ] Appropriate indexes defined for query performance
@@ -95,9 +103,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/schema/step-configurations.schema.ts` - New schema for step configs
 
 **Changes:**
+
 - Define `stepConfigurations` table with fields: id (primary key), featureRequestId (foreign key with cascade delete), step (text: 'refine' | 'research' | 'plan'), modelProvider (text), modelId (text), customSystemPrompt (text nullable), customUserPromptTemplate (text nullable), temperature (real/numeric nullable), thinkingEnabled (integer as boolean), createdAt, updatedAt
 - Add foreign key reference to featureRequests table with onDelete cascade
 - Create unique index on (featureRequestId, step) combination to prevent duplicate configs
@@ -105,11 +115,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Export StepConfiguration and NewStepConfiguration types
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema follows project conventions with proper timestamp defaults
 - [ ] Unique constraint prevents duplicate step configurations per feature request
 - [ ] All validation commands pass
@@ -123,9 +135,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/schema/feature-request-context-files.schema.ts` - New schema for context files
 
 **Changes:**
+
 - Define `featureRequestContextFiles` table with fields: id (primary key), featureRequestId (foreign key with cascade delete), filePath (text), fileType (text: 'repository' | 'document' | 'image'), displayName (text), sizeBytes (integer), includedInContext (integer as boolean, default true), createdAt, updatedAt
 - Add foreign key reference to featureRequests table with onDelete cascade
 - Create indexes on featureRequestId and fileType fields
@@ -133,11 +147,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Export FeatureRequestContextFile and NewFeatureRequestContextFile types
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema supports all required file types
 - [ ] Unique constraint prevents duplicate file paths per feature request
 - [ ] All validation commands pass
@@ -151,20 +167,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `db/index.ts` - Import and spread new schemas into schema object
 - `drizzle.config.ts` - Add new schema file paths to schema array
 
 **Changes:**
+
 - In db/index.ts: Add imports for featureRequestRunsSchema, stepConfigurationsSchema, featureRequestContextFilesSchema
 - In db/index.ts: Spread new schemas into the combined schema object
 - In drizzle.config.ts: Add paths for feature-request-runs.schema.ts, step-configurations.schema.ts, feature-request-context-files.schema.ts
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new schemas imported and registered
 - [ ] DrizzleDatabase type includes new schema types
 - [ ] All validation commands pass
@@ -178,18 +198,22 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - New migration file(s) in `drizzle/` directory (auto-generated)
 
 **Changes:**
+
 - Run `pnpm db:generate` to generate migration SQL from schema changes
 - Review generated migration file to ensure correctness
 
 **Validation Commands:**
+
 ```bash
 pnpm db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated with correct CREATE TABLE statements
 - [ ] All foreign keys and indexes included in migration
 
@@ -202,20 +226,24 @@ pnpm db:generate
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/repositories/feature-request-runs.repository.ts` - Repository implementation
 
 **Changes:**
+
 - Define FeatureRequestRunsRepository interface with methods: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndStep, update, delete, getLatestByFeatureRequestId
 - Implement createFeatureRequestRunsRepository factory function
 - Follow patterns from repository-overviews.repository.ts for implementation style
 - Include updatedAt auto-update in update method using sql template
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All CRUD operations implemented following existing patterns
 - [ ] TypeScript types properly inferred from schema
 - [ ] Query methods support filtering by step and status
@@ -230,20 +258,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/repositories/step-configurations.repository.ts` - Repository implementation
 
 **Changes:**
+
 - Define StepConfigurationsRepository interface with methods: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndStep, update, delete, upsert
 - Implement createStepConfigurationsRepository factory function
 - Include upsert method for convenient create-or-update behavior (similar to repository-overviews.repository.ts)
 - Follow existing repository patterns for consistency
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Upsert method handles both create and update cases
 - [ ] Methods properly filter by featureRequestId and step
 - [ ] All validation commands pass
@@ -257,20 +289,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `db/repositories/feature-request-context-files.repository.ts` - Repository implementation
 
 **Changes:**
+
 - Define FeatureRequestContextFilesRepository interface with methods: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndType, update, delete, setIncludedInContext, bulkCreate
 - Implement createFeatureRequestContextFilesRepository factory function
 - Include setIncludedInContext convenience method for toggling file inclusion
 - Include bulkCreate for batch file additions
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All CRUD operations implemented
 - [ ] Bulk operations support adding multiple files efficiently
 - [ ] Toggle method for includedInContext works correctly
@@ -285,20 +321,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add new channel definitions
 
 **Changes:**
+
 - Add `featureRequestRuns` channel group with: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndStep, update, delete, getLatestByFeatureRequestId
 - Add `stepConfigurations` channel group with: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndStep, update, delete, upsert
 - Add `featureRequestContextFiles` channel group with: create, getById, getByFeatureRequestId, getByFeatureRequestIdAndType, update, delete, setIncludedInContext, bulkCreate
 - Follow existing naming pattern: 'db:entityName:methodName'
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All channels follow existing naming conventions
 - [ ] Channel names match repository method names
 - [ ] All validation commands pass
@@ -312,20 +352,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/feature-request-runs.handlers.ts` - IPC handlers
 
 **Changes:**
+
 - Create registerFeatureRequestRunsHandlers function accepting repository parameter
 - Register ipcMain.handle for each channel, delegating to repository methods
 - Follow pattern from projects.handlers.ts for structure
 - Include proper typing for all handler parameters and return types
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All repository methods exposed via IPC handlers
 - [ ] Handler function follows existing naming pattern
 - [ ] All validation commands pass
@@ -339,19 +383,23 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/step-configurations.handlers.ts` - IPC handlers
 
 **Changes:**
+
 - Create registerStepConfigurationsHandlers function accepting repository parameter
 - Register handlers for all step configuration operations including upsert
 - Follow established handler patterns
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All repository methods exposed via IPC
 - [ ] Upsert handler properly implemented
 - [ ] All validation commands pass
@@ -365,19 +413,23 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `electron/ipc/feature-request-context-files.handlers.ts` - IPC handlers
 
 **Changes:**
+
 - Create registerFeatureRequestContextFilesHandlers function accepting repository parameter
 - Register handlers for all context file operations including bulkCreate and setIncludedInContext
 - Follow established handler patterns
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All repository methods exposed via IPC
 - [ ] Bulk operations handler properly implemented
 - [ ] All validation commands pass
@@ -391,20 +443,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/register-handlers.ts` - Add handler registrations
 
 **Changes:**
+
 - Import new handler registration functions and repository factories
 - Create repository instances using createFeatureRequestRunsRepository, createStepConfigurationsRepository, createFeatureRequestContextFilesRepository
 - Call registration functions with repository instances
 - Maintain alphabetical ordering per ESLint perfectionist rules
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new handlers registered in proper order
 - [ ] Repository instances created with database connection
 - [ ] All validation commands pass
@@ -418,9 +474,11 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/preload.ts` - Add API methods and types
 
 **Changes:**
+
 - Import new schema types (FeatureRequestRun, NewFeatureRequestRun, etc.)
 - Add featureRequestRuns object to db namespace in ElectronAPI interface with typed methods
 - Add stepConfigurations object to db namespace with typed methods
@@ -428,11 +486,13 @@ pnpm run lint --fix && pnpm run typecheck
 - Implement corresponding ipcRenderer.invoke calls in electronAPI object
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new API methods properly typed
 - [ ] Methods invoke correct IPC channels
 - [ ] Interface matches repository signatures
@@ -447,20 +507,24 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `types/electron.ts` - Add type exports and update ElectronAPI
 
 **Changes:**
+
 - Add type re-exports for FeatureRequestRun, NewFeatureRequestRun from feature-request-runs.schema.ts
 - Add type re-exports for StepConfiguration, NewStepConfiguration from step-configurations.schema.ts
 - Add type re-exports for FeatureRequestContextFile, NewFeatureRequestContextFile from feature-request-context-files.schema.ts
 - Update ElectronAPI interface to include new db methods matching preload.ts
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new types exported for renderer use
 - [ ] ElectronAPI interface synchronized with preload.ts
 - [ ] All validation commands pass
@@ -474,19 +538,23 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/validations/feature-request.ts` - Update status enum
 
 **Changes:**
+
 - Expand featureRequestStatusSchema enum to include: 'draft', 'refining', 'refined', 'researching', 'researched', 'planning', 'planned', 'completed', 'failed'
 - Ensure updateFeatureRequestSchema and editFeatureRequestFormSchema use updated enum
 - Export new FeatureRequestStatus type
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Status enum matches schema definition
 - [ ] Existing form validations continue to work
 - [ ] All validation commands pass
@@ -500,11 +568,13 @@ pnpm run lint --fix && pnpm run typecheck
 **Confidence**: High
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint --fix && pnpm run typecheck && pnpm electron:dev
 ```
 
 **Success Criteria:**
+
 - [ ] Application starts without errors
 - [ ] Database migrations applied successfully
 - [ ] No TypeScript errors in any modified/created files
@@ -539,12 +609,14 @@ pnpm run lint --fix && pnpm run typecheck && pnpm electron:dev
 ## File Discovery Results
 
 ### Critical (Must Modify)
+
 - `db/schema/feature-requests.schema.ts` - Add archivedAt, staleSteps, expand status enum
 - `db/index.ts` - Import and register new schemas
 - `drizzle.config.ts` - Add new schema file paths
 - `types/electron.ts` - Export new types
 
 ### High Priority (Reference Patterns)
+
 - `db/schema/repositories.schema.ts` - Schema pattern with foreign keys
 - `db/schema/repository-overviews.schema.ts` - Schema with model tracking
 - `db/schema/feature-request-repositories.schema.ts` - Junction table pattern
@@ -553,6 +625,7 @@ pnpm run lint --fix && pnpm run typecheck && pnpm electron:dev
 - `lib/validations/feature-request.ts` - Update status enum
 
 ### Files to Create
+
 - `db/schema/feature-request-runs.schema.ts`
 - `db/schema/step-configurations.schema.ts`
 - `db/schema/feature-request-context-files.schema.ts`
