@@ -136,9 +136,7 @@ export const RepositoryOverviewViewer = ({
       <div className={'flex flex-wrap gap-4 text-xs text-muted-foreground'}>
         {overview.generatedAt && <span>Generated: {new Date(overview.generatedAt).toLocaleDateString()}</span>}
         {overview.modelId && (
-          <span>
-            {overview.modelId === 'imported' ? 'Source: Imported' : `Model: ${overview.modelId}`}
-          </span>
+          <span>{overview.modelId === 'imported' ? 'Source: Imported' : `Model: ${overview.modelId}`}</span>
         )}
         {overview.lastEditedAt && <span>Last edited: {new Date(overview.lastEditedAt).toLocaleDateString()}</span>}
       </div>

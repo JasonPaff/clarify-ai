@@ -165,136 +165,134 @@ export function ImportRepositoryOverviewDialog({
         onCancel={handleCancelConfirmation}
         onConfirm={() => void handleConfirmImport()}
       />
-    <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
-      <DialogPortal>
-        <DialogBackdrop />
-        <DialogPopup size={'lg'}>
-          {/* Close Button */}
-          <div className={'relative'}>
-            <DialogClose render={<IconButton className={'absolute -top-2 -right-2'} />}>
-              <X className={'size-4'} />
-            </DialogClose>
-          </div>
+      <DialogRoot onOpenChange={handleOpenChange} open={isOpen}>
+        <DialogPortal>
+          <DialogBackdrop />
+          <DialogPopup size={'lg'}>
+            {/* Close Button */}
+            <div className={'relative'}>
+              <DialogClose render={<IconButton className={'absolute -top-2 -right-2'} />}>
+                <X className={'size-4'} />
+              </DialogClose>
+            </div>
 
-          {/* Header */}
-          <DialogTitle>Import Repository Overview</DialogTitle>
-          <DialogDescription>
-            Import an existing repository overview from a markdown file or paste content directly.
-          </DialogDescription>
+            {/* Header */}
+            <DialogTitle>Import Repository Overview</DialogTitle>
+            <DialogDescription>
+              Import an existing repository overview from a markdown file or paste content directly.
+            </DialogDescription>
 
-          {/* Form */}
-          <form
-            className={'mt-6'}
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}
-          >
-            <div className={'flex flex-col gap-4'}>
-              {/* Input Method Selection */}
-              <form.AppField
-                listeners={{
-                  onChange: () => {
-                    // Clear content when input method changes
-                    form.setFieldValue('content', '');
-                    setSelectedFilePath(null);
-                    setFileError(null);
-                  },
-                }}
-                name={'inputMethod'}
-              >
-                {(field) => (
-                  <field.RadioField
-                    label={'Import Method'}
-                    options={INPUT_METHOD_OPTIONS}
-                    orientation={'horizontal'}
-                  />
-                )}
-              </form.AppField>
-
-              {/* File Selection UI */}
-              {isFileMethod && (
-                <div className={'flex flex-col gap-2'}>
-                  <Button
-                    className={'w-full justify-start gap-2'}
-                    disabled={isLoadingFile}
-                    onClick={handleSelectFile}
-                    type={'button'}
-                    variant={'outline'}
-                  >
-                    <Upload className={'size-4'} />
-                    {isLoadingFile ? 'Loading...' : 'Select Markdown File'}
-                  </Button>
-
-                  {selectedFilePath && !fileError && (
-                    <div className={'flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2'}>
-                      <FileText className={'size-4 text-muted-foreground'} />
-                      <span className={'truncate text-sm text-muted-foreground'}>{selectedFilePath}</span>
-                    </div>
-                  )}
-
-                  {fileError && (
-                    <div className={'rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2'}>
-                      <span className={'text-sm text-destructive'}>{fileError}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Paste Content UI */}
-              {isPasteMethod && (
-                <form.AppField name={'content'}>
+            {/* Form */}
+            <form
+              className={'mt-6'}
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void form.handleSubmit();
+              }}
+            >
+              <div className={'flex flex-col gap-4'}>
+                {/* Input Method Selection */}
+                <form.AppField
+                  listeners={{
+                    onChange: () => {
+                      // Clear content when input method changes
+                      form.setFieldValue('content', '');
+                      setSelectedFilePath(null);
+                      setFileError(null);
+                    },
+                  }}
+                  name={'inputMethod'}
+                >
                   {(field) => (
-                    <field.TextareaField
-                      description={'Paste the markdown content for the repository overview'}
-                      label={'Overview Content'}
-                      placeholder={'# Repository Overview\n\nPaste your markdown content here...'}
-                      rows={10}
+                    <field.RadioField
+                      label={'Import Method'}
+                      options={INPUT_METHOD_OPTIONS}
+                      orientation={'horizontal'}
                     />
                   )}
                 </form.AppField>
-              )}
 
-              {/* Hidden content field error for file method */}
-              {isFileMethod && (
-                <form.AppField name={'content'}>
-                  {(field) => {
-                    const error = field.state.meta.errors[0]?.message;
-                    const hasError = Boolean(error) && field.state.meta.isTouched;
+                {/* File Selection UI */}
+                {isFileMethod && (
+                  <div className={'flex flex-col gap-2'}>
+                    <Button
+                      className={'w-full justify-start gap-2'}
+                      disabled={isLoadingFile}
+                      onClick={handleSelectFile}
+                      type={'button'}
+                      variant={'outline'}
+                    >
+                      <Upload className={'size-4'} />
+                      {isLoadingFile ? 'Loading...' : 'Select Markdown File'}
+                    </Button>
 
-                    if (!hasError) return null;
-
-                    return (
-                      <div className={'rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2'}>
-                        <span className={'text-sm text-destructive'}>{error}</span>
+                    {selectedFilePath && !fileError && (
+                      <div className={'flex items-center gap-2 rounded-md border border-border bg-muted/50 px-3 py-2'}>
+                        <FileText className={'size-4 text-muted-foreground'} />
+                        <span className={'truncate text-sm text-muted-foreground'}>{selectedFilePath}</span>
                       </div>
-                    );
-                  }}
-                </form.AppField>
-              )}
+                    )}
 
-              {/* Action Buttons */}
-              <div className={'mt-2 flex justify-end gap-3'}>
-                <Button
-                  disabled={isDisabled}
-                  onClick={() => handleOpenChange(false)}
-                  type={'button'}
-                  variant={'outline'}
-                >
-                  Cancel
-                </Button>
-                <form.AppForm>
-                  <form.SubmitButton>
-                    {isSubmitting ? 'Importing...' : 'Import Overview'}
-                  </form.SubmitButton>
-                </form.AppForm>
+                    {fileError && (
+                      <div className={'rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2'}>
+                        <span className={'text-sm text-destructive'}>{fileError}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Paste Content UI */}
+                {isPasteMethod && (
+                  <form.AppField name={'content'}>
+                    {(field) => (
+                      <field.TextareaField
+                        description={'Paste the markdown content for the repository overview'}
+                        label={'Overview Content'}
+                        placeholder={'# Repository Overview\n\nPaste your markdown content here...'}
+                        rows={10}
+                      />
+                    )}
+                  </form.AppField>
+                )}
+
+                {/* Hidden content field error for file method */}
+                {isFileMethod && (
+                  <form.AppField name={'content'}>
+                    {(field) => {
+                      const error = field.state.meta.errors[0]?.message;
+                      const hasError = Boolean(error) && field.state.meta.isTouched;
+
+                      if (!hasError) return null;
+
+                      return (
+                        <div className={'rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2'}>
+                          <span className={'text-sm text-destructive'}>{error}</span>
+                        </div>
+                      );
+                    }}
+                  </form.AppField>
+                )}
+
+                {/* Action Buttons */}
+                <div className={'mt-2 flex justify-end gap-3'}>
+                  <Button
+                    disabled={isDisabled}
+                    onClick={() => handleOpenChange(false)}
+                    type={'button'}
+                    variant={'outline'}
+                  >
+                    Cancel
+                  </Button>
+                  <form.AppForm>
+                    <form.SubmitButton>{isSubmitting ? 'Importing...' : 'Import Overview'}</form.SubmitButton>
+                  </form.AppForm>
+                </div>
               </div>
-            </div>
-          </form>
-        </DialogPopup>
-      </DialogPortal>
-    </DialogRoot>
+            </form>
+          </DialogPopup>
+        </DialogPortal>
+      </DialogRoot>
     </Fragment>
   );
 }
