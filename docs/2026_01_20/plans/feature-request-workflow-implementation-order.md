@@ -259,13 +259,7 @@ _Goal: Upgrade the existing clarification step_
 - [ ] Add run history dropdown to Clarify step
 - [ ] Implement "Use this version" restore functionality
 
-### 6.4 Cost Estimation
-
-- [ ] Calculate context size before running
-- [ ] Display cost estimate
-- [ ] Integrate pricing library
-
-### 6.5 Stale State
+### 6.4 Stale State
 
 - [ ] Track when Describe step changes
 - [ ] Mark Clarify as stale when needed
