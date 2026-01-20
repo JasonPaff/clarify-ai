@@ -42,8 +42,7 @@ export const toastRootVariants = cva(
   }
 );
 
-type ToastRootStyledProps = ComponentPropsWithRef<typeof BaseToast.Root> &
-  VariantProps<typeof toastRootVariants>;
+type ToastRootStyledProps = ComponentPropsWithRef<typeof BaseToast.Root> & VariantProps<typeof toastRootVariants>;
 
 export const ToastRootStyled = ({ className, ref, variant, ...props }: ToastRootStyledProps) => {
   return <BaseToast.Root className={cn(toastRootVariants({ className, variant }))} ref={ref} {...props} />;
@@ -58,9 +57,7 @@ export const ToastTitle = ({ className, ref, ...props }: ToastTitleProps) => {
 type ToastDescriptionProps = ComponentPropsWithRef<typeof BaseToast.Description>;
 
 export const ToastDescription = ({ className, ref, ...props }: ToastDescriptionProps) => {
-  return (
-    <BaseToast.Description className={cn('text-sm text-muted-foreground', className)} ref={ref} {...props} />
-  );
+  return <BaseToast.Description className={cn('text-sm text-muted-foreground', className)} ref={ref} {...props} />;
 };
 
 type ToastCloseProps = ComponentPropsWithRef<typeof BaseToast.Close>;

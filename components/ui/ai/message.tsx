@@ -4,7 +4,17 @@ import type { FileUIPart, UIMessage } from 'ai';
 import type { ComponentProps, ComponentPropsWithRef, HTMLAttributes, ReactElement, ReactNode } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon, PaperclipIcon, XIcon } from 'lucide-react';
-import { Children, createContext, Fragment, isValidElement, memo, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  Children,
+  createContext,
+  Fragment,
+  isValidElement,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Streamdown } from 'streamdown';
 
 import { Button } from '@/components/ui/button';

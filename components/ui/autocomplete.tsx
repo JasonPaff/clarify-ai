@@ -96,12 +96,7 @@ type AutocompletePositionerProps = ComponentPropsWithRef<typeof BaseAutocomplete
 
 export const AutocompletePositioner = ({ className, ref, ...props }: AutocompletePositionerProps) => {
   return (
-    <BaseAutocomplete.Positioner
-      className={cn('z-50 outline-none', className)}
-      ref={ref}
-      sideOffset={4}
-      {...props}
-    />
+    <BaseAutocomplete.Positioner className={cn('z-50 outline-none', className)} ref={ref} sideOffset={4} {...props} />
   );
 };
 
@@ -246,22 +241,14 @@ export const AutocompleteGroupLabel = ({ className, ref, size, ...props }: Autoc
 type AutocompleteSeparatorProps = ComponentPropsWithRef<typeof BaseAutocomplete.Separator>;
 
 export const AutocompleteSeparator = ({ className, ref, ...props }: AutocompleteSeparatorProps) => {
-  return (
-    <BaseAutocomplete.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} ref={ref} {...props} />
-  );
+  return <BaseAutocomplete.Separator className={cn('-mx-1 my-1 h-px bg-border', className)} ref={ref} {...props} />;
 };
 
 /* Arrow */
 type AutocompleteArrowProps = ComponentPropsWithRef<typeof BaseAutocomplete.Arrow>;
 
 export const AutocompleteArrow = ({ className, ref, ...props }: AutocompleteArrowProps) => {
-  return (
-    <BaseAutocomplete.Arrow
-      className={cn('fill-card stroke-border stroke-1', className)}
-      ref={ref}
-      {...props}
-    />
-  );
+  return <BaseAutocomplete.Arrow className={cn('fill-card stroke-border stroke-1', className)} ref={ref} {...props} />;
 };
 
 /* Backdrop */
