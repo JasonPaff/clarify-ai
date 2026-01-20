@@ -6,9 +6,13 @@ import { useState } from 'react';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
+import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
+import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useClarification } from '@/hooks/use-clarification';
+import { getModelInfo } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
 
 import { AdvancedSettings } from './advanced-settings';
@@ -30,6 +34,9 @@ type ClarificationPanelProps = ClassName & {
 export const ClarificationPanel = ({ className, featureRequest, onClose, onComplete }: ClarificationPanelProps) => {
   const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
+
+  const { isThinkingEnabled } = useThinkingPreference();
 
   const {
     analysis,
@@ -37,7 +44,9 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
     cancelClarification,
     error,
     isLoading,
+    isReasoningStreaming,
     questions,
+    reasoningText,
     resetClarification,
     saveAnswers,
     setAnswer,
@@ -48,7 +57,13 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
 
   const handleStartClarification = async () => {
     if (!selectedModel) return;
-    await startClarification(selectedModel, customPrompt || undefined);
+    const isModelSupportsThinking = getModelInfo(selectedModel)?.supportsThinking ?? false;
+    const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
+    await startClarification(
+      selectedModel,
+      customPrompt || undefined,
+      isModelSupportsThinking ? effectiveThinking : undefined
+    );
   };
 
   const handleSaveAndContinue = async () => {
@@ -65,8 +80,16 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
     }
   };
 
+  const handleThinkingToggle = (isChecked: boolean) => {
+    setThinkingOverride(isChecked);
+  };
+
   const allQuestionsAnswered =
     questions.length > 0 && questions.every((q) => answers.some((a) => a.questionId === q.id && a.selectedValue));
+  const modelInfo = selectedModel ? getModelInfo(selectedModel) : undefined;
+  const isModelSupportsThinking = modelInfo?.supportsThinking ?? false;
+  const hasReasoningContent = reasoningText.length > 0;
+  const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -101,12 +124,41 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
           </div>
 
           <AdvancedSettings customPrompt={customPrompt} onCustomPromptChange={setCustomPrompt} />
+
+          {/* Thinking Toggle - Only shown for models that support thinking */}
+          {isModelSupportsThinking && (
+            <div className={'flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2'}>
+              <div className={'flex flex-col gap-0.5'}>
+                <label className={'text-sm font-medium'} htmlFor={'clarification-thinking-toggle'}>
+                  Enable thinking for this request
+                </label>
+                <span className={'text-xs text-muted-foreground'}>
+                  {thinkingOverride === null
+                    ? `Using global preference (${isThinkingEnabled ? 'enabled' : 'disabled'})`
+                    : 'Override for this request'}
+                </span>
+              </div>
+              <Switch
+                checked={effectiveThinking}
+                id={'clarification-thinking-toggle'}
+                onCheckedChange={handleThinkingToggle}
+              />
+            </div>
+          )}
         </div>
       )}
 
       {/* Analyzing state: Show streaming text */}
       {status === 'analyzing' && (
         <div className={'space-y-3'}>
+          {/* Reasoning/Thinking Display */}
+          {hasReasoningContent && (
+            <Reasoning isStreaming={isReasoningStreaming}>
+              <ReasoningTrigger />
+              <ReasoningContent className={'h-36'}>{reasoningText}</ReasoningContent>
+            </Reasoning>
+          )}
+
           <StreamingAnalysis isLoading={isLoading} text={streamingText} />
           <Button onClick={cancelClarification} variant={'outline'}>
             Cancel

@@ -11,6 +11,7 @@
 Step 8 was already fully implemented. The IPC handler agent verified all layers.
 
 **Files Verified**:
+
 - `electron/ipc/channels.ts` - Channel constants
 - `electron/ipc/ai-overview.handlers.ts` - Streaming handler
 - `electron/ipc/register-handlers.ts` - Handler registration
@@ -19,10 +20,12 @@ Step 8 was already fully implemented. The IPC handler agent verified all layers.
 - `hooks/useElectron.ts` - React hooks
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 
 **Success Criteria**:
+
 - [✓] Channel constants added for streaming communication
 - [✓] Generate handler implemented with streaming
 - [✓] Proper error handling
@@ -52,6 +55,7 @@ Step 8 was already fully implemented. The IPC handler agent verified all layers.
 ## React Hook API
 
 `useElectronAiOverview()` returns:
+
 - `generate(request)` - Start generation
 - `cancel()` - Cancel generation
 - `subscribeToStream(callback)` - Subscribe to chunks with cleanup
@@ -60,6 +64,7 @@ Step 8 was already fully implemented. The IPC handler agent verified all layers.
 ## Streaming Pattern
 
 Uses one-way streaming from main process to renderer:
+
 1. Renderer invokes `generate()` via IPC
 2. Main process streams chunks via `webContents.send()`
 3. Renderer receives chunks via `onStream()` callback

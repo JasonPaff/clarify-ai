@@ -18,6 +18,7 @@
 ## Codebase Exploration Summary
 
 The clarification agent explored:
+
 - Database schema: `repository_overviews` table with `content`, `manualContent`, `modelId`, `generatedAt` fields
 - Existing components: `RepositoryOverviewGenerator`, `RepositoryOverviewViewer`
 - IPC handlers: CRUD operations for repository overviews
@@ -26,19 +27,25 @@ The clarification agent explored:
 ## Questions Generated
 
 ### Question 1: How should users import an overview?
+
 **Options**:
+
 - File upload dialog (Electron file picker)
 - Paste from clipboard (textarea input)
 - Both options
 
 ### Question 2: What should happen when importing into a repository that already has an overview?
+
 **Options**:
+
 - Replace entirely (no confirmation)
 - Confirm before replace (with warning dialog)
 - Save as manual edit (preserve AI-generated content)
 
 ### Question 3: How should imported overviews be tracked in the database?
+
 **Options**:
+
 - Mark as manually created (modelId='imported')
 - Store as manual edit (use manualContent field)
 - Add import-specific fields (new schema columns)
@@ -59,6 +66,7 @@ The clarification agent explored:
 The repository overview should have a way to import an overview in case the user already has one that they want to use or create.
 
 **Additional context from clarification**:
+
 - Import Method: Both options (Recommended) - Support both file upload dialog AND paste from clipboard for maximum flexibility
 - Existing Content Handling: Confirm before replace (Recommended) - Show warning dialog asking user to confirm before overwriting existing overview
 - Metadata Storage: Mark as manually created (Recommended) - Store in 'content' field with modelId='imported' and generatedAt as import timestamp

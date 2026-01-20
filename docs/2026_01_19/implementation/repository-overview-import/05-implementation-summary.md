@@ -10,12 +10,12 @@ Successfully implemented the ability to import pre-existing overview content fro
 
 ## Statistics
 
-| Metric | Value |
-|--------|-------|
-| Steps Completed | 10/10 |
-| Files Created | 3 |
-| Files Modified | 9 |
-| Quality Gates | ✅ Passed |
+| Metric          | Value     |
+| --------------- | --------- |
+| Steps Completed | 10/10     |
+| Files Created   | 3         |
+| Files Modified  | 9         |
+| Quality Gates   | ✅ Passed |
 
 ## Files Created
 

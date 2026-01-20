@@ -103,8 +103,7 @@ export const comboboxClearVariants = cva(
   }
 );
 
-type ComboboxClearProps = ComponentPropsWithRef<typeof BaseCombobox.Clear> &
-  VariantProps<typeof comboboxClearVariants>;
+type ComboboxClearProps = ComponentPropsWithRef<typeof BaseCombobox.Clear> & VariantProps<typeof comboboxClearVariants>;
 
 export const ComboboxClear = ({ children, className, ref, size, ...props }: ComboboxClearProps) => {
   return (
@@ -147,8 +146,7 @@ export const comboboxPopupVariants = cva(
   }
 );
 
-type ComboboxPopupProps = ComponentPropsWithRef<typeof BaseCombobox.Popup> &
-  VariantProps<typeof comboboxPopupVariants>;
+type ComboboxPopupProps = ComponentPropsWithRef<typeof BaseCombobox.Popup> & VariantProps<typeof comboboxPopupVariants>;
 
 export const ComboboxPopup = ({ className, ref, size, ...props }: ComboboxPopupProps) => {
   return <BaseCombobox.Popup className={cn(comboboxPopupVariants({ size }), className)} ref={ref} {...props} />;
@@ -193,8 +191,7 @@ export const comboboxItemVariants = cva(
   }
 );
 
-type ComboboxItemProps = ComponentPropsWithRef<typeof BaseCombobox.Item> &
-  VariantProps<typeof comboboxItemVariants>;
+type ComboboxItemProps = ComponentPropsWithRef<typeof BaseCombobox.Item> & VariantProps<typeof comboboxItemVariants>;
 
 export const ComboboxItem = ({ className, ref, size, ...props }: ComboboxItemProps) => {
   return <BaseCombobox.Item className={cn(comboboxItemVariants({ size }), className)} ref={ref} {...props} />;
@@ -263,7 +260,9 @@ type ComboboxGroupLabelProps = ComponentPropsWithRef<typeof BaseCombobox.GroupLa
   VariantProps<typeof comboboxGroupLabelVariants>;
 
 export const ComboboxGroupLabel = ({ className, ref, size, ...props }: ComboboxGroupLabelProps) => {
-  return <BaseCombobox.GroupLabel className={cn(comboboxGroupLabelVariants({ size }), className)} ref={ref} {...props} />;
+  return (
+    <BaseCombobox.GroupLabel className={cn(comboboxGroupLabelVariants({ size }), className)} ref={ref} {...props} />
+  );
 };
 
 /* Separator */
@@ -338,8 +337,7 @@ export const comboboxChipVariants = cva(
   }
 );
 
-type ComboboxChipProps = ComponentPropsWithRef<typeof BaseCombobox.Chip> &
-  VariantProps<typeof comboboxChipVariants>;
+type ComboboxChipProps = ComponentPropsWithRef<typeof BaseCombobox.Chip> & VariantProps<typeof comboboxChipVariants>;
 
 export const ComboboxChip = ({ className, ref, size, ...props }: ComboboxChipProps) => {
   return <BaseCombobox.Chip className={cn(comboboxChipVariants({ size }), className)} ref={ref} {...props} />;

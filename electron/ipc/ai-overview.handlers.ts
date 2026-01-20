@@ -2,16 +2,17 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron';
 
 import { ipcMain } from 'electron';
 
+import type { ApiKeyProvider } from './lib/provider-types';
+
 import { IpcChannels } from './channels';
 import { collectRepositoryData } from './fs.handlers';
+import { buildThinkingProviderOptions } from './lib/ai-utils';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
-
-/** Default thinking budget in tokens for models that support extended thinking */
-const DEFAULT_THINKING_BUDGET = 10000;
 
 /** Request payload for generating repository overview */
 export interface RepositoryOverviewGenerateRequest {
   customPrompt?: string;
+  enableThinking?: boolean;
   modelId: string; // Format: "provider:modelId"
   repositoryId: number;
   repositoryPath: string;
@@ -27,42 +28,6 @@ export interface RepositoryOverviewStreamChunk {
     reasoningTokens?: number;
     totalTokens: number;
   };
-}
-
-/** Provider type for API key providers */
-type ApiKeyProvider = 'anthropic' | 'google' | 'openai';
-
-/**
- * Build provider options to enable thinking/reasoning for supported models
- */
-function buildThinkingProviderOptions(
-  provider: ApiKeyProvider,
-  supportsThinking: boolean
-): Record<string, unknown> | undefined {
-  if (!supportsThinking) {
-    return undefined;
-  }
-
-  switch (provider) {
-    case 'anthropic':
-      return {
-        anthropic: {
-          thinking: { budgetTokens: DEFAULT_THINKING_BUDGET, type: 'enabled' },
-        },
-      };
-    case 'google':
-      return {
-        google: {
-          thinkingConfig: { includeThoughts: true, thinkingBudget: DEFAULT_THINKING_BUDGET },
-        },
-      };
-    case 'openai':
-      return {
-        openai: { reasoningEffort: 'medium' },
-      };
-    default:
-      return undefined;
-  }
 }
 
 // Active abort controller for cancellation
@@ -81,7 +46,7 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         return { error: 'Main window not available', success: false };
       }
 
-      const { customPrompt, modelId, repositoryPath } = request;
+      const { customPrompt, enableThinking = true, modelId, repositoryPath } = request;
 
       // Parse the model ID to get provider and model
       const { modelId: model, provider } = parseModelId(modelId);
@@ -114,9 +79,11 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         const prompt = buildRepositoryOverviewPrompt(repoData, customPrompt);
 
         // Check if the model supports thinking and build provider options
+        // Only enable thinking when both the model supports it AND the user has enabled it
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
-        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, supportsThinking);
+        const shouldEnableThinking = supportsThinking && enableThinking;
+        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, shouldEnableThinking);
 
         // Stream the response
         const result = streamText({

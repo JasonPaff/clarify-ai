@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { ThinkingPreferenceProvider } from '@/components/providers/thinking-preference-provider';
 import { ToastProvider } from '@/components/providers/toast-provider';
 
 import './globals.css';
@@ -40,7 +41,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <div className={'root'}>
           <QueryProvider>
             <ThemeProvider>
-              <ToastProvider>{children}</ToastProvider>
+              <ThinkingPreferenceProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </ThinkingPreferenceProvider>
             </ThemeProvider>
           </QueryProvider>
         </div>

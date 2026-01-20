@@ -2,12 +2,16 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron';
 
 import { ipcMain } from 'electron';
 
+import type { ApiKeyProvider } from './lib/provider-types';
+
 import { IpcChannels } from './channels';
+import { buildThinkingProviderOptions } from './lib/ai-utils';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
 
 /** Request payload for generating clarifying questions */
 export interface ClarificationGenerateRequest {
   customPrompt?: string;
+  enableThinking?: boolean;
   featureRequest: string;
   featureRequestId: number;
   modelId: string; // Format: "provider:modelId"
@@ -20,7 +24,13 @@ export interface ClarificationStreamChunk {
   toolCallId?: string;
   toolName?: string;
   toolResult?: unknown;
-  type: 'error' | 'finish' | 'text' | 'tool_call' | 'tool_result';
+  type: 'error' | 'finish' | 'reasoning' | 'reasoning_end' | 'reasoning_start' | 'text' | 'tool_call' | 'tool_result';
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    reasoningTokens?: number;
+    totalTokens: number;
+  };
 }
 
 // Active abort controller for cancellation
@@ -39,7 +49,7 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         return { error: 'Main window not available', success: false };
       }
 
-      const { customPrompt, featureRequest, modelId } = request;
+      const { customPrompt, enableThinking = true, featureRequest, modelId } = request;
 
       // Parse the model ID to get provider and model
       const { modelId: model, provider } = parseModelId(modelId);
@@ -58,12 +68,20 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         const { stepCountIs, streamText } = await import('ai');
         const { clarificationTool } = await import('../../lib/ai/tools/clarification-tool');
         const { buildClarificationPrompt } = await import('../../lib/ai/prompts/clarification');
+        const { getModelInfo } = await import('../../lib/ai/models');
 
         // Create the provider instance
         const providerInstance = await createProvider(provider, credentials);
 
         // Build the prompt
         const prompt = buildClarificationPrompt(featureRequest, customPrompt);
+
+        // Check if the model supports thinking and build provider options
+        // Only enable thinking when both the model supports it AND the user has enabled it
+        const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
+        const supportsThinking = modelInfo?.supportsThinking ?? false;
+        const shouldEnableThinking = supportsThinking && enableThinking;
+        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, shouldEnableThinking);
 
         // Stream the response
         const result = streamText({
@@ -74,7 +92,8 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
           tools: {
             generateClarifyingQuestions: clarificationTool,
           },
-        });
+          ...(providerOptions && { providerOptions }),
+        } as Parameters<typeof streamText>[0]);
 
         // Process the stream and send chunks to renderer
         for await (const part of result.fullStream) {
@@ -92,10 +111,35 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
               };
               break;
 
-            case 'finish':
+            case 'finish': {
+              const usage = part.totalUsage;
               chunk = {
                 type: 'finish',
+                usage: usage
+                  ? {
+                      inputTokens: usage.inputTokens ?? 0,
+                      outputTokens: usage.outputTokens ?? 0,
+                      reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? undefined,
+                      totalTokens: usage.totalTokens ?? 0,
+                    }
+                  : undefined,
               };
+              break;
+            }
+
+            case 'reasoning-delta':
+              chunk = {
+                content: part.text,
+                type: 'reasoning',
+              };
+              break;
+
+            case 'reasoning-end':
+              chunk = { type: 'reasoning_end' };
+              break;
+
+            case 'reasoning-start':
+              chunk = { type: 'reasoning_start' };
               break;
 
             case 'text-delta':

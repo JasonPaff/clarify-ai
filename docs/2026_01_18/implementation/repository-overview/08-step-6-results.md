@@ -11,6 +11,7 @@
 The repository data collection was already fully implemented. The IPC handler agent verified all layers.
 
 **Files Verified**:
+
 - `electron/ipc/lib/repository-scanner.ts` - Core scanning module
 - `electron/ipc/fs.handlers.ts` - Data collection function and IPC handler
 - `electron/ipc/register-handlers.ts` - Handler registration
@@ -19,10 +20,12 @@ The repository data collection was already fully implemented. The IPC handler ag
 - `hooks/useElectron.ts` - React hook
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 
 **Success Criteria**:
+
 - [✓] Repository data collector module created
 - [✓] All required file types collected
 - [✓] File tree generation implemented (ASCII format, respects .gitignore)
@@ -36,16 +39,19 @@ The repository data collection was already fully implemented. The IPC handler ag
 ## Data Collection Features
 
 **Files Collected**:
+
 - Always: `package.json`, `tsconfig.json`, `README.md`, `.env.example`
 - Optional: `tailwind.config.*`, `next.config.*`, `drizzle.config.*`, `eslint.config.*`
 
 **Detection**:
+
 - Framework: next, angular, vue, react, node, unknown
 - TypeScript presence
 - Tailwind CSS presence
 - Primary programming languages (top 5, excluding JSON/MD/YAML)
 
 **File Tree**:
+
 - ASCII representation
 - Respects .gitignore rules
 - Configurable depth (default: 4 levels)
@@ -60,6 +66,7 @@ The repository data collection was already fully implemented. The IPC handler ag
 ## Dependencies
 
 All installed and ready:
+
 - `directory-tree@3.5.2`
 - `ignore@7.0.5`
 - `linguist-js@2.9.2`

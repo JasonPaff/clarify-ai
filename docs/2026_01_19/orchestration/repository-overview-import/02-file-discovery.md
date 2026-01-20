@@ -21,6 +21,7 @@ The file discovery agent performed comprehensive codebase exploration:
 ### AI Analysis Reasoning
 
 The agent used intelligent content-based discovery to:
+
 1. Identify existing repository overview infrastructure (database, IPC, queries)
 2. Locate file dialog and file system handlers for file upload functionality
 3. Find UI component patterns (dialogs, forms, buttons, badges)
@@ -33,41 +34,49 @@ The agent used intelligent content-based discovery to:
 ### Critical Priority (Core Implementation)
 
 **New Components to Create:**
+
 - `components/repositories/import-repository-overview-dialog.tsx` - **NEW FILE** Main dialog component for importing with dual input methods
 
 **Database & IPC Layer:**
+
 - `electron/ipc/repository-overviews.handlers.ts` - Add new import handler
 - `electron/ipc/channels.ts` - May need new channel constant
 - `db/repositories/repository-overviews.repository.ts` - Contains upsert method
 
 **Query Hooks:**
+
 - `hooks/queries/use-repository-overviews.ts` - Existing overview check + upsert mutation
 - `lib/queries/repository-overviews.ts` - Query key factory for cache invalidation
 
 ### High Priority (Integration Points)
 
 **UI Integration:**
+
 - `components/repositories/repository-card.tsx` - Add "Import Overview" button
 - `components/repositories/repository-overview-dialog.tsx` - May add import mode
 - `components/repositories/repository-overview-viewer.tsx` - Show import indicator
 
 **File Dialog & File System:**
+
 - `electron/ipc/dialog.handlers.ts` - openFile handler with .md filter
 - `electron/ipc/fs.handlers.ts` - readFile handler for markdown content
 - `hooks/useElectron.ts` - useElectronDialog + useElectronFs hooks
 
 **Type Definitions:**
+
 - `types/electron.ts` - ElectronAPI interface exports
 - `electron/preload.ts` - Context bridge exposing Electron API
 
 ### Medium Priority (Supporting Infrastructure)
 
 **Form & Validation:**
+
 - `lib/forms/form-hook.ts` - TanStack Form hook configuration
 - `lib/validations/repository.ts` - May add import content validation
 - `components/ui/form/textarea-field.tsx` - Paste input field component
 
 **UI Components (Existing - For Reference):**
+
 - `components/ui/dialog.tsx` - Base dialog primitives
 - `components/ui/button.tsx` - Button component with variants
 - `components/ui/radio-group.tsx` - Input method selection
@@ -78,15 +87,18 @@ The agent used intelligent content-based discovery to:
 ### Low Priority (Reference & Context)
 
 **Schema & Data Model:**
+
 - `db/schema/repository-overviews.schema.ts` - Database table structure
 
 **Related Components (Pattern Reference):**
+
 - `components/repositories/new-repository-dialog.tsx` - Dialog form pattern
 - `components/repositories/repository-overview-generator.tsx` - Current generation flow
 - `components/repositories/repository-overview-markdown.tsx` - Markdown renderer
 - `app/(app)/projects/[projectId]/repositories/page.tsx` - Repositories listing page
 
 **Utility Files:**
+
 - `lib/utils.ts` - cn() utility for class merging
 - `types/component-types.ts` - Global component types
 
@@ -97,9 +109,11 @@ The agent used intelligent content-based discovery to:
 ✅ **Integration points cross-referenced with actual file contents**
 
 **New Files to Create**:
+
 - `components/repositories/import-repository-overview-dialog.tsx`
 
 **Files to Modify**:
+
 - `electron/ipc/repository-overviews.handlers.ts` (add import handler)
 - `electron/ipc/channels.ts` (possibly add new channel)
 - `components/repositories/repository-card.tsx` (add import button)
@@ -153,6 +167,7 @@ The agent used intelligent content-based discovery to:
 ## Recommended Implementation Approach
 
 ### Phase 1: Create Import Dialog Component
+
 1. Create `import-repository-overview-dialog.tsx` with dual input methods
 2. Implement file upload using `useElectronDialog().openFile()`
 3. Implement paste input using TextareaField
@@ -161,14 +176,17 @@ The agent used intelligent content-based discovery to:
 6. Call `useUpsertRepositoryOverview()` with `modelId='imported'`
 
 ### Phase 2: Integrate into Repository Card
+
 1. Add "Import Overview" button to `repository-card.tsx`
 2. Render `ImportRepositoryOverviewDialog` with trigger
 
 ### Phase 3: Update Display Components
+
 1. Update `repository-overview-viewer.tsx` to show "Imported" badge
 2. Distinguish imported vs AI-generated overviews
 
 ### Phase 4: Add Validation Schema (Optional)
+
 1. Create validation schema for content length and non-empty validation
 
 ## Outcome

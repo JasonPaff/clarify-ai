@@ -11,15 +11,18 @@
 The functionality was already implemented in previous steps. The tanstack-query agent verified the implementation.
 
 **Files Reviewed**:
+
 - `hooks/queries/use-repositories.ts` - Contains `useRepositoriesWithOverviewStatus` hook
 - `hooks/queries/use-repository-overviews.ts` - Contains `useRepositoryOverviewStatuses`
 - `lib/queries/repositories.ts` - Query key definitions
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 
 **Success Criteria**:
+
 - [✓] Repository queries include overview status information
 - [✓] Efficient data fetching (no N+1 queries)
 - [✓] Maintains existing repository query functionality

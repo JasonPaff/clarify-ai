@@ -35,11 +35,13 @@ interface UseClarificationResult {
   cancelClarification: () => void;
   error: null | string;
   isLoading: boolean;
+  isReasoningStreaming: boolean;
   questions: Array<ClarificationQuestion>;
+  reasoningText: string;
   resetClarification: () => void;
   saveAnswers: () => Promise<void>;
   setAnswer: (questionId: string, selectedValue: null | string, customText?: string) => void;
-  startClarification: (modelId: FullModelId, customPrompt?: string) => Promise<void>;
+  startClarification: (modelId: FullModelId, customPrompt?: string, enableThinking?: boolean) => Promise<void>;
   status: ClarificationStatus;
   streamingText: string;
 }
@@ -69,6 +71,8 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     parseClarificationAnswers(featureRequest.clarificationAnswers)
   );
   const [streamingText, setStreamingText] = useState('');
+  const [reasoningText, setReasoningText] = useState('');
+  const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -81,6 +85,8 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     setQuestions(parseClarificationQuestions(featureRequest.clarificationQuestions));
     setAnswers(parseClarificationAnswers(featureRequest.clarificationAnswers));
     setStreamingText('');
+    setReasoningText('');
+    setIsReasoningStreaming(false);
     setError(null);
     setIsLoading(false);
   }
@@ -90,7 +96,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
 
   // Start clarification generation
   const startClarification = useCallback(
-    async (modelId: FullModelId, customPrompt?: string) => {
+    async (modelId: FullModelId, customPrompt?: string, enableThinking?: boolean) => {
       if (!api || !isElectron) {
         setError('Not running in Electron');
         return;
@@ -99,6 +105,8 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
       // Reset state for new run
       setStatus('analyzing');
       setStreamingText('');
+      setReasoningText('');
+      setIsReasoningStreaming(false);
       setError(null);
       setIsLoading(true);
       setQuestions([]);
@@ -110,11 +118,27 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
           case 'error':
             setError(chunk.content ?? 'Unknown error');
             setIsLoading(false);
+            setIsReasoningStreaming(false);
             setStatus('idle');
             break;
 
           case 'finish':
             setIsLoading(false);
+            setIsReasoningStreaming(false);
+            break;
+
+          case 'reasoning':
+            if (chunk.content) {
+              setReasoningText((prev) => prev + chunk.content);
+            }
+            break;
+
+          case 'reasoning_end':
+            setIsReasoningStreaming(false);
+            break;
+
+          case 'reasoning_start':
+            setIsReasoningStreaming(true);
             break;
 
           case 'text':
@@ -169,6 +193,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
       // Start generation
       const result = await api.ai.clarification.generate({
         customPrompt,
+        enableThinking,
         featureRequest: featureRequest.rawRequest ?? '',
         featureRequestId: featureRequest.id,
         modelId,
@@ -245,6 +270,8 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     setQuestions([]);
     setAnswers([]);
     setStreamingText('');
+    setReasoningText('');
+    setIsReasoningStreaming(false);
     setError(null);
     setIsLoading(false);
   }, []);
@@ -264,7 +291,9 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     cancelClarification,
     error,
     isLoading,
+    isReasoningStreaming,
     questions,
+    reasoningText,
     resetClarification,
     saveAnswers,
     setAnswer,

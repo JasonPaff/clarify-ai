@@ -69,9 +69,9 @@ This feature adds user control over AI thinking/reasoning capabilities through a
 - Define `ThinkingPreference` type as boolean
 - Define `DEFAULT_THINKING_PREFERENCE` as `true` (enabled by default)
 - Create `ThinkingPreferenceProvider` component that:
-    - Uses `useElectronStore` to persist preference
-    - Provides `thinkingEnabled` boolean and `setThinkingEnabled` function via context
-    - Follows the `ThemeProvider` pattern for loading/persistence
+  - Uses `useElectronStore` to persist preference
+  - Provides `thinkingEnabled` boolean and `setThinkingEnabled` function via context
+  - Follows the `ThemeProvider` pattern for loading/persistence
 - Create `useThinkingPreference` hook for consuming the context
 
 **Validation Commands:**
@@ -134,10 +134,10 @@ pnpm lint && pnpm typecheck
 - Import `Switch` component from `@/components/ui/switch`
 - Import `Brain` icon from `lucide-react` for visual context
 - Replace the "Preferences configuration coming soon" placeholder with:
-    - A toggle row containing a label, description, and Switch component
-    - Label: "Enable AI Thinking"
-    - Description: "When enabled, models that support extended thinking will show their reasoning process"
-    - Switch bound to `thinkingEnabled` state and `setThinkingEnabled` handler
+  - A toggle row containing a label, description, and Switch component
+  - Label: "Enable AI Thinking"
+  - Description: "When enabled, models that support extended thinking will show their reasoning process"
+  - Switch bound to `thinkingEnabled` state and `setThinkingEnabled` handler
 
 **Validation Commands:**
 
@@ -168,11 +168,11 @@ pnpm lint && pnpm typecheck
 **Changes:**
 
 - In `ai-overview.handlers.ts`:
-    - Add `enableThinking?: boolean` to `RepositoryOverviewGenerateRequest` interface
+  - Add `enableThinking?: boolean` to `RepositoryOverviewGenerateRequest` interface
 - In `ai-clarification.handlers.ts`:
-    - Add `enableThinking?: boolean` to `ClarificationGenerateRequest` interface
-    - Add `'reasoning' | 'reasoning_start' | 'reasoning_end'` to `ClarificationStreamChunk.type` union
-    - Add `reasoningTokens?: number` to `ClarificationUsageData` interface
+  - Add `enableThinking?: boolean` to `ClarificationGenerateRequest` interface
+  - Add `'reasoning' | 'reasoning_start' | 'reasoning_end'` to `ClarificationStreamChunk.type` union
+  - Add `reasoningTokens?: number` to `ClarificationUsageData` interface
 
 **Validation Commands:**
 
@@ -272,8 +272,8 @@ pnpm lint && pnpm typecheck
 **Changes:**
 
 - Create new file with:
-    - `DEFAULT_THINKING_BUDGET` constant
-    - `buildThinkingProviderOptions(provider, supportsThinking, enableThinking)` function
+  - `DEFAULT_THINKING_BUDGET` constant
+  - `buildThinkingProviderOptions(provider, supportsThinking, enableThinking)` function
 - Update both handlers to import from shared module
 - Remove duplicate `buildThinkingProviderOptions` function from `ai-overview.handlers.ts`
 
@@ -338,9 +338,9 @@ pnpm lint && pnpm typecheck
 - Add local state for per-request thinking override: `const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null)`
 - Compute effective thinking state: `const effectiveThinking = thinkingOverride ?? thinkingEnabled`
 - Add a thinking toggle in the idle state configuration section (only shown when model supports thinking):
-    - Use existing model info check: `supportsThinking`
-    - Display Switch with label "Enable thinking for this request"
-    - Bind to local override state
+  - Use existing model info check: `supportsThinking`
+  - Display Switch with label "Enable thinking for this request"
+  - Bind to local override state
 - Pass `enableThinking: effectiveThinking` to the generate request
 
 **Validation Commands:**
@@ -375,7 +375,7 @@ In `use-clarification.ts`:
 
 - Add state for reasoning: `reasoningText`, `isReasoningStreaming`
 - Add reasoning stream handlers in the `onStream` callback:
-    - Handle `'reasoning_start'`, `'reasoning'`, `'reasoning_end'` chunk types
+  - Handle `'reasoning_start'`, `'reasoning'`, `'reasoning_end'` chunk types
 - Update `startClarification` signature to accept optional `enableThinking` parameter
 - Pass `enableThinking` to the generate request
 - Export `reasoningText` and `isReasoningStreaming` from hook

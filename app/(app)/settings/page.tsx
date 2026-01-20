@@ -1,25 +1,28 @@
 'use client';
 
-import { Palette, Settings2 } from 'lucide-react';
+import { Brain, Palette, Settings2 } from 'lucide-react';
 import { Fragment } from 'react';
 
 import { PageHeader } from '@/components/layout/page-header';
+import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { ApiKeysSection } from '@/components/settings/api-keys-section';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { ThemeSelector } from '@/components/ui/theme-selector';
 
 export default function SettingsPage() {
+  const { isThinkingEnabled, setIsThinkingEnabled } = useThinkingPreference();
+
+  const handleThinkingToggle = (isChecked: boolean) => {
+    setIsThinkingEnabled(isChecked);
+  };
+
   return (
     <Fragment>
       <PageHeader description={'Configure your application preferences'} title={'Settings'} />
 
       <div className={'space-y-6'}>
-        {/* API Keys Section */}
-        <ApiKeysSection />
-
-        <Separator />
-
         {/* Appearance Section */}
         <Card>
           <CardHeader>
@@ -62,16 +65,36 @@ export default function SettingsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div
-              className={`
-                rounded-lg border border-dashed border-border p-8 text-center
-                text-sm text-muted-foreground
-              `}
-            >
-              Preferences configuration coming soon
+            <div className={'space-y-4'}>
+              {/* AI Thinking Toggle */}
+              <div className={'flex items-center justify-between gap-4'}>
+                <div className={'flex items-center gap-3'}>
+                  <div
+                    className={`
+                      flex size-8 items-center justify-center rounded-md bg-muted
+                    `}
+                  >
+                    <Brain className={'size-4 text-muted-foreground'} />
+                  </div>
+                  <div className={'space-y-0.5'}>
+                    <label className={'text-sm font-medium'} htmlFor={'thinking-toggle'}>
+                      Enable AI Thinking
+                    </label>
+                    <p className={'text-xs text-muted-foreground'}>
+                      When enabled, models that support extended thinking will show their reasoning process
+                    </p>
+                  </div>
+                </div>
+                <Switch checked={isThinkingEnabled} id={'thinking-toggle'} onCheckedChange={handleThinkingToggle} />
+              </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* API Keys Section */}
+        <ApiKeysSection />
+
+        <Separator />
       </div>
     </Fragment>
   );

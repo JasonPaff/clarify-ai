@@ -213,8 +213,7 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
   const _isDisabled = entry.isDisabled;
   const _isEnterprise = category === 'enterprise';
   const _isLocal = category === 'local';
-  const _canRefreshOpenRouter =
-    entry.provider === 'openrouter' && _isConfigured && _isUserKey && !_isDisabled;
+  const _canRefreshOpenRouter = entry.provider === 'openrouter' && _isConfigured && _isUserKey && !_isDisabled;
 
   const handleToggleDisabled = () => {
     toggleMutation.mutate(entry.provider);
@@ -277,11 +276,7 @@ const ApiKeyTableRow = ({ entry, onDelete, onEdit }: ApiKeyTableRowProps) => {
       {/* Provider */}
       <div className={'flex items-center gap-2'}>
         <Badge variant={entry.provider}>{providerDisplayName}</Badge>
-        {_isDisabled && (
-          <Badge size={'sm'}>
-            Disabled
-          </Badge>
-        )}
+        {_isDisabled && <Badge size={'sm'}>Disabled</Badge>}
       </div>
 
       {/* Credentials Display */}

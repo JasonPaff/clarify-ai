@@ -54,77 +54,76 @@ interface OpenRouterApiResponse {
 export function registerOpenRouterModelsHandlers(): void {
   // Fetch models from OpenRouter API and cache them
   ipcMain.handle(IpcChannels.openRouterModels.fetch, async (): Promise<FetchResult> => {
-      const apiKey = getOpenRouterApiKey();
+    const apiKey = getOpenRouterApiKey();
 
-      if (!apiKey) {
-        return {
-          error: 'OpenRouter API key not configured or disabled',
-          success: false,
-        };
-      }
-
-      try {
-        const response = await fetch('https://openrouter.ai/api/v1/models/user', {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          method: 'GET',
-          signal: AbortSignal.timeout(30000), // 30 second timeout
-        });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            return {
-              error: 'Invalid OpenRouter API key',
-              success: false,
-            };
-          }
-          return {
-            error: `OpenRouter API error: ${response.status} ${response.statusText}`,
-            success: false,
-          };
-        }
-
-        const data = (await response.json()) as OpenRouterApiResponse;
-
-        if (!data.data || !Array.isArray(data.data)) {
-          return {
-            error: 'Invalid response from OpenRouter API',
-            success: false,
-          };
-        }
-
-        // Transform models to our format
-        const models = data.data.map(transformModel);
-
-        // Cache the models
-        const cached: StoredOpenRouterModels = {
-          lastFetchedAt: new Date().toISOString(),
-          models,
-        };
-
-        store.set(OPENROUTER_MODELS_NAMESPACE, cached);
-
-        return {
-          models,
-          success: true,
-        };
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          return {
-            error: 'Request to OpenRouter API timed out',
-            success: false,
-          };
-        }
-
-        return {
-          error: error instanceof Error ? error.message : 'Unknown error fetching models',
-          success: false,
-        };
-      }
+    if (!apiKey) {
+      return {
+        error: 'OpenRouter API key not configured or disabled',
+        success: false,
+      };
     }
-  );
+
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/models/user', {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'GET',
+        signal: AbortSignal.timeout(30000), // 30 second timeout
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          return {
+            error: 'Invalid OpenRouter API key',
+            success: false,
+          };
+        }
+        return {
+          error: `OpenRouter API error: ${response.status} ${response.statusText}`,
+          success: false,
+        };
+      }
+
+      const data = (await response.json()) as OpenRouterApiResponse;
+
+      if (!data.data || !Array.isArray(data.data)) {
+        return {
+          error: 'Invalid response from OpenRouter API',
+          success: false,
+        };
+      }
+
+      // Transform models to our format
+      const models = data.data.map(transformModel);
+
+      // Cache the models
+      const cached: StoredOpenRouterModels = {
+        lastFetchedAt: new Date().toISOString(),
+        models,
+      };
+
+      store.set(OPENROUTER_MODELS_NAMESPACE, cached);
+
+      return {
+        models,
+        success: true,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        return {
+          error: 'Request to OpenRouter API timed out',
+          success: false,
+        };
+      }
+
+      return {
+        error: error instanceof Error ? error.message : 'Unknown error fetching models',
+        success: false,
+      };
+    }
+  });
 
   // Get cached models (returns null if not cached)
   ipcMain.handle(IpcChannels.openRouterModels.get, (): null | StoredOpenRouterModels => {
@@ -178,8 +177,7 @@ function transformModel(model: OpenRouterApiModel): OpenRouterModel {
   const supportedParams = model.supported_parameters ?? [];
 
   // Check if model supports thinking/reasoning
-  const supportsThinking =
-    supportedParams.includes('include_reasoning') || supportedParams.includes('reasoning');
+  const supportsThinking = supportedParams.includes('include_reasoning') || supportedParams.includes('reasoning');
 
   return {
     contextLength: model.context_length ?? null,

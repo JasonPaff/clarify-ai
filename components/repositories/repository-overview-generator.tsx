@@ -6,12 +6,14 @@ import { Fragment, useCallback, useEffect, useState } from 'react';
 import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
+import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { UsageFooter } from '@/components/ui/ai/usage-footer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { getModelInfo } from '@/lib/ai/models';
@@ -54,7 +56,9 @@ export const RepositoryOverviewGenerator = ({
   const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
   const [usageData, setUsageData] = useState<null | RepositoryOverviewStreamChunk['usage']>(null);
   const [error, setError] = useState<null | string>(null);
+  const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
 
+  const { isThinkingEnabled } = useThinkingPreference();
   const { cancel, generate, subscribeToStream } = useElectronAiOverview();
 
   const handleStreamChunk = useCallback((chunk: RepositoryOverviewStreamChunk) => {
@@ -107,6 +111,8 @@ export const RepositoryOverviewGenerator = ({
   const handleGenerate = async () => {
     if (!selectedModel) return;
 
+    const modelSupportsThinking = getModelInfo(selectedModel)?.supportsThinking ?? false;
+
     setStatus('generating');
     setStreamingContent('');
     setReasoningContent('');
@@ -115,6 +121,7 @@ export const RepositoryOverviewGenerator = ({
 
     const result = await generate({
       customPrompt: customPrompt || undefined,
+      enableThinking: modelSupportsThinking ? effectiveThinking : undefined,
       modelId: selectedModel,
       repositoryId,
       repositoryPath,
@@ -156,6 +163,10 @@ export const RepositoryOverviewGenerator = ({
     }
   };
 
+  const handleThinkingToggle = (isChecked: boolean) => {
+    setThinkingOverride(isChecked);
+  };
+
   const isGenerating = status === 'generating';
   const isComplete = status === 'complete';
   const isStopped = status === 'stopped';
@@ -170,6 +181,7 @@ export const RepositoryOverviewGenerator = ({
   const modelInfo = selectedModel ? getModelInfo(selectedModel) : undefined;
   const supportsThinking = modelInfo?.supportsThinking ?? false;
   const hasReasoningContent = reasoningContent.length > 0;
+  const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -219,6 +231,23 @@ export const RepositoryOverviewGenerator = ({
               </div>
             )}
           </div>
+
+          {/* Thinking Toggle - Only shown for models that support thinking */}
+          {supportsThinking && (
+            <div className={'flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2'}>
+              <div className={'flex flex-col gap-0.5'}>
+                <label className={'text-sm font-medium'} htmlFor={'thinking-toggle'}>
+                  Enable thinking for this request
+                </label>
+                <span className={'text-xs text-muted-foreground'}>
+                  {thinkingOverride === null
+                    ? `Using global preference (${isThinkingEnabled ? 'enabled' : 'disabled'})`
+                    : 'Override for this request'}
+                </span>
+              </div>
+              <Switch checked={effectiveThinking} id={'thinking-toggle'} onCheckedChange={handleThinkingToggle} />
+            </div>
+          )}
         </Fragment>
       )}
 
