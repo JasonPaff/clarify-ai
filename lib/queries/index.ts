@@ -1,20 +1,26 @@
 import { inferQueryKeyStore, mergeQueryKeys } from '@lukemorales/query-key-factory';
 
 import { apiKeyKeys } from './api-keys';
+import { featureRequestContextFileKeys } from './feature-request-context-files';
 import { featureRequestRepositoryKeys } from './feature-request-repositories';
+import { featureRequestRunKeys } from './feature-request-runs';
 import { featureRequestKeys } from './feature-requests';
 import { openRouterModelsKeys } from './openrouter-models';
 import { projectKeys } from './projects';
 import { repositoryKeys } from './repositories';
 import { repositoryOverviewKeys } from './repository-overviews';
+import { stepConfigurationKeys } from './step-configurations';
 
 export const queries = mergeQueryKeys(
   apiKeyKeys,
+  featureRequestContextFileKeys,
   featureRequestKeys,
   featureRequestRepositoryKeys,
+  featureRequestRunKeys,
   openRouterModelsKeys,
   projectKeys,
   repositoryKeys,
-  repositoryOverviewKeys
+  repositoryOverviewKeys,
+  stepConfigurationKeys
 );
 export type QueryKeys = inferQueryKeyStore<typeof queries>;

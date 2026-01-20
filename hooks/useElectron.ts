@@ -6,12 +6,16 @@ import type {
   ApiKeyInfo,
   ApiKeyProvider,
   CollectRepositoryDataResult,
+  ContextFileType,
   ElectronAPI,
+  FeatureRequestRunStatus,
+  FeatureRequestRunStep,
   OpenRouterModel,
   ProviderCredentials,
   RepositoryOverviewGenerateRequest,
   RepositoryOverviewStreamChunk,
   SetApiKeyInput,
+  StepConfigurationStep,
   StoredOpenRouterModels,
 } from '@/types/electron';
 
@@ -294,7 +298,140 @@ export function useElectronDb() {
     [api]
   );
 
-  return { featureRequestRepositories, featureRequests, isElectron, projects, repositories, repositoryOverviews };
+  const featureRequestRuns = useMemo(
+    () => ({
+      create: (data: Parameters<NonNullable<typeof api>['db']['featureRequestRuns']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRuns.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRuns.delete(id);
+      },
+      getByFeatureRequestId: (featureRequestId: number) =>
+        api?.db.featureRequestRuns.getByFeatureRequestId(featureRequestId) ?? Promise.resolve([]),
+      getByFeatureRequestIdAndStatus: (featureRequestId: number, status: FeatureRequestRunStatus) =>
+        api?.db.featureRequestRuns.getByFeatureRequestIdAndStatus(featureRequestId, status) ?? Promise.resolve([]),
+      getByFeatureRequestIdAndStep: (featureRequestId: number, step: FeatureRequestRunStep) =>
+        api?.db.featureRequestRuns.getByFeatureRequestIdAndStep(featureRequestId, step) ?? Promise.resolve([]),
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequestRuns.getById(id);
+      },
+      getCurrentRun: (featureRequestId: number, step: FeatureRequestRunStep) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequestRuns.getCurrentRun(featureRequestId, step);
+      },
+      getLatestByFeatureRequestId: (featureRequestId: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequestRuns.getLatestByFeatureRequestId(featureRequestId);
+      },
+      getLatestByFeatureRequestIdAndStep: (featureRequestId: number, step: FeatureRequestRunStep) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequestRuns.getLatestByFeatureRequestIdAndStep(featureRequestId, step);
+      },
+      setCurrentRun: (featureRequestId: number, step: FeatureRequestRunStep, runId: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRuns.setCurrentRun(featureRequestId, step, runId);
+      },
+      update: (id: number, data: Parameters<NonNullable<typeof api>['db']['featureRequestRuns']['update']>[1]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestRuns.update(id, data);
+      },
+    }),
+    [api]
+  );
+
+  const stepConfigurations = useMemo(
+    () => ({
+      create: (data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.stepConfigurations.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.stepConfigurations.delete(id);
+      },
+      getByFeatureRequestId: (featureRequestId: number) =>
+        api?.db.stepConfigurations.getByFeatureRequestId(featureRequestId) ?? Promise.resolve([]),
+      getByFeatureRequestIdAndStep: (featureRequestId: number, step: StepConfigurationStep) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.stepConfigurations.getByFeatureRequestIdAndStep(featureRequestId, step);
+      },
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.stepConfigurations.getById(id);
+      },
+      update: (
+        id: number,
+        data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['update']>[1]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.stepConfigurations.update(id, data);
+      },
+      upsert: (
+        featureRequestId: number,
+        step: StepConfigurationStep,
+        data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['upsert']>[2]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.stepConfigurations.upsert(featureRequestId, step, data);
+      },
+    }),
+    [api]
+  );
+
+  const featureRequestContextFiles = useMemo(
+    () => ({
+      bulkCreate: (
+        data: Parameters<NonNullable<typeof api>['db']['featureRequestContextFiles']['bulkCreate']>[0]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestContextFiles.bulkCreate(data);
+      },
+      create: (data: Parameters<NonNullable<typeof api>['db']['featureRequestContextFiles']['create']>[0]) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestContextFiles.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestContextFiles.delete(id);
+      },
+      getByFeatureRequestId: (featureRequestId: number) =>
+        api?.db.featureRequestContextFiles.getByFeatureRequestId(featureRequestId) ?? Promise.resolve([]),
+      getByFeatureRequestIdAndType: (featureRequestId: number, fileType: ContextFileType) =>
+        api?.db.featureRequestContextFiles.getByFeatureRequestIdAndType(featureRequestId, fileType) ??
+        Promise.resolve([]),
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.featureRequestContextFiles.getById(id);
+      },
+      setIncludedInContext: (id: number, includedInContext: boolean) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestContextFiles.setIncludedInContext(id, includedInContext);
+      },
+      update: (
+        id: number,
+        data: Parameters<NonNullable<typeof api>['db']['featureRequestContextFiles']['update']>[1]
+      ) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.featureRequestContextFiles.update(id, data);
+      },
+    }),
+    [api]
+  );
+
+  return {
+    featureRequestContextFiles,
+    featureRequestRepositories,
+    featureRequestRuns,
+    featureRequests,
+    isElectron,
+    projects,
+    repositories,
+    repositoryOverviews,
+    stepConfigurations,
+  };
 }
 
 export function useElectronDialog() {

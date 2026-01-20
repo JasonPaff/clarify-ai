@@ -6,6 +6,21 @@ import { featureRequestKeys } from '@/lib/queries/feature-requests';
 
 import { useElectronDb } from '../useElectron';
 
+export function useArchiveFeatureRequest() {
+  const queryClient = useQueryClient();
+  const { featureRequests } = useElectronDb();
+
+  return useMutation({
+    mutationFn: (id: number) => featureRequests.update(id, { archivedAt: new Date().toISOString() }),
+    onSuccess: (featureRequest) => {
+      if (featureRequest) {
+        queryClient.setQueryData(featureRequestKeys.detail(featureRequest.id).queryKey, featureRequest);
+        void queryClient.invalidateQueries({ queryKey: featureRequestKeys.byProject._def });
+      }
+    },
+  });
+}
+
 export function useCreateFeatureRequest() {
   const queryClient = useQueryClient();
   const { featureRequests } = useElectronDb();
@@ -50,6 +65,21 @@ export function useFeatureRequests(projectId: number) {
     ...featureRequestKeys.byProject(projectId),
     enabled: isElectron && projectId > 0,
     queryFn: () => featureRequests.getByProjectId(projectId),
+  });
+}
+
+export function useUnarchiveFeatureRequest() {
+  const queryClient = useQueryClient();
+  const { featureRequests } = useElectronDb();
+
+  return useMutation({
+    mutationFn: (id: number) => featureRequests.update(id, { archivedAt: null }),
+    onSuccess: (featureRequest) => {
+      if (featureRequest) {
+        queryClient.setQueryData(featureRequestKeys.detail(featureRequest.id).queryKey, featureRequest);
+        void queryClient.invalidateQueries({ queryKey: featureRequestKeys.byProject._def });
+      }
+    },
   });
 }
 

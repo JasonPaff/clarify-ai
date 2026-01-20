@@ -177,27 +177,19 @@ _Goal: Build reusable components for the workflow_
   - "Use this version" action
 - [ ] Create `components/features/workflow/run-history-item.tsx`
 
-### 4.3 Cost Estimation Display
-
-- [ ] Research and integrate pricing library (e.g., `llm-pricing` or similar)
-- [ ] Create `components/features/workflow/cost-estimate.tsx`:
-  - Shows token count
-  - Shows estimated cost based on model
-- [ ] Create `lib/pricing/` utilities for cost calculation
-
-### 4.4 Stale State Indicator
+### 4.3 Stale State Indicator
 
 - [ ] Create `components/features/workflow/stale-warning-banner.tsx`
 - [ ] Update `workflow-steps.tsx` to show warning icons on stale steps
 - [ ] Add stale step detection logic
 
-### 4.5 Confirmation Dialogs
+### 4.4 Confirmation Dialogs
 
 - [ ] Create `components/features/workflow/cancel-ai-dialog.tsx`
 - [ ] Create `components/features/workflow/restore-run-dialog.tsx`
 - [ ] Create `components/features/workflow/discard-results-dialog.tsx`
 
-### 4.6 Context File Picker
+### 4.5 Context File Picker
 
 - [ ] Create `components/features/workflow/context-file-picker.tsx`:
   - File browser dialog integration
