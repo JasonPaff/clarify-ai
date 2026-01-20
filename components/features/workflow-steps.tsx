@@ -1,13 +1,15 @@
 'use client';
 
-import { Check } from 'lucide-react';
+import { AlertTriangle, Check } from 'lucide-react';
 import { Fragment } from 'react';
 
+import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 interface Step {
   description: string;
   id: string;
+  isStale?: boolean;
   title: string;
 }
 
@@ -37,9 +39,10 @@ export const WORKFLOW_STEPS: Array<Step> = [
 interface WorkflowStepsProps {
   currentStep: string;
   onStepClick?: (stepId: string) => void;
+  staleSteps?: Array<string>;
 }
 
-export function WorkflowSteps({ currentStep, onStepClick }: WorkflowStepsProps) {
+export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: WorkflowStepsProps) => {
   const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);
 
   return (
@@ -48,6 +51,38 @@ export function WorkflowSteps({ currentStep, onStepClick }: WorkflowStepsProps) 
         const isCompleted = index < currentIndex;
         const isCurrent = step.id === currentStep;
         const isClickable = onStepClick && (isCompleted || isCurrent);
+        const isStale = staleSteps.includes(step.id);
+
+        const stepIndicator = (
+          <div className={'relative'}>
+            {/* Step indicator */}
+            <div
+              className={cn(
+                `
+                  flex size-10 items-center justify-center rounded-full
+                  border-2 text-sm font-medium transition-colors
+                `,
+                isCompleted && 'border-accent bg-accent text-accent-foreground',
+                isCurrent && 'border-accent bg-background text-accent',
+                !isCompleted && !isCurrent && 'border-border bg-background text-muted-foreground',
+                isStale && 'border-amber-500'
+              )}
+            >
+              {isCompleted ? <Check className={'size-5'} /> : index + 1}
+            </div>
+
+            {/* Stale warning indicator */}
+            {isStale && (
+              <div
+                className={
+                  'absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-amber-500 text-white'
+                }
+              >
+                <AlertTriangle className={'size-3'} />
+              </div>
+            )}
+          </div>
+        );
 
         return (
           <Fragment key={step.id}>
@@ -61,27 +96,22 @@ export function WorkflowSteps({ currentStep, onStepClick }: WorkflowStepsProps) 
               onClick={() => isClickable && onStepClick?.(step.id)}
               type={'button'}
             >
-              {/* Step indicator */}
-              <div
-                className={cn(
-                  `
-                    flex size-10 items-center justify-center rounded-full
-                    border-2 text-sm font-medium transition-colors
-                  `,
-                  isCompleted && 'border-accent bg-accent text-accent-foreground',
-                  isCurrent && 'border-accent bg-background text-accent',
-                  !isCompleted && !isCurrent && 'border-border bg-background text-muted-foreground'
-                )}
-              >
-                {isCompleted ? <Check className={'size-5'} /> : index + 1}
-              </div>
+              {/* Step indicator with optional stale tooltip */}
+              {isStale ? (
+                <Tooltip content={'This step is outdated due to changes in a previous step'} side={'top'}>
+                  {stepIndicator}
+                </Tooltip>
+              ) : (
+                stepIndicator
+              )}
 
               {/* Step label */}
               <span
                 className={cn(
                   'mt-2 text-sm font-medium',
                   isCurrent && 'text-foreground',
-                  !isCurrent && 'text-muted-foreground'
+                  !isCurrent && 'text-muted-foreground',
+                  isStale && 'text-amber-500'
                 )}
               >
                 {step.title}
@@ -98,4 +128,4 @@ export function WorkflowSteps({ currentStep, onStepClick }: WorkflowStepsProps) 
       })}
     </div>
   );
-}
+};

@@ -1,0 +1,261 @@
+'use client';
+
+import type { ComponentPropsWithRef } from 'react';
+
+import { ChevronDown, Settings2 } from 'lucide-react';
+import { useMemo } from 'react';
+
+import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
+import type { FullModelId } from '@/lib/ai/models';
+
+import { ModelSelector } from '@/components/features/clarification/model-selector';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Textarea } from '@/components/ui/textarea';
+import { useStepConfig, useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
+import { getModelInfo } from '@/lib/ai/models';
+import { cn } from '@/lib/utils';
+
+import { ParameterSlider } from './parameter-slider';
+import { ThinkingBudgetControl } from './thinking-budget-control';
+
+const DEFAULT_TEMPERATURE = 0.7;
+const DEFAULT_MAX_TOKENS = 4096;
+const DEFAULT_THINKING_BUDGET = 8192;
+
+interface StepSettingsPanelProps extends ComponentPropsWithRef<'div'> {
+  featureRequestId: number;
+  step: StepConfigurationStep;
+}
+
+export const StepSettingsPanel = ({
+  className,
+  featureRequestId,
+  ref,
+  step,
+  ...props
+}: StepSettingsPanelProps) => {
+  const { data: config, isLoading } = useStepConfig(featureRequestId, step);
+  const upsertMutation = useUpsertStepConfig();
+
+  const currentModelId = useMemo(() => {
+    if (config?.modelProvider && config?.modelId) {
+      return `${config.modelProvider}:${config.modelId}` as FullModelId;
+    }
+    return null;
+  }, [config?.modelProvider, config?.modelId]);
+
+  const modelInfo = useMemo(() => {
+    if (currentModelId) {
+      return getModelInfo(currentModelId);
+    }
+    return undefined;
+  }, [currentModelId]);
+
+  const isSupportsThinking = modelInfo?.supportsThinking ?? false;
+
+  const isCustomized = useMemo(() => {
+    if (!config) return false;
+    return (
+      config.modelId !== null ||
+      config.temperature !== null ||
+      config.maxTokens !== null ||
+      config.thinkingEnabled ||
+      (config.customSystemPrompt !== null && config.customSystemPrompt !== '')
+    );
+  }, [config]);
+
+  const handleModelChange = (fullModelId: FullModelId) => {
+    const [provider, ...modelParts] = fullModelId.split(':');
+    const modelId = modelParts.join(':');
+
+    upsertMutation.mutate({
+      data: {
+        modelId,
+        modelProvider: provider,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const handleTemperatureChange = (value: number) => {
+    upsertMutation.mutate({
+      data: {
+        temperature: value,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const handleMaxTokensChange = (value: number) => {
+    upsertMutation.mutate({
+      data: {
+        maxTokens: value,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const handleThinkingEnabledChange = (isEnabled: boolean) => {
+    upsertMutation.mutate({
+      data: {
+        thinkingBudget: isEnabled ? (config?.thinkingBudget ?? DEFAULT_THINKING_BUDGET) : null,
+        thinkingEnabled: isEnabled,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const handleThinkingBudgetChange = (budget: number) => {
+    upsertMutation.mutate({
+      data: {
+        thinkingBudget: budget,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const handleCustomPromptBlur = (value: string) => {
+    upsertMutation.mutate({
+      data: {
+        customSystemPrompt: value || null,
+      },
+      featureRequestId,
+      step,
+    });
+  };
+
+  const stepLabel = useMemo(() => {
+    switch (step) {
+      case 'plan':
+        return 'Plan';
+      case 'refine':
+        return 'Refine';
+      case 'research':
+        return 'Research';
+      default:
+        return step;
+    }
+  }, [step]);
+
+  const formatTemperature = (value: number) => value.toFixed(1);
+
+  const formatMaxTokens = (value: number) => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}k`;
+    }
+    return String(value);
+  };
+
+  return (
+    <div className={cn('w-full', className)} ref={ref} {...props}>
+      <Collapsible defaultOpen={false}>
+        {/* Trigger */}
+        <CollapsibleTrigger
+          className={cn(
+            'flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-left text-sm',
+            'transition-colors hover:bg-muted/50'
+          )}
+          isHideChevron
+        >
+          <div className={'flex items-center gap-2'}>
+            <Settings2 className={'size-4 text-muted-foreground'} />
+            <span className={'font-medium'}>{stepLabel} Settings</span>
+            {isCustomized && (
+              <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>
+                Customized
+              </span>
+            )}
+          </div>
+          <ChevronDown
+            className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'}
+          />
+        </CollapsibleTrigger>
+
+        {/* Content */}
+        <CollapsibleContent className={'mt-2'}>
+          <div className={'space-y-6 rounded-md border border-border bg-card p-4'}>
+            {/* Model Selection */}
+            <div className={'flex flex-col gap-2'}>
+              <label className={'text-sm font-medium'}>Model</label>
+              <ModelSelector
+                isDisabled={isLoading || upsertMutation.isPending}
+                onValueChange={handleModelChange}
+                value={currentModelId}
+              />
+            </div>
+
+            {/* Temperature Slider */}
+            <ParameterSlider
+              description={'Controls randomness. Lower values are more focused, higher values more creative.'}
+              formatValue={formatTemperature}
+              isDisabled={isLoading || upsertMutation.isPending}
+              label={'Temperature'}
+              max={2}
+              min={0}
+              onValueChange={handleTemperatureChange}
+              step={0.1}
+              value={config?.temperature ?? DEFAULT_TEMPERATURE}
+            />
+
+            {/* Max Tokens Slider */}
+            <ParameterSlider
+              description={'Maximum number of tokens the model can generate in the response.'}
+              formatValue={formatMaxTokens}
+              isDisabled={isLoading || upsertMutation.isPending}
+              label={'Max Tokens'}
+              max={16000}
+              min={100}
+              onValueChange={handleMaxTokensChange}
+              step={100}
+              value={config?.maxTokens ?? DEFAULT_MAX_TOKENS}
+            />
+
+            {/* Thinking Budget Control */}
+            <ThinkingBudgetControl
+              budget={config?.thinkingBudget ?? DEFAULT_THINKING_BUDGET}
+              isDisabled={isLoading || upsertMutation.isPending}
+              isEnabled={config?.thinkingEnabled ?? false}
+              isSupportsThinking={isSupportsThinking}
+              onBudgetChange={handleThinkingBudgetChange}
+              onEnabledChange={handleThinkingEnabledChange}
+            />
+
+            {/* Custom System Prompt */}
+            <div className={'flex flex-col gap-2'}>
+              <div className={'flex items-center justify-between'}>
+                <label className={'text-sm font-medium'} htmlFor={`custom-prompt-${step}`}>
+                  Custom System Prompt
+                </label>
+                {config?.customSystemPrompt && (
+                  <button
+                    className={'text-xs text-muted-foreground hover:text-foreground'}
+                    onClick={() => handleCustomPromptBlur('')}
+                    type={'button'}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+              <p className={'text-xs text-muted-foreground'}>
+                Override the default system prompt for this step. Leave empty to use the default.
+              </p>
+              <Textarea
+                className={'min-h-32 font-mono text-xs'}
+                defaultValue={config?.customSystemPrompt ?? ''}
+                disabled={isLoading || upsertMutation.isPending}
+                id={`custom-prompt-${step}`}
+                onBlur={(e) => handleCustomPromptBlur(e.target.value)}
+                placeholder={'Enter custom system prompt...'}
+              />
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
