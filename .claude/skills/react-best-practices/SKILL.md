@@ -59,12 +59,12 @@ Read package.json
 
 **Library adjustments:**
 
-| Library | Adjustment |
-|---------|------------|
-| `@tanstack/react-query` | Skip manual loading/error state rules |
-| `@tanstack/react-form` | Skip controlled/uncontrolled form rules |
-| `react-hook-form` | Skip controlled input warnings |
-| Next.js App Router | Apply RSC rules |
+| Library                 | Adjustment                              |
+| ----------------------- | --------------------------------------- |
+| `@tanstack/react-query` | Skip manual loading/error state rules   |
+| `@tanstack/react-form`  | Skip controlled/uncontrolled form rules |
+| `react-hook-form`       | Skip controlled input warnings          |
+| Next.js App Router      | Apply RSC rules                         |
 
 Store detected libraries as context string for subagents.
 
@@ -83,6 +83,7 @@ Collect all file paths into a list.
 Group files into batches of **3-5 files each** to keep subagent context manageable.
 
 Example batching:
+
 ```
 Batch 1: [src/components/Header.tsx, src/components/Footer.tsx, src/components/Nav.tsx]
 Batch 2: [src/hooks/useAuth.ts, src/hooks/useData.ts, src/hooks/useForm.ts]
@@ -96,7 +97,7 @@ Batch 3: [src/pages/Home.tsx, src/pages/Dashboard.tsx, src/pages/Settings.tsx]
 
 For each batch, spawn a `general-purpose` subagent with this prompt template:
 
-```
+````
 You are auditing React files for best practices violations.
 
 ## Context
@@ -130,9 +131,10 @@ Read the rules from: .claude/skills/react-best-practices/references/React-Best-P
     }
   ]
 }
-```
+````
 
 Only return the JSON. No other text.
+
 ```
 
 ### Step 5: Collect and Aggregate Results (Main Agent)
@@ -149,8 +151,10 @@ Wait for all subagents to complete, then:
 Write the report to a markdown file:
 
 ```
+
 Write to: docs/react-best-practices-audit.md
-```
+
+````
 
 **Summary Section:**
 
@@ -170,11 +174,11 @@ Write to: docs/react-best-practices-audit.md
 
 **Files analyzed**: N
 **Files with issues**: M
-```
+````
 
 **Critical Issues Section:**
 
-```markdown
+````markdown
 ## Critical Issues (Fix Immediately)
 
 ### src/components/UserDashboard.tsx
@@ -184,20 +188,24 @@ Write to: docs/react-best-practices-audit.md
 useEffect with addEventListener has no cleanup
 
 **Current:**
+
 ```tsx
 useEffect(() => {
   window.addEventListener('resize', handler);
 }, []);
 ```
+````
 
 **Fixed:**
+
 ```tsx
 useEffect(() => {
   window.addEventListener('resize', handler);
   return () => window.removeEventListener('resize', handler);
 }, []);
 ```
-```
+
+````
 
 **Warning and Info sections follow same pattern.**
 
@@ -212,7 +220,7 @@ useEffect(() => {
 
 ### src/components/DataTable.tsx
 - [ ] Line 112: Use stable key instead of index
-```
+````
 
 ## Rules Summary
 

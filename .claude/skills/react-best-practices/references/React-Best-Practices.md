@@ -97,19 +97,7 @@ Avoid complex conditional logic inline in JSX.
 
 ```tsx
 // Warning: Nested ternaries
-return (
-  <div>
-    {isLoading ? (
-      <Spinner />
-    ) : hasError ? (
-      <Error />
-    ) : hasData ? (
-      <DataDisplay />
-    ) : (
-      <EmptyState />
-    )}
-  </div>
-);
+return <div>{isLoading ? <Spinner /> : hasError ? <Error /> : hasData ? <DataDisplay /> : <EmptyState />}</div>;
 
 // Fixed: Extract to derived state
 const renderContent = () => {
@@ -161,10 +149,7 @@ return (
 
 // Fixed: Extract to derived state
 const activeUsersSorted = useMemo(
-  () =>
-    users
-      .filter((u) => u.isActive)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+  () => users.filter((u) => u.isActive).sort((a, b) => a.name.localeCompare(b.name)),
   [users]
 );
 
@@ -202,10 +187,7 @@ const itemCount = items.length;
 const hasItems = items.length > 0;
 
 // For expensive calculations, use useMemo
-const expensiveTotal = useMemo(
-  () => items.reduce((sum, item) => sum + calculateValue(item), 0),
-  [items]
-);
+const expensiveTotal = useMemo(() => items.reduce((sum, item) => sum + calculateValue(item), 0), [items]);
 ```
 
 ### 3.2 Expensive State Initialization (Warning)
@@ -456,10 +438,7 @@ const useUserData = () => {
 
 ```tsx
 // Expensive calculations (O(n^2) or worse, large arrays)
-const sortedItems = useMemo(
-  () => items.sort((a, b) => complexComparison(a, b)),
-  [items]
-);
+const sortedItems = useMemo(() => items.sort((a, b) => complexComparison(a, b)), [items]);
 
 // Values passed to memoized child components or effect dependencies
 const config = useMemo(() => ({ theme, locale }), [theme, locale]);
@@ -778,13 +757,13 @@ When React Hook Form is detected:
 
 ## Quick Reference: Severity by Category
 
-| Category           | Critical                                        | Warning                                     | Info                          |
-| ------------------ | ----------------------------------------------- | ------------------------------------------- | ----------------------------- |
-| Component Design   | -                                               | Size, mixed inputs, naming                  | -                             |
-| JSX Patterns       | -                                               | Nested ternaries, inline objects, logic     | -                             |
-| State Management   | -                                               | Derived state, expensive init, duplicate    | URL state                     |
-| Effects            | Missing cleanup, hook rules                     | No abort, sync effects, missing deps        | -                             |
-| Performance        | Dynamic list keys                               | Missing memo where needed, unnecessary memo | -                             |
-| Error Handling     | -                                               | No error state, no try-catch, silent catch  | Error boundaries              |
-| TypeScript         | -                                               | `any` in props, wrong event types           | Props naming                  |
-| RSC                | Client code in server, non-serializable props   | -                                           | -                             |
+| Category         | Critical                                      | Warning                                     | Info             |
+| ---------------- | --------------------------------------------- | ------------------------------------------- | ---------------- |
+| Component Design | -                                             | Size, mixed inputs, naming                  | -                |
+| JSX Patterns     | -                                             | Nested ternaries, inline objects, logic     | -                |
+| State Management | -                                             | Derived state, expensive init, duplicate    | URL state        |
+| Effects          | Missing cleanup, hook rules                   | No abort, sync effects, missing deps        | -                |
+| Performance      | Dynamic list keys                             | Missing memo where needed, unnecessary memo | -                |
+| Error Handling   | -                                             | No error state, no try-catch, silent catch  | Error boundaries |
+| TypeScript       | -                                             | `any` in props, wrong event types           | Props naming     |
+| RSC              | Client code in server, non-serializable props | -                                           | -                |
