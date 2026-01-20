@@ -15,11 +15,6 @@ export default function SettingsPage() {
       <PageHeader description={'Configure your application preferences'} title={'Settings'} />
 
       <div className={'space-y-6'}>
-        {/* API Keys Section */}
-        <ApiKeysSection />
-
-        <Separator />
-
         {/* Appearance Section */}
         <Card>
           <CardHeader>
@@ -41,6 +36,11 @@ export default function SettingsPage() {
             <ThemeSelector />
           </CardContent>
         </Card>
+
+        <Separator />
+
+        {/* API Keys Section */}
+        <ApiKeysSection />
 
         <Separator />
 
