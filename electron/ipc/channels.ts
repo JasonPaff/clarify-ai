@@ -5,6 +5,16 @@ export const IpcChannels = {
       generate: 'ai:clarification:generate',
       stream: 'ai:clarification:stream',
     },
+    discovery: {
+      cancel: 'ai:discovery:cancel',
+      generate: 'ai:discovery:generate',
+      stream: 'ai:discovery:stream',
+    },
+    plan: {
+      cancel: 'ai:plan:cancel',
+      generate: 'ai:plan:generate',
+      stream: 'ai:plan:stream',
+    },
     repositoryOverview: {
       cancel: 'ai:repositoryOverview:cancel',
       generate: 'ai:repositoryOverview:generate',
@@ -48,8 +58,10 @@ export const IpcChannels = {
       getByFeatureRequestIdAndStatus: 'db:featureRequestRuns:getByFeatureRequestIdAndStatus',
       getByFeatureRequestIdAndStep: 'db:featureRequestRuns:getByFeatureRequestIdAndStep',
       getById: 'db:featureRequestRuns:getById',
+      getCurrentRun: 'db:featureRequestRuns:getCurrentRun',
       getLatestByFeatureRequestId: 'db:featureRequestRuns:getLatestByFeatureRequestId',
       getLatestByFeatureRequestIdAndStep: 'db:featureRequestRuns:getLatestByFeatureRequestIdAndStep',
+      setCurrentRun: 'db:featureRequestRuns:setCurrentRun',
       update: 'db:featureRequestRuns:update',
     },
     featureRequests: {

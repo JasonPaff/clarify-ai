@@ -18,11 +18,13 @@ export interface FeatureRequestRunsRepository {
   getByFeatureRequestIdAndStatus(featureRequestId: number, status: FeatureRequestRunStatus): Array<FeatureRequestRun>;
   getByFeatureRequestIdAndStep(featureRequestId: number, step: FeatureRequestRunStep): Array<FeatureRequestRun>;
   getById(id: number): FeatureRequestRun | undefined;
+  getCurrentRun(featureRequestId: number, step: FeatureRequestRunStep): FeatureRequestRun | undefined;
   getLatestByFeatureRequestId(featureRequestId: number): FeatureRequestRun | undefined;
   getLatestByFeatureRequestIdAndStep(
     featureRequestId: number,
     step: FeatureRequestRunStep
   ): FeatureRequestRun | undefined;
+  setCurrentRun(featureRequestId: number, step: FeatureRequestRunStep, runId: number): FeatureRequestRun | undefined;
   update(id: number, data: Partial<NewFeatureRequestRun>): FeatureRequestRun | undefined;
 }
 
@@ -71,6 +73,20 @@ export function createFeatureRequestRunsRepository(db: DrizzleDatabase): Feature
       return db.select().from(featureRequestRuns).where(eq(featureRequestRuns.id, id)).get();
     },
 
+    getCurrentRun(featureRequestId: number, step: FeatureRequestRunStep): FeatureRequestRun | undefined {
+      return db
+        .select()
+        .from(featureRequestRuns)
+        .where(
+          and(
+            eq(featureRequestRuns.featureRequestId, featureRequestId),
+            eq(featureRequestRuns.step, step),
+            eq(featureRequestRuns.isCurrentRun, true)
+          )
+        )
+        .get();
+    },
+
     getLatestByFeatureRequestId(featureRequestId: number): FeatureRequestRun | undefined {
       return db
         .select()
@@ -91,6 +107,26 @@ export function createFeatureRequestRunsRepository(db: DrizzleDatabase): Feature
         .where(and(eq(featureRequestRuns.featureRequestId, featureRequestId), eq(featureRequestRuns.step, step)))
         .orderBy(desc(featureRequestRuns.createdAt))
         .limit(1)
+        .get();
+    },
+
+    setCurrentRun(
+      featureRequestId: number,
+      step: FeatureRequestRunStep,
+      runId: number
+    ): FeatureRequestRun | undefined {
+      // First, set isCurrentRun=false for ALL runs matching featureRequestId and step
+      db.update(featureRequestRuns)
+        .set({ isCurrentRun: false, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .where(and(eq(featureRequestRuns.featureRequestId, featureRequestId), eq(featureRequestRuns.step, step)))
+        .run();
+
+      // Then, set isCurrentRun=true for the specific runId
+      return db
+        .update(featureRequestRuns)
+        .set({ isCurrentRun: true, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .where(eq(featureRequestRuns.id, runId))
+        .returning()
         .get();
     },
 

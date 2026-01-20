@@ -1,0 +1,1 @@
+ALTER TABLE `step_configurations` ADD `thinking_budget` integer;

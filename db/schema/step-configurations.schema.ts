@@ -23,10 +23,12 @@ export const stepConfigurations = sqliteTable(
       .notNull()
       .references(() => featureRequests.id, { onDelete: 'cascade' }),
     id: integer('id').primaryKey({ autoIncrement: true }),
+    maxTokens: integer('max_tokens'),
     modelId: text('model_id'),
     modelProvider: text('model_provider'),
     step: text('step').$type<StepConfigurationStep>().notNull(),
     temperature: real('temperature'),
+    thinkingBudget: integer('thinking_budget'),
     thinkingEnabled: integer('thinking_enabled', { mode: 'boolean' }).notNull().default(false),
     updatedAt: text('updated_at')
       .default(sql`(CURRENT_TIMESTAMP)`)

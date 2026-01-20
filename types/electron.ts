@@ -23,11 +23,29 @@ export type {
 // Re-export AI clarification types for renderer use
 export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
 
+// Re-export AI discovery types for renderer use
+export type {
+  DiscoveredFile,
+  DiscoveryGenerateRequest,
+  DiscoveryRepositoryOverview,
+  DiscoveryScopeConfig,
+  DiscoveryStreamChunk,
+} from '../electron/ipc/ai-discovery.handlers';
+
 // Re-export AI overview types for renderer use
 export type {
   RepositoryOverviewGenerateRequest,
   RepositoryOverviewStreamChunk,
 } from '../electron/ipc/ai-overview.handlers';
+
+// Re-export AI plan types for renderer use
+export type {
+  ImplementationPlan,
+  PlanGenerateRequest,
+  PlanQualityGate,
+  PlanStep,
+  PlanStreamChunk,
+} from '../electron/ipc/ai-plan.handlers';
 
 // Re-export API key types for renderer use (excluding ApiKeyProvider and ProviderCredentials which come from provider-types)
 export type { ApiKeyInfo, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
@@ -68,7 +86,7 @@ export type { OpenRouterModel, StoredOpenRouterModels } from '../electron/ipc/op
  * Provides access to native capabilities, database operations, and AI functionality.
  */
 export interface ElectronAPI {
-  /** AI-related operations including clarification and repository overview generation */
+  /** AI-related operations including clarification, discovery, plan, and repository overview generation */
   ai: {
     clarification: {
       cancel(): Promise<void>;
@@ -77,6 +95,24 @@ export interface ElectronAPI {
       ): Promise<{ error?: string; success: boolean }>;
       onStream(
         callback: (chunk: import('../electron/ipc/ai-clarification.handlers').ClarificationStreamChunk) => void
+      ): () => void;
+    };
+    discovery: {
+      cancel(): Promise<void>;
+      generate(
+        request: import('../electron/ipc/ai-discovery.handlers').DiscoveryGenerateRequest
+      ): Promise<{ error?: string; success: boolean }>;
+      onStream(
+        callback: (chunk: import('../electron/ipc/ai-discovery.handlers').DiscoveryStreamChunk) => void
+      ): () => void;
+    };
+    plan: {
+      cancel(): Promise<void>;
+      generate(
+        request: import('../electron/ipc/ai-plan.handlers').PlanGenerateRequest
+      ): Promise<{ error?: string; success: boolean }>;
+      onStream(
+        callback: (chunk: import('../electron/ipc/ai-plan.handlers').PlanStreamChunk) => void
       ): () => void;
     };
     repositoryOverview: {
@@ -191,12 +227,21 @@ export interface ElectronAPI {
         step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep
       ): Promise<Array<import('../db/schema/feature-request-runs.schema').FeatureRequestRun>>;
       getById(id: number): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
+      getCurrentRun(
+        featureRequestId: number,
+        step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
       getLatestByFeatureRequestId(
         featureRequestId: number
       ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
       getLatestByFeatureRequestIdAndStep(
         featureRequestId: number,
         step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep
+      ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
+      setCurrentRun(
+        featureRequestId: number,
+        step: import('../db/schema/feature-request-runs.schema').FeatureRequestRunStep,
+        runId: number
       ): Promise<import('../db/schema/feature-request-runs.schema').FeatureRequestRun | undefined>;
       update(
         id: number,

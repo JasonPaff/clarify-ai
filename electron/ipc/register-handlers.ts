@@ -12,7 +12,9 @@ import { createRepositoryOverviewsRepository } from '@/db/repositories/repositor
 import { createStepConfigurationsRepository } from '@/db/repositories/step-configurations.repository';
 
 import { registerAiClarificationHandlers } from './ai-clarification.handlers';
+import { registerAiDiscoveryHandlers } from './ai-discovery.handlers';
 import { registerAiOverviewHandlers } from './ai-overview.handlers';
+import { registerAiPlanHandlers } from './ai-plan.handlers';
 import { registerApiKeysHandlers } from './api-keys.handlers';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
@@ -47,8 +49,14 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // AI clarification handlers (need window reference for streaming)
   registerAiClarificationHandlers(getMainWindow);
 
+  // AI discovery handlers (need window reference for streaming)
+  registerAiDiscoveryHandlers(getMainWindow);
+
   // AI overview handlers (need window reference for streaming)
   registerAiOverviewHandlers(getMainWindow);
+
+  // AI plan handlers (need window reference for streaming)
+  registerAiPlanHandlers(getMainWindow);
 
   // OpenRouter models handlers (caching via electron-store)
   registerOpenRouterModelsHandlers();

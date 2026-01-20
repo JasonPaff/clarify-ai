@@ -22,7 +22,9 @@ import type {
 } from '@/db/schema/step-configurations.schema';
 
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
+import type { DiscoveryGenerateRequest, DiscoveryStreamChunk } from './ipc/ai-discovery.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
+import type { PlanGenerateRequest, PlanStreamChunk } from './ipc/ai-plan.handlers';
 import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';
 import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
 import type { ApiKeyProvider, ProviderCredentials } from './ipc/lib/provider-types';
@@ -36,6 +38,16 @@ export interface ElectronAPI {
       cancel(): Promise<void>;
       generate(request: ClarificationGenerateRequest): Promise<{ error?: string; success: boolean }>;
       onStream(callback: (chunk: ClarificationStreamChunk) => void): () => void;
+    };
+    discovery: {
+      cancel(): Promise<void>;
+      generate(request: DiscoveryGenerateRequest): Promise<{ error?: string; success: boolean }>;
+      onStream(callback: (chunk: DiscoveryStreamChunk) => void): () => void;
+    };
+    plan: {
+      cancel(): Promise<void>;
+      generate(request: PlanGenerateRequest): Promise<{ error?: string; success: boolean }>;
+      onStream(callback: (chunk: PlanStreamChunk) => void): () => void;
     };
     repositoryOverview: {
       cancel(): Promise<void>;
@@ -94,10 +106,16 @@ export interface ElectronAPI {
         step: FeatureRequestRunStep
       ): Promise<Array<FeatureRequestRun>>;
       getById(id: number): Promise<FeatureRequestRun | undefined>;
+      getCurrentRun(featureRequestId: number, step: FeatureRequestRunStep): Promise<FeatureRequestRun | undefined>;
       getLatestByFeatureRequestId(featureRequestId: number): Promise<FeatureRequestRun | undefined>;
       getLatestByFeatureRequestIdAndStep(
         featureRequestId: number,
         step: FeatureRequestRunStep
+      ): Promise<FeatureRequestRun | undefined>;
+      setCurrentRun(
+        featureRequestId: number,
+        step: FeatureRequestRunStep,
+        runId: number
       ): Promise<FeatureRequestRun | undefined>;
       update(id: number, data: Partial<NewFeatureRequestRun>): Promise<FeatureRequestRun | undefined>;
     };
@@ -212,6 +230,34 @@ const electronAPI: ElectronAPI = {
         };
       },
     },
+    discovery: {
+      cancel: () => ipcRenderer.invoke(IpcChannels.ai.discovery.cancel),
+      generate: (request) => ipcRenderer.invoke(IpcChannels.ai.discovery.generate, request),
+      onStream: (callback) => {
+        const handler = (_event: Electron.IpcRendererEvent, chunk: DiscoveryStreamChunk) => {
+          callback(chunk);
+        };
+        ipcRenderer.on(IpcChannels.ai.discovery.stream, handler);
+        // Return unsubscribe function
+        return () => {
+          ipcRenderer.removeListener(IpcChannels.ai.discovery.stream, handler);
+        };
+      },
+    },
+    plan: {
+      cancel: () => ipcRenderer.invoke(IpcChannels.ai.plan.cancel),
+      generate: (request) => ipcRenderer.invoke(IpcChannels.ai.plan.generate, request),
+      onStream: (callback) => {
+        const handler = (_event: Electron.IpcRendererEvent, chunk: PlanStreamChunk) => {
+          callback(chunk);
+        };
+        ipcRenderer.on(IpcChannels.ai.plan.stream, handler);
+        // Return unsubscribe function
+        return () => {
+          ipcRenderer.removeListener(IpcChannels.ai.plan.stream, handler);
+        };
+      },
+    },
     repositoryOverview: {
       cancel: () => ipcRenderer.invoke(IpcChannels.ai.repositoryOverview.cancel),
       generate: (request) => ipcRenderer.invoke(IpcChannels.ai.repositoryOverview.generate, request),
@@ -290,6 +336,8 @@ const electronAPI: ElectronAPI = {
       getByFeatureRequestIdAndStep: (featureRequestId, step) =>
         ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getByFeatureRequestIdAndStep, featureRequestId, step),
       getById: (id) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getById, id),
+      getCurrentRun: (featureRequestId, step) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getCurrentRun, featureRequestId, step),
       getLatestByFeatureRequestId: (featureRequestId) =>
         ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.getLatestByFeatureRequestId, featureRequestId),
       getLatestByFeatureRequestIdAndStep: (featureRequestId, step) =>
@@ -298,6 +346,8 @@ const electronAPI: ElectronAPI = {
           featureRequestId,
           step
         ),
+      setCurrentRun: (featureRequestId, step, runId) =>
+        ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.setCurrentRun, featureRequestId, step, runId),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.featureRequestRuns.update, id, data),
     },
     featureRequests: {

@@ -251,6 +251,7 @@ clarify-ai/
 - Use `sql` template literal for raw SQL (e.g., `CURRENT_TIMESTAMP`)
 - Create indexes for commonly queried fields
 - Repository pattern for data access (`db/repositories/`)
+- Do not manually run migrations, migrations will run on app start automatically
 
 ### Electron/IPC
 

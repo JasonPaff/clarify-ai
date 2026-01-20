@@ -78,4 +78,27 @@ export function registerFeatureRequestRunsHandlers(featureRequestRunsRepository:
   ipcMain.handle(IpcChannels.db.featureRequestRuns.delete, (_event: IpcMainInvokeEvent, id: number): boolean => {
     return featureRequestRunsRepository.delete(id);
   });
+
+  ipcMain.handle(
+    IpcChannels.db.featureRequestRuns.getCurrentRun,
+    (
+      _event: IpcMainInvokeEvent,
+      featureRequestId: number,
+      step: FeatureRequestRunStep
+    ): FeatureRequestRun | undefined => {
+      return featureRequestRunsRepository.getCurrentRun(featureRequestId, step);
+    }
+  );
+
+  ipcMain.handle(
+    IpcChannels.db.featureRequestRuns.setCurrentRun,
+    (
+      _event: IpcMainInvokeEvent,
+      featureRequestId: number,
+      step: FeatureRequestRunStep,
+      runId: number
+    ): FeatureRequestRun | undefined => {
+      return featureRequestRunsRepository.setCurrentRun(featureRequestId, step, runId);
+    }
+  );
 }
