@@ -102,13 +102,19 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
 
   // Filter options based on input
   const filteredOptions = useMemo(() => {
+    // If no input value, show all options
     if (!inputValue) return allOptions;
+
+    // If input matches the selected option's label exactly, show all options
+    // This handles the case where combobox reopens and shows selected value
+    if (selectedOption && inputValue === selectedOption.label) return allOptions;
+
     const lowercaseInput = inputValue.toLowerCase();
     return allOptions.filter(
       (option) =>
         option.label.toLowerCase().includes(lowercaseInput) || option.group.toLowerCase().includes(lowercaseInput)
     );
-  }, [allOptions, inputValue]);
+  }, [allOptions, inputValue, selectedOption]);
 
   // Get filtered groups (only show groups that have matching options)
   const filteredGroups = useMemo(() => {
@@ -124,7 +130,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
   return (
     <ComboboxRoot<ModelOption>
       disabled={isDisabled || isLoading || hasNoProviders}
-      items={filteredOptions}
+      items={allOptions}
       onInputValueChange={handleInputValueChange}
       onValueChange={handleValueChange}
       value={selectedOption}
