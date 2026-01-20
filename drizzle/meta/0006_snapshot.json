@@ -111,23 +111,17 @@
       "indexes": {
         "ai_usage_logs_created_at_idx": {
           "name": "ai_usage_logs_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "isUnique": false
         },
         "ai_usage_logs_operation_type_idx": {
           "name": "ai_usage_logs_operation_type_idx",
-          "columns": [
-            "operation_type"
-          ],
+          "columns": ["operation_type"],
           "isUnique": false
         },
         "ai_usage_logs_project_id_idx": {
           "name": "ai_usage_logs_project_id_idx",
-          "columns": [
-            "project_id"
-          ],
+          "columns": ["project_id"],
           "isUnique": false
         }
       },
@@ -136,12 +130,8 @@
           "name": "ai_usage_logs_project_id_projects_id_fk",
           "tableFrom": "ai_usage_logs",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -186,24 +176,17 @@
       "indexes": {
         "feature_request_repositories_feature_request_id_repository_id_idx": {
           "name": "feature_request_repositories_feature_request_id_repository_id_idx",
-          "columns": [
-            "feature_request_id",
-            "repository_id"
-          ],
+          "columns": ["feature_request_id", "repository_id"],
           "isUnique": true
         },
         "feature_request_repositories_feature_request_id_idx": {
           "name": "feature_request_repositories_feature_request_id_idx",
-          "columns": [
-            "feature_request_id"
-          ],
+          "columns": ["feature_request_id"],
           "isUnique": false
         },
         "feature_request_repositories_repository_id_idx": {
           "name": "feature_request_repositories_repository_id_idx",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": false
         }
       },
@@ -212,12 +195,8 @@
           "name": "feature_request_repositories_feature_request_id_feature_requests_id_fk",
           "tableFrom": "feature_request_repositories",
           "tableTo": "feature_requests",
-          "columnsFrom": [
-            "feature_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["feature_request_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -225,12 +204,8 @@
           "name": "feature_request_repositories_repository_id_repositories_id_fk",
           "tableFrom": "feature_request_repositories",
           "tableTo": "repositories",
-          "columnsFrom": [
-            "repository_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["repository_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -375,16 +350,12 @@
       "indexes": {
         "feature_requests_project_id_idx": {
           "name": "feature_requests_project_id_idx",
-          "columns": [
-            "project_id"
-          ],
+          "columns": ["project_id"],
           "isUnique": false
         },
         "feature_requests_status_idx": {
           "name": "feature_requests_status_idx",
-          "columns": [
-            "status"
-          ],
+          "columns": ["status"],
           "isUnique": false
         }
       },
@@ -393,12 +364,8 @@
           "name": "feature_requests_project_id_projects_id_fk",
           "tableFrom": "feature_requests",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -459,30 +426,22 @@
       "indexes": {
         "projects_created_at_idx": {
           "name": "projects_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "isUnique": false
         },
         "projects_is_favorited_idx": {
           "name": "projects_is_favorited_idx",
-          "columns": [
-            "is_favorited"
-          ],
+          "columns": ["is_favorited"],
           "isUnique": false
         },
         "projects_name_idx": {
           "name": "projects_name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         },
         "projects_updated_at_idx": {
           "name": "projects_updated_at_idx",
-          "columns": [
-            "updated_at"
-          ],
+          "columns": ["updated_at"],
           "isUnique": false
         }
       },
@@ -556,16 +515,12 @@
       "indexes": {
         "repositories_project_id_idx": {
           "name": "repositories_project_id_idx",
-          "columns": [
-            "project_id"
-          ],
+          "columns": ["project_id"],
           "isUnique": false
         },
         "repositories_path_idx": {
           "name": "repositories_path_idx",
-          "columns": [
-            "path"
-          ],
+          "columns": ["path"],
           "isUnique": false
         }
       },
@@ -574,12 +529,8 @@
           "name": "repositories_project_id_projects_id_fk",
           "tableFrom": "repositories",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -667,16 +618,12 @@
       "indexes": {
         "repository_overviews_repository_id_unique": {
           "name": "repository_overviews_repository_id_unique",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": true
         },
         "repository_overviews_repository_id_idx": {
           "name": "repository_overviews_repository_id_idx",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": false
         }
       },
@@ -685,12 +632,8 @@
           "name": "repository_overviews_repository_id_repositories_id_fk",
           "tableFrom": "repository_overviews",
           "tableTo": "repositories",
-          "columnsFrom": [
-            "repository_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["repository_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

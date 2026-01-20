@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
     unoptimized: isElectronBuild,
   },
   output: isElectronBuild ? 'export' : undefined,
+  outputFileTracingIncludes: {
+    '/api/**/*': ['./node_modules/**/*.wasm', './node_modules/tiktoken/**/*.wasm'],
+  },
+  serverExternalPackages: ['tiktoken'],
   trailingSlash: isElectronBuild,
   transpilePackages: ['shiki', 'streamdown'],
 };

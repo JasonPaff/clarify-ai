@@ -10,6 +10,12 @@ files:
   - electron-dist/**/*
   - out/**/*
   - package.json
+  -
+extraResources:
+  - from: node_modules/tiktoken/tiktoken_bg.wasm
+    to: tiktoken_bg.wasm
+  - from: node_modules/@tokenlens/tokenizer/tiktoken_bg.wasm
+    to: tiktoken_bg.wasm
 
 extraMetadata:
   main: electron-dist/electron/main.js
