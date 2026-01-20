@@ -43,6 +43,13 @@
       "when": 1768791805325,
       "tag": "0005_white_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1768870142024,
+      "tag": "0006_furry_toro",
+      "breakpoints": true
     }
   ]
 }

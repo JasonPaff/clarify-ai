@@ -23,6 +23,7 @@ interface RepositoryCardProps {
   onEdit?: () => void;
   overviewStatus: RepositoryOverviewStatus;
   path: string;
+  projectId: number;
 }
 
 export function RepositoryCard({
@@ -34,6 +35,7 @@ export function RepositoryCard({
   onEdit,
   overviewStatus,
   path,
+  projectId,
 }: RepositoryCardProps) {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
@@ -104,7 +106,7 @@ export function RepositoryCard({
 
         {/* Overview Actions */}
         <div className={'mt-4 flex gap-2'}>
-          <RepositoryOverviewDialog repositoryId={id} repositoryName={name} repositoryPath={path}>
+          <RepositoryOverviewDialog projectId={projectId} repositoryId={id} repositoryName={name} repositoryPath={path}>
             {hasOverview ? (
               <Button size={'sm'} variant={'outline'}>
                 <Eye className={'size-3.5'} />

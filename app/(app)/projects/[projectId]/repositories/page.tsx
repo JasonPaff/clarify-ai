@@ -64,6 +64,7 @@ function RepositoriesContent({ projectId }: { projectId: number }) {
             onEdit={() => setEditingRepository({ id: repository.id, name: repository.name, path: repository.path })}
             overviewStatus={repository.overviewStatus}
             path={repository.path}
+            projectId={projectId}
           />
         ))}
       </div>

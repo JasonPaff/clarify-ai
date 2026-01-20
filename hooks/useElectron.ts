@@ -3,10 +3,13 @@
 import { useCallback, useMemo } from 'react';
 
 import type {
+  AiUsageLog,
+  AiUsageLogTotals,
   ApiKeyInfo,
   ApiKeyProvider,
   CollectRepositoryDataResult,
   ElectronAPI,
+  NewAiUsageLog,
   OpenRouterModel,
   ProviderCredentials,
   RepositoryOverviewGenerateRequest,
@@ -171,6 +174,24 @@ export function useElectronApp() {
 export function useElectronDb() {
   const { api, isElectron } = useElectron();
 
+  const aiUsageLogs = useMemo(
+    () => ({
+      create: (data: NewAiUsageLog): Promise<AiUsageLog> => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiUsageLogs.create(data);
+      },
+      delete: (projectId: number): Promise<void> => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiUsageLogs.delete(projectId);
+      },
+      getByProjectId: (projectId: number): Promise<Array<AiUsageLog>> =>
+        api?.db.aiUsageLogs.getByProjectId(projectId) ?? Promise.resolve([]),
+      getTotalsByProjectId: (projectId: number): Promise<AiUsageLogTotals | null> =>
+        api?.db.aiUsageLogs.getTotalsByProjectId(projectId) ?? Promise.resolve(null),
+    }),
+    [api]
+  );
+
   const featureRequestRepositories = useMemo(
     () => ({
       addToFeatureRequest: (featureRequestId: number, repositoryId: number) => {
@@ -294,7 +315,15 @@ export function useElectronDb() {
     [api]
   );
 
-  return { featureRequestRepositories, featureRequests, isElectron, projects, repositories, repositoryOverviews };
+  return {
+    aiUsageLogs,
+    featureRequestRepositories,
+    featureRequests,
+    isElectron,
+    projects,
+    repositories,
+    repositoryOverviews,
+  };
 }
 
 export function useElectronDialog() {

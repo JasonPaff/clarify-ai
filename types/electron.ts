@@ -1,11 +1,19 @@
+// Re-export AI usage log repository types for renderer use
+export type { AiUsageLogTotals } from '../db/repositories/ai-usage-logs.repository';
 // Re-export database types for renderer use
+export type { AiUsageLog, NewAiUsageLog } from '../db/schema/ai-usage-logs.schema';
 export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
 export type { NewProject, Project } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
+
 export type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
 
 // Re-export AI clarification types for renderer use
-export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
+export type {
+  ClarificationGenerateRequest,
+  ClarificationStreamChunk,
+  ClarificationUsageData,
+} from '../electron/ipc/ai-clarification.handlers';
 
 // Re-export AI overview types for renderer use
 export type {
@@ -125,6 +133,16 @@ export interface ElectronAPI {
   };
   /** Database operations for managing application data */
   db: {
+    aiUsageLogs: {
+      create(
+        data: import('../db/schema/ai-usage-logs.schema').NewAiUsageLog
+      ): Promise<import('../db/schema/ai-usage-logs.schema').AiUsageLog>;
+      delete(projectId: number): Promise<void>;
+      getByProjectId(projectId: number): Promise<Array<import('../db/schema/ai-usage-logs.schema').AiUsageLog>>;
+      getTotalsByProjectId(
+        projectId: number
+      ): Promise<import('../db/repositories/ai-usage-logs.repository').AiUsageLogTotals | null>;
+    };
     featureRequestRepositories: {
       addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;

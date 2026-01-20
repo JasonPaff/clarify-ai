@@ -32,6 +32,14 @@ export function ProjectTabs({ projectId }: ProjectTabsProps) {
     },
     {
       href: $path({
+        route: '/projects/[projectId]/usage',
+        routeParams: { projectId },
+      }),
+      label: 'Usage',
+      value: 'usage',
+    },
+    {
+      href: $path({
         route: '/projects/[projectId]/settings',
         routeParams: { projectId },
       }),

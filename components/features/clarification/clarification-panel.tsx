@@ -6,9 +6,12 @@ import { useState } from 'react';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
+import { CostConfirmationDialog } from '@/components/ui/ai/cost-confirmation-dialog';
+import { UsageFooter } from '@/components/ui/ai/usage-footer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useClarification } from '@/hooks/use-clarification';
+import { estimateInputTokens } from '@/lib/ai/token-counting';
 import { cn } from '@/lib/utils';
 
 import { AdvancedSettings } from './advanced-settings';
@@ -30,6 +33,7 @@ type ClarificationPanelProps = ClassName & {
 export const ClarificationPanel = ({ className, featureRequest, onClose, onComplete }: ClarificationPanelProps) => {
   const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const {
     analysis,
@@ -44,12 +48,28 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
     startClarification,
     status,
     streamingText,
+    usageData,
   } = useClarification({ featureRequest });
 
-  const handleStartClarification = async () => {
+  const handleAnalyzeRequestClick = () => {
     if (!selectedModel) return;
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDialogClose = () => {
+    setIsConfirmDialogOpen(false);
+  };
+
+  const handleConfirmAnalysis = async () => {
+    if (!selectedModel) return;
+    setIsConfirmDialogOpen(false);
     await startClarification(selectedModel, customPrompt || undefined);
   };
+
+  // Estimate input tokens for the cost confirmation dialog
+  const estimatedInputTokens = selectedModel
+    ? estimateInputTokens(featureRequest.rawRequest ?? '', customPrompt || undefined, selectedModel)
+    : 0;
 
   const handleSaveAndContinue = async () => {
     await saveAnswers();
@@ -95,13 +115,26 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
               <label className={'mb-1.5 block text-sm font-medium'}>AI Model</label>
               <ModelSelector isDisabled={isLoading} onValueChange={setSelectedModel} value={selectedModel} />
             </div>
-            <Button disabled={!selectedModel || isLoading} onClick={handleStartClarification}>
+            <Button disabled={!selectedModel || isLoading} onClick={handleAnalyzeRequestClick}>
               Analyze Request
             </Button>
           </div>
 
           <AdvancedSettings customPrompt={customPrompt} onCustomPromptChange={setCustomPrompt} />
         </div>
+      )}
+
+      {/* Cost confirmation dialog */}
+      {selectedModel && (
+        <CostConfirmationDialog
+          estimatedInputTokens={estimatedInputTokens}
+          isLoading={isLoading}
+          isOpen={isConfirmDialogOpen}
+          modelId={selectedModel}
+          onClose={handleConfirmDialogClose}
+          onConfirm={handleConfirmAnalysis}
+          operationType={'Clarification Analysis'}
+        />
       )}
 
       {/* Analyzing state: Show streaming text */}
@@ -130,6 +163,18 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
               Cancel
             </Button>
           </div>
+
+          {/* Usage Footer */}
+          {usageData && (
+            <UsageFooter
+              costUsd={usageData.estimatedCostUsd}
+              durationMs={usageData.durationMs}
+              inputTokens={usageData.inputTokens}
+              outputTokens={usageData.outputTokens}
+              totalTokens={usageData.totalTokens}
+              variant={'compact'}
+            />
+          )}
         </div>
       )}
 
@@ -159,6 +204,18 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
               Ask Questions Anyway
             </Button>
           </div>
+
+          {/* Usage Footer */}
+          {usageData && (
+            <UsageFooter
+              costUsd={usageData.estimatedCostUsd}
+              durationMs={usageData.durationMs}
+              inputTokens={usageData.inputTokens}
+              outputTokens={usageData.outputTokens}
+              totalTokens={usageData.totalTokens}
+              variant={'compact'}
+            />
+          )}
         </div>
       )}
 
@@ -178,6 +235,18 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
           <Button onClick={resetClarification} variant={'outline'}>
             Re-run Clarification
           </Button>
+
+          {/* Usage Footer */}
+          {usageData && (
+            <UsageFooter
+              costUsd={usageData.estimatedCostUsd}
+              durationMs={usageData.durationMs}
+              inputTokens={usageData.inputTokens}
+              outputTokens={usageData.outputTokens}
+              totalTokens={usageData.totalTokens}
+              variant={'compact'}
+            />
+          )}
         </div>
       )}
     </div>

@@ -25,6 +25,12 @@ export const IpcChannels = {
     getVersion: 'app:getVersion',
   },
   db: {
+    aiUsageLogs: {
+      create: 'db:aiUsageLogs:create',
+      delete: 'db:aiUsageLogs:delete',
+      getByProjectId: 'db:aiUsageLogs:getByProjectId',
+      getTotalsByProjectId: 'db:aiUsageLogs:getTotalsByProjectId',
+    },
     featureRequestRepositories: {
       addToFeatureRequest: 'db:featureRequestRepositories:addToFeatureRequest',
       getByFeatureRequestId: 'db:featureRequestRepositories:getByFeatureRequestId',

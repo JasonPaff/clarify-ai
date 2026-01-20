@@ -1,14 +1,17 @@
 import type { BrowserWindow } from 'electron';
 
-import type { DrizzleDatabase } from '../../db';
+import type { DrizzleDatabase } from '@/db';
 
-import { createFeatureRequestRepositoriesRepository } from '../../db/repositories/feature-request-repositories.repository';
-import { createFeatureRequestsRepository } from '../../db/repositories/feature-requests.repository';
-import { createProjectsRepository } from '../../db/repositories/projects.repository';
-import { createRepositoriesRepository } from '../../db/repositories/repositories.repository';
-import { createRepositoryOverviewsRepository } from '../../db/repositories/repository-overviews.repository';
+import { createAiUsageLogsRepository } from '@/db/repositories/ai-usage-logs.repository';
+import { createFeatureRequestRepositoriesRepository } from '@/db/repositories/feature-request-repositories.repository';
+import { createFeatureRequestsRepository } from '@/db/repositories/feature-requests.repository';
+import { createProjectsRepository } from '@/db/repositories/projects.repository';
+import { createRepositoriesRepository } from '@/db/repositories/repositories.repository';
+import { createRepositoryOverviewsRepository } from '@/db/repositories/repository-overviews.repository';
+
 import { registerAiClarificationHandlers } from './ai-clarification.handlers';
 import { registerAiOverviewHandlers } from './ai-overview.handlers';
+import { registerAiUsageLogsHandlers } from './ai-usage-logs.handlers';
 import { registerApiKeysHandlers } from './api-keys.handlers';
 import { registerAppHandlers } from './app.handlers';
 import { registerDialogHandlers } from './dialog.handlers';
@@ -37,11 +40,14 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // API keys handlers (encryption via safeStorage)
   registerApiKeysHandlers();
 
-  // AI clarification handlers (need window reference for streaming)
-  registerAiClarificationHandlers(getMainWindow);
+  // Database handlers - AI Usage Logs (created early since AI handlers need it)
+  const aiUsageLogsRepository = createAiUsageLogsRepository(db);
 
-  // AI overview handlers (need window reference for streaming)
-  registerAiOverviewHandlers(getMainWindow);
+  // AI clarification handlers (need window reference for streaming and usage logging)
+  registerAiClarificationHandlers(getMainWindow, aiUsageLogsRepository);
+
+  // AI overview handlers (need window reference for streaming and usage logging)
+  registerAiOverviewHandlers(getMainWindow, aiUsageLogsRepository);
 
   // OpenRouter models handlers (caching via electron-store)
   registerOpenRouterModelsHandlers();
@@ -65,4 +71,7 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
   // Database handlers - Repository Overviews
   const repositoryOverviewsRepository = createRepositoryOverviewsRepository(db);
   registerRepositoryOverviewsHandlers(repositoryOverviewsRepository);
+
+  // Database handlers - AI Usage Logs (repository already created above)
+  registerAiUsageLogsHandlers(aiUsageLogsRepository);
 }

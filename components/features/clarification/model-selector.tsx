@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
+import type { CostTier, ModelPricing } from '@/lib/ai/pricing';
 import type { ApiKeyProvider } from '@/types/electron';
 
 import {
@@ -19,13 +20,16 @@ import {
   ComboboxRoot,
   ComboboxTrigger,
 } from '@/components/ui/combobox';
+import { Tooltip } from '@/components/ui/tooltip';
 import { useAvailableModels } from '@/hooks/use-available-models';
 import { PROVIDER_NAMES } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
 
 interface ModelOption {
+  costTier: CostTier;
   group: string;
   label: string;
+  pricing: ModelPricing | null;
   value: string;
 }
 
@@ -33,6 +37,49 @@ type ModelSelectorProps = ClassName & {
   isDisabled?: boolean;
   onValueChange: (value: FullModelId) => void;
   value: FullModelId | null;
+};
+
+/**
+ * Returns Tailwind classes for the cost tier indicator color
+ */
+const getCostTierColorClass = (tier: CostTier): string => {
+  switch (tier) {
+    case '$':
+      return 'text-green-600 dark:text-green-400';
+    case '$$':
+      return 'text-yellow-600 dark:text-yellow-400';
+    case '$$$':
+      return 'text-red-600 dark:text-red-400';
+  }
+};
+
+interface CostTierIndicatorProps {
+  costTier: CostTier;
+  pricing: ModelPricing | null;
+}
+
+/**
+ * Displays a cost tier indicator with pricing tooltip
+ */
+const CostTierIndicator = ({ costTier, pricing }: CostTierIndicatorProps) => {
+  const tooltipContent = (
+    <div className={'flex flex-col gap-0.5 text-left'}>
+      {pricing ? (
+        <Fragment>
+          <span>Input: ${pricing.inputCostPer1k.toFixed(4)} / 1K tokens</span>
+          <span>Output: ${pricing.outputCostPer1k.toFixed(4)} / 1K tokens</span>
+        </Fragment>
+      ) : (
+        <span>Pricing unavailable</span>
+      )}
+    </div>
+  );
+
+  return (
+    <Tooltip content={tooltipContent} side={'right'}>
+      <span className={cn('ml-1.5 text-xs font-semibold', getCostTierColorClass(costTier))}>{costTier}</span>
+    </Tooltip>
+  );
 };
 
 /**
@@ -67,8 +114,10 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
         const groupLabel = PROVIDER_NAMES[provider];
         for (const model of models) {
           options.push({
+            costTier: model.costTier,
             group: groupLabel,
             label: model.name,
+            pricing: model.pricing,
             value: model.fullId,
           });
         }
@@ -102,13 +151,19 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
 
   // Filter options based on input
   const filteredOptions = useMemo(() => {
+    // If no input value, show all options
     if (!inputValue) return allOptions;
+
+    // If input matches the selected option's label exactly, show all options
+    // This handles the case where combobox reopens and shows selected value
+    if (selectedOption && inputValue === selectedOption.label) return allOptions;
+
     const lowercaseInput = inputValue.toLowerCase();
     return allOptions.filter(
       (option) =>
         option.label.toLowerCase().includes(lowercaseInput) || option.group.toLowerCase().includes(lowercaseInput)
     );
-  }, [allOptions, inputValue]);
+  }, [allOptions, inputValue, selectedOption]);
 
   // Get filtered groups (only show groups that have matching options)
   const filteredGroups = useMemo(() => {
@@ -124,7 +179,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
   return (
     <ComboboxRoot<ModelOption>
       disabled={isDisabled || isLoading || hasNoProviders}
-      items={filteredOptions}
+      items={allOptions}
       onInputValueChange={handleInputValueChange}
       onValueChange={handleValueChange}
       value={selectedOption}
@@ -149,7 +204,10 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
                     .map((option) => (
                       <ComboboxItem key={option.value} value={option}>
                         <ComboboxItemIndicator />
-                        <span className={'col-start-2'}>{option.label}</span>
+                        <span className={'col-start-2 flex items-center'}>
+                          {option.label}
+                          <CostTierIndicator costTier={option.costTier} pricing={option.pricing} />
+                        </span>
                       </ComboboxItem>
                     ))}
                 </ComboboxGroup>

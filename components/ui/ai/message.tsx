@@ -1,16 +1,59 @@
 'use client';
 
 import type { FileUIPart, UIMessage } from 'ai';
-import type { ComponentProps, HTMLAttributes, ReactElement } from 'react';
+import type { ComponentProps, ComponentPropsWithRef, HTMLAttributes, ReactElement, ReactNode } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon, PaperclipIcon, XIcon } from 'lucide-react';
-import { createContext, Fragment, memo, useContext, useEffect, useMemo, useState } from 'react';
+import { Children, createContext, Fragment, isValidElement, memo, useContext, useEffect, useMemo, useState } from 'react';
 import { Streamdown } from 'streamdown';
 
 import { Button } from '@/components/ui/button';
 import { ButtonGroup, ButtonGroupText } from '@/components/ui/button-group';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+
+type SafeParagraphProps = ComponentPropsWithRef<'p'>;
+
+/**
+ * Check if any children contain block-level elements that cannot be inside <p>
+ */
+function hasBlockChildren(children: ReactNode): boolean {
+  return Children.toArray(children).some((child) => {
+    if (!isValidElement(child)) return false;
+    const type = child.type;
+    if (typeof type === 'string') {
+      const blockElements = ['div', 'pre', 'ul', 'ol', 'table', 'blockquote', 'figure', 'hr', 'form', 'fieldset'];
+      return blockElements.includes(type);
+    }
+    const props = child.props as Record<string, unknown> | undefined;
+    if (props) {
+      const dataStreamdown = props['data-streamdown'];
+      if (
+        typeof dataStreamdown === 'string' &&
+        (dataStreamdown.includes('code-block') || dataStreamdown.includes('list'))
+      ) {
+        return true;
+      }
+      if (props.children) {
+        return hasBlockChildren(props.children as ReactNode);
+      }
+    }
+    return false;
+  });
+}
+
+/**
+ * Custom paragraph component that uses <div> when children contain block-level elements.
+ */
+function SafeParagraph({ children, ...props }: SafeParagraphProps) {
+  const useDiv = hasBlockChildren(children);
+  if (useDiv) {
+    return <div {...props}>{children}</div>;
+  }
+  return <p {...props}>{children}</p>;
+}
+
+const streamdownComponents = { p: SafeParagraph };
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage['role'];
@@ -236,7 +279,11 @@ export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
 export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
-    <Streamdown className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)} {...props} />
+    <Streamdown
+      className={cn('size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0', className)}
+      components={streamdownComponents}
+      {...props}
+    />
   ),
   (prevProps, nextProps) => prevProps.children === nextProps.children
 );

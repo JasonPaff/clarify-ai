@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import type { AiUsageLogTotals } from '@/db/repositories/ai-usage-logs.repository';
+import type { AiUsageLog, NewAiUsageLog } from '@/db/schema/ai-usage-logs.schema';
 import type { FeatureRequest, NewFeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { NewProject, Project } from '@/db/schema/projects.schema';
 import type { NewRepository, Repository } from '@/db/schema/repositories.schema';
@@ -46,6 +48,12 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    aiUsageLogs: {
+      create(data: NewAiUsageLog): Promise<AiUsageLog>;
+      delete(projectId: number): Promise<void>;
+      getByProjectId(projectId: number): Promise<Array<AiUsageLog>>;
+      getTotalsByProjectId(projectId: number): Promise<AiUsageLogTotals | null>;
+    };
     featureRequestRepositories: {
       addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
       getByFeatureRequestId(featureRequestId: number): Promise<Array<number>>;
@@ -176,6 +184,13 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
+    aiUsageLogs: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.aiUsageLogs.create, data),
+      delete: (projectId) => ipcRenderer.invoke(IpcChannels.db.aiUsageLogs.delete, projectId),
+      getByProjectId: (projectId) => ipcRenderer.invoke(IpcChannels.db.aiUsageLogs.getByProjectId, projectId),
+      getTotalsByProjectId: (projectId) =>
+        ipcRenderer.invoke(IpcChannels.db.aiUsageLogs.getTotalsByProjectId, projectId),
+    },
     featureRequestRepositories: {
       addToFeatureRequest: (featureRequestId, repositoryId) =>
         ipcRenderer.invoke(

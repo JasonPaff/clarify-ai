@@ -7,9 +7,12 @@ import type { ApiKeyProvider } from '@/types/electron';
 import { useApiKeys } from '@/hooks/queries/use-api-keys';
 import { useOpenRouterModels } from '@/hooks/queries/use-openrouter-models';
 import { AI_MODELS, type AIModel, createModelId, type FullModelId } from '@/lib/ai/models';
+import { type CostTier, getCostTier, getPricing, type ModelPricing } from '@/lib/ai/pricing';
 
 export interface AvailableModel extends AIModel {
+  costTier: CostTier;
   fullId: FullModelId;
+  pricing: ModelPricing | null;
   provider: ApiKeyProvider;
 }
 
@@ -46,9 +49,11 @@ export function useAvailableModels(): UseAvailableModelsResult {
           for (const model of dynamicModels) {
             result.push({
               contextLength: model.contextLength,
+              costTier: getCostTier(model.id),
               fullId: createModelId(provider, model.id),
               id: model.id,
               name: model.name,
+              pricing: getPricing(model.id),
               provider,
               supportsThinking: model.supportsThinking,
             });
@@ -63,7 +68,9 @@ export function useAvailableModels(): UseAvailableModelsResult {
         for (const model of providerModels) {
           result.push({
             ...model,
+            costTier: getCostTier(model.id),
             fullId: createModelId(provider, model.id),
+            pricing: getPricing(model.id),
             provider,
           });
         }

@@ -7,6 +7,7 @@ import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
+import { CostConfirmationDialog } from '@/components/ui/ai/cost-confirmation-dialog';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { UsageFooter } from '@/components/ui/ai/usage-footer';
@@ -19,11 +20,25 @@ import { cn } from '@/lib/utils';
 
 import { ModelSelector } from '../features/clarification/model-selector';
 
+/**
+ * Estimated input tokens for repository overview generation.
+ * This is a conservative estimate based on typical repository sizes:
+ * - Base prompt template: ~300 tokens
+ * - File tree: ~2,000-8,000 tokens
+ * - Package.json: ~500-2,000 tokens
+ * - README: ~500-3,000 tokens
+ * - Config files: ~500-2,000 tokens
+ *
+ * Using 12,000 as a reasonable middle-ground estimate.
+ */
+const ESTIMATED_INPUT_TOKENS = 12000;
+
 type GenerationStatus = 'complete' | 'error' | 'generating' | 'idle' | 'stopped';
 
 type RepositoryOverviewGeneratorProps = ClassName & {
   onCancel: () => void;
   onSave: (data: SaveData) => void;
+  projectId: number;
   repositoryId: number;
   repositoryPath: string;
 };
@@ -42,12 +57,14 @@ export const RepositoryOverviewGenerator = ({
   className,
   onCancel,
   onSave,
+  projectId,
   repositoryId,
   repositoryPath,
 }: RepositoryOverviewGeneratorProps) => {
   const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isCustomPromptOpen, setIsCustomPromptOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [streamingContent, setStreamingContent] = useState('');
   const [reasoningContent, setReasoningContent] = useState('');
@@ -104,9 +121,19 @@ export const RepositoryOverviewGenerator = ({
     };
   }, [cancel]);
 
-  const handleGenerate = async () => {
+  const handleGenerateClick = () => {
+    if (!selectedModel) return;
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleConfirmDialogClose = () => {
+    setIsConfirmDialogOpen(false);
+  };
+
+  const handleConfirmGenerate = async () => {
     if (!selectedModel) return;
 
+    setIsConfirmDialogOpen(false);
     setStatus('generating');
     setStreamingContent('');
     setReasoningContent('');
@@ -116,6 +143,7 @@ export const RepositoryOverviewGenerator = ({
     const result = await generate({
       customPrompt: customPrompt || undefined,
       modelId: selectedModel,
+      projectId,
       repositoryId,
       repositoryPath,
     });
@@ -277,6 +305,8 @@ export const RepositoryOverviewGenerator = ({
       {/* Token Usage Display */}
       {isFinishedState && usageData && (
         <UsageFooter
+          costUsd={usageData.estimatedCostUsd}
+          durationMs={usageData.durationMs}
           inputTokens={usageData.inputTokens}
           outputTokens={usageData.outputTokens}
           reasoningTokens={usageData.reasoningTokens}
@@ -291,7 +321,7 @@ export const RepositoryOverviewGenerator = ({
             <Button onClick={onCancel} variant={'outline'}>
               Cancel
             </Button>
-            <Button disabled={!selectedModel} onClick={handleGenerate}>
+            <Button disabled={!selectedModel} onClick={handleGenerateClick}>
               Generate
             </Button>
           </Fragment>
@@ -327,6 +357,18 @@ export const RepositoryOverviewGenerator = ({
           </Fragment>
         )}
       </div>
+
+      {/* Cost Confirmation Dialog */}
+      {selectedModel && (
+        <CostConfirmationDialog
+          estimatedInputTokens={ESTIMATED_INPUT_TOKENS}
+          isOpen={isConfirmDialogOpen}
+          modelId={selectedModel}
+          onClose={handleConfirmDialogClose}
+          onConfirm={handleConfirmGenerate}
+          operationType={'Repository Overview Generation'}
+        />
+      )}
     </div>
   );
 };

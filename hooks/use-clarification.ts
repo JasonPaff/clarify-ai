@@ -10,7 +10,7 @@ import type {
   ClarificationQuestion,
   ClarificationStatus,
 } from '@/lib/validations/clarification';
-import type { ClarificationStreamChunk } from '@/types/electron';
+import type { ClarificationStreamChunk, ClarificationUsageData } from '@/types/electron';
 
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import {
@@ -42,6 +42,7 @@ interface UseClarificationResult {
   startClarification: (modelId: FullModelId, customPrompt?: string) => Promise<void>;
   status: ClarificationStatus;
   streamingText: string;
+  usageData: ClarificationUsageData | null;
 }
 
 /**
@@ -71,6 +72,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
   const [streamingText, setStreamingText] = useState('');
   const [error, setError] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [usageData, setUsageData] = useState<ClarificationUsageData | null>(null);
 
   // Reset state when feature request changes (synchronous check during render)
   // This is the recommended React pattern for resetting state on prop changes
@@ -83,6 +85,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     setStreamingText('');
     setError(null);
     setIsLoading(false);
+    setUsageData(null);
   }
 
   // Stream handler reference for cleanup
@@ -103,6 +106,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
       setIsLoading(true);
       setQuestions([]);
       setAnalysis(null);
+      setUsageData(null);
 
       // Set up stream listener
       unsubscribeRef.current = api.ai.clarification.onStream((chunk: ClarificationStreamChunk) => {
@@ -115,6 +119,10 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
 
           case 'finish':
             setIsLoading(false);
+            // Capture usage data from finish chunk
+            if (chunk.usage) {
+              setUsageData(chunk.usage);
+            }
             break;
 
           case 'text':
@@ -172,6 +180,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
         featureRequest: featureRequest.rawRequest ?? '',
         featureRequestId: featureRequest.id,
         modelId,
+        projectId: featureRequest.projectId,
       });
 
       // Clean up listener
@@ -247,6 +256,7 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     setStreamingText('');
     setError(null);
     setIsLoading(false);
+    setUsageData(null);
   }, []);
 
   // Clean up on unmount
@@ -271,5 +281,6 @@ export function useClarification({ featureRequest }: UseClarificationOptions): U
     startClarification,
     status,
     streamingText,
+    usageData,
   };
 }

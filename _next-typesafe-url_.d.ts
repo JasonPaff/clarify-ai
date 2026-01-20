@@ -14,6 +14,7 @@ declare module "@@@next-typesafe-url" {
     "/projects/[projectId]/features/[featureId]": InferRoute<import("./app/(app)/projects/[projectId]/features/[featureId]/route-type").RouteType>;
     "/projects/[projectId]/repositories": InferRoute<import("./app/(app)/projects/[projectId]/repositories/route-type").RouteType>;
     "/projects/[projectId]/settings": InferRoute<import("./app/(app)/projects/[projectId]/settings/route-type").RouteType>;
+    "/projects/[projectId]/usage": InferRoute<import("./app/(app)/projects/[projectId]/usage/route-type").RouteType>;
   }
 
   interface StaticRouter {
