@@ -1,7 +1,8 @@
 'use client';
 
-import { FolderOpen, Plus } from 'lucide-react';
+import { AlertCircle, FolderOpen, Plus } from 'lucide-react';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   useAddContextFile,
@@ -33,6 +34,9 @@ export const ContextFilePicker = ({ className, featureRequestId }: ContextFilePi
   const isAddingFile = addContextFileMutation.isPending;
   const isRemovingFile = removeContextFileMutation.isPending;
   const isDisabled = isAddingFile || isRemovingFile;
+  const hasAddError = addContextFileMutation.isError;
+  const hasRemoveError = removeContextFileMutation.isError;
+  const hasMutationError = hasAddError || hasRemoveError;
 
   const handleAddFileClick = async () => {
     const filePath = await openFile();
@@ -81,6 +85,18 @@ export const ContextFilePicker = ({ className, featureRequestId }: ContextFilePi
           Add File
         </Button>
       </div>
+
+      {/* Mutation Error Alert */}
+      {hasMutationError && (
+        <Alert variant={'destructive'}>
+          <AlertCircle className={'size-4'} />
+          <AlertDescription>
+            {hasAddError && 'Failed to add file. '}
+            {hasRemoveError && 'Failed to remove file. '}
+            Please try again.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* File List */}
       {isLoading ? (

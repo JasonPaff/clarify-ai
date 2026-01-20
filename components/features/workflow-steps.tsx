@@ -16,8 +16,8 @@ interface Step {
 export const WORKFLOW_STEPS: Array<Step> = [
   {
     description: 'Describe your feature idea',
-    id: 'entry',
-    title: 'Entry',
+    id: 'describe',
+    title: 'Describe',
   },
   {
     description: 'Clarify and expand requirements',

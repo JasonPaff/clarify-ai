@@ -12,7 +12,7 @@ import { use, useState } from 'react';
 import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
-import { EntryStep } from '@/components/features/entry-step';
+import { DescribeStep } from '@/components/features/describe-step';
 import { ResearchStep } from '@/components/features/research-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
@@ -24,7 +24,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { useFeatureRequest } from '@/hooks/queries/use-feature-requests';
 
 type FeatureWorkflowPageProps = PageProps;
-const STEP_ORDER = ['entry', 'refine', 'research', 'plan'] as const;
+const STEP_ORDER = ['describe', 'refine', 'research', 'plan'] as const;
 
 type FeatureRequestStatus = 'completed' | 'draft' | 'planning' | 'refining' | 'researching';
 
@@ -51,7 +51,7 @@ export default withParamValidation(FeatureWorkflowPage, Route);
 function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   const { featureId, projectId } = use(routeParams);
 
-  const [currentStep, setCurrentStep] = useState<StepId>('entry');
+  const [currentStep, setCurrentStep] = useState<StepId>('describe');
 
   const { data: featureRequest, error, isLoading } = useFeatureRequest(featureId);
 
@@ -106,9 +106,9 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   };
 
   const stepContent: Record<StepId, { description: string; icon: ReactNode; title: string }> = {
-    entry: {
+    describe: {
       description:
-        'Describe your feature idea in plain language. Be as detailed or brief as you like - the AI will help refine it.',
+        'Describe your feature idea, select target repositories, and configure context files to include in the planning process.',
       icon: <Lightbulb className={'size-6'} />,
       title: 'Describe Your Feature',
     },
@@ -178,8 +178,8 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {currentStep === 'entry' ? (
-            <EntryStep featureRequest={featureRequest} />
+          {currentStep === 'describe' ? (
+            <DescribeStep featureRequest={featureRequest} projectId={projectId} />
           ) : currentStep === 'research' ? (
             <ResearchStep featureRequestId={featureId} projectId={projectId} />
           ) : (

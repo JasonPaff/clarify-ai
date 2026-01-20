@@ -158,6 +158,57 @@ export function useRepositoryOverviewStatuses(repositoryIds: Array<number>) {
   };
 }
 
+/**
+ * Hook to calculate estimated token count from repository overviews.
+ * Uses the content length of each overview to estimate tokens.
+ *
+ * @param repositoryIds - Array of repository IDs to calculate tokens for
+ * @returns Total estimated tokens from all repository overviews
+ */
+export function useRepositoryOverviewTokens(repositoryIds: Array<number>) {
+  const { isElectron, repositoryOverviews } = useElectronDb();
+
+  // Create stable query options for each repository
+  const queries = useQueries({
+    combine: (results) => ({
+      data: results.map((result, index) => ({
+        content: result.data?.content ?? result.data?.manualContent ?? null,
+        repositoryId: repositoryIds[index],
+      })),
+      isError: results.some((result) => result.isError),
+      isPending: results.some((result) => result.isPending),
+    }),
+    queries: repositoryIds.map((repositoryId) => ({
+      ...repositoryOverviewKeys.byRepositoryId(repositoryId),
+      enabled: isElectron && repositoryId > 0,
+      queryFn: async () => {
+        const result = await repositoryOverviews.getByRepositoryId(repositoryId);
+        return result ?? null;
+      },
+    })),
+  });
+
+  // Calculate total tokens from all overview content
+  const totalTokens = useMemo(() => {
+    let tokens = 0;
+
+    for (const { content } of queries.data) {
+      if (content) {
+        // Use chars/4 heuristic for token estimation
+        tokens += Math.ceil(content.length / 4);
+      }
+    }
+
+    return tokens;
+  }, [queries.data]);
+
+  return {
+    isError: queries.isError,
+    isPending: queries.isPending,
+    totalTokens,
+  };
+}
+
 export function useUpdateRepositoryOverview() {
   const queryClient = useQueryClient();
   const { repositoryOverviews } = useElectronDb();

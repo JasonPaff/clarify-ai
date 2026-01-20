@@ -14,6 +14,14 @@ export const requiredRepositoryIdsSchema = z
 
 export type RequiredRepositoryIds = z.infer<typeof requiredRepositoryIdsSchema>;
 
+// Form schema for repository selection - wraps the optional IDs in an object for TanStack Form
+// Used when only repository selection is needed (e.g., current DescribeStep implementation)
+export const repositorySelectionFormSchema = z.object({
+  repositoryIds: repositoryIdsSchema,
+});
+
+export type RepositorySelectionFormValues = z.infer<typeof repositorySelectionFormSchema>;
+
 // Form schema for research step - wraps the required IDs in an object for TanStack Form
 export const researchStepFormSchema = z.object({
   repositoryIds: requiredRepositoryIdsSchema,

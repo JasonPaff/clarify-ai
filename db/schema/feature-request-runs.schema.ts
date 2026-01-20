@@ -14,11 +14,12 @@ export type FeatureRequestRunStatus = 'completed' | 'failed' | 'pending' | 'runn
 
 /**
  * Feature request run step values:
+ * - 'describe': The feature description step (initial user input processing)
  * - 'refine': The refinement/clarification step
  * - 'research': The file discovery/research step
  * - 'plan': The implementation planning step
  */
-export type FeatureRequestRunStep = 'plan' | 'refine' | 'research';
+export type FeatureRequestRunStep = 'describe' | 'plan' | 'refine' | 'research';
 
 export const featureRequestRuns = sqliteTable(
   'feature_request_runs',

@@ -5,11 +5,12 @@ import { featureRequests } from './feature-requests.schema';
 
 /**
  * Step configuration step values for the orchestration workflow:
+ * - 'describe': Feature description step (initial user input processing)
  * - 'refine': Feature refinement step
  * - 'research': File discovery/research step
  * - 'plan': Implementation planning step
  */
-export type StepConfigurationStep = 'plan' | 'refine' | 'research';
+export type StepConfigurationStep = 'describe' | 'plan' | 'refine' | 'research';
 
 export const stepConfigurations = sqliteTable(
   'step_configurations',

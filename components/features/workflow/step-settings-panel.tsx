@@ -125,6 +125,8 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
 
   const stepLabel = useMemo(() => {
     switch (step) {
+      case 'describe':
+        return 'Describe';
       case 'plan':
         return 'Plan';
       case 'refine':
