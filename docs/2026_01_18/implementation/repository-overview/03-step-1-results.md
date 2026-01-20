@@ -11,17 +11,21 @@ The schema was already implemented. The database-schema agent verified all conve
 **Status**: success
 
 **Files Created**:
+
 - `db/schema/repository-overviews.schema.ts` - Database schema for repository_overviews table (already existed)
 
 **Migration Generated**:
+
 - `drizzle/0004_sweet_madame_web.sql` - Contains repository_overviews table creation (already exists)
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 - ✅ pnpm db:generate: PASS (no changes needed)
 
 **Success Criteria**:
+
 - [✓] Schema file created with proper Drizzle ORM syntax
 - [✓] All required fields defined with correct types
 - [✓] Index created on repositoryId for query performance
@@ -34,6 +38,7 @@ The schema was already implemented. The database-schema agent verified all conve
 **Table**: `repository_overviews`
 
 **Columns**:
+
 - id (integer, primary key, auto-increment)
 - repositoryId (integer, foreign key to repositories.id, unique, cascade delete)
 - content (text, not null) - AI-generated overview content
@@ -46,9 +51,11 @@ The schema was already implemented. The database-schema agent verified all conve
 - updatedAt (timestamp, auto-generated)
 
 **Indexes**:
+
 - repository_overviews_repository_id_idx (on repositoryId)
 
 **Types Exported**:
+
 - `NewRepositoryOverview` (insert type)
 - `RepositoryOverview` (select type)
 

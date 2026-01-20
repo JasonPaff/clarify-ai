@@ -15,6 +15,7 @@
 ## File Discovery Results
 
 ### Critical Priority Files
+
 - `electron/ipc/repository-overviews.handlers.ts` - Add import handler
 - `electron/ipc/channels.ts` - Add IPC channel constant
 - `db/repositories/repository-overviews.repository.ts` - Upsert method for persistence
@@ -23,6 +24,7 @@
 - `components/repositories/import-repository-overview-dialog.tsx` - **NEW FILE** Main import dialog
 
 ### High Priority Files (Integration)
+
 - `components/repositories/repository-card.tsx` - Add import button
 - `components/repositories/repository-overview-viewer.tsx` - Show import indicator
 - `electron/ipc/dialog.handlers.ts` - File selection with .md filter
@@ -32,6 +34,7 @@
 - `electron/preload.ts` - Context bridge
 
 ### Supporting Files
+
 - Form infrastructure: `lib/forms/form-hook.ts`, `components/ui/form/textarea-field.tsx`
 - UI components: `components/ui/dialog.tsx`, `components/ui/button.tsx`, `components/ui/radio-group.tsx`, `components/ui/badge.tsx`, `components/ui/alert.tsx`
 - Schema: `db/schema/repository-overviews.schema.ts`
@@ -63,17 +66,21 @@ This feature adds the ability to import pre-existing overview content from exter
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/channels.ts` - Add `'electron:importRepositoryOverview'` channel constant
 
 **Changes:**
+
 - Add new channel constant to the channels object: `'electron:importRepositoryOverview'`
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New channel constant added to channels object
 - [ ] All validation commands pass
 
@@ -86,21 +93,25 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `electron/ipc/repository-overviews.handlers.ts` - Add import handler function
 - `electron/ipc/register-handlers.ts` - Register the new import handler
 
 **Changes:**
+
 - Add handler function that accepts `repositoryId` and `content` parameters
 - Validate input parameters (non-empty content, valid repository ID)
 - Use repository overview repository's upsert method with `modelId: 'imported'` and current timestamp
 - Register handler in the handler registration function
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Handler validates input parameters before processing
 - [ ] Handler uses repository upsert method correctly
 - [ ] Handler is registered in register-handlers.ts
@@ -115,19 +126,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `types/electron.ts` - Add `importRepositoryOverview` method signature
 - `electron/preload.ts` - Expose import method through contextBridge
 
 **Changes:**
+
 - Add method signature: `importRepositoryOverview(repositoryId: number, content: string): Promise<void>`
 - Expose method in preload script using `ipcRenderer.invoke` with the new channel
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Type definition matches handler signature
 - [ ] Preload script exposes method correctly
 - [ ] All validation commands pass
@@ -141,19 +156,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/queries/use-repository-overviews.ts` - Add `useImportRepositoryOverview` mutation hook
 
 **Changes:**
+
 - Create mutation hook that calls `electronDb.importRepositoryOverview`
 - Invalidate `repositoryOverviews.detail` and `repositoryOverviews.list` query keys on success
 - Include proper error handling with type-safe error messages
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Mutation hook properly invalidates cache on success
 - [ ] Hook uses `useElectronDb()` for IPC calls
 - [ ] Error handling is implemented
@@ -168,20 +187,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/repositories/import-confirmation-dialog.tsx` - Confirmation dialog component
 
 **Changes:**
+
 - Create dialog component using Base UI Dialog primitives
 - Accept props: `isOpen`, `onConfirm`, `onCancel`
 - Display warning message about overwriting existing content
 - Style with CVA variants for consistency
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog uses Base UI primitives correctly
 - [ ] Warning message clearly communicates data loss risk
 - [ ] Component follows CVA styling patterns
@@ -196,9 +219,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `components/repositories/import-repository-overview-dialog.tsx` - Main import dialog
 
 **Changes:**
+
 - Create dialog component using Base UI Dialog primitives
 - Use TanStack Form with `useAppForm` hook for state management
 - Add radio group to select input method (file upload vs paste)
@@ -209,11 +234,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Handle loading and error states
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form uses `useAppForm` hook correctly
 - [ ] Radio group switches between input methods
 - [ ] File dialog integration works with Markdown filter
@@ -230,9 +257,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `components/repositories/import-repository-overview-dialog.tsx` - Add confirmation flow logic
 
 **Changes:**
+
 - Query for existing overview using `useRepositoryOverview` hook
 - On form submit, check if overview exists
 - If exists, show confirmation dialog component
@@ -241,11 +270,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Display success/error feedback
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Existing overview check works correctly
 - [ ] Confirmation dialog appears only when overview exists
 - [ ] Import proceeds after confirmation
@@ -261,9 +292,11 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `app/(app)/projects/[projectId]/repositories/[repositoryId]/page.tsx` - Add import button and dialog
 
 **Changes:**
+
 - Add "Import Overview" button near existing "Generate Overview" functionality
 - Add state management for dialog open/close
 - Include ImportRepositoryOverviewDialog component
@@ -271,11 +304,13 @@ pnpm run lint:fix && pnpm run typecheck
 - Ensure button is appropriately disabled during loading states
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Import button is visible and accessible
 - [ ] Dialog opens/closes correctly
 - [ ] Repository ID is passed to dialog
@@ -291,20 +326,24 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/repositories/repository-overview-viewer.tsx` - Update badge rendering logic
 - `components/repositories/repository-card.tsx` - Update badge rendering if overview info shown
 
 **Changes:**
+
 - Add conditional logic to check if `modelId === 'imported'`
 - Display "Imported" badge variant for imported overviews
 - Maintain existing badge display for AI-generated overviews
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Badge displays "Imported" when modelId is 'imported'
 - [ ] Existing AI model badges continue to work
 - [ ] Badge styling is consistent with existing patterns
@@ -319,19 +358,23 @@ pnpm run lint:fix && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/validations/import-repository-overview.ts` - Zod schema for import form
 
 **Changes:**
+
 - Create schema with fields: `inputMethod` (enum: 'file' or 'paste'), `content` (string, min 1 char)
 - Export schema and infer TypeScript type
 - Add validation error messages
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema validates input method selection
 - [ ] Schema validates non-empty content
 - [ ] Type is properly inferred from schema
@@ -355,15 +398,18 @@ pnpm run lint:fix && pnpm run typecheck
 ## Notes
 
 **Assumptions:**
+
 - The existing `electron:selectFile` IPC channel in `dialog.handlers.ts` supports file type filtering
 - The repository overview repository's upsert method correctly handles the `'imported'` modelId value
 - The existing dialog components support nested dialogs (main import dialog + confirmation dialog)
 
 **Risks:**
+
 - **Medium Risk**: Dialog UX with two nested dialogs (import + confirmation) may feel clunky; consider alternative flows if user testing shows confusion
 - **Low Risk**: File reading implementation not explicitly mentioned in file discovery; may need to add file content reading logic in the IPC handler
 
 **Technical Considerations:**
+
 - The `'imported'` string literal for `modelId` should be added as a constant to avoid magic strings
 - Consider adding a character limit validation for pasted content to prevent performance issues with extremely large files
 - The import operation should be atomic (all-or-nothing) to prevent partial data corruption

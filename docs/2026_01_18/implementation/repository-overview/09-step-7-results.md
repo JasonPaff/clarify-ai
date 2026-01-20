@@ -9,13 +9,16 @@
 **Status**: success
 
 **Files Created**:
+
 - `lib/ai/prompts/repository-overview.ts` - Prompt template with variable substitution
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 
 **Success Criteria**:
+
 - [✓] Prompt template file created
 - [✓] Default prompt follows design document structure (7 sections)
 - [✓] Template variable substitution function implemented
@@ -28,6 +31,7 @@
 ## Template Structure
 
 **Seven Sections**:
+
 1. Project Overview (2-3 sentences)
 2. Purpose (4-5 bullet points)
 3. Tech Stack (categorized packages with versions)
@@ -56,6 +60,7 @@
 ## Graceful Degradation
 
 Missing files show user-friendly messages:
+
 - "No package.json found"
 - "No TypeScript config found"
 - "No README found"

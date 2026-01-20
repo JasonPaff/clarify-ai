@@ -7,11 +7,13 @@
 ## Summary
 
 ### Database Layer (Steps 1-3) ✅
+
 - Created `ai_usage_logs` schema with all required fields
 - Generated migration `0006_furry_toro.sql`
 - Created repository with CRUD and aggregation methods
 
 ### IPC Layer (Steps 4-8) ✅
+
 - Added IPC channel constants for aiUsageLogs
 - Created IPC handlers for all operations
 - Registered handlers in register-handlers.ts
@@ -19,23 +21,28 @@
 - Updated useElectronDb hook with new methods
 
 ### AI Pricing & Token Utilities (Steps 9-10) ✅
+
 - Created comprehensive model pricing data for all providers
 - Implemented cost tier classification ($, $$, $$$)
 - Created token counting utilities with TokenLens integration
 
 ### AI Handler Updates (Steps 11-13) ✅
+
 - Updated AI clarification handler with token capture
 - Updated AI overview handler with token capture
 - Repository injection for usage logging
 
 ### TanStack Query (Steps 14-15) ✅
+
 - Created query key factory for AI usage logs
 - Created hooks: useAiUsageLogs, useAiUsageLogsTotals, useDeleteAiUsageLogs
 
 ### Validation (Step 16) ✅
+
 - Created Zod validation schemas for AI usage logs
 
 ## Files Created
+
 - `db/schema/ai-usage-logs.schema.ts`
 - `db/repositories/ai-usage-logs.repository.ts`
 - `electron/ipc/ai-usage-logs.handlers.ts`
@@ -47,6 +54,7 @@
 - `drizzle/0006_furry_toro.sql` (migration)
 
 ## Files Modified
+
 - `db/index.ts`
 - `drizzle.config.ts`
 - `electron/ipc/channels.ts`
@@ -59,7 +67,9 @@
 - `lib/queries/index.ts`
 
 ## Validation Status
+
 All files pass `pnpm lint && pnpm typecheck`.
 
 ## Next Steps
+
 Steps 17-26: Frontend components, UI integration, and testing.

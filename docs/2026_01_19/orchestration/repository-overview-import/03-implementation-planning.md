@@ -27,6 +27,7 @@ IMPORTANT: Include 'pnpm run lint:fix && pnpm run typecheck' validation for ever
 The agent generated a comprehensive 10-step implementation plan in markdown format.
 
 **Plan Structure**:
+
 - Overview with estimates (4-6 hours, Medium complexity, Medium risk)
 - Quick Summary
 - Prerequisites (3 items)
@@ -49,6 +50,7 @@ The agent generated a comprehensive 10-step implementation plan in markdown form
 **Risk Level**: Medium
 
 **Complexity Breakdown**:
+
 - IPC Layer: Low complexity (following existing patterns)
 - Query Hooks: Low complexity (standard TanStack Query mutation)
 - UI Components: Medium complexity (dual input methods + confirmation flow)
@@ -56,6 +58,7 @@ The agent generated a comprehensive 10-step implementation plan in markdown form
 - Validation: Low complexity (standard Zod schema)
 
 **Risk Assessment**:
+
 - Medium Risk: Nested dialog UX (import + confirmation)
 - Low Risk: File reading implementation details
 - Low Risk: Character limit for large files
@@ -84,15 +87,18 @@ The agent generated a comprehensive 10-step implementation plan in markdown form
 ## Technical Considerations Captured
 
 **Assumptions**:
+
 - Existing `electron:selectFile` supports file filtering
 - Repository upsert method handles `'imported'` modelId
 - Dialog components support nesting
 
 **Risks**:
+
 - Nested dialog UX may need refinement
 - File reading logic may need implementation
 
 **Technical Notes**:
+
 - Use constant for `'imported'` literal to avoid magic strings
 - Add character limit validation for performance
 - Ensure atomic import operation

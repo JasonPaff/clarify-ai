@@ -11,16 +11,19 @@
 The dialog components were already fully implemented. The frontend-component agent verified all features.
 
 **Files Verified**:
+
 - `components/repositories/repository-overview-dialog.tsx` - Dialog wrapper
 - `components/repositories/repository-overview-generator.tsx` - Generation UI
 - `components/repositories/repository-overview-viewer.tsx` - Viewer UI
 - `components/repositories/repository-overview-markdown.tsx` - Markdown renderer
 
 **Validation Results**:
+
 - ✅ pnpm lint: PASS
 - ✅ pnpm typecheck: PASS
 
 **Success Criteria**:
+
 - [✓] Dialog component created with all required features
 - [✓] Real-time streaming display works (Conversation/Message components)
 - [✓] Model selection implemented (ModelSelector integration)
@@ -47,6 +50,7 @@ RepositoryOverviewDialog (wrapper)
 ## Features Implemented
 
 **Generation Mode**:
+
 - Model selection with defaults
 - Optional custom prompt (collapsible)
 - Repository path display
@@ -57,10 +61,12 @@ RepositoryOverviewDialog (wrapper)
 - Error handling with Alert
 
 **Viewer Mode**:
+
 - Markdown rendering of existing overview
 - Regenerate button
 
 **State Management**:
+
 - `idle`, `generating`, `complete`, `stopped`, `error` states
 - Accumulates streamed content
 - Model and custom prompt state

@@ -17,6 +17,7 @@
 ## Plan Summary
 
 **10 Steps** to implement:
+
 1. Add IPC channel constant
 2. Implement IPC handler
 3. Update Electron API types

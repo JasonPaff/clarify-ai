@@ -5,9 +5,9 @@
 
 ## Automated Checks
 
-| Check | Status |
-|-------|--------|
-| `pnpm lint` | ✅ PASS |
+| Check            | Status  |
+| ---------------- | ------- |
+| `pnpm lint`      | ✅ PASS |
 | `pnpm typecheck` | ✅ PASS |
 
 ## Manual Verification Checklist
