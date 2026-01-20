@@ -67,6 +67,9 @@ export const IpcChannels = {
     openFile: 'dialog:openFile',
     saveFile: 'dialog:saveFile',
   },
+  electron: {
+    importRepositoryOverview: 'electron:importRepositoryOverview',
+  },
   fs: {
     collectRepositoryData: 'fs:collectRepositoryData',
     exists: 'fs:exists',

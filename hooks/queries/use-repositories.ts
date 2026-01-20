@@ -82,8 +82,10 @@ export function useRepositoriesWithOverviewStatus(projectId: number) {
       overviewStatus: overviewStatusesQuery.data.get(repository.id) ?? {
         generatedAt: null,
         hasOverview: false,
+        isImported: false,
         isManuallyEdited: false,
         lastEditedAt: null,
+        modelId: null,
       },
     }));
   }, [repositoriesQuery.data, overviewStatusesQuery.data]);

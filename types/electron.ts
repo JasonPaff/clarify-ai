@@ -123,6 +123,7 @@ export interface ElectronAPI {
     getPath(name: 'appData' | 'desktop' | 'documents' | 'downloads' | 'home' | 'temp' | 'userData'): Promise<string>;
     getVersion(): Promise<string>;
   };
+  /** Database operations for managing application data */
   db: {
     featureRequestRepositories: {
       addToFeatureRequest(featureRequestId: number, repositoryId: number): Promise<boolean>;
@@ -193,6 +194,21 @@ export interface ElectronAPI {
       defaultPath?: string,
       filters?: Array<{ extensions: Array<string>; name: string }>
     ): Promise<null | string>;
+  };
+  /** Electron-specific operations (non-database, non-AI) */
+  electron: {
+    /**
+     * Import a repository overview from external content (e.g., markdown file).
+     * Validates and upserts the content into the database for the given repository.
+     */
+    importRepositoryOverview(
+      repositoryId: number,
+      content: string
+    ): Promise<{
+      error?: string;
+      overview?: import('../db/schema/repository-overviews.schema').RepositoryOverview;
+      success: boolean;
+    }>;
   };
   fs: {
     collectRepositoryData(

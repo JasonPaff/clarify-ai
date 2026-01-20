@@ -1,7 +1,8 @@
 'use client';
 
 import { format, formatDistanceToNow } from 'date-fns';
-import { Check, Eye, FileText, GitBranch, Pencil, Sparkles, Trash2 } from 'lucide-react';
+import { Check, Eye, FileText, GitBranch, Pencil, Sparkles, Trash2, Upload } from 'lucide-react';
+import { useState } from 'react';
 
 import type { RepositoryOverviewStatus } from '@/hooks/queries/use-repository-overviews';
 
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconButton } from '@/components/ui/icon-button';
 
+import { ImportRepositoryOverviewDialog } from './import-repository-overview-dialog';
 import { RepositoryOverviewDialog } from './repository-overview-dialog';
 
 interface RepositoryCardProps {
@@ -33,6 +35,8 @@ export function RepositoryCard({
   overviewStatus,
   path,
 }: RepositoryCardProps) {
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+
   const formattedLastScanned = lastScannedAt
     ? `Last scanned ${formatDistanceToNow(new Date(lastScannedAt), { addSuffix: true })}`
     : 'Never scanned';
@@ -82,10 +86,17 @@ export function RepositoryCard({
           <FileText className={'size-3.5 text-muted-foreground'} />
           <span className={'text-xs text-muted-foreground'}>Overview:</span>
           {hasOverview ? (
-            <Badge size={'sm'} variant={'completed'}>
-              <Check className={'mr-1 size-3'} />
-              Generated ({formattedGeneratedDate})
-            </Badge>
+            overviewStatus.isImported ? (
+              <Badge size={'sm'} variant={'default'}>
+                <Upload className={'mr-1 size-3'} />
+                Imported ({formattedGeneratedDate})
+              </Badge>
+            ) : (
+              <Badge size={'sm'} variant={'completed'}>
+                <Check className={'mr-1 size-3'} />
+                Generated ({formattedGeneratedDate})
+              </Badge>
+            )
           ) : (
             <span className={'text-xs text-muted-foreground'}>Not generated</span>
           )}
@@ -106,7 +117,19 @@ export function RepositoryCard({
               </Button>
             )}
           </RepositoryOverviewDialog>
+
+          <Button onClick={() => setIsImportDialogOpen(true)} size={'sm'} variant={'outline'}>
+            <Upload className={'size-3.5'} />
+            Import Overview
+          </Button>
         </div>
+
+        {/* Import Dialog */}
+        <ImportRepositoryOverviewDialog
+          isOpen={isImportDialogOpen}
+          onOpenChange={setIsImportDialogOpen}
+          repositoryId={id}
+        />
       </CardContent>
     </Card>
   );

@@ -91,6 +91,12 @@ export interface ElectronAPI {
       filters?: Array<{ extensions: Array<string>; name: string }>
     ): Promise<null | string>;
   };
+  electron: {
+    importRepositoryOverview(
+      repositoryId: number,
+      content: string
+    ): Promise<{ error?: string; overview?: RepositoryOverview; success: boolean }>;
+  };
   fs: {
     collectRepositoryData(repositoryPath: string): Promise<CollectRepositoryDataResult>;
     exists(path: string): Promise<boolean>;
@@ -229,6 +235,10 @@ const electronAPI: ElectronAPI = {
     openDirectory: () => ipcRenderer.invoke(IpcChannels.dialog.openDirectory),
     openFile: (filters) => ipcRenderer.invoke(IpcChannels.dialog.openFile, filters),
     saveFile: (defaultPath, filters) => ipcRenderer.invoke(IpcChannels.dialog.saveFile, defaultPath, filters),
+  },
+  electron: {
+    importRepositoryOverview: (repositoryId, content) =>
+      ipcRenderer.invoke(IpcChannels.electron.importRepositoryOverview, repositoryId, content),
   },
   fs: {
     collectRepositoryData: (repositoryPath) => ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),

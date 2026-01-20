@@ -50,4 +50,39 @@ export function registerRepositoryOverviewsHandlers(
       return repositoryOverviewsRepository.deleteByRepositoryId(repositoryId);
     }
   );
+
+  // Import handler for importing repository overviews from external markdown files
+  ipcMain.handle(
+    IpcChannels.electron.importRepositoryOverview,
+    (
+      _event: IpcMainInvokeEvent,
+      repositoryId: number,
+      content: string
+    ): { error?: string; overview?: RepositoryOverview; success: boolean } => {
+      // Validate repositoryId
+      if (repositoryId <= 0) {
+        return { error: 'Invalid repository ID', success: false };
+      }
+
+      // Validate content
+      if (content.trim().length === 0) {
+        return { error: 'Content cannot be empty', success: false };
+      }
+
+      try {
+        const overview = repositoryOverviewsRepository.upsert(repositoryId, {
+          content: content.trim(),
+          generatedAt: new Date().toISOString(),
+          modelId: 'imported',
+          promptUsed: '',
+        });
+        return { overview, success: true };
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error.message : 'Failed to import overview',
+          success: false,
+        };
+      }
+    }
+  );
 }

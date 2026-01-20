@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { repositoryOverviewKeys } from '@/lib/queries/repository-overviews';
 
-import { useElectronDb } from '../useElectron';
+import { useElectron, useElectronDb } from '../useElectron';
 
 /**
  * Overview status information for a repository.
@@ -15,10 +15,14 @@ export interface RepositoryOverviewStatus {
   generatedAt: null | string;
   /** Whether the repository has an AI-generated overview */
   hasOverview: boolean;
+  /** Whether the overview was imported (modelId === 'imported') */
+  isImported: boolean;
   /** Whether the overview has been manually edited */
   isManuallyEdited: boolean;
   /** When the overview was last edited (if manually edited) */
   lastEditedAt: null | string;
+  /** The model ID used to generate the overview, or 'imported' for imported overviews */
+  modelId: null | string;
 }
 
 export function useCreateRepositoryOverview() {
@@ -55,6 +59,30 @@ export function useDeleteRepositoryOverviewByRepositoryId() {
     mutationFn: (repositoryId: number) => repositoryOverviews.deleteByRepositoryId(repositoryId),
     onSuccess: (_result, repositoryId) => {
       queryClient.removeQueries({ queryKey: repositoryOverviewKeys.byRepositoryId(repositoryId).queryKey });
+    },
+  });
+}
+
+export function useImportRepositoryOverview() {
+  const queryClient = useQueryClient();
+  const { api } = useElectron();
+
+  return useMutation({
+    mutationFn: async ({ content, repositoryId }: { content: string; repositoryId: number }) => {
+      if (!api) {
+        throw new Error('Electron API not available');
+      }
+      const result = await api.electron.importRepositoryOverview(repositoryId, content);
+      if (!result.success) {
+        throw new Error(result.error ?? 'Failed to import repository overview');
+      }
+      return result;
+    },
+    onSuccess: (result, { repositoryId }) => {
+      if (result.overview) {
+        queryClient.setQueryData(repositoryOverviewKeys.byRepositoryId(repositoryId).queryKey, result.overview);
+      }
+      void queryClient.invalidateQueries({ queryKey: repositoryOverviewKeys._def });
     },
   });
 }
@@ -108,11 +136,14 @@ export function useRepositoryOverviewStatuses(repositoryIds: Array<number>) {
 
     for (const { data, repositoryId } of queries.data) {
       if (repositoryId !== undefined) {
+        const modelId = data?.modelId ?? null;
         map.set(repositoryId, {
           generatedAt: data?.generatedAt ?? null,
           hasOverview: data !== undefined && data !== null,
+          isImported: modelId === 'imported',
           isManuallyEdited: data?.manualContent !== null && data?.manualContent !== undefined,
           lastEditedAt: data?.lastEditedAt ?? null,
+          modelId,
         });
       }
     }
