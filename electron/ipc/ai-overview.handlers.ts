@@ -2,9 +2,9 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron';
 
 import { ipcMain } from 'electron';
 
-import type { AiUsageLogsRepository } from '../../db/repositories/ai-usage-logs.repository';
+import type { AiUsageLogsRepository } from '@/db/repositories/ai-usage-logs.repository';
 
-import { estimateCost } from '../../lib/ai/pricing';
+import { estimateCostWithTokenlens } from '../lib/tokenlens';
 import { IpcChannels } from './channels';
 import { collectRepositoryData } from './fs.handlers';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
@@ -168,8 +168,8 @@ export function registerAiOverviewHandlers(
               const totalTokens = usage?.totalTokens ?? 0;
               const reasoningTokens = usage?.outputTokenDetails?.reasoningTokens ?? undefined;
 
-              // Calculate estimated cost
-              const estimatedCostUsd = estimateCost(model, inputTokens, outputTokens);
+              // Calculate estimated cost using tokenlens with provider for accurate lookup
+              const estimatedCostUsd = await estimateCostWithTokenlens(model, inputTokens, outputTokens, provider);
 
               // Log successful usage to database
               try {

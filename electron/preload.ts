@@ -13,6 +13,12 @@ import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';
 import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
 import type { ApiKeyProvider, ProviderCredentials } from './ipc/lib/provider-types';
 import type { OpenRouterModel, StoredOpenRouterModels } from './ipc/openrouter-models.handlers';
+import type {
+  TokenlensContextResult,
+  TokenlensCountResult,
+  TokenlensCostResult,
+  TokenlensModelData,
+} from './ipc/tokenlens.handlers';
 
 import { IpcChannels } from './ipc/channels';
 
@@ -136,6 +142,17 @@ export interface ElectronAPI {
     delete(key: string): Promise<boolean>;
     get<T>(key: string): Promise<T | undefined>;
     set(key: string, value: unknown): Promise<boolean>;
+  };
+  tokenlens: {
+    countTokens(modelId: string, text: string): Promise<TokenlensCountResult>;
+    estimateCost(
+      modelId: string,
+      inputTokens: number,
+      outputTokens: number,
+      provider?: string
+    ): Promise<TokenlensCostResult>;
+    getContextLimits(modelId: string, provider?: string): Promise<TokenlensContextResult>;
+    getModelData(modelId: string, provider?: string): Promise<TokenlensModelData>;
   };
 }
 
@@ -272,6 +289,14 @@ const electronAPI: ElectronAPI = {
     delete: (key) => ipcRenderer.invoke(IpcChannels.store.delete, key),
     get: <T>(key: string) => ipcRenderer.invoke(IpcChannels.store.get, key) as Promise<T | undefined>,
     set: (key, value) => ipcRenderer.invoke(IpcChannels.store.set, key, value),
+  },
+  tokenlens: {
+    countTokens: (modelId, text) => ipcRenderer.invoke(IpcChannels.tokenlens.countTokens, modelId, text),
+    estimateCost: (modelId, inputTokens, outputTokens, provider) =>
+      ipcRenderer.invoke(IpcChannels.tokenlens.estimateCost, modelId, inputTokens, outputTokens, provider),
+    getContextLimits: (modelId, provider) =>
+      ipcRenderer.invoke(IpcChannels.tokenlens.getContextLimits, modelId, provider),
+    getModelData: (modelId, provider) => ipcRenderer.invoke(IpcChannels.tokenlens.getModelData, modelId, provider),
   },
 };
 

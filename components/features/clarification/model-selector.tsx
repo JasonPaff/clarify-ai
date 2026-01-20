@@ -64,10 +64,10 @@ interface CostTierIndicatorProps {
 const CostTierIndicator = ({ costTier, pricing }: CostTierIndicatorProps) => {
   const tooltipContent = (
     <div className={'flex flex-col gap-0.5 text-left'}>
-      {pricing ? (
+      {pricing?.inputCostPer1M !== undefined && pricing?.outputCostPer1M !== undefined ? (
         <Fragment>
-          <span>Input: ${pricing.inputCostPer1k.toFixed(4)} / 1K tokens</span>
-          <span>Output: ${pricing.outputCostPer1k.toFixed(4)} / 1K tokens</span>
+          <span>Input: ${(pricing.inputCostPer1M / 1000).toFixed(4)} / 1K tokens</span>
+          <span>Output: ${(pricing.outputCostPer1M / 1000).toFixed(4)} / 1K tokens</span>
         </Fragment>
       ) : (
         <span>Pricing unavailable</span>

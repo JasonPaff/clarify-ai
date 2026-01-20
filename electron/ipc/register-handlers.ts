@@ -23,6 +23,7 @@ import { registerProjectsHandlers } from './projects.handlers';
 import { registerRepositoriesHandlers } from './repositories.handlers';
 import { registerRepositoryOverviewsHandlers } from './repository-overviews.handlers';
 import { registerStoreHandlers } from './store.handlers';
+import { registerTokenlensHandlers } from './tokenlens.handlers';
 
 export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => BrowserWindow | null): void {
   // File system handlers
@@ -51,6 +52,9 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 
   // OpenRouter models handlers (caching via electron-store)
   registerOpenRouterModelsHandlers();
+
+  // Tokenlens handlers (model pricing and context limits)
+  registerTokenlensHandlers();
 
   // Database handlers - Projects
   const projectsRepository = createProjectsRepository(db);

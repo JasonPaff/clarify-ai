@@ -286,12 +286,7 @@ function UsageLogRow({ log }: UsageLogRowProps) {
   };
 
   return (
-    <div
-      className={cn(
-        'rounded-lg border border-border bg-card p-4 transition-colors',
-        'hover:border-accent/50'
-      )}
-    >
+    <div className={cn('rounded-lg border border-border bg-card p-4 transition-colors', 'hover:border-accent/50')}>
       {/* Main Row */}
       <div className={'flex items-center justify-between gap-4'}>
         {/* Left: Status, Operation, Model */}
@@ -339,9 +334,7 @@ function UsageLogRow({ log }: UsageLogRowProps) {
           </div>
 
           {/* Timestamp */}
-          <div className={'text-xs text-muted-foreground'}>
-            {format(new Date(log.createdAt), 'MMM d, h:mm a')}
-          </div>
+          <div className={'text-xs text-muted-foreground'}>{format(new Date(log.createdAt), 'MMM d, h:mm a')}</div>
         </div>
       </div>
 

@@ -270,6 +270,31 @@ export interface ElectronAPI {
     get<T>(key: string): Promise<T | undefined>;
     set(key: string, value: unknown): Promise<boolean>;
   };
+  /** Tokenlens v2 API for model pricing, context limits, and token counting from live provider catalogs */
+  tokenlens: {
+    /** Count tokens in text using actual model tokenizer */
+    countTokens(
+      modelId: string,
+      text: string
+    ): Promise<import('../electron/ipc/tokenlens.handlers').TokenlensCountResult>;
+    /** Estimate cost in USD for a model request */
+    estimateCost(
+      modelId: string,
+      inputTokens: number,
+      outputTokens: number,
+      provider?: string
+    ): Promise<import('../electron/ipc/tokenlens.handlers').TokenlensCostResult>;
+    /** Get context window limits for a model */
+    getContextLimits(
+      modelId: string,
+      provider?: string
+    ): Promise<import('../electron/ipc/tokenlens.handlers').TokenlensContextResult>;
+    /** Get full model metadata including pricing and context limits */
+    getModelData(
+      modelId: string,
+      provider?: string
+    ): Promise<import('../electron/ipc/tokenlens.handlers').TokenlensModelData>;
+  };
 }
 
 declare global {

@@ -115,8 +115,7 @@ export const UsageFooter = ({
       <Activity aria-hidden={'true'} className={'size-3.5'} />
       <span>
         Input: {formatTokens(inputTokens)} | Output: {formatTokens(outputTokens)}
-        {reasoningDisplay} | Total:{' '}
-        {formatTokens(totalTokens)} tokens
+        {reasoningDisplay} | Total: {formatTokens(totalTokens)} tokens
       </span>
     </div>
   );

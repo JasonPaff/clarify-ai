@@ -94,4 +94,10 @@ export const IpcChannels = {
     get: 'store:get',
     set: 'store:set',
   },
+  tokenlens: {
+    countTokens: 'tokenlens:countTokens',
+    estimateCost: 'tokenlens:estimateCost',
+    getContextLimits: 'tokenlens:getContextLimits',
+    getModelData: 'tokenlens:getModelData',
+  },
 } as const;
