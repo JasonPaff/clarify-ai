@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { featureRequestKeys } from '@/lib/queries/feature-requests';
+import { projectKeys } from '@/lib/queries/projects';
 
 import { useElectronDb } from '../useElectron';
 
@@ -29,6 +30,7 @@ export function useCreateFeatureRequest() {
     mutationFn: (data: Parameters<typeof featureRequests.create>[0]) => featureRequests.create(data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: featureRequestKeys.byProject._def });
+      void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
     },
   });
 }
@@ -44,6 +46,8 @@ export function useDeleteFeatureRequest() {
       queryClient.removeQueries({ queryKey: featureRequestKeys.detail(id).queryKey });
       // Invalidate all feature request queries
       void queryClient.invalidateQueries({ queryKey: featureRequestKeys._def });
+      // Invalidate project list to update feature counts
+      void queryClient.invalidateQueries({ queryKey: projectKeys.list._def });
     },
   });
 }

@@ -25,3 +25,4 @@ export const projects = sqliteTable(
 
 export type NewProject = typeof projects.$inferInsert;
 export type Project = typeof projects.$inferSelect;
+export type ProjectWithFeatureCount = Project & { featureCount: number };

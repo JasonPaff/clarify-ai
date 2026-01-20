@@ -11,7 +11,7 @@ export type {
   NewFeatureRequestRun,
 } from '../db/schema/feature-request-runs.schema';
 export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-requests.schema';
-export type { NewProject, Project } from '../db/schema/projects.schema';
+export type { NewProject, Project, ProjectWithFeatureCount } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 export type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
 export type {
@@ -263,7 +263,7 @@ export interface ElectronAPI {
         data: import('../db/schema/projects.schema').NewProject
       ): Promise<import('../db/schema/projects.schema').Project>;
       delete(id: number): Promise<boolean>;
-      getAll(): Promise<Array<import('../db/schema/projects.schema').Project>>;
+      getAll(): Promise<Array<import('../db/schema/projects.schema').ProjectWithFeatureCount>>;
       getById(id: number): Promise<import('../db/schema/projects.schema').Project | undefined>;
       getFavorited(): Promise<Array<import('../db/schema/projects.schema').Project>>;
       update(

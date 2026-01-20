@@ -71,6 +71,7 @@ function ProjectsContent() {
       {projects.map((project) => (
         <ProjectCard
           description={project.description ?? undefined}
+          featureCount={project.featureCount}
           id={project.id}
           isFavorited={project.isFavorited ?? false}
           key={project.id}

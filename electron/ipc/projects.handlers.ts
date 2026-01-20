@@ -1,12 +1,12 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
 
 import type { ProjectsRepository } from '../../db/repositories/projects.repository';
-import type { NewProject, Project } from '../../db/schema/projects.schema';
+import type { NewProject, Project, ProjectWithFeatureCount } from '../../db/schema/projects.schema';
 
 import { IpcChannels } from './channels';
 
 export function registerProjectsHandlers(projectsRepository: ProjectsRepository): void {
-  ipcMain.handle(IpcChannels.db.projects.getAll, (): Array<Project> => {
+  ipcMain.handle(IpcChannels.db.projects.getAll, (): Array<ProjectWithFeatureCount> => {
     return projectsRepository.getAll();
   });
 

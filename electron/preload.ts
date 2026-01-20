@@ -12,7 +12,7 @@ import type {
   NewFeatureRequestRun,
 } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest, NewFeatureRequest } from '@/db/schema/feature-requests.schema';
-import type { NewProject, Project } from '@/db/schema/projects.schema';
+import type { NewProject, Project, ProjectWithFeatureCount } from '@/db/schema/projects.schema';
 import type { NewRepository, Repository } from '@/db/schema/repositories.schema';
 import type { NewRepositoryOverview, RepositoryOverview } from '@/db/schema/repository-overviews.schema';
 import type {
@@ -129,7 +129,7 @@ export interface ElectronAPI {
     projects: {
       create(data: NewProject): Promise<Project>;
       delete(id: number): Promise<boolean>;
-      getAll(): Promise<Array<Project>>;
+      getAll(): Promise<Array<ProjectWithFeatureCount>>;
       getById(id: number): Promise<Project | undefined>;
       getFavorited(): Promise<Array<Project>>;
       update(id: number, data: Partial<NewProject>): Promise<Project | undefined>;
