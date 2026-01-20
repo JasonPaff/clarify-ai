@@ -77,24 +77,17 @@
       "indexes": {
         "feature_request_context_files_feature_request_id_file_path_idx": {
           "name": "feature_request_context_files_feature_request_id_file_path_idx",
-          "columns": [
-            "feature_request_id",
-            "file_path"
-          ],
+          "columns": ["feature_request_id", "file_path"],
           "isUnique": true
         },
         "feature_request_context_files_feature_request_id_idx": {
           "name": "feature_request_context_files_feature_request_id_idx",
-          "columns": [
-            "feature_request_id"
-          ],
+          "columns": ["feature_request_id"],
           "isUnique": false
         },
         "feature_request_context_files_file_type_idx": {
           "name": "feature_request_context_files_file_type_idx",
-          "columns": [
-            "file_type"
-          ],
+          "columns": ["file_type"],
           "isUnique": false
         }
       },
@@ -103,12 +96,8 @@
           "name": "feature_request_context_files_feature_request_id_feature_requests_id_fk",
           "tableFrom": "feature_request_context_files",
           "tableTo": "feature_requests",
-          "columnsFrom": [
-            "feature_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["feature_request_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -153,24 +142,17 @@
       "indexes": {
         "feature_request_repositories_feature_request_id_repository_id_idx": {
           "name": "feature_request_repositories_feature_request_id_repository_id_idx",
-          "columns": [
-            "feature_request_id",
-            "repository_id"
-          ],
+          "columns": ["feature_request_id", "repository_id"],
           "isUnique": true
         },
         "feature_request_repositories_feature_request_id_idx": {
           "name": "feature_request_repositories_feature_request_id_idx",
-          "columns": [
-            "feature_request_id"
-          ],
+          "columns": ["feature_request_id"],
           "isUnique": false
         },
         "feature_request_repositories_repository_id_idx": {
           "name": "feature_request_repositories_repository_id_idx",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": false
         }
       },
@@ -179,12 +161,8 @@
           "name": "feature_request_repositories_feature_request_id_feature_requests_id_fk",
           "tableFrom": "feature_request_repositories",
           "tableTo": "feature_requests",
-          "columnsFrom": [
-            "feature_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["feature_request_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -192,12 +170,8 @@
           "name": "feature_request_repositories_repository_id_repositories_id_fk",
           "tableFrom": "feature_request_repositories",
           "tableTo": "repositories",
-          "columnsFrom": [
-            "repository_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["repository_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -350,32 +324,22 @@
       "indexes": {
         "feature_request_runs_current_run_idx": {
           "name": "feature_request_runs_current_run_idx",
-          "columns": [
-            "feature_request_id",
-            "step",
-            "is_current_run"
-          ],
+          "columns": ["feature_request_id", "step", "is_current_run"],
           "isUnique": false
         },
         "feature_request_runs_feature_request_id_idx": {
           "name": "feature_request_runs_feature_request_id_idx",
-          "columns": [
-            "feature_request_id"
-          ],
+          "columns": ["feature_request_id"],
           "isUnique": false
         },
         "feature_request_runs_status_idx": {
           "name": "feature_request_runs_status_idx",
-          "columns": [
-            "status"
-          ],
+          "columns": ["status"],
           "isUnique": false
         },
         "feature_request_runs_step_idx": {
           "name": "feature_request_runs_step_idx",
-          "columns": [
-            "step"
-          ],
+          "columns": ["step"],
           "isUnique": false
         }
       },
@@ -384,12 +348,8 @@
           "name": "feature_request_runs_feature_request_id_feature_requests_id_fk",
           "tableFrom": "feature_request_runs",
           "tableTo": "feature_requests",
-          "columnsFrom": [
-            "feature_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["feature_request_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -548,23 +508,17 @@
       "indexes": {
         "feature_requests_archived_at_idx": {
           "name": "feature_requests_archived_at_idx",
-          "columns": [
-            "archived_at"
-          ],
+          "columns": ["archived_at"],
           "isUnique": false
         },
         "feature_requests_project_id_idx": {
           "name": "feature_requests_project_id_idx",
-          "columns": [
-            "project_id"
-          ],
+          "columns": ["project_id"],
           "isUnique": false
         },
         "feature_requests_status_idx": {
           "name": "feature_requests_status_idx",
-          "columns": [
-            "status"
-          ],
+          "columns": ["status"],
           "isUnique": false
         }
       },
@@ -573,12 +527,8 @@
           "name": "feature_requests_project_id_projects_id_fk",
           "tableFrom": "feature_requests",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -639,30 +589,22 @@
       "indexes": {
         "projects_created_at_idx": {
           "name": "projects_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "isUnique": false
         },
         "projects_is_favorited_idx": {
           "name": "projects_is_favorited_idx",
-          "columns": [
-            "is_favorited"
-          ],
+          "columns": ["is_favorited"],
           "isUnique": false
         },
         "projects_name_idx": {
           "name": "projects_name_idx",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "isUnique": false
         },
         "projects_updated_at_idx": {
           "name": "projects_updated_at_idx",
-          "columns": [
-            "updated_at"
-          ],
+          "columns": ["updated_at"],
           "isUnique": false
         }
       },
@@ -736,16 +678,12 @@
       "indexes": {
         "repositories_project_id_idx": {
           "name": "repositories_project_id_idx",
-          "columns": [
-            "project_id"
-          ],
+          "columns": ["project_id"],
           "isUnique": false
         },
         "repositories_path_idx": {
           "name": "repositories_path_idx",
-          "columns": [
-            "path"
-          ],
+          "columns": ["path"],
           "isUnique": false
         }
       },
@@ -754,12 +692,8 @@
           "name": "repositories_project_id_projects_id_fk",
           "tableFrom": "repositories",
           "tableTo": "projects",
-          "columnsFrom": [
-            "project_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["project_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -847,16 +781,12 @@
       "indexes": {
         "repository_overviews_repository_id_unique": {
           "name": "repository_overviews_repository_id_unique",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": true
         },
         "repository_overviews_repository_id_idx": {
           "name": "repository_overviews_repository_id_idx",
-          "columns": [
-            "repository_id"
-          ],
+          "columns": ["repository_id"],
           "isUnique": false
         }
       },
@@ -865,12 +795,8 @@
           "name": "repository_overviews_repository_id_repositories_id_fk",
           "tableFrom": "repository_overviews",
           "tableTo": "repositories",
-          "columnsFrom": [
-            "repository_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["repository_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -980,17 +906,12 @@
       "indexes": {
         "step_configurations_feature_request_id_step_idx": {
           "name": "step_configurations_feature_request_id_step_idx",
-          "columns": [
-            "feature_request_id",
-            "step"
-          ],
+          "columns": ["feature_request_id", "step"],
           "isUnique": true
         },
         "step_configurations_feature_request_id_idx": {
           "name": "step_configurations_feature_request_id_idx",
-          "columns": [
-            "feature_request_id"
-          ],
+          "columns": ["feature_request_id"],
           "isUnique": false
         }
       },
@@ -999,12 +920,8 @@
           "name": "step_configurations_feature_request_id_feature_requests_id_fk",
           "tableFrom": "step_configurations",
           "tableTo": "feature_requests",
-          "columnsFrom": [
-            "feature_request_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["feature_request_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

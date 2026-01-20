@@ -55,14 +55,7 @@ interface RunHistoryItemProps extends Omit<ComponentPropsWithRef<'div'>, 'onSele
   run: FeatureRequestRun;
 }
 
-export const RunHistoryItem = ({
-  className,
-  isCurrentRun,
-  onRunSelect,
-  ref,
-  run,
-  ...props
-}: RunHistoryItemProps) => {
+export const RunHistoryItem = ({ className, isCurrentRun, onRunSelect, ref, run, ...props }: RunHistoryItemProps) => {
   const handleSelectClick = () => {
     onRunSelect(run);
   };
@@ -88,9 +81,7 @@ export const RunHistoryItem = ({
 
           {/* Current Label */}
           {isCurrentRun && (
-            <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent'}>
-              Current
-            </span>
+            <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent'}>Current</span>
           )}
         </div>
 
@@ -98,9 +89,7 @@ export const RunHistoryItem = ({
         <div className={'flex items-center gap-2'}>
           <span className={runStatusBadgeVariants({ status: run.status })}>{statusLabel}</span>
           {run.durationMs && (
-            <span className={'text-xs text-muted-foreground'}>
-              {(run.durationMs / 1000).toFixed(1)}s
-            </span>
+            <span className={'text-xs text-muted-foreground'}>{(run.durationMs / 1000).toFixed(1)}s</span>
           )}
         </div>
       </div>

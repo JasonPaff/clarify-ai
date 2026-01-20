@@ -27,13 +27,7 @@ interface StepSettingsPanelProps extends ComponentPropsWithRef<'div'> {
   step: StepConfigurationStep;
 }
 
-export const StepSettingsPanel = ({
-  className,
-  featureRequestId,
-  ref,
-  step,
-  ...props
-}: StepSettingsPanelProps) => {
+export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...props }: StepSettingsPanelProps) => {
   const { data: config, isLoading } = useStepConfig(featureRequestId, step);
   const upsertMutation = useUpsertStepConfig();
 
@@ -166,14 +160,10 @@ export const StepSettingsPanel = ({
             <Settings2 className={'size-4 text-muted-foreground'} />
             <span className={'font-medium'}>{stepLabel} Settings</span>
             {isCustomized && (
-              <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>
-                Customized
-              </span>
+              <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>Customized</span>
             )}
           </div>
-          <ChevronDown
-            className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'}
-          />
+          <ChevronDown className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'} />
         </CollapsibleTrigger>
 
         {/* Content */}

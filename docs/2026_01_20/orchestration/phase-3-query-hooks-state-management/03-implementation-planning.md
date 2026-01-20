@@ -27,6 +27,7 @@ Generate an implementation plan in MARKDOWN format (NOT XML) for Phase 3: Query 
 ## Plan Generation Results
 
 ### Format Validation
+
 - **Format Check**: PASS - Output is markdown with all required sections
 - **Template Compliance**: PASS - Contains Overview, Prerequisites, Implementation Steps, Quality Gates, Notes
 - **Section Validation**: PASS - Each step has What/Why/Confidence/Files/Changes/Validation/Success Criteria
@@ -34,6 +35,7 @@ Generate an implementation plan in MARKDOWN format (NOT XML) for Phase 3: Query 
 - **No Code Examples**: PASS - Plan contains instructions only, no implementation code
 
 ### Plan Summary
+
 - **Estimated Duration**: 4-6 hours
 - **Complexity**: Medium
 - **Risk Level**: Low
@@ -41,19 +43,20 @@ Generate an implementation plan in MARKDOWN format (NOT XML) for Phase 3: Query 
 
 ### Steps Overview
 
-| Step | Description | Files | Priority |
-|------|-------------|-------|----------|
-| 1 | Create Query Keys for Feature Request Runs | CREATE `lib/queries/feature-request-runs.ts` | Critical |
-| 2 | Create Query Keys for Step Configurations | CREATE `lib/queries/step-configurations.ts` | Critical |
-| 3 | Create Query Keys for Context Files | CREATE `lib/queries/feature-request-context-files.ts` | Critical |
-| 4 | Update Query Keys Index | MODIFY `lib/queries/index.ts` | High |
-| 5 | Update useElectronDb Hook | MODIFY `hooks/useElectron.ts` | High |
-| 6 | Create Feature Request Runs Hooks | CREATE `hooks/queries/use-feature-request-runs.ts` | High |
-| 7 | Create Step Configurations Hooks | CREATE `hooks/queries/use-step-configurations.ts` | High |
-| 8 | Create Context Files Hooks | CREATE `hooks/queries/use-feature-request-context-files.ts` | High |
-| 9 | Update Feature Requests Hooks | MODIFY `hooks/queries/use-feature-requests.ts` | High |
+| Step | Description                                | Files                                                       | Priority |
+| ---- | ------------------------------------------ | ----------------------------------------------------------- | -------- |
+| 1    | Create Query Keys for Feature Request Runs | CREATE `lib/queries/feature-request-runs.ts`                | Critical |
+| 2    | Create Query Keys for Step Configurations  | CREATE `lib/queries/step-configurations.ts`                 | Critical |
+| 3    | Create Query Keys for Context Files        | CREATE `lib/queries/feature-request-context-files.ts`       | Critical |
+| 4    | Update Query Keys Index                    | MODIFY `lib/queries/index.ts`                               | High     |
+| 5    | Update useElectronDb Hook                  | MODIFY `hooks/useElectron.ts`                               | High     |
+| 6    | Create Feature Request Runs Hooks          | CREATE `hooks/queries/use-feature-request-runs.ts`          | High     |
+| 7    | Create Step Configurations Hooks           | CREATE `hooks/queries/use-step-configurations.ts`           | High     |
+| 8    | Create Context Files Hooks                 | CREATE `hooks/queries/use-feature-request-context-files.ts` | High     |
+| 9    | Update Feature Requests Hooks              | MODIFY `hooks/queries/use-feature-requests.ts`              | High     |
 
 ### Quality Gates Defined
+
 - All TypeScript files pass `pnpm typecheck`
 - All files pass `pnpm lint`
 - All new query key files export properly typed key factories

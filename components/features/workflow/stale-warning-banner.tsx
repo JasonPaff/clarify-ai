@@ -55,11 +55,7 @@ export const StaleWarningBanner = ({
 
         {/* Actions */}
         <div className={'mt-1 flex items-center gap-2'}>
-          <Button
-            className={'h-7 gap-1.5 px-2.5 text-xs'}
-            onClick={handleRerunClick}
-            variant={'outline'}
-          >
+          <Button className={'h-7 gap-1.5 px-2.5 text-xs'} onClick={handleRerunClick} variant={'outline'}>
             <RefreshCw className={'size-3'} />
             Re-run {stepName}
           </Button>

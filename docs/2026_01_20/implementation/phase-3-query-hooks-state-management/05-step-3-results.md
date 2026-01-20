@@ -12,11 +12,11 @@
 
 ## Query Keys Created
 
-| Key | Purpose | Parameters |
-|-----|---------|------------|
-| `featureRequestContextFileKeys.detail(id)` | Single context file by ID | `id: number` |
-| `featureRequestContextFileKeys.byFeatureRequest(featureRequestId)` | All context files for a feature request | `featureRequestId: number` |
-| `featureRequestContextFileKeys.byFeatureRequestAndType(featureRequestId, fileType)` | Context files filtered by type | `featureRequestId: number, fileType: ContextFileType` |
+| Key                                                                                 | Purpose                                 | Parameters                                            |
+| ----------------------------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------- |
+| `featureRequestContextFileKeys.detail(id)`                                          | Single context file by ID               | `id: number`                                          |
+| `featureRequestContextFileKeys.byFeatureRequest(featureRequestId)`                  | All context files for a feature request | `featureRequestId: number`                            |
+| `featureRequestContextFileKeys.byFeatureRequestAndType(featureRequestId, fileType)` | Context files filtered by type          | `featureRequestId: number, fileType: ContextFileType` |
 
 ## Validation Results
 

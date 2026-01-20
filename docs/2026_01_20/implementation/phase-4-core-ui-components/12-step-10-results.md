@@ -22,6 +22,7 @@
 ## Component Summary
 
 **Props**:
+
 - `open?: boolean` - Controlled open state
 - `onOpenChange?: (open: boolean) => void` - State change callback
 - `onConfirm: () => void` - Called when user confirms discard
@@ -29,6 +30,7 @@
 - `children?: ReactNode` - Trigger content
 
 **Features**:
+
 - Uses `useControllableState` for controlled/uncontrolled pattern
 - Destructive button variant for "Discard" action
 - Warning text in destructive color

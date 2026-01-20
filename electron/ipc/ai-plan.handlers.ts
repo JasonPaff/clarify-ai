@@ -120,7 +120,8 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
           risks: ['Risk 1: This is a placeholder (placeholder)', 'Risk 2: Actual risks will be identified by AI'],
           steps: [
             {
-              description: 'This is a placeholder step description. Real implementation will provide detailed guidance.',
+              description:
+                'This is a placeholder step description. Real implementation will provide detailed guidance.',
               estimatedComplexity: 'medium',
               files: discoveredFiles.map((f) => f.filePath),
               order: 1,

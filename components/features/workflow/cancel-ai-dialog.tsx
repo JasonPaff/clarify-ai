@@ -74,9 +74,7 @@ export function CancelAiDialog({
           )}
         >
           {/* Title */}
-          <AlertDialog.Title className={'text-lg font-semibold text-foreground'}>
-            Stop AI Generation?
-          </AlertDialog.Title>
+          <AlertDialog.Title className={'text-lg font-semibold text-foreground'}>Stop AI Generation?</AlertDialog.Title>
 
           {/* Description */}
           <AlertDialog.Description className={'mt-2 text-sm text-muted-foreground'}>

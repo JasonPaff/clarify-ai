@@ -48,17 +48,10 @@ export const ThinkingBudgetControl = ({
   /* Switch Control */
   const switchControl = (
     <div className={'flex items-center gap-3'}>
-      <Switch
-        checked={isEnabled}
-        disabled={isControlDisabled}
-        onCheckedChange={handleEnabledChange}
-        size={'sm'}
-      />
+      <Switch checked={isEnabled} disabled={isControlDisabled} onCheckedChange={handleEnabledChange} size={'sm'} />
       <div className={'flex flex-col gap-0.5'}>
         <span className={'text-sm font-medium'}>Extended Thinking</span>
-        <span className={'text-xs text-muted-foreground'}>
-          Enable deep reasoning for complex tasks
-        </span>
+        <span className={'text-xs text-muted-foreground'}>Enable deep reasoning for complex tasks</span>
       </div>
     </div>
   );

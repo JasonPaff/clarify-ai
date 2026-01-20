@@ -12,13 +12,13 @@ This phase implements five component groups for the workflow UI: Step Settings P
 
 ## Quick Summary
 
-| Component Group | Files | Description |
-|----------------|-------|-------------|
-| Step Settings Panel | 3 | Collapsible panel with model, params, prompt |
-| Run History Selector | 2 | Dropdown for viewing/restoring past runs |
-| Stale State Indicator | 2 | Banner + stepper icons for stale steps |
-| Confirmation Dialogs | 3 | Cancel AI, Restore Run, Discard Results |
-| Context File Picker | 2 | File browser + selected files list |
+| Component Group       | Files | Description                                  |
+| --------------------- | ----- | -------------------------------------------- |
+| Step Settings Panel   | 3     | Collapsible panel with model, params, prompt |
+| Run History Selector  | 2     | Dropdown for viewing/restoring past runs     |
+| Stale State Indicator | 2     | Banner + stepper icons for stale steps       |
+| Confirmation Dialogs  | 3     | Cancel AI, Restore Run, Discard Results      |
+| Context File Picker   | 2     | File browser + selected files list           |
 
 **Total**: 11 new files, 1 modified file
 
@@ -37,9 +37,11 @@ This phase implements five component groups for the workflow UI: Step Settings P
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/parameter-slider.tsx` - Reusable slider with label, value display, and min/max configuration
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `Slider` from `@base-ui/react/slider`
 - Create CVA variants for slider track, indicator, and thumb styling matching project theme
@@ -49,11 +51,13 @@ This phase implements five component groups for the workflow UI: Step Settings P
 - Add optional `description` prop for helper text
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders slider with label and value display
 - [ ] Value changes trigger `onChange` callback
 - [ ] Styling matches project theme using CVA variants
@@ -68,9 +72,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/thinking-budget-control.tsx` - Switch + slider combo for thinking budget management
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `Switch` from `@/components/ui/switch`
 - Import `ParameterSlider` from `./parameter-slider`
@@ -80,11 +86,13 @@ pnpm run lint && pnpm run typecheck
 - Add label "Extended Thinking" with description text
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Switch toggles thinking enabled state
 - [ ] Slider only appears when thinking is enabled
 - [ ] Component disables appropriately when model doesn't support thinking
@@ -99,9 +107,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/step-settings-panel.tsx` - Main collapsible settings panel
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `Collapsible`, `CollapsibleTrigger`, `CollapsibleContent` from `@/components/ui/collapsible`
 - Import `ModelSelector` from `@/components/features/clarification/model-selector`
@@ -117,11 +127,13 @@ pnpm run lint && pnpm run typecheck
 - Show "Customized" badge when settings differ from defaults
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Panel expands/collapses correctly
 - [ ] Model selection updates configuration
 - [ ] Parameter sliders persist values
@@ -137,9 +149,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/run-history-item.tsx` - Individual run entry display
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `FeatureRequestRun` type from `@/db/types`
 - Import `formatDistanceToNow` from `date-fns`
@@ -149,11 +163,13 @@ pnpm run lint && pnpm run typecheck
 - Use CVA for status badge variants (success/error/warning colors)
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component displays run timestamp in human-readable format
 - [ ] Status badge shows correct color for each status
 - [ ] Current run is visually distinguished
@@ -169,9 +185,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/run-history-dropdown.tsx` - Dropdown selector for run history
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `SelectRoot`, `SelectTrigger`, `SelectValue`, `SelectPortal`, `SelectPositioner`, `SelectPopup`, `SelectList` from `@/components/ui/select`
 - Import `RunHistoryItem` from `./run-history-item`
@@ -184,11 +202,13 @@ pnpm run lint && pnpm run typecheck
 - Handle empty state when no runs exist
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dropdown displays all runs for the step
 - [ ] Current run is clearly marked
 - [ ] Selecting a different run triggers confirmation dialog
@@ -204,9 +224,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `components/features/workflow/stale-warning-banner.tsx` - Warning banner for stale steps
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `Alert`, `AlertTitle`, `AlertDescription` from `@/components/ui/alert`
 - Import `AlertTriangle`, `RefreshCw` icons from `lucide-react`
@@ -217,11 +239,13 @@ pnpm run lint && pnpm run typecheck
 - Add "Re-run" action button
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Banner displays with warning styling
 - [ ] Reason for staleness is clearly communicated
 - [ ] Re-run button triggers callback
@@ -237,9 +261,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `components/features/workflow-steps.tsx` - Add stale state visual indicator
 
 **Changes:**
+
 - Import `AlertTriangle` icon from `lucide-react`
 - Extend `Step` interface to include optional `isStale` boolean
 - Extend `WorkflowStepsProps` to accept `staleSteps` array of step IDs
@@ -248,11 +274,13 @@ pnpm run lint && pnpm run typecheck
 - Style stale indicator with amber/warning color
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Stale steps show warning icon overlay
 - [ ] Tooltip explains stale status
 - [ ] Non-stale steps render normally
@@ -267,9 +295,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/cancel-ai-dialog.tsx` - Cancel confirmation dialog
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `AlertDialog` from `@base-ui/react/alert-dialog`
 - Import `Button` from `@/components/ui/button`
@@ -281,11 +311,13 @@ pnpm run lint && pnpm run typecheck
 - Use destructive button variant for confirm action
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens/closes correctly
 - [ ] Confirm button triggers callback and closes dialog
 - [ ] Cancel button closes without action
@@ -301,9 +333,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/restore-run-dialog.tsx` - Restore confirmation dialog
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `AlertDialog` from `@base-ui/react/alert-dialog`
 - Import `Button` from `@/components/ui/button`
@@ -316,11 +350,13 @@ pnpm run lint && pnpm run typecheck
 - Include Cancel and "Restore" buttons
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog displays run details
 - [ ] Confirm triggers restore and closes
 - [ ] Cancel closes without action
@@ -335,9 +371,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/discard-results-dialog.tsx` - Discard confirmation dialog
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `AlertDialog` from `@base-ui/react/alert-dialog`
 - Import `Button` from `@/components/ui/button`
@@ -348,11 +386,13 @@ pnpm run lint && pnpm run typecheck
 - Include Cancel and "Discard" buttons with destructive variant
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens/closes correctly
 - [ ] Destructive action is clearly indicated
 - [ ] All validation commands pass
@@ -366,9 +406,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/context-file-list.tsx` - List of selected context files
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `FeatureRequestContextFile` type from `@/db/types`
 - Import `File`, `X`, `FileText`, `Image` icons from `lucide-react`
@@ -380,11 +422,13 @@ pnpm run lint && pnpm run typecheck
 - Handle empty state
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Files display with correct icons by type
 - [ ] Remove button triggers callback with file ID
 - [ ] Empty state is handled
@@ -399,9 +443,11 @@ pnpm run lint && pnpm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `components/features/workflow/context-file-picker.tsx` - Main file picker component
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `useElectronDialog` from `@/hooks/useElectron`
 - Import `useElectronFs` from `@/hooks/useElectron`
@@ -416,11 +462,13 @@ pnpm run lint && pnpm run typecheck
 - Handle loading and error states
 
 **Validation Commands:**
+
 ```bash
 pnpm run lint && pnpm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Add File button opens native file dialog
 - [ ] Selected files are added to context
 - [ ] Files list displays correctly
@@ -453,34 +501,34 @@ pnpm run lint && pnpm run typecheck
 
 ### Files to Create (11)
 
-| File | Component Group |
-|------|-----------------|
-| `components/features/workflow/parameter-slider.tsx` | Step Settings Panel |
-| `components/features/workflow/thinking-budget-control.tsx` | Step Settings Panel |
-| `components/features/workflow/step-settings-panel.tsx` | Step Settings Panel |
-| `components/features/workflow/run-history-item.tsx` | Run History Selector |
-| `components/features/workflow/run-history-dropdown.tsx` | Run History Selector |
-| `components/features/workflow/stale-warning-banner.tsx` | Stale State Indicator |
-| `components/features/workflow/cancel-ai-dialog.tsx` | Confirmation Dialogs |
-| `components/features/workflow/restore-run-dialog.tsx` | Confirmation Dialogs |
-| `components/features/workflow/discard-results-dialog.tsx` | Confirmation Dialogs |
-| `components/features/workflow/context-file-list.tsx` | Context File Picker |
-| `components/features/workflow/context-file-picker.tsx` | Context File Picker |
+| File                                                       | Component Group       |
+| ---------------------------------------------------------- | --------------------- |
+| `components/features/workflow/parameter-slider.tsx`        | Step Settings Panel   |
+| `components/features/workflow/thinking-budget-control.tsx` | Step Settings Panel   |
+| `components/features/workflow/step-settings-panel.tsx`     | Step Settings Panel   |
+| `components/features/workflow/run-history-item.tsx`        | Run History Selector  |
+| `components/features/workflow/run-history-dropdown.tsx`    | Run History Selector  |
+| `components/features/workflow/stale-warning-banner.tsx`    | Stale State Indicator |
+| `components/features/workflow/cancel-ai-dialog.tsx`        | Confirmation Dialogs  |
+| `components/features/workflow/restore-run-dialog.tsx`      | Confirmation Dialogs  |
+| `components/features/workflow/discard-results-dialog.tsx`  | Confirmation Dialogs  |
+| `components/features/workflow/context-file-list.tsx`       | Context File Picker   |
+| `components/features/workflow/context-file-picker.tsx`     | Context File Picker   |
 
 ### Files to Modify (1)
 
-| File | Change |
-|------|--------|
+| File                                     | Change                       |
+| ---------------------------------------- | ---------------------------- |
 | `components/features/workflow-steps.tsx` | Add stale step warning icons |
 
 ### Key Reference Files
 
-| File | Purpose |
-|------|---------|
+| File                                                      | Purpose                          |
+| --------------------------------------------------------- | -------------------------------- |
 | `components/features/clarification/advanced-settings.tsx` | Pattern for collapsible settings |
-| `components/features/clarification/model-selector.tsx` | Pattern for model selection |
-| `components/features/delete-feature-request-dialog.tsx` | Pattern for confirmation dialogs |
-| `components/ui/dialog.tsx` | Base dialog primitives |
-| `components/ui/collapsible.tsx` | Collapsible primitives |
-| `components/ui/select.tsx` | Select dropdown primitives |
-| `components/ui/alert.tsx` | Alert/warning banner |
+| `components/features/clarification/model-selector.tsx`    | Pattern for model selection      |
+| `components/features/delete-feature-request-dialog.tsx`   | Pattern for confirmation dialogs |
+| `components/ui/dialog.tsx`                                | Base dialog primitives           |
+| `components/ui/collapsible.tsx`                           | Collapsible primitives           |
+| `components/ui/select.tsx`                                | Select dropdown primitives       |
+| `components/ui/alert.tsx`                                 | Alert/warning banner             |

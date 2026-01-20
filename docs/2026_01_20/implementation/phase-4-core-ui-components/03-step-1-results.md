@@ -25,11 +25,13 @@
 **Base UI Primitive**: `@base-ui/react/slider`
 
 **CVA Variants**:
+
 - `sliderTrackVariants`: size (default, sm, lg)
 - `sliderIndicatorVariants`: size (default, sm, lg)
 - `sliderThumbVariants`: size (default, sm, lg)
 
 **Props**:
+
 - `label: string` - Label text displayed above the slider
 - `value: number` - Current slider value
 - `onValueChange: (value: number) => void` - Callback when value changes

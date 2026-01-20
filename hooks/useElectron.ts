@@ -362,10 +362,7 @@ export function useElectronDb() {
         if (!api) return Promise.resolve(undefined);
         return api.db.stepConfigurations.getById(id);
       },
-      update: (
-        id: number,
-        data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['update']>[1]
-      ) => {
+      update: (id: number, data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['update']>[1]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.stepConfigurations.update(id, data);
       },
@@ -383,9 +380,7 @@ export function useElectronDb() {
 
   const featureRequestContextFiles = useMemo(
     () => ({
-      bulkCreate: (
-        data: Parameters<NonNullable<typeof api>['db']['featureRequestContextFiles']['bulkCreate']>[0]
-      ) => {
+      bulkCreate: (data: Parameters<NonNullable<typeof api>['db']['featureRequestContextFiles']['bulkCreate']>[0]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.featureRequestContextFiles.bulkCreate(data);
       },

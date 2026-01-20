@@ -29,13 +29,7 @@ interface RunHistoryDropdownProps extends Omit<ComponentPropsWithRef<'div'>, 'ch
   step: FeatureRequestRunStep;
 }
 
-export const RunHistoryDropdown = ({
-  className,
-  featureRequestId,
-  ref,
-  step,
-  ...props
-}: RunHistoryDropdownProps) => {
+export const RunHistoryDropdown = ({ className, featureRequestId, ref, step, ...props }: RunHistoryDropdownProps) => {
   const [selectedRun, setSelectedRun] = useState<FeatureRequestRun | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -88,11 +82,7 @@ export const RunHistoryDropdown = ({
     <div className={cn('flex items-center', className)} ref={ref} {...props}>
       {/* Dropdown */}
       <SelectRoot onValueChange={handleRunSelect} value={currentRun?.id?.toString() ?? ''}>
-        <SelectTrigger
-          className={'min-w-[200px]'}
-          disabled={isEmptyState}
-          size={'sm'}
-        >
+        <SelectTrigger className={'min-w-[200px]'} disabled={isEmptyState} size={'sm'}>
           <div className={'flex items-center gap-2'}>
             <History aria-hidden={'true'} className={'size-4 text-muted-foreground'} />
             <SelectValue placeholder={isEmptyState ? 'No history' : 'Select version...'}>
@@ -139,10 +129,14 @@ export const RunHistoryDropdown = ({
                               <span
                                 className={cn(
                                   'rounded-full px-1.5 py-0.5 text-xs font-medium capitalize',
-                                  run.status === 'completed' && 'bg-green-500/15 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-                                  run.status === 'failed' && 'bg-red-500/15 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-                                  run.status === 'running' && 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-                                  run.status === 'pending' && 'bg-neutral-500/15 text-neutral-700 dark:bg-neutral-500/20 dark:text-neutral-400'
+                                  run.status === 'completed' &&
+                                    'bg-green-500/15 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                                  run.status === 'failed' &&
+                                    'bg-red-500/15 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                                  run.status === 'running' &&
+                                    'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+                                  run.status === 'pending' &&
+                                    'bg-neutral-500/15 text-neutral-700 dark:bg-neutral-500/20 dark:text-neutral-400'
                                 )}
                               >
                                 {run.status}

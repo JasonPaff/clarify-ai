@@ -8,21 +8,21 @@
 
 ## Query Hooks Created
 
-| Hook | Purpose | Parameters |
-|------|---------|------------|
-| `useContextFiles(featureRequestId)` | Fetch all context files for a feature request | `featureRequestId: number` |
-| `useContextFilesByType(featureRequestId, fileType)` | Fetch context files filtered by type | `featureRequestId: number, fileType: ContextFileType` |
-| `useContextFile(id)` | Fetch a single context file by ID | `id: number` |
+| Hook                                                | Purpose                                       | Parameters                                            |
+| --------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------- |
+| `useContextFiles(featureRequestId)`                 | Fetch all context files for a feature request | `featureRequestId: number`                            |
+| `useContextFilesByType(featureRequestId, fileType)` | Fetch context files filtered by type          | `featureRequestId: number, fileType: ContextFileType` |
+| `useContextFile(id)`                                | Fetch a single context file by ID             | `id: number`                                          |
 
 ## Mutation Hooks Created
 
-| Hook | Purpose | Cache Invalidation |
-|------|---------|-------------------|
-| `useAddContextFile()` | Create a single context file | Sets detail cache, invalidates lists |
-| `useBulkAddContextFiles()` | Bulk create multiple context files | Invalidates all list queries |
-| `useUpdateContextFile()` | Update a context file | Sets detail cache, invalidates lists |
-| `useRemoveContextFile()` | Delete a context file | Removes detail, invalidates all |
-| `useSetContextFileIncluded()` | Toggle `includedInContext` flag | Sets detail cache, invalidates lists |
+| Hook                          | Purpose                            | Cache Invalidation                   |
+| ----------------------------- | ---------------------------------- | ------------------------------------ |
+| `useAddContextFile()`         | Create a single context file       | Sets detail cache, invalidates lists |
+| `useBulkAddContextFiles()`    | Bulk create multiple context files | Invalidates all list queries         |
+| `useUpdateContextFile()`      | Update a context file              | Sets detail cache, invalidates lists |
+| `useRemoveContextFile()`      | Delete a context file              | Removes detail, invalidates all      |
+| `useSetContextFileIncluded()` | Toggle `includedInContext` flag    | Sets detail cache, invalidates lists |
 
 ## Validation Results
 

@@ -24,6 +24,7 @@
 ## Component Summary
 
 **Props**:
+
 - `open?: boolean` - Controlled open state
 - `onOpenChange?: (open: boolean) => void` - State change callback
 - `onConfirm: () => void` - Called when user confirms cancellation
@@ -31,6 +32,7 @@
 - `children?: ReactNode` - Trigger content
 
 **Pattern**:
+
 - Uses `useControllableState` for controlled/uncontrolled state
 - Follows exact pattern from `delete-feature-request-dialog.tsx`
 - Base UI `AlertDialog` primitive

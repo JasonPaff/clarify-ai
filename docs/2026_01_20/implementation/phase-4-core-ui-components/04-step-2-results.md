@@ -23,12 +23,14 @@
 ## Component Summary
 
 **Props Interface**:
+
 - `isEnabled` / `onEnabledChange` - Toggle state for extended thinking
 - `budget` / `onBudgetChange` - Token budget value (1024-128000, step 1024)
 - `isSupportsThinking` - Whether the current model supports extended thinking
 - `isDisabled` - External disable control
 
 **Behavior**:
+
 - When `isSupportsThinking` is false, switch is disabled with explanatory tooltip
 - Slider only renders when both `isEnabled` and `isSupportsThinking` are true
 - Budget values formatted as "Xk tokens" for values >= 1000

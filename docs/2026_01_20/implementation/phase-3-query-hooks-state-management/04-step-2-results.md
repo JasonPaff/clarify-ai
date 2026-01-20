@@ -12,11 +12,11 @@
 
 ## Query Keys Created
 
-| Key | Purpose | Parameters |
-|-----|---------|------------|
-| `stepConfigurationKeys.byFeatureRequest(featureRequestId)` | List all configurations for a feature request | `featureRequestId: number` |
-| `stepConfigurationKeys.byFeatureRequestAndStep(featureRequestId, step)` | Get configuration for specific step | `featureRequestId: number, step: StepConfigurationStep` |
-| `stepConfigurationKeys.detail(id)` | Get a single configuration by ID | `id: number` |
+| Key                                                                     | Purpose                                       | Parameters                                              |
+| ----------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------- |
+| `stepConfigurationKeys.byFeatureRequest(featureRequestId)`              | List all configurations for a feature request | `featureRequestId: number`                              |
+| `stepConfigurationKeys.byFeatureRequestAndStep(featureRequestId, step)` | Get configuration for specific step           | `featureRequestId: number, step: StepConfigurationStep` |
+| `stepConfigurationKeys.detail(id)`                                      | Get a single configuration by ID              | `id: number`                                            |
 
 ## Validation Results
 

@@ -8,9 +8,11 @@
 ## Inputs
 
 ### Refined Feature Request
+
 Implement Phase 4 of the feature request workflow - Core UI Components covering five component groups for workflow step management.
 
 ### File Discovery Summary
+
 - 11 new files to create
 - 1 file to modify
 - 43 reference files discovered
@@ -43,20 +45,20 @@ Key Patterns:
 
 The implementation planner generated a 12-step plan organized by component group:
 
-| Step | Component | Files |
-|------|-----------|-------|
-| 1 | Parameter Slider | parameter-slider.tsx |
-| 2 | Thinking Budget Control | thinking-budget-control.tsx |
-| 3 | Step Settings Panel | step-settings-panel.tsx |
-| 4 | Run History Item | run-history-item.tsx |
-| 5 | Run History Dropdown | run-history-dropdown.tsx |
-| 6 | Stale Warning Banner | stale-warning-banner.tsx |
-| 7 | Workflow Steps Enhancement | workflow-steps.tsx (modify) |
-| 8 | Cancel AI Dialog | cancel-ai-dialog.tsx |
-| 9 | Restore Run Dialog | restore-run-dialog.tsx |
-| 10 | Discard Results Dialog | discard-results-dialog.tsx |
-| 11 | Context File List | context-file-list.tsx |
-| 12 | Context File Picker | context-file-picker.tsx |
+| Step | Component                  | Files                       |
+| ---- | -------------------------- | --------------------------- |
+| 1    | Parameter Slider           | parameter-slider.tsx        |
+| 2    | Thinking Budget Control    | thinking-budget-control.tsx |
+| 3    | Step Settings Panel        | step-settings-panel.tsx     |
+| 4    | Run History Item           | run-history-item.tsx        |
+| 5    | Run History Dropdown       | run-history-dropdown.tsx    |
+| 6    | Stale Warning Banner       | stale-warning-banner.tsx    |
+| 7    | Workflow Steps Enhancement | workflow-steps.tsx (modify) |
+| 8    | Cancel AI Dialog           | cancel-ai-dialog.tsx        |
+| 9    | Restore Run Dialog         | restore-run-dialog.tsx      |
+| 10   | Discard Results Dialog     | discard-results-dialog.tsx  |
+| 11   | Context File List          | context-file-list.tsx       |
+| 12   | Context File Picker        | context-file-picker.tsx     |
 
 ## Plan Validation Results
 

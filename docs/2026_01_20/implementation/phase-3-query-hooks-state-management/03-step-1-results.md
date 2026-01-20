@@ -12,14 +12,14 @@
 
 ## Query Keys Created
 
-| Key | Purpose | Parameters |
-|-----|---------|------------|
-| `featureRequestRunKeys.byFeatureRequest(featureRequestId)` | List all runs for a feature request | `featureRequestId: number` |
-| `featureRequestRunKeys.byFeatureRequestAndStep(featureRequestId, step)` | List runs filtered by step | `featureRequestId: number, step: FeatureRequestRunStep` |
-| `featureRequestRunKeys.currentRun(featureRequestId, step)` | Get the current run for a step | `featureRequestId: number, step: FeatureRequestRunStep` |
-| `featureRequestRunKeys.detail(id)` | Get a single run by ID | `id: number` |
-| `featureRequestRunKeys.latest(featureRequestId)` | Get the most recent run | `featureRequestId: number` |
-| `featureRequestRunKeys.latestByStep(featureRequestId, step)` | Get the most recent run for a step | `featureRequestId: number, step: FeatureRequestRunStep` |
+| Key                                                                     | Purpose                             | Parameters                                              |
+| ----------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------- |
+| `featureRequestRunKeys.byFeatureRequest(featureRequestId)`              | List all runs for a feature request | `featureRequestId: number`                              |
+| `featureRequestRunKeys.byFeatureRequestAndStep(featureRequestId, step)` | List runs filtered by step          | `featureRequestId: number, step: FeatureRequestRunStep` |
+| `featureRequestRunKeys.currentRun(featureRequestId, step)`              | Get the current run for a step      | `featureRequestId: number, step: FeatureRequestRunStep` |
+| `featureRequestRunKeys.detail(id)`                                      | Get a single run by ID              | `id: number`                                            |
+| `featureRequestRunKeys.latest(featureRequestId)`                        | Get the most recent run             | `featureRequestId: number`                              |
+| `featureRequestRunKeys.latestByStep(featureRequestId, step)`            | Get the most recent run for a step  | `featureRequestId: number, step: FeatureRequestRunStep` |
 
 ## Validation Results
 

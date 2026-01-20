@@ -76,13 +76,7 @@ export const ContextFilePicker = ({ className, featureRequestId }: ContextFilePi
           <FolderOpen className={'size-4 text-muted-foreground'} />
           <span className={'text-sm font-medium'}>Context Files</span>
         </div>
-        <Button
-          disabled={isDisabled}
-          onClick={handleAddFileClick}
-          size={'sm'}
-          type={'button'}
-          variant={'outline'}
-        >
+        <Button disabled={isDisabled} onClick={handleAddFileClick} size={'sm'} type={'button'} variant={'outline'}>
           <Plus className={'size-4'} />
           Add File
         </Button>

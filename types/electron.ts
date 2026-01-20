@@ -111,9 +111,7 @@ export interface ElectronAPI {
       generate(
         request: import('../electron/ipc/ai-plan.handlers').PlanGenerateRequest
       ): Promise<{ error?: string; success: boolean }>;
-      onStream(
-        callback: (chunk: import('../electron/ipc/ai-plan.handlers').PlanStreamChunk) => void
-      ): () => void;
+      onStream(callback: (chunk: import('../electron/ipc/ai-plan.handlers').PlanStreamChunk) => void): () => void;
     };
     repositoryOverview: {
       cancel(): Promise<void>;

@@ -24,11 +24,13 @@
 ## Component Summary
 
 **Props**:
+
 - `featureRequestId: number` - Feature request to show runs for
 - `step: WorkflowStep` - Workflow step to filter runs
 - `className?: string` - Additional CSS classes
 
 **Features**:
+
 - Uses `useRunsByStep` hook for data fetching
 - Current run marked with "Current" badge
 - Integrates `RestoreRunDialog` for confirmation
@@ -36,6 +38,7 @@
 - Uses `useSetCurrentRun` mutation for restoration
 
 **Integration**:
+
 - Uses select primitives from `@/components/ui/select`
 - Uses `RunHistoryItem` for individual run display
 - Query hooks handle cache invalidation

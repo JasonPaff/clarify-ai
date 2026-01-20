@@ -64,8 +64,8 @@ Implement Phase 3 of the feature request workflow by creating React hooks for ac
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
+| Metric              | Value      |
+| ------------------- | ---------- |
 | Original Word Count | ~100 words |
-| Refined Word Count | 407 words |
-| Expansion Ratio | ~4x |
+| Refined Word Count  | 407 words  |
+| Expansion Ratio     | ~4x        |

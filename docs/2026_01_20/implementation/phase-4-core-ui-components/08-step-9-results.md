@@ -23,6 +23,7 @@
 ## Component Summary
 
 **Props**:
+
 - `open?: boolean` - Controlled open state
 - `onOpenChange?: (open: boolean) => void` - State change callback
 - `onConfirm: () => void` - Called when user confirms restore
@@ -30,6 +31,7 @@
 - `children?: ReactNode` - Trigger content
 
 **Features**:
+
 - Displays step label (Refinement/Research/Planning)
 - Shows run status and formatted date
 - Warning about replacing current outputs

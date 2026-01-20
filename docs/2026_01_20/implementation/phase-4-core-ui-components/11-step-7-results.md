@@ -23,14 +23,17 @@
 ## Changes Summary
 
 **Imports Added**:
+
 - `AlertTriangle` from `lucide-react`
 - `Tooltip` from `@/components/ui/tooltip`
 
 **Interface Extensions**:
+
 - `Step.isStale?: boolean`
 - `WorkflowStepsProps.staleSteps?: Array<string>`
 
 **Visual Indicators**:
+
 - Amber-500 border on step indicator when stale
 - AlertTriangle badge overlay at top-right
 - Amber-500 text color on step title

@@ -110,11 +110,7 @@ export function createFeatureRequestRunsRepository(db: DrizzleDatabase): Feature
         .get();
     },
 
-    setCurrentRun(
-      featureRequestId: number,
-      step: FeatureRequestRunStep,
-      runId: number
-    ): FeatureRequestRun | undefined {
+    setCurrentRun(featureRequestId: number, step: FeatureRequestRunStep, runId: number): FeatureRequestRun | undefined {
       // First, set isCurrentRun=false for ALL runs matching featureRequestId and step
       db.update(featureRequestRuns)
         .set({ isCurrentRun: false, updatedAt: sql`(CURRENT_TIMESTAMP)` })

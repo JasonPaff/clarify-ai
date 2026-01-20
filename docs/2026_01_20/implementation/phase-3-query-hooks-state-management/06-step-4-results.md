@@ -13,6 +13,7 @@ The query keys index was already updated by the subagents during the previous st
 ## Current Index Contents
 
 The index now merges:
+
 - `apiKeyKeys`
 - `featureRequestContextFileKeys` (added in Step 3)
 - `featureRequestKeys`

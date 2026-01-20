@@ -4,10 +4,10 @@
 
 ## Quality Gate Results
 
-| Gate | Result |
-|------|--------|
-| pnpm lint | PASS |
-| pnpm typecheck | PASS |
+| Gate           | Result |
+| -------------- | ------ |
+| pnpm lint      | PASS   |
+| pnpm typecheck | PASS   |
 
 ## Quality Checklist
 

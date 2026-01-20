@@ -24,6 +24,7 @@
 ## Component Summary
 
 **Features**:
+
 - Uses `Collapsible` with Settings2 icon header
 - Model selection via `ModelSelector` component
 - Temperature slider (0-2, step 0.1)
@@ -33,6 +34,7 @@
 - "Customized" badge when settings differ from defaults
 
 **Integration**:
+
 - Uses `useStepConfig` and `useUpsertStepConfig` hooks for data persistence
 - Follows `advanced-settings.tsx` pattern exactly
 

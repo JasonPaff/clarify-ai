@@ -16,13 +16,13 @@
 
 ### Component Groups
 
-| Component Group | Files | Description |
-|----------------|-------|-------------|
-| Step Settings Panel | 3 | Collapsible panel with model, params, prompt |
-| Run History Selector | 2 | Dropdown for viewing/restoring past runs |
-| Stale State Indicator | 2 | Banner + stepper icons for stale steps |
-| Confirmation Dialogs | 3 | Cancel AI, Restore Run, Discard Results |
-| Context File Picker | 2 | File browser + selected files list |
+| Component Group       | Files | Description                                  |
+| --------------------- | ----- | -------------------------------------------- |
+| Step Settings Panel   | 3     | Collapsible panel with model, params, prompt |
+| Run History Selector  | 2     | Dropdown for viewing/restoring past runs     |
+| Stale State Indicator | 2     | Banner + stepper icons for stale steps       |
+| Confirmation Dialogs  | 3     | Cancel AI, Restore Run, Discard Results      |
+| Context File Picker   | 2     | File browser + selected files list           |
 
 ### Files Summary
 

@@ -33,9 +33,11 @@
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/feature-request-runs.ts` - Query key factory for run-related queries
 
 **Changes:**
+
 - Define `featureRequestRunKeys` using `createQueryKeys` from `@lukemorales/query-key-factory`
 - Add key for `byFeatureRequest(featureRequestId)` - list all runs for a feature request
 - Add key for `byFeatureRequestAndStep(featureRequestId, step)` - list runs filtered by step
@@ -45,11 +47,13 @@
 - Add key for `latestByStep(featureRequestId, step)` - get the most recent run for a step
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] File exports `featureRequestRunKeys` with all defined key factories
 - [ ] TypeScript compiles without errors
 - [ ] ESLint passes without errors
@@ -63,20 +67,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/step-configurations.ts` - Query key factory for step configuration queries
 
 **Changes:**
+
 - Define `stepConfigurationKeys` using `createQueryKeys` from `@lukemorales/query-key-factory`
 - Add key for `byFeatureRequest(featureRequestId)` - list all configurations for a feature request
 - Add key for `byFeatureRequestAndStep(featureRequestId, step)` - get configuration for specific step
 - Add key for `detail(id)` - get a single configuration by ID
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] File exports `stepConfigurationKeys` with all defined key factories
 - [ ] TypeScript compiles without errors
 - [ ] ESLint passes without errors
@@ -90,20 +98,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `lib/queries/feature-request-context-files.ts` - Query key factory for context file queries
 
 **Changes:**
+
 - Define `featureRequestContextFileKeys` using `createQueryKeys` from `@lukemorales/query-key-factory`
 - Add key for `byFeatureRequest(featureRequestId)` - list all context files for a feature request
 - Add key for `byFeatureRequestAndType(featureRequestId, fileType)` - list files filtered by type
 - Add key for `detail(id)` - get a single context file by ID
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] File exports `featureRequestContextFileKeys` with all defined key factories
 - [ ] TypeScript compiles without errors
 - [ ] ESLint passes without errors
@@ -117,20 +129,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `lib/queries/index.ts` - Central query key registry
 
 **Changes:**
+
 - Import `featureRequestRunKeys` from `./feature-request-runs`
 - Import `stepConfigurationKeys` from `./step-configurations`
 - Import `featureRequestContextFileKeys` from `./feature-request-context-files`
 - Add all three key factories to `mergeQueryKeys` call
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All new key factories are imported and merged
 - [ ] `QueryKeys` type includes all new key definitions
 - [ ] TypeScript compiles without errors
@@ -145,9 +161,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/useElectron.ts` - Electron API hooks
 
 **Changes:**
+
 - Add `featureRequestRuns` useMemo block with methods: `create`, `delete`, `getById`, `getByFeatureRequestId`, `getByFeatureRequestIdAndStatus`, `getByFeatureRequestIdAndStep`, `getCurrentRun`, `getLatestByFeatureRequestId`, `getLatestByFeatureRequestIdAndStep`, `setCurrentRun`, `update`
 - Add `stepConfigurations` useMemo block with methods: `create`, `delete`, `getById`, `getByFeatureRequestId`, `getByFeatureRequestIdAndStep`, `update`, `upsert`
 - Add `featureRequestContextFiles` useMemo block with methods: `create`, `bulkCreate`, `delete`, `getById`, `getByFeatureRequestId`, `getByFeatureRequestIdAndType`, `setIncludedInContext`, `update`
@@ -155,11 +173,13 @@ pnpm lint && pnpm typecheck
 - Follow existing pattern of throwing `Error('Electron API not available')` for mutations and returning empty arrays/undefined for queries
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `useElectronDb()` returns `featureRequestRuns`, `stepConfigurations`, and `featureRequestContextFiles`
 - [ ] All methods match the signatures in `ElectronAPI.db.*` interface
 - [ ] TypeScript compiles without errors
@@ -174,9 +194,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-feature-request-runs.ts` - Query hooks for runs
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `useMutation`, `useQuery`, `useQueryClient` from `@tanstack/react-query`
 - Import `featureRequestRunKeys` from `@/lib/queries/feature-request-runs`
@@ -195,11 +217,13 @@ pnpm lint && pnpm typecheck
 - All mutations should invalidate relevant query keys on success
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All hooks exported and functional
 - [ ] Queries use proper enabled conditions
 - [ ] Mutations invalidate correct query keys
@@ -215,9 +239,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-step-configurations.ts` - Query hooks for step configurations
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `useMutation`, `useQuery`, `useQueryClient` from `@tanstack/react-query`
 - Import `stepConfigurationKeys` from `@/lib/queries/step-configurations`
@@ -233,11 +259,13 @@ pnpm lint && pnpm typecheck
 - All mutations should invalidate relevant query keys on success
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All hooks exported and functional
 - [ ] Queries use proper enabled conditions
 - [ ] Mutations invalidate correct query keys
@@ -253,9 +281,11 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `hooks/queries/use-feature-request-context-files.ts` - Query hooks for context files
 
 **Changes:**
+
 - Add `'use client'` directive
 - Import `useMutation`, `useQuery`, `useQueryClient` from `@tanstack/react-query`
 - Import `featureRequestContextFileKeys` from `@/lib/queries/feature-request-context-files`
@@ -272,11 +302,13 @@ pnpm lint && pnpm typecheck
 - All mutations should invalidate relevant query keys on success
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All hooks exported and functional
 - [ ] Queries use proper enabled conditions
 - [ ] Mutations invalidate correct query keys
@@ -292,20 +324,24 @@ pnpm lint && pnpm typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `hooks/queries/use-feature-requests.ts` - Existing feature request hooks
 
 **Changes:**
+
 - Implement `useArchiveFeatureRequest()` mutation that calls `featureRequests.update(id, { archivedAt: new Date().toISOString() })`
 - Implement `useUnarchiveFeatureRequest()` mutation that calls `featureRequests.update(id, { archivedAt: null })`
 - Both mutations should invalidate `featureRequestKeys.detail(id)` and `featureRequestKeys.byProject._def` on success
 - Follow the existing mutation pattern in the file for consistency
 
 **Validation Commands:**
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `useArchiveFeatureRequest` and `useUnarchiveFeatureRequest` hooks exported
 - [ ] Mutations properly set/clear `archivedAt` timestamp
 - [ ] Query cache invalidation works correctly

@@ -23,11 +23,13 @@
 ## Component Summary
 
 **Props**:
+
 - `files: Array<FeatureRequestContextFile>` - Context files to display
 - `onRemove: (fileId: number) => void` - Callback when remove clicked
 - `className?: string` - Additional CSS classes
 
 **Features**:
+
 - Type-based icons: document → FileText, image → Image, repository → File
 - Truncated path display with full path tooltip
 - Empty state message: "No context files added"

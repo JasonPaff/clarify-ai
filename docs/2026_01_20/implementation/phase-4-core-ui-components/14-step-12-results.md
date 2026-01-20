@@ -24,10 +24,12 @@
 ## Component Summary
 
 **Props**:
+
 - `featureRequestId: number` - Feature request to manage files for
 - `className?: string` - Additional CSS classes
 
 **Features**:
+
 - Uses `useElectronDialog().openFile()` for native file dialog
 - Uses `useElectronFs().stat()` for file size
 - Automatic file type detection (image vs document) from extension

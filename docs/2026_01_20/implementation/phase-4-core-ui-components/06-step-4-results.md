@@ -24,17 +24,20 @@
 ## Component Summary
 
 **Props**:
+
 - `run: FeatureRequestRun` - The run data to display
 - `isCurrentRun: boolean` - Whether this is the currently selected run
 - `onRunSelect: (run: FeatureRequestRun) => void` - Callback when user selects this run
 
 **CVA Variants** (`runStatusBadgeVariants`):
+
 - completed: green background
 - failed: red background
 - running: yellow background
 - pending: neutral background
 
 **Features**:
+
 - Relative timestamp display
 - Duration display when available
 - Status badge with color variants

@@ -8,14 +8,15 @@
 
 ## Mutation Hooks Added
 
-| Hook | Purpose | Action |
-|------|---------|--------|
-| `useArchiveFeatureRequest()` | Archive a feature request | Sets `archivedAt` to ISO timestamp |
-| `useUnarchiveFeatureRequest()` | Unarchive a feature request | Sets `archivedAt` to `null` |
+| Hook                           | Purpose                     | Action                             |
+| ------------------------------ | --------------------------- | ---------------------------------- |
+| `useArchiveFeatureRequest()`   | Archive a feature request   | Sets `archivedAt` to ISO timestamp |
+| `useUnarchiveFeatureRequest()` | Unarchive a feature request | Sets `archivedAt` to `null`        |
 
 ## Cache Invalidation
 
 Both mutations:
+
 - Set detail query data via `queryClient.setQueryData`
 - Invalidate list queries via `featureRequestKeys.byProject._def`
 

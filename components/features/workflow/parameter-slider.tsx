@@ -122,10 +122,7 @@ export const ParameterSlider = ({
             <Slider.Indicator className={sliderIndicatorVariants({ size })} />
             <Slider.Thumb
               aria-label={label}
-              className={cn(
-                sliderThumbVariants({ size }),
-                'cursor-grab transition-shadow hover:shadow-md'
-              )}
+              className={cn(sliderThumbVariants({ size }), 'cursor-grab transition-shadow hover:shadow-md')}
             />
           </Slider.Track>
         </Slider.Control>

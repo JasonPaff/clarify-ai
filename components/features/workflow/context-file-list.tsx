@@ -44,16 +44,11 @@ export const ContextFileList = ({ className, files, onRemove }: ContextFileListP
 
         // Truncate path to show only last 2 segments
         const pathSegments = file.filePath.split(/[/\\]/);
-        const truncatedPath =
-          pathSegments.length > 2
-            ? `.../${pathSegments.slice(-2).join('/')}`
-            : file.filePath;
+        const truncatedPath = pathSegments.length > 2 ? `.../${pathSegments.slice(-2).join('/')}` : file.filePath;
 
         return (
           <div
-            className={
-              'flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2'
-            }
+            className={'flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2'}
             key={file.id}
           >
             {/* File Info */}

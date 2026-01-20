@@ -24,6 +24,7 @@
 ## Component Summary
 
 **Props**:
+
 - `stepName: string` - Name of the workflow step
 - `reason: string` - Explanation of why step is stale
 - `onRerun: () => void` - Callback for re-run action
@@ -31,6 +32,7 @@
 - `className?: string` - Additional CSS classes
 
 **Features**:
+
 - Uses Alert component with warning variant
 - AlertTriangle icon for visual warning
 - RefreshCw icon on "Re-run" button
