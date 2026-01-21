@@ -14,7 +14,7 @@
 
 ## Quick Summary
 
-- Transform the placeholder `research-step.tsx` into a fully functional file discovery system with AI-powered analysis
+- Replace the placeholder discover step file (`research-step.tsx`) with a fully functional file discovery system with AI-powered analysis
 - Implement scope selector UI with folder tree navigation, glob pattern filtering, and per-repository configuration
 - Build discovery AI integration with streaming progress, tool-based file analysis, and parallel repository processing
 - Create comprehensive results UI with file cards, expandable details, inline editing, and manual file addition
@@ -25,8 +25,8 @@
 - [x] Repository overview generation system is functional (existing)
 - [x] TanStack Query setup is configured (existing)
 - [x] IPC channels for discovery are defined in `electron/ipc/channels.ts` (existing)
-- [x] Step configuration system supports 'research' step (existing)
-- [x] Feature request schema has `researchFindings` field (existing)
+- [x] Step configuration system supports 'discover' step (existing)
+- [x] Feature request schema has `discoveryFindings` field (existing)
 
 ---
 
@@ -195,7 +195,7 @@ pnpm run lint:fix && pnpm run typecheck
 
 **Changes:**
 - Define hook interface with status, files, progress, error, and action methods
-- Initialize state from feature request's researchFindings field
+- Initialize state from feature request's discoveryFindings field
 - Set up stream listener for discovery chunks
 - Handle progress updates (percentage, currentStep)
 - Handle result chunks to populate discovered files
@@ -460,12 +460,12 @@ pnpm run lint:fix && pnpm run typecheck
 **Changes:**
 - Accept featureRequest and projectId props
 - Use useDiscovery hook for state management
-- Use useStepConfig for 'research' step configuration
-- Use useCurrentRun for 'research' step run tracking
+- Use useStepConfig for 'discover' step configuration
+- Use useCurrentRun for 'discover' step run tracking
 - Use useStaleSteps for stale state handling
 - Use useFeatureRequestRepositories for selected repositories
 - Check repository overview status using useRepositoryOverviewStatuses
-- Display StaleWarningBanner when research step is stale
+- Display StaleWarningBanner when discover step is stale
 - Display header with StepSettingsPanel, cost estimate, and RunHistoryDropdown
 - Display RepositoryOverviewStatusPanel showing overview requirements
 - Show missing overview warning when repositories lack overviews
@@ -482,7 +482,7 @@ pnpm run lint:fix && pnpm run typecheck
 
 **Success Criteria:**
 - [ ] Component integrates all sub-components correctly
-- [ ] Step settings panel configured for 'research' step
+- [ ] Step settings panel configured for 'discover' step
 - [ ] Repository overview requirements enforced
 - [ ] Progress and results display at correct times
 - [ ] Run history restoration works
@@ -492,7 +492,7 @@ pnpm run lint:fix && pnpm run typecheck
 
 ### Step 15: Integrate Discover Step into Feature Page
 
-**What**: Replace the placeholder ResearchStep with the new DiscoverStep component in the feature workflow page.
+**What**: Replace the placeholder discover step component (`ResearchStep`) with the new DiscoverStep component in the feature workflow page.
 **Why**: Connects the new discovery functionality to the main application workflow.
 **Confidence**: High
 
@@ -511,21 +511,21 @@ pnpm run lint:fix && pnpm run typecheck
 ```
 
 **Success Criteria:**
-- [ ] DiscoverStep renders in research workflow position
+- [ ] DiscoverStep renders in discover workflow position
 - [ ] Props passed correctly from page component
 - [ ] Navigation between steps works
 - [ ] All validation commands pass
 
 ---
 
-### Step 16: Remove Legacy Research Step Component
+### Step 16: Remove Legacy Discover Step Component
 
-**What**: Delete the old placeholder research-step.tsx file since it has been replaced.
+**What**: Delete the old placeholder discover step file (`research-step.tsx`) since it has been replaced.
 **Why**: Removes unused code and prevents confusion with the new implementation.
 **Confidence**: High
 
 **Files to Delete:**
-- `components/features/research-step.tsx` - Legacy placeholder component
+- `components/features/research-step.tsx` - Legacy discover step placeholder component
 
 **Changes:**
 - Delete the file entirely
