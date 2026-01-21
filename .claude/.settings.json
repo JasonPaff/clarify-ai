@@ -1,7 +1,3 @@
 {
-  "hooks": {},
-  "env": {
-    "ANTHROPIC_BASE_URL" : "http://localhost:8080",
-    "ANTHROPIC_API_KEY" : "dummy"
-  }
+  "hooks": {}
 }
