@@ -8,6 +8,7 @@ import { useRepositories } from '@/hooks/queries/use-repositories';
 interface RepositorySelectorProps {
   description?: string;
   isDisabled?: boolean;
+  isRequired?: boolean;
   label?: string;
   projectId: number;
 }
@@ -26,6 +27,7 @@ interface RepositorySelectorProps {
 export const RepositorySelector = ({
   description,
   isDisabled,
+  isRequired,
   label = 'Repositories',
   projectId,
 }: RepositorySelectorProps) => {
@@ -42,14 +44,21 @@ export const RepositorySelector = ({
 
   const hasNoRepositories = !isPending && options.length === 0;
 
-  const descriptionDisplay = hasNoRepositories
-    ? 'No repositories found for this project. Add repositories in project settings.'
-    : description;
+  const getDescriptionText = () => {
+    if (hasNoRepositories) {
+      return 'No repositories found for this project. Add repositories in project settings.';
+    }
+    if (isRequired && !description) {
+      return 'At least one repository must be selected.';
+    }
+    return description;
+  };
 
   return (
     <MultiSelectField
-      description={descriptionDisplay}
+      description={getDescriptionText()}
       isDisabled={isDisabled || isPending || hasNoRepositories}
+      isRequired={isRequired}
       label={label}
       options={options}
     />

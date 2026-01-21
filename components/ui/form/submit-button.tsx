@@ -13,7 +13,7 @@ type SubmitButtonProps = ClassName & RequiredChildren & VariantProps<typeof butt
 export function SubmitButton({ children, className, size, variant }: SubmitButtonProps) {
   const form = useFormContext();
 
-  const [isSubmitting] = useStore(form.store, (state) => [state.isSubmitting]);
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
 
   return (
     <Button

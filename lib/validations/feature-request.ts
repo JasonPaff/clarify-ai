@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { repositoryIdsSchema } from './feature-request-repositories';
+import {
+  repositoryIdsSchema,
+  requiredRepositoryIdsSchema,
+} from './feature-request-repositories';
 
 /**
  * Status enum for feature request workflow stages:
@@ -30,9 +33,10 @@ const featureRequestRawRequestSchema = z.string().min(1, 'Please describe your f
 const featureRequestTitleSchema = z.string().min(1, 'Title is required').max(255, 'Title is too long');
 
 // Schema for creating a new feature request
+// Requires at least one repository to be selected for discovery and planning workflow
 export const createFeatureRequestSchema = z.object({
   description: featureRequestDescriptionSchema,
-  repositoryIds: repositoryIdsSchema,
+  repositoryIds: requiredRepositoryIdsSchema,
   title: featureRequestTitleSchema,
 });
 

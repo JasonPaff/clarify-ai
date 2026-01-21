@@ -29,6 +29,7 @@ type MultiSelectFieldProps = ClassName &
   VariantProps<typeof checkboxVariants> & {
     description?: string;
     isDisabled?: boolean;
+    isRequired?: boolean;
     label: string;
     options: Array<MultiSelectOption>;
   };
@@ -43,6 +44,7 @@ export const MultiSelectField = ({
   className,
   description,
   isDisabled,
+  isRequired,
   label,
   options,
   size,
@@ -77,6 +79,11 @@ export const MultiSelectField = ({
       {/* Label */}
       <Field.Label className={labelVariants({ size })} nativeLabel={false} render={<span />}>
         {label}
+        {isRequired && (
+          <span aria-hidden={'true'} className={'ml-0.5 text-destructive'}>
+            *
+          </span>
+        )}
       </Field.Label>
 
       {/* Options List */}

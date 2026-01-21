@@ -15,6 +15,7 @@ type TextFieldProps = ClassName &
     autoFocus?: boolean;
     description?: string;
     isDisabled?: boolean;
+    isRequired?: boolean;
     label: string;
     placeholder?: string;
     type?: 'email' | 'password' | 'text' | 'url';
@@ -25,6 +26,7 @@ export const TextField = ({
   className,
   description,
   isDisabled,
+  isRequired,
   label,
   placeholder,
   size,
@@ -46,7 +48,14 @@ export const TextField = ({
       size={size}
     >
       {/* Label */}
-      <Field.Label className={labelVariants({ size })}>{label}</Field.Label>
+      <Field.Label className={labelVariants({ size })}>
+        {label}
+        {isRequired && (
+          <span aria-hidden={'true'} className={'ml-0.5 text-destructive'}>
+            *
+          </span>
+        )}
+      </Field.Label>
 
       {/* Input */}
       <Input

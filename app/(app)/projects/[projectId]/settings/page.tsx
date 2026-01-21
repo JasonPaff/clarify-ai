@@ -1,22 +1,40 @@
 'use client';
 
-import { AlertTriangle, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, FolderOutput, Loader2, Pencil, Trash2 } from 'lucide-react';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { use } from 'react';
 
 import { PageProps, Route } from '@/app/(app)/projects/[projectId]/settings/route-type';
+import { DefaultModelSettings } from '@/components/projects/default-model-settings';
 import { DeleteProjectDialog } from '@/components/projects/delete-project-dialog';
 import { EditProjectDialog } from '@/components/projects/edit-project-dialog';
+import { PlanExportFolderField } from '@/components/projects/plan-export-folder-field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useProject } from '@/hooks/queries/use-projects';
+import { useProject, useUpdateProject } from '@/hooks/queries/use-projects';
+import { useAppForm } from '@/lib/forms/form-hook';
 
 type ProjectSettingsPageProps = PageProps;
 
 function ProjectSettingsPage({ routeParams }: ProjectSettingsPageProps) {
   const { projectId } = use(routeParams);
   const { data: project, error, isLoading } = useProject(projectId);
+  const updateProject = useUpdateProject();
+
+  const exportFolderForm = useAppForm({
+    defaultValues: {
+      planExportFolder: project ? (project.planExportFolder ?? '') : '',
+    },
+    onSubmit: async ({ value }) => {
+      await updateProject.mutateAsync({
+        data: {
+          planExportFolder: value.planExportFolder || null,
+        },
+        id: projectId,
+      });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -73,6 +91,58 @@ function ProjectSettingsPage({ routeParams }: ProjectSettingsPageProps) {
           </div>
         </CardContent>
       </Card>
+
+      <Separator />
+
+      {/* Export Settings */}
+      <Card>
+        <CardHeader>
+          <div className={'flex items-center gap-3'}>
+            <div className={'flex size-10 items-center justify-center rounded-lg bg-muted'}>
+              <FolderOutput className={'size-5 text-muted-foreground'} />
+            </div>
+            <div>
+              <CardTitle>Export Settings</CardTitle>
+              <CardDescription>Configure where implementation plans are exported</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              void exportFolderForm.handleSubmit();
+            }}
+          >
+            <div className={'flex flex-col gap-4'}>
+              <exportFolderForm.AppField name={'planExportFolder'}>
+                {() => (
+                  <PlanExportFolderField
+                    description={'Select a folder to automatically export implementation plans as markdown files'}
+                    isDisabled={updateProject.isPending}
+                    label={'Plan Export Folder'}
+                  />
+                )}
+              </exportFolderForm.AppField>
+
+              {/* Save Button */}
+              <div className={'flex justify-end'}>
+                <exportFolderForm.AppForm>
+                  <exportFolderForm.SubmitButton>
+                    {updateProject.isPending ? 'Saving...' : 'Save'}
+                  </exportFolderForm.SubmitButton>
+                </exportFolderForm.AppForm>
+              </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Default AI Models */}
+      <DefaultModelSettings projectId={projectId} />
 
       <Separator />
 

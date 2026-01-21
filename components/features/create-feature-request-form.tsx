@@ -30,6 +30,7 @@ export function CreateFeatureRequestForm({
       await onSubmit(value);
     },
     validators: {
+      onChange: createFeatureRequestSchema,
       onSubmit: createFeatureRequestSchema,
     },
   });
@@ -46,7 +47,12 @@ export function CreateFeatureRequestForm({
         {/* Title Field */}
         <form.AppField name={'title'}>
           {(field) => (
-            <field.TextField autoFocus label={'Title'} placeholder={'Enter a title for your feature request'} />
+            <field.TextField
+              autoFocus
+              isRequired
+              label={'Title'}
+              placeholder={'Enter a title for your feature request'}
+            />
           )}
         </form.AppField>
 
@@ -66,12 +72,18 @@ export function CreateFeatureRequestForm({
         <form.AppField name={'repositoryIds'}>
           {() => (
             <RepositorySelector
-              description={'Select repositories to analyze (optional)'}
+              description={'Select at least one repository to analyze'}
+              isRequired
               label={'Target Repositories'}
               projectId={projectId}
             />
           )}
         </form.AppField>
+
+        {/* Form Error Display */}
+        <form.AppForm>
+          <form.FormError className={'mt-2'} />
+        </form.AppForm>
 
         {/* Action Buttons */}
         <div className={'mt-2 flex justify-end gap-3'}>

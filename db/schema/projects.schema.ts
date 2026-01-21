@@ -11,6 +11,7 @@ export const projects = sqliteTable(
     id: integer('id').primaryKey({ autoIncrement: true }),
     isFavorited: integer('is_favorited', { mode: 'boolean' }).notNull().default(false),
     name: text('name').notNull(),
+    planExportFolder: text('plan_export_folder'),
     updatedAt: text('updated_at')
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),

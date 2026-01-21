@@ -44,6 +44,7 @@ export function createProjectsRepository(db: DrizzleDatabase): ProjectsRepositor
           id: projects.id,
           isFavorited: projects.isFavorited,
           name: projects.name,
+          planExportFolder: projects.planExportFolder,
           updatedAt: projects.updatedAt,
         })
         .from(projects)
