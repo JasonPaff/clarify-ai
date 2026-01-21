@@ -14,7 +14,7 @@ import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featu
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 import { ClarifyStep } from '@/components/features/clarify-step';
 import { DescribeStep } from '@/components/features/describe-step';
-import { ResearchStep } from '@/components/features/research-step';
+import { DiscoverStep } from '@/components/features/discover-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -210,7 +210,7 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
           ) : currentStep === 'refine' ? (
             <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
           ) : currentStep === 'research' ? (
-            <ResearchStep featureRequestId={featureId} projectId={projectId} />
+            <DiscoverStep featureRequest={featureRequest} projectId={projectId} />
           ) : (
             <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
               <p className={'text-sm text-muted-foreground'}>

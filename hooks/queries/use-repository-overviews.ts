@@ -101,6 +101,40 @@ export function useRepositoryOverview(repositoryId: number) {
 }
 
 /**
+ * Hook to fetch the actual content of repository overviews for multiple repositories.
+ * Returns a Map of repository ID to overview content string.
+ *
+ * @param repositoryIds - Array of repository IDs to fetch overview content for
+ * @returns Map of repository ID to overview content (prefers manualContent over content)
+ */
+export function useRepositoryOverviewContents(repositoryIds: Array<number>) {
+  const { isElectron, repositoryOverviews } = useElectronDb();
+
+  const queries = useQueries({
+    combine: (results) => ({
+      data: new Map(
+        results.map((result, index) => [
+          repositoryIds[index] as number,
+          result.data?.manualContent ?? result.data?.content ?? null,
+        ])
+      ),
+      isError: results.some((r) => r.isError),
+      isPending: results.some((r) => r.isPending),
+    }),
+    queries: repositoryIds.map((repositoryId) => ({
+      ...repositoryOverviewKeys.byRepositoryId(repositoryId),
+      enabled: isElectron && repositoryId > 0,
+      queryFn: async () => {
+        const result = await repositoryOverviews.getByRepositoryId(repositoryId);
+        return result ?? null;
+      },
+    })),
+  });
+
+  return queries;
+}
+
+/**
  * Hook to fetch overview statuses for multiple repositories in parallel.
  * Uses TanStack Query's useQueries for efficient parallel fetching with shared cache.
  *
