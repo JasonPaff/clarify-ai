@@ -24,10 +24,7 @@ const planToolInputSchema = z.object({
     .optional()
     .describe('Prerequisites that must be in place before starting implementation'),
   reasoning: z.string().describe('Explanation of how the plan was developed and why this approach was chosen'),
-  risks: z
-    .array(planRiskSchema)
-    .optional()
-    .describe('Potential risks and their mitigations for this implementation'),
+  risks: z.array(planRiskSchema).optional().describe('Potential risks and their mitigations for this implementation'),
   steps: z
     .array(
       z.object({

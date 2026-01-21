@@ -24,13 +24,7 @@ interface QualityGateListProps extends ComponentPropsWithRef<'div'> {
  * Displays a list of quality validation checkpoints with optional completion tracking.
  * Supports both command-based (automated) and manual verification gates.
  */
-export const QualityGateList = ({
-  className,
-  onGateToggle,
-  qualityGates,
-  ref,
-  ...props
-}: QualityGateListProps) => {
+export const QualityGateList = ({ className, onGateToggle, qualityGates, ref, ...props }: QualityGateListProps) => {
   const [completedGates, setCompletedGates] = useState<Set<number>>(new Set());
   const [copiedIndex, setCopiedIndex] = useState<null | number>(null);
 
@@ -179,17 +173,11 @@ const QualityGateItem = ({
         <div className={'pt-0.5'}>
           {isCommandGate ? (
             <Tooltip content={'Command validation'}>
-              <Terminal
-                aria-label={'Command validation'}
-                className={'size-4 text-muted-foreground'}
-              />
+              <Terminal aria-label={'Command validation'} className={'size-4 text-muted-foreground'} />
             </Tooltip>
           ) : (
             <Tooltip content={'Manual verification'}>
-              <Eye
-                aria-label={'Manual verification'}
-                className={'size-4 text-muted-foreground'}
-              />
+              <Eye aria-label={'Manual verification'} className={'size-4 text-muted-foreground'} />
             </Tooltip>
           )}
         </div>
@@ -197,31 +185,18 @@ const QualityGateItem = ({
         {/* Content */}
         <div className={'min-w-0 flex-1'}>
           {/* Description */}
-          <p
-            className={cn(
-              'text-sm text-foreground',
-              isCompleted && 'text-muted-foreground line-through'
-            )}
-          >
+          <p className={cn('text-sm text-foreground', isCompleted && 'text-muted-foreground line-through')}>
             {gate.description}
           </p>
 
           {/* Command display for command-type gates */}
           {isCommandGate && gate.command && (
             <div className={'mt-2 flex items-center gap-2'}>
-              <code
-                className={
-                  'flex-1 rounded-sm bg-muted px-2 py-1.5 font-mono text-xs text-foreground'
-                }
-              >
+              <code className={'flex-1 rounded-sm bg-muted px-2 py-1.5 font-mono text-xs text-foreground'}>
                 {gate.command}
               </code>
               <Tooltip content={isCopied ? 'Copied!' : 'Copy command'}>
-                <IconButton
-                  aria-label={'Copy command to clipboard'}
-                  className={'size-7'}
-                  onClick={handleCopyClick}
-                >
+                <IconButton aria-label={'Copy command to clipboard'} className={'size-7'} onClick={handleCopyClick}>
                   {isCopied ? (
                     <Check aria-hidden={'true'} className={'size-3.5 text-green-500'} />
                   ) : (

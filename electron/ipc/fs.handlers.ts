@@ -156,10 +156,7 @@ export function registerFsHandlers(): void {
 
   ipcMain.handle(
     IpcChannels.fs.mkdir,
-    async (
-      _event: IpcMainInvokeEvent,
-      dirPath: string
-    ): Promise<{ error?: string; success: boolean }> => {
+    async (_event: IpcMainInvokeEvent, dirPath: string): Promise<{ error?: string; success: boolean }> => {
       if (!isValidPath(dirPath)) {
         return { error: 'Invalid directory path', success: false };
       }

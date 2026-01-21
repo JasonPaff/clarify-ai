@@ -100,8 +100,7 @@ export const planCostEstimateVariants = cva(
 );
 
 interface PlanCostEstimateProps
-  extends Omit<ComponentPropsWithRef<'div'>, 'children'>,
-    VariantProps<typeof planCostEstimateVariants> {
+  extends Omit<ComponentPropsWithRef<'div'>, 'children'>, VariantProps<typeof planCostEstimateVariants> {
   /** Optional custom prompt template (uses default if not provided) */
   customPrompt?: string;
   /** Array of discovered files from the discovery step */

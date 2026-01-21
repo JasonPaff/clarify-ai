@@ -66,15 +66,7 @@ interface ExportDialogProps extends ComponentPropsWithRef<'div'>, VariantProps<t
 /**
  * Dialog component for exporting implementation plans to clipboard, file, or docs folder.
  */
-export const ExportDialog = ({
-  className,
-  featureName,
-  onExport,
-  plan,
-  ref,
-  trigger,
-  ...props
-}: ExportDialogProps) => {
+export const ExportDialog = ({ className, featureName, onExport, plan, ref, trigger, ...props }: ExportDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [exportingOption, setExportingOption] = useState<ExportOption | null>(null);
@@ -379,11 +371,7 @@ export const ExportDialog = ({
                 onClick={handleClipboardExport}
                 type={'button'}
               >
-                <div
-                  className={
-                    'flex size-10 items-center justify-center rounded-md bg-accent/10 text-accent'
-                  }
-                >
+                <div className={'flex size-10 items-center justify-center rounded-md bg-accent/10 text-accent'}>
                   {isClipboardExporting ? (
                     <Loader2 aria-hidden={'true'} className={'size-5 animate-spin'} />
                   ) : (

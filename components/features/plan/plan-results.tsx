@@ -323,7 +323,9 @@ export const PlanResults = ({
                       'flex size-8 items-center justify-center rounded-md text-xs font-medium transition-colors',
                       'hover:bg-muted',
                       'focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none',
-                      index === activeStepIndex ? 'bg-accent text-accent-foreground' : 'bg-muted/50 text-muted-foreground'
+                      index === activeStepIndex
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-muted/50 text-muted-foreground'
                     )}
                     key={index}
                     onClick={() => handleStepSelect(index)}
@@ -442,7 +444,9 @@ export const PlanResults = ({
                 <FlaskConical aria-hidden={'true'} className={'mt-0.5 size-5 text-accent'} />
                 <div>
                   <h4 className={'text-sm font-medium text-foreground'}>Testing Strategy</h4>
-                  <p className={'mt-1 max-w-none text-sm/relaxed text-muted-foreground'}>{testingStrategy.description}</p>
+                  <p className={'mt-1 max-w-none text-sm/relaxed text-muted-foreground'}>
+                    {testingStrategy.description}
+                  </p>
                 </div>
               </div>
 

@@ -261,10 +261,7 @@ const QualityGateItem = ({ gate }: QualityGateItemProps) => {
           {isCommand ? (
             <Terminal aria-hidden={'true'} className={'mt-0.5 size-3.5 shrink-0 text-blue-600 dark:text-blue-400'} />
           ) : (
-            <CheckCircle2
-              aria-hidden={'true'}
-              className={'mt-0.5 size-3.5 shrink-0 text-muted-foreground'}
-            />
+            <CheckCircle2 aria-hidden={'true'} className={'mt-0.5 size-3.5 shrink-0 text-muted-foreground'} />
           )}
           <span className={'text-sm text-foreground'}>{description}</span>
         </div>
