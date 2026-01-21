@@ -2,7 +2,7 @@
 
 import type { VariantProps } from 'class-variance-authority';
 
-import { ArrowLeft, ArrowRight, FileText, Lightbulb, Loader2, Search, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText, Lightbulb, Loader2, Search, Sparkles } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import Link from 'next/link';
@@ -17,7 +17,6 @@ import { DescribeStep } from '@/components/features/describe-step';
 import { DiscoverStep } from '@/components/features/discover-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconButton } from '@/components/ui/icon-button';
 import { Separator } from '@/components/ui/separator';
@@ -221,26 +220,17 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
         {/* Workflow Steps - Right Column */}
         <div className={'sticky top-0 self-start'}>
           <WorkflowSteps
+            canGoBack={canGoBack}
+            canGoNext={canGoNext}
+            currentIndex={currentIndex}
             currentStep={currentStep}
+            onGoBack={handleGoBack}
+            onGoNext={handleGoNext}
             onStepClick={(stepId) => setCurrentStep(stepId as StepId)}
             staleSteps={staleStepNames}
+            totalSteps={STEP_ORDER.length}
           />
         </div>
-      </div>
-
-      {/* Navigation */}
-      <div className={'flex items-center justify-between'}>
-        <Button disabled={!canGoBack} onClick={handleGoBack} variant={'outline'}>
-          <ArrowLeft className={'size-4'} />
-          Previous
-        </Button>
-        <span className={'text-sm text-muted-foreground'}>
-          Step {currentIndex + 1} of {STEP_ORDER.length}
-        </span>
-        <Button disabled={!canGoNext} onClick={handleGoNext}>
-          Next
-          <ArrowRight className={'size-4'} />
-        </Button>
       </div>
     </div>
   );

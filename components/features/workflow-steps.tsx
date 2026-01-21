@@ -1,7 +1,8 @@
 'use client';
 
-import { AlertTriangle, Check } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -36,13 +37,28 @@ export const WORKFLOW_STEPS: Array<Step> = [
 ];
 
 interface WorkflowStepsProps {
+  canGoBack: boolean;
+  canGoNext: boolean;
+  currentIndex: number;
   currentStep: string;
+  onGoBack: () => void;
+  onGoNext: () => void;
   onStepClick?: (stepId: string) => void;
   staleSteps?: Array<string>;
+  totalSteps: number;
 }
 
-export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: WorkflowStepsProps) => {
-  const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);
+export const WorkflowSteps = ({
+  canGoBack,
+  canGoNext,
+  currentIndex,
+  currentStep,
+  onGoBack,
+  onGoNext,
+  onStepClick,
+  staleSteps = [],
+  totalSteps,
+}: WorkflowStepsProps) => {
   const isLastStep = (index: number) => index === WORKFLOW_STEPS.length - 1;
 
   return (
@@ -135,6 +151,23 @@ export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: Wor
           </div>
         );
       })}
+
+      {/* Navigation */}
+      <div className={'mt-4 flex flex-col gap-3 border-t border-border/50 pt-4'}>
+        <span className={'text-center text-xs text-muted-foreground'}>
+          Step {currentIndex + 1} of {totalSteps}
+        </span>
+        <div className={'flex gap-2'}>
+          <Button className={'flex-1'} disabled={!canGoBack} onClick={onGoBack} size={'sm'} variant={'outline'}>
+            <ArrowLeft className={'size-4'} />
+            Previous
+          </Button>
+          <Button className={'flex-1'} disabled={!canGoNext} onClick={onGoNext} size={'sm'}>
+            Next
+            <ArrowRight className={'size-4'} />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
