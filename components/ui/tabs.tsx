@@ -36,7 +36,7 @@ export const TabsTrigger = ({ className, ref, ...props }: TabsTriggerProps) => {
         `,
         className
       )}
-      nativeButton={false}
+      nativeButton={true}
       ref={ref}
       {...props}
     />

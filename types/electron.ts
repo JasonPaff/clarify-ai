@@ -42,9 +42,14 @@ export type {
 export type {
   ImplementationPlan,
   PlanGenerateRequest,
-  PlanQualityGate,
+  PlanRepositoryOverview,
+  PlanRisk,
+  PlanScopeConfig,
   PlanStep,
   PlanStreamChunk,
+  PlanToolResultData,
+  QualityGate,
+  TestingStrategy,
 } from '../electron/ipc/ai-plan.handlers';
 
 // Re-export API key types for renderer use (excluding ApiKeyProvider and ProviderCredentials which come from provider-types)
@@ -353,6 +358,7 @@ export interface ElectronAPI {
       repositoryPath: string
     ): Promise<import('../electron/ipc/fs.handlers').CollectRepositoryDataResult>;
     exists(path: string): Promise<boolean>;
+    mkdir(path: string): Promise<{ error?: string; success: boolean }>;
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
       error?: string;

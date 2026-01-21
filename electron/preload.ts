@@ -180,6 +180,7 @@ export interface ElectronAPI {
   fs: {
     collectRepositoryData(repositoryPath: string): Promise<CollectRepositoryDataResult>;
     exists(path: string): Promise<boolean>;
+    mkdir(path: string): Promise<{ error?: string; success: boolean }>;
     readDirectory(path: string): Promise<{
       entries?: Array<{ isDirectory: boolean; isFile: boolean; name: string }>;
       error?: string;
@@ -403,6 +404,7 @@ const electronAPI: ElectronAPI = {
   fs: {
     collectRepositoryData: (repositoryPath) => ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),
     exists: (path) => ipcRenderer.invoke(IpcChannels.fs.exists, path),
+    mkdir: (path) => ipcRenderer.invoke(IpcChannels.fs.mkdir, path),
     readDirectory: (path) => ipcRenderer.invoke(IpcChannels.fs.readDirectory, path),
     readFile: (path) => ipcRenderer.invoke(IpcChannels.fs.readFile, path),
     stat: (path) => ipcRenderer.invoke(IpcChannels.fs.stat, path),

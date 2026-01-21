@@ -513,6 +513,14 @@ export function useElectronFs() {
     [api]
   );
 
+  const mkdir = useCallback(
+    async (path: string): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.fs.mkdir(path);
+    },
+    [api]
+  );
+
   const stat = useCallback(
     async (
       path: string
@@ -537,6 +545,7 @@ export function useElectronFs() {
     collectRepositoryData,
     exists,
     isElectron,
+    mkdir,
     readDirectory,
     readFile,
     stat,

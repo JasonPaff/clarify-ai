@@ -15,6 +15,7 @@ import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/rou
 import { ClarifyStep } from '@/components/features/clarify-step';
 import { DescribeStep } from '@/components/features/describe-step';
 import { DiscoverStep } from '@/components/features/discover-step';
+import { PlanStep } from '@/components/features/plan-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -207,13 +208,9 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
               <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
             ) : currentStep === 'research' ? (
               <DiscoverStep featureRequest={featureRequest} projectId={projectId} />
-            ) : (
-              <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
-                <p className={'text-sm text-muted-foreground'}>
-                  {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
-                </p>
-              </div>
-            )}
+            ) : currentStep === 'plan' ? (
+              <PlanStep featureRequest={featureRequest} projectId={projectId} />
+            ) : null}
           </CardContent>
         </Card>
 

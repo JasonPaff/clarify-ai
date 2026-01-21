@@ -56,6 +56,12 @@ CORE REQUIREMENTS:
   npm run lint:fix && npm run typecheck
   ```
 - **Quality Gates**: Plan must include overall quality gates section with lint and typecheck validation commands
+- **Codex Review Quality Gates**: Plan MUST include `/codex-review` steps at logical checkpoints AND always as the final quality gate:
+  - After completing a major component or module
+  - After database schema changes
+  - After API endpoint implementation
+  - After significant refactoring
+  - **ALWAYS as the final step** before the plan is considered complete
 - **Success Criteria**: Each step must have checkboxes for validation command success
 - **Library Documentation**: If using third-party libraries, use ref tool to read docs instead of guessing when needed
 
@@ -137,10 +143,34 @@ npm run lint:fix && npm run typecheck
 
 [Continue same pattern...]
 
+---
+
+### Step N: Codex Code Review (Quality Gate)
+
+**What**: Run Codex code review to validate implementation quality
+**Why**: AI-powered code review (GPT 5.2) catches issues before they become problems. Runs in read-only sandbox mode for non-interactive execution.
+**Confidence**: High
+
+**Validation Commands:**
+
+```bash
+/codex-review
+```
+
+**Success Criteria:**
+
+- [ ] Codex review completes without critical issues
+- [ ] Any warnings or suggestions addressed or documented
+- [ ] Code quality approved by GPT 5.2 review
+
+---
+
 ## Quality Gates
 
 - [ ] All TypeScript files pass `npm run typecheck`
 - [ ] All files pass `npm run lint:fix`
+- [ ] [Any intermediate Codex reviews pass - add at logical checkpoints]
+- [ ] Final Codex code review passes (`/codex-review`)
 - [ ] [Any manual verification required]
 
 ## Notes
@@ -154,6 +184,14 @@ npm run lint:fix && npm run typecheck
 
 - EVERY step that touches .js/.jsx/.ts/.tsx files MUST include validation commands
 - NO EXCEPTIONS - this is critical for code quality and preventing errors
+
+**CODEX REVIEW QUALITY GATES (REQUIRED):**
+
+- Plans MUST include `/codex-review` as the FINAL step before completion
+- Add intermediate Codex review steps at logical checkpoints (after major components, schema changes, API work)
+- Codex uses GPT 5.2 for AI-powered code review in read-only sandbox mode
+- Runs non-interactively without permission prompts (safe for automated execution)
+- This is a MANDATORY requirement for all implementation plans
 
 **Plan Structure Requirements:**
 

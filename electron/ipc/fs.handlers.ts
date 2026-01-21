@@ -154,6 +154,27 @@ export function registerFsHandlers(): void {
     }
   );
 
+  ipcMain.handle(
+    IpcChannels.fs.mkdir,
+    async (
+      _event: IpcMainInvokeEvent,
+      dirPath: string
+    ): Promise<{ error?: string; success: boolean }> => {
+      if (!isValidPath(dirPath)) {
+        return { error: 'Invalid directory path', success: false };
+      }
+      try {
+        await fs.mkdir(dirPath, { recursive: true });
+        return { success: true };
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          success: false,
+        };
+      }
+    }
+  );
+
   ipcMain.handle(IpcChannels.fs.exists, async (_event: IpcMainInvokeEvent, filePath: string): Promise<boolean> => {
     if (!isValidPath(filePath)) {
       return false;

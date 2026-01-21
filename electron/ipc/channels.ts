@@ -115,6 +115,7 @@ export const IpcChannels = {
   fs: {
     collectRepositoryData: 'fs:collectRepositoryData',
     exists: 'fs:exists',
+    mkdir: 'fs:mkdir',
     readDirectory: 'fs:readDirectory',
     readFile: 'fs:readFile',
     stat: 'fs:stat',

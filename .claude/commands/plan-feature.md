@@ -27,7 +27,7 @@ When the user runs this command, execute this workflow:
 1. **Clarification** (Optional): Gather clarifying questions if request is ambiguous
 2. **Feature Request Refinement**: Enhance the user request with project context
 3. **File Discovery**: Find all relevant files for the implementation
-4. **Implementation Planning**: Generate detailed Markdown implementation plan
+4. **Implementation Planning**: Generate detailed Markdown implementation plan with Codex review quality gates
 
 ### Clarification Skip Conditions
 
@@ -186,7 +186,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
 
 ### Step 3: Implementation Planning
 
-**Objective**: Generate detailed markdown implementation plan following the required template.
+**Objective**: Generate detailed markdown implementation plan following the required template, with Codex review quality gates at logical checkpoints.
 
 **Process**:
 
@@ -198,10 +198,11 @@ relevant to implementing the feature by analyzing the refined request and codeba
    - **TIMEOUT**: Set 60-second timeout for plan generation
    - **RETRY STRATEGY**: If format validation fails, retry with explicit format constraints (maximum 2 attempts)
    - **FALLBACK**: If all retries fail, flag for manual review and continue with available output
-   - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'pnpm run lint:fix && pnpm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples."
+   - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'pnpm run lint:fix && pnpm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples. CRITICAL: Include Codex code review quality gate steps using '/codex-review' at logical checkpoints in the plan (e.g., after completing a major component, after database schema changes, after API endpoint implementation) AND always as the final quality gate step at the end of the plan. The Codex review uses GPT 5.2 to review code changes."
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - **VALIDATION COMMANDS**: Ensure all steps include appropriate validation commands
+   - **CODEX QUALITY GATES**: Ensure plan includes Codex review steps at logical points and as final step
    - Agent generates structured markdown implementation plan
 3. **Enhanced Plan Validation**:
    - **Format Check**: Verify output is markdown with required sections (not XML)
@@ -209,6 +210,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
    - **Template Compliance**: Check for Overview, Prerequisites, Implementation Steps, Quality Gates
    - **Section Validation**: Verify each required section contains appropriate content
    - **Command Validation**: Ensure steps include `pnpm run lint:fix && pnpm run typecheck`
+   - **Codex Review Validation**: Ensure plan includes `/codex-review` quality gate steps at logical points and as final step
    - **Content Quality**: Verify no code examples or implementations included
    - **Completeness Check**: Confirm plan addresses all aspects of the refined request
    - **Error Recovery**: If validation fails, retry with explicit format constraints
@@ -280,7 +282,7 @@ Directory: docs/{date}/orchestration/{feature-name}/
 - 📄 00a-clarification.md - {Gathered X clarifications / Skipped - request was detailed}
 - 📄 01-feature-refinement.md - Refined request with project context
 - 📄 02-file-discovery.md - Discovered X files across Y directories
-- 📄 03-implementation-planning.md - Generated Z-step implementation plan
+- 📄 03-implementation-planning.md - Generated Z-step implementation plan (includes Codex review quality gates)
 
 Execution time: X.X seconds
 ```
@@ -330,6 +332,7 @@ Execution time: X.X seconds
   - **Format Compliance**: Plan must be in markdown format (not XML)
   - **Template Adherence**: Includes all required sections (Overview, Prerequisites, Steps, Quality Gates)
   - **Validation Commands**: Every step includes appropriate lint/typecheck commands
+  - **Codex Review Gates**: Plan includes `/codex-review` quality gate steps at logical checkpoints AND as final step
   - **No Code Examples**: Plan contains no implementation code, only instructions
   - **Actionable Steps**: Implementation plan contains concrete, actionable steps
   - **Complete Coverage**: Plan addresses the refined feature request completely
