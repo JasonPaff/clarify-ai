@@ -1,12 +1,14 @@
 'use client';
 
 import { AlertCircle, CheckCircle2, Loader2, MessageCirclePlus, SkipForward, X } from 'lucide-react';
+import { useEffect } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
+import { useWorkflow } from '@/components/providers/workflow-provider';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -33,6 +35,8 @@ type ClarificationPanelProps = ClassName & {
   featureRequest: FeatureRequest;
   isConfigLoading?: boolean;
   modelConfig: ClarificationModelConfig | null;
+  /** Callback to register the cancel function for external cancellation */
+  onCancelRegister?: (cancelFn: () => void) => void;
   onClose?: () => void;
   onComplete?: () => void;
 };
@@ -48,9 +52,12 @@ export const ClarificationPanel = ({
   featureRequest,
   isConfigLoading = false,
   modelConfig,
+  onCancelRegister,
   onClose,
   onComplete,
 }: ClarificationPanelProps) => {
+  const { registerAiOperation, unregisterAiOperation } = useWorkflow();
+
   const {
     analysis,
     answers,
@@ -70,6 +77,25 @@ export const ClarificationPanel = ({
     status,
     streamingText,
   } = useClarification({ currentRun, featureRequest, modelConfig });
+
+  // Register/unregister AI operation with workflow context when loading state changes
+  useEffect(() => {
+    if (isLoading) {
+      registerAiOperation('refine');
+    } else {
+      unregisterAiOperation('refine');
+    }
+
+    // Cleanup on unmount to ensure we unregister if component unmounts while loading
+    return () => {
+      unregisterAiOperation('refine');
+    };
+  }, [isLoading, registerAiOperation, unregisterAiOperation]);
+
+  // Register the cancel function for external cancellation (e.g., from step navigation)
+  useEffect(() => {
+    onCancelRegister?.(cancelClarification);
+  }, [cancelClarification, onCancelRegister]);
 
   const handleStartClarification = async (forceQuestions = false) => {
     if (!modelConfig?.modelId) return;

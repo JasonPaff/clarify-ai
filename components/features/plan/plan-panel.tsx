@@ -1,10 +1,12 @@
 'use client';
 
 import { AlertCircle, CheckCircle2, ClipboardList, Loader2, RefreshCw } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
+import type { PlanStatus } from '@/lib/validations/plan';
 import type { PlanRepositoryOverview } from '@/types/electron';
 
 import { ExportDialog } from '@/components/features/plan/export-dialog';
@@ -38,6 +40,14 @@ type PlanPanelProps = ClassName & {
   isConfigLoading?: boolean;
   /** Model configuration from step settings */
   modelConfig: null | PlanModelConfig;
+  /** Callback to register the cancel function for external cancellation */
+  onCancelRegister?: (cancelFn: () => void) => void;
+  /** Callback when plan generation completes successfully */
+  onGenerationComplete?: () => void;
+  /** Callback when plan generation fails */
+  onGenerationError?: (error: string) => void;
+  /** Callback when plan generation starts */
+  onGenerationStart?: () => void;
   /** Repository overviews with context for plan generation */
   repositoryOverviews: Array<PlanRepositoryOverview>;
 };
@@ -53,6 +63,10 @@ export const PlanPanel = ({
   featureRequest,
   isConfigLoading = false,
   modelConfig,
+  onCancelRegister,
+  onGenerationComplete,
+  onGenerationError,
+  onGenerationStart,
   repositoryOverviews,
 }: PlanPanelProps) => {
   const {
@@ -96,6 +110,45 @@ export const PlanPanel = ({
   const handleCancel = () => {
     cancelPlanGeneration();
   };
+
+  // Track previous status for callback invocation
+  const previousStatusRef = useRef<PlanStatus>(status);
+
+  // Effect to call callbacks when status changes
+  useEffect(() => {
+    const prevStatus = previousStatusRef.current;
+    previousStatusRef.current = status;
+
+    // Skip if status hasn't changed
+    if (prevStatus === status) {
+      return;
+    }
+
+    // Generation started: idle/failed -> generating
+    if (status === 'generating' && (prevStatus === 'idle' || prevStatus === 'failed')) {
+      onGenerationStart?.();
+    }
+
+    // Generation completed: generating -> completed
+    if (status === 'completed' && prevStatus === 'generating') {
+      onGenerationComplete?.();
+    }
+
+    // Generation failed: generating -> failed
+    if (status === 'failed' && prevStatus === 'generating') {
+      onGenerationError?.(error ?? 'Plan generation failed');
+    }
+
+    // Generation cancelled: generating -> idle
+    if (status === 'idle' && prevStatus === 'generating') {
+      onGenerationComplete?.();
+    }
+  }, [status, error, onGenerationStart, onGenerationComplete, onGenerationError]);
+
+  // Register the cancel function for external cancellation (e.g., from step navigation)
+  useEffect(() => {
+    onCancelRegister?.(cancelPlanGeneration);
+  }, [cancelPlanGeneration, onCancelRegister]);
 
   // Derived conditions
   const hasModelConfigured = modelConfig?.modelId !== null;

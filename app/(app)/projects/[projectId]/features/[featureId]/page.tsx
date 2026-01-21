@@ -7,9 +7,10 @@ import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import Link from 'next/link';
 import { ReactNode, useEffectEvent } from 'react';
-import { use, useEffect, useRef, useState } from 'react';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
+import type { ValidationWarning } from '@/lib/workflow/step-validation';
 
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 import { ClarifyStep } from '@/components/features/clarify-step';
@@ -17,13 +18,19 @@ import { DescribeStep } from '@/components/features/describe-step';
 import { DiscoverStep } from '@/components/features/discover-step';
 import { PlanStep } from '@/components/features/plan-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
+import { StepTransitionWarningDialog } from '@/components/features/workflow/step-transition-warning-dialog';
+import { useWorkflow } from '@/components/providers/workflow-provider';
 import { Badge, badgeVariants } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { IconButton } from '@/components/ui/icon-button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useContextFiles } from '@/hooks/queries/use-feature-request-context-files';
+import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { useLeaveWarning } from '@/hooks/use-leave-warning';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
+import { getStepWarnings, hasCautionWarnings } from '@/lib/workflow/step-validation';
 
 type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ['describe', 'refine', 'research', 'plan'] as const;
@@ -31,6 +38,24 @@ const STEP_ORDER = ['describe', 'refine', 'research', 'plan'] as const;
 type FeatureRequestStatus = 'clarifying' | 'completed' | 'describing' | 'draft' | 'failed' | 'planning' | 'researching';
 
 type StepId = (typeof STEP_ORDER)[number];
+
+/**
+ * Human-readable labels for each step, used in warning dialog.
+ */
+const STEP_LABELS: Record<StepId, string> = {
+  describe: 'Describe',
+  plan: 'Plan',
+  refine: 'Clarify',
+  research: 'Discover',
+} as const;
+
+/**
+ * State for managing pending navigation with validation warnings.
+ */
+interface PendingNavigation {
+  targetStep: StepId;
+  warnings: Array<ValidationWarning>;
+}
 
 const statusLabels: Record<FeatureRequestStatus, string> = {
   clarifying: 'Clarifying',
@@ -58,9 +83,34 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   const { featureId, projectId } = use(routeParams);
 
   const [currentStep, setCurrentStep] = useState<StepId>('describe');
+  const [pendingNavigation, setPendingNavigation] = useState<null | PendingNavigation>(null);
   const lastFeatureIdRef = useRef<null | number>(null);
 
   const { data: featureRequest, error, isLoading } = useFeatureRequest(featureId);
+  const { data: linkedRepositories } = useFeatureRequestRepositories(featureId);
+  const { data: contextFiles } = useContextFiles(featureId);
+
+  // Access workflow context for AI operation blocking (used in Step 11)
+  const { getActiveOperationStep, isAnyAiOperationRunning } = useWorkflow();
+
+  // Cancel callback ref that step components can register with
+  const cancelCallbackRef = useRef<(() => void) | null>(null);
+
+  // Get the active operation step name for the cancel dialog
+  const activeOperationStepName = getActiveOperationStep();
+
+  // Cancel handler that invokes the registered cancel callback
+  const handleCancelAiOperation = useCallback(() => {
+    cancelCallbackRef.current?.();
+  }, []);
+
+  // Set up beforeunload handler to prevent window closure during AI operations
+  // The hook internally manages the beforeunload event listener based on isActive
+  useLeaveWarning({
+    isActive: isAnyAiOperationRunning,
+    onCancel: handleCancelAiOperation,
+    stepName: activeOperationStepName ?? 'current',
+  });
 
   const { staleStepNames } = useStaleSteps({
     featureRequestId: featureId,
@@ -78,6 +128,50 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       updateCurrentStep(featureRequest.status as FeatureRequestStatus);
     }
   }, [featureRequest]);
+
+  /**
+   * Attempts to navigate to a target step with validation.
+   * If caution-severity warnings exist, shows the warning dialog instead.
+   */
+  const attemptStepTransition = useCallback(
+    (targetStep: StepId) => {
+      if (!featureRequest) return;
+
+      // Get warnings for the target step
+      const warnings = getStepWarnings(targetStep, {
+        contextFiles: contextFiles ?? undefined,
+        featureRequest,
+        linkedRepositoryIds: linkedRepositories ?? undefined,
+      });
+
+      // If there are caution-severity warnings, show dialog instead of navigating
+      if (hasCautionWarnings(warnings)) {
+        setPendingNavigation({ targetStep, warnings });
+        return;
+      }
+
+      // No caution warnings - navigate directly
+      setCurrentStep(targetStep);
+    },
+    [contextFiles, featureRequest, linkedRepositories]
+  );
+
+  /**
+   * Confirms the pending navigation and navigates to the target step.
+   */
+  const handleConfirmTransition = useCallback(() => {
+    if (pendingNavigation) {
+      setCurrentStep(pendingNavigation.targetStep);
+      setPendingNavigation(null);
+    }
+  }, [pendingNavigation]);
+
+  /**
+   * Cancels the pending navigation and clears the warning state.
+   */
+  const handleCancelTransition = useCallback(() => {
+    setPendingNavigation(null);
+  }, []);
 
   // Loading state
   if (isLoading) {
@@ -119,13 +213,29 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
 
   const handleGoBack = () => {
     if (canGoBack) {
-      setCurrentStep(STEP_ORDER[currentIndex - 1] as StepId);
+      const targetStep = STEP_ORDER[currentIndex - 1] as StepId;
+      // Going back typically doesn't need validation warnings
+      setCurrentStep(targetStep);
     }
   };
 
   const handleGoNext = () => {
     if (canGoNext) {
-      setCurrentStep(STEP_ORDER[currentIndex + 1] as StepId);
+      const targetStep = STEP_ORDER[currentIndex + 1] as StepId;
+      // Check for validation warnings when moving forward
+      attemptStepTransition(targetStep);
+    }
+  };
+
+  const handleStepClick = (stepId: string) => {
+    const targetStep = stepId as StepId;
+    const targetIndex = STEP_ORDER.indexOf(targetStep);
+
+    // Only validate when moving forward
+    if (targetIndex > currentIndex) {
+      attemptStepTransition(targetStep);
+    } else {
+      setCurrentStep(targetStep);
     }
   };
 
@@ -205,11 +315,19 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
             {currentStep === 'describe' ? (
               <DescribeStep featureRequest={featureRequest} projectId={projectId} />
             ) : currentStep === 'refine' ? (
-              <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
+              <ClarifyStep
+                cancelCallbackRef={cancelCallbackRef}
+                featureRequest={featureRequest}
+                projectId={projectId}
+              />
             ) : currentStep === 'research' ? (
-              <DiscoverStep featureRequest={featureRequest} projectId={projectId} />
+              <DiscoverStep
+                cancelCallbackRef={cancelCallbackRef}
+                featureRequest={featureRequest}
+                projectId={projectId}
+              />
             ) : currentStep === 'plan' ? (
-              <PlanStep featureRequest={featureRequest} projectId={projectId} />
+              <PlanStep cancelCallbackRef={cancelCallbackRef} featureRequest={featureRequest} projectId={projectId} />
             ) : null}
           </CardContent>
         </Card>
@@ -217,18 +335,30 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
         {/* Workflow Steps - Right Column */}
         <div className={'sticky top-0 self-start'}>
           <WorkflowSteps
+            activeOperationStepName={activeOperationStepName}
             canGoBack={canGoBack}
             canGoNext={canGoNext}
             currentIndex={currentIndex}
             currentStep={currentStep}
+            isAiOperationRunning={isAnyAiOperationRunning}
+            onCancelAiOperation={handleCancelAiOperation}
             onGoBack={handleGoBack}
             onGoNext={handleGoNext}
-            onStepClick={(stepId) => setCurrentStep(stepId as StepId)}
+            onStepClick={handleStepClick}
             staleSteps={staleStepNames}
             totalSteps={STEP_ORDER.length}
           />
         </div>
       </div>
+
+      {/* Step Transition Warning Dialog */}
+      <StepTransitionWarningDialog
+        onCancel={handleCancelTransition}
+        onConfirm={handleConfirmTransition}
+        open={pendingNavigation !== null}
+        targetStep={pendingNavigation ? STEP_LABELS[pendingNavigation.targetStep] : ''}
+        warnings={pendingNavigation?.warnings ?? []}
+      />
     </div>
   );
 }

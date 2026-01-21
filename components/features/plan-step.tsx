@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import type { MutableRefObject } from 'react';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
@@ -8,9 +10,12 @@ import type { PlanRepositoryOverview } from '@/types/electron';
 
 import { PlanCostEstimate } from '@/components/features/plan/plan-cost-estimate';
 import { PlanPanel } from '@/components/features/plan/plan-panel';
+import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
+import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
+import { useWorkflow } from '@/components/providers/workflow-provider';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useRepositories } from '@/hooks/queries/use-repositories';
@@ -20,15 +25,20 @@ import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { parseDiscoveredFiles } from '@/lib/validations/discovery';
 
 interface PlanStepProps {
+  /** Ref to register the cancel callback for external cancellation */
+  cancelCallbackRef?: MutableRefObject<(() => void) | null>;
   featureRequest: FeatureRequest;
   projectId: number;
 }
 
-export const PlanStep = ({ featureRequest, projectId }: PlanStepProps) => {
+export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanStepProps) => {
   const { data: config, isLoading: isConfigLoading } = useStepConfig(projectId, 'plan');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'plan');
   const { data: repositories } = useRepositories(projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
+
+  // Workflow context for AI operation tracking
+  const { registerAiOperation, unregisterAiOperation } = useWorkflow();
 
   // Get selected repository IDs from feature request repositories
   const selectedRepositoryIds = useMemo(() => {
@@ -47,10 +57,60 @@ export const PlanStep = ({ featureRequest, projectId }: PlanStepProps) => {
     staleStepsJson: featureRequest.staleSteps,
   });
 
+  // Track feature request ID for state reset detection
+  const [trackedFeatureId, setTrackedFeatureId] = useState(featureRequest.id);
+
   // Track re-run key to force PlanPanel remount when re-running
   const [rerunKey, setRerunKey] = useState(0);
 
+  // Track last saved timestamp for plan results
+  // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
+  // to ensure JavaScript parses it as UTC, not local time
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
+    featureRequest.implementationPlan ? new Date(featureRequest.updatedAt + 'Z') : null
+  );
+
+  // Track loading state for AI operation registration
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Track plan error state for SaveErrorAlert
+  const [planError, setPlanError] = useState<Error | null>(null);
+
+  // Track previous isGenerating state for AI operation registration
+  const previousIsGeneratingRef = useRef(false);
+
   const isPlanStale = isStale('plan');
+
+  // Reset state when feature request changes
+  if (featureRequest.id !== trackedFeatureId) {
+    setTrackedFeatureId(featureRequest.id);
+    setLastSavedAt(featureRequest.implementationPlan ? new Date(featureRequest.updatedAt + 'Z') : null);
+    setPlanError(null);
+  }
+
+  // Register/unregister AI operation with workflow context when generation state changes
+  // Also update lastSavedAt when generation completes successfully
+  useEffect(() => {
+    const wasGenerating = previousIsGeneratingRef.current;
+    previousIsGeneratingRef.current = isGenerating;
+
+    if (isGenerating && !wasGenerating) {
+      // Plan generation started - register the AI operation
+      registerAiOperation('plan');
+    } else if (!isGenerating && wasGenerating) {
+      // Plan generation finished (success or failure) - unregister the AI operation
+      unregisterAiOperation('plan');
+    }
+  }, [isGenerating, registerAiOperation, unregisterAiOperation]);
+
+  // Cleanup AI operation on unmount if still generating
+  useEffect(() => {
+    return () => {
+      if (previousIsGeneratingRef.current) {
+        unregisterAiOperation('plan');
+      }
+    };
+  }, [unregisterAiOperation]);
 
   // Build model config from step configuration
   const modelConfig = useMemo(() => {
@@ -112,6 +172,40 @@ export const PlanStep = ({ featureRequest, projectId }: PlanStepProps) => {
     await clearStale('plan');
   }, [clearStale]);
 
+  // Callback for when plan generation starts
+  const handleGenerationStart = useCallback(() => {
+    setIsGenerating(true);
+    setPlanError(null);
+  }, []);
+
+  // Callback for when plan generation completes successfully
+  const handleGenerationComplete = useCallback(() => {
+    setIsGenerating(false);
+    setLastSavedAt(new Date());
+    setPlanError(null);
+  }, []);
+
+  // Callback for when plan generation fails
+  const handleGenerationError = useCallback((error: string) => {
+    setIsGenerating(false);
+    setPlanError(new Error(error));
+  }, []);
+
+  // Callback for retrying after error
+  const handleRetry = useCallback(() => {
+    setPlanError(null);
+  }, []);
+
+  // Handler to register cancel function from PlanPanel
+  const handleCancelRegister = useCallback(
+    (cancelFn: () => void) => {
+      if (cancelCallbackRef) {
+        cancelCallbackRef.current = cancelFn;
+      }
+    },
+    [cancelCallbackRef]
+  );
+
   return (
     <div className={'flex flex-col gap-6'} key={rerunKey}>
       {/* Stale Warning Banner */}
@@ -145,6 +239,9 @@ export const PlanStep = ({ featureRequest, projectId }: PlanStepProps) => {
         </div>
       </div>
 
+      {/* Save Error Alert */}
+      <SaveErrorAlert error={planError} onRetry={handleRetry} />
+
       {/* Section 2: Plan Content */}
       <section className={'flex flex-col gap-3'}>
         <PlanPanel
@@ -152,8 +249,17 @@ export const PlanStep = ({ featureRequest, projectId }: PlanStepProps) => {
           featureRequest={featureRequest}
           isConfigLoading={isConfigLoading}
           modelConfig={modelConfig}
+          onCancelRegister={handleCancelRegister}
+          onGenerationComplete={handleGenerationComplete}
+          onGenerationError={handleGenerationError}
+          onGenerationStart={handleGenerationStart}
           repositoryOverviews={repositoryOverviews}
         />
+
+        {/* Auto-Save Status */}
+        <div className={'flex items-center justify-end'}>
+          <AutoSaveStatus isSaving={isGenerating} lastSavedAt={lastSavedAt} />
+        </div>
       </section>
     </div>
   );

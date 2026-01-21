@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { MutableRefObject, useEffectEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
@@ -11,10 +13,13 @@ import { DiscoveryCostEstimate } from '@/components/features/discovery/discovery
 import { DiscoveryProgress } from '@/components/features/discovery/discovery-progress';
 import { DiscoveryResults } from '@/components/features/discovery/discovery-results';
 import { ScopeSelector } from '@/components/features/discovery/scope-selector';
+import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
 import { RepositoryOverviewStatusPanel } from '@/components/features/workflow/repository-overview-status-panel';
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
+import { useWorkflow } from '@/components/providers/workflow-provider';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
@@ -26,15 +31,20 @@ import { useDiscovery } from '@/hooks/use-discovery';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 
 interface DiscoverStepProps {
+  /** Ref to register the cancel callback for external cancellation */
+  cancelCallbackRef?: MutableRefObject<(() => void) | null>;
   featureRequest: FeatureRequest;
   projectId: number;
 }
 
-export const DiscoverStep = ({ featureRequest, projectId }: DiscoverStepProps) => {
+export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: DiscoverStepProps) => {
   const { data: config, isLoading: isConfigLoading } = useStepConfig(projectId, 'research');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'research');
   const { data: repositories } = useRepositories(projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
+
+  // Workflow context for AI operation tracking
+  const { registerAiOperation, unregisterAiOperation } = useWorkflow();
 
   // Get selected repository IDs from feature request repositories
   // The query returns an array of repository IDs directly
@@ -54,8 +64,21 @@ export const DiscoverStep = ({ featureRequest, projectId }: DiscoverStepProps) =
     staleStepsJson: featureRequest.staleSteps,
   });
 
+  // Track feature request ID for state reset detection
+  const [trackedFeatureId, setTrackedFeatureId] = useState(featureRequest.id);
+
   // Track re-run key to force component remount when re-running
   const [rerunKey, setRerunKey] = useState(0);
+
+  // Track last saved timestamp for discovery results
+  // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
+  // to ensure JavaScript parses it as UTC, not local time
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
+    featureRequest.researchFindings ? new Date(featureRequest.updatedAt + 'Z') : null
+  );
+
+  // Track previous isLoading state for AI operation registration
+  const previousIsLoadingRef = useRef(false);
 
   // Scope configuration state
   const [scopeConfig, setScopeConfig] = useState<DiscoveryScopeConfig>({
@@ -101,6 +124,52 @@ export const DiscoverStep = ({ featureRequest, projectId }: DiscoverStepProps) =
     featureRequest,
     modelConfig,
   });
+
+  // Reset state when feature request changes
+  if (featureRequest.id !== trackedFeatureId) {
+    setTrackedFeatureId(featureRequest.id);
+    setLastSavedAt(featureRequest.researchFindings ? new Date(featureRequest.updatedAt + 'Z') : null);
+  }
+
+  const updatedLateSavedAt = useEffectEvent(() => {
+    setLastSavedAt(new Date());
+  });
+
+  // Register/unregister AI operation with workflow context when discovery loading state changes
+  // Also update lastSavedAt when discovery completes successfully
+  useEffect(() => {
+    const wasLoading = previousIsLoadingRef.current;
+    previousIsLoadingRef.current = isLoading;
+
+    if (isLoading && !wasLoading) {
+      // Discovery started - register the AI operation
+      registerAiOperation('research');
+    } else if (!isLoading && wasLoading) {
+      // Discovery finished (success or failure) - unregister the AI operation
+      unregisterAiOperation('research');
+
+      // Update lastSavedAt when discovery completes successfully
+      if (status === 'completed' && files.length > 0) {
+        updatedLateSavedAt();
+      }
+    }
+  }, [isLoading, registerAiOperation, unregisterAiOperation, status, files.length]);
+
+  // Cleanup AI operation on unmount if still loading
+  useEffect(() => {
+    return () => {
+      if (previousIsLoadingRef.current) {
+        unregisterAiOperation('research');
+      }
+    };
+  }, [unregisterAiOperation]);
+
+  // Register the cancel function for external cancellation (e.g., from step navigation)
+  useEffect(() => {
+    if (cancelCallbackRef) {
+      cancelCallbackRef.current = cancelDiscovery;
+    }
+  }, [cancelCallbackRef, cancelDiscovery]);
 
   // Build repository options for the results filter
   const repositoryOptions = useMemo(() => {
@@ -268,6 +337,14 @@ export const DiscoverStep = ({ featureRequest, projectId }: DiscoverStepProps) =
         </div>
       </div>
 
+      {/* Discovery Error Alert */}
+      {error && (
+        <Alert variant={'destructive'}>
+          <AlertCircle className={'size-4'} />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       {/* Section 2: Repository Overview Status */}
       <section className={'flex flex-col gap-3'}>
         <h3 className={'text-sm font-medium text-foreground'}>Repository Context</h3>
@@ -334,25 +411,24 @@ export const DiscoverStep = ({ featureRequest, projectId }: DiscoverStepProps) =
 
       {/* Section 5: Discovery Results */}
       {isDiscoveryComplete && (
-        <DiscoveryResults
-          discoveredFiles={files}
-          onAddFile={addFile}
-          onRemoveFile={removeFile}
-          onUpdateFile={handleUpdateFile}
-          projectId={projectId}
-          repositories={repositoryOptions}
-        />
+        <section className={'flex flex-col gap-3'}>
+          <DiscoveryResults
+            discoveredFiles={files}
+            onAddFile={addFile}
+            onRemoveFile={removeFile}
+            onUpdateFile={handleUpdateFile}
+            projectId={projectId}
+            repositories={repositoryOptions}
+          />
+
+          {/* Auto-Save Status */}
+          <div className={'flex items-center justify-end'}>
+            <AutoSaveStatus isSaving={isLoading} lastSavedAt={lastSavedAt} />
+          </div>
+        </section>
       )}
 
-      {/* Section 6: Error Display */}
-      {error && (
-        <div className={'rounded-md border border-destructive/50 bg-destructive/5 p-4'}>
-          <p className={'text-sm font-medium text-destructive'}>Discovery Error</p>
-          <p className={'mt-1 text-sm text-destructive/80'}>{error}</p>
-        </div>
-      )}
-
-      {/* Section 7: Action Buttons */}
+      {/* Section 6: Action Buttons */}
       {isDiscoveryIdle && (
         <div className={'flex items-center gap-3'}>
           <Button disabled={!canStartDiscovery || isConfigLoading} onClick={handleStartDiscovery} size={'default'}>

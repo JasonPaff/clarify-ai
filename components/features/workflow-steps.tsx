@@ -1,7 +1,9 @@
 'use client';
 
 import { AlertTriangle, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { useState } from 'react';
 
+import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -37,10 +39,16 @@ export const WORKFLOW_STEPS: Array<Step> = [
 ];
 
 interface WorkflowStepsProps {
+  /** Name of the active AI operation step for the cancel dialog message */
+  activeOperationStepName?: string;
   canGoBack: boolean;
   canGoNext: boolean;
   currentIndex: number;
   currentStep: string;
+  /** Whether an AI operation is currently running (used for navigation blocking) */
+  isAiOperationRunning?: boolean;
+  /** Callback to cancel the active AI operation */
+  onCancelAiOperation?: () => void;
   onGoBack: () => void;
   onGoNext: () => void;
   onStepClick?: (stepId: string) => void;
@@ -49,17 +57,52 @@ interface WorkflowStepsProps {
 }
 
 export const WorkflowSteps = ({
+  activeOperationStepName = 'current',
   canGoBack,
   canGoNext,
   currentIndex,
   currentStep,
+  isAiOperationRunning = false,
+  onCancelAiOperation,
   onGoBack,
   onGoNext,
   onStepClick,
   staleSteps = [],
   totalSteps,
 }: WorkflowStepsProps) => {
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [pendingStepId, setPendingStepId] = useState<null | string>(null);
+
   const isLastStep = (index: number) => index === WORKFLOW_STEPS.length - 1;
+
+  const handleStepClick = (stepId: string, isClickable: boolean) => {
+    if (!isClickable) return;
+
+    if (isAiOperationRunning) {
+      setPendingStepId(stepId);
+      setIsCancelDialogOpen(true);
+      return;
+    }
+
+    onStepClick?.(stepId);
+  };
+
+  const handleCancelConfirm = () => {
+    onCancelAiOperation?.();
+    setIsCancelDialogOpen(false);
+
+    if (pendingStepId) {
+      onStepClick?.(pendingStepId);
+      setPendingStepId(null);
+    }
+  };
+
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setIsCancelDialogOpen(isOpen);
+    if (!isOpen) {
+      setPendingStepId(null);
+    }
+  };
 
   return (
     <div
@@ -103,17 +146,20 @@ export const WorkflowSteps = ({
           </div>
         );
 
+        const isNavigationBlocked = isAiOperationRunning && isClickable && step.id !== currentStep;
+
         return (
           <div className={'flex flex-col'} key={step.id}>
             {/* Step Row */}
             <button
               className={cn(
                 'flex items-center gap-3 text-left',
-                isClickable && 'cursor-pointer',
-                !isClickable && 'cursor-default'
+                isClickable && !isNavigationBlocked && 'cursor-pointer',
+                !isClickable && 'cursor-default',
+                isNavigationBlocked && 'cursor-not-allowed opacity-60'
               )}
               disabled={!isClickable}
-              onClick={() => isClickable && onStepClick?.(step.id)}
+              onClick={() => handleStepClick(step.id, !!isClickable)}
               type={'button'}
             >
               {/* Step indicator with optional stale tooltip */}
@@ -168,6 +214,14 @@ export const WorkflowSteps = ({
           </Button>
         </div>
       </div>
+
+      {/* Cancel AI Dialog */}
+      <CancelAiDialog
+        onConfirm={handleCancelConfirm}
+        onOpenChange={handleDialogOpenChange}
+        open={isCancelDialogOpen}
+        stepName={activeOperationStepName}
+      />
     </div>
   );
 };

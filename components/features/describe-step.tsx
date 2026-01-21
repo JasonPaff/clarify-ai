@@ -34,6 +34,7 @@ import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
 import { repositorySelectionFormSchema } from '@/lib/validations/feature-request-repositories';
+import { getDownstreamSteps } from '@/lib/workflow/stale-detection';
 
 interface DescribeStepProps {
   featureRequest: FeatureRequest;
@@ -128,14 +129,17 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
       id: featureRequest.id,
     });
 
-    // Check if clarification was previously completed - if so, mark 'refine' step as stale
+    // Check if clarification was previously completed - if so, mark all downstream steps as stale
     // since the upstream content has changed
     const clarificationWasCompleted = featureRequest.clarificationStatus === 'completed';
     if (clarificationWasCompleted) {
-      void markStepsStaleMutation.mutateAsync({
-        featureRequestId: featureRequest.id,
-        steps: ['refine'],
-      });
+      const downstreamSteps = getDownstreamSteps('describe');
+      if (downstreamSteps.length > 0) {
+        void markStepsStaleMutation.mutateAsync({
+          featureRequestId: featureRequest.id,
+          steps: [...downstreamSteps],
+        });
+      }
     }
 
     setOriginalContent(content);
