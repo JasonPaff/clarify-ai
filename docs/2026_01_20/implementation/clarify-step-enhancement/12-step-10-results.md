@@ -5,11 +5,11 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `hooks/use-clarification.ts` | Added restoreFromRun function and automatic restoration effect on currentRun change |
-| `components/features/clarify-step.tsx` | Added useCurrentRun hook and passes currentRun to ClarificationPanel |
-| `components/features/clarification/clarification-panel.tsx` | Added currentRun prop, passes to useClarification hook |
+| File                                                        | Changes                                                                             |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `hooks/use-clarification.ts`                                | Added restoreFromRun function and automatic restoration effect on currentRun change |
+| `components/features/clarify-step.tsx`                      | Added useCurrentRun hook and passes currentRun to ClarificationPanel                |
+| `components/features/clarification/clarification-panel.tsx` | Added currentRun prop, passes to useClarification hook                              |
 
 ## Validation Results
 

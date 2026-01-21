@@ -5,14 +5,14 @@
 
 ## Files Deleted
 
-| File | Reason |
-|------|--------|
+| File                                                      | Reason                                                                   |
+| --------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `components/features/clarification/advanced-settings.tsx` | No longer imported anywhere; custom prompt migrated to StepSettingsPanel |
 
 ## Files Retained
 
-| File | Reason |
-|------|--------|
+| File                                                   | Reason                                                                      |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- |
 | `components/features/clarification/model-selector.tsx` | Still used by step-settings-panel.tsx and repository-overview-generator.tsx |
 
 ## Validation Results

@@ -5,10 +5,10 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `components/features/clarify-step.tsx` | Added RunHistoryDropdown to header area with handleRunRestored callback placeholder |
-| `components/features/workflow/run-history-dropdown.tsx` | Added optional onRunRestored callback prop, invoked in onSuccess |
+| File                                                    | Changes                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `components/features/clarify-step.tsx`                  | Added RunHistoryDropdown to header area with handleRunRestored callback placeholder |
+| `components/features/workflow/run-history-dropdown.tsx` | Added optional onRunRestored callback prop, invoked in onSuccess                    |
 
 ## Validation Results
 

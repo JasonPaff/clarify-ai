@@ -87,8 +87,7 @@ interface ContextFile {
 }
 
 interface TokenEstimationWarningProps
-  extends Omit<ComponentPropsWithRef<'div'>, 'children'>,
-    VariantProps<typeof tokenEstimationVariants> {
+  extends Omit<ComponentPropsWithRef<'div'>, 'children'>, VariantProps<typeof tokenEstimationVariants> {
   contextFiles: Array<ContextFile | FeatureRequestContextFile>;
   modelContextLimit: number;
   repositoryOverviewTokens?: number;
@@ -180,9 +179,7 @@ export const TokenEstimationWarning = ({
 
       {/* Progress Bar */}
       <Progress.Root className={'mb-3'} max={100} value={percentage}>
-        <Progress.Track
-          className={'h-2 w-full overflow-hidden rounded-full bg-muted'}
-        >
+        <Progress.Track className={'h-2 w-full overflow-hidden rounded-full bg-muted'}>
           <Progress.Indicator
             className={cn(progressIndicatorVariants({ status }))}
             style={{ width: `${percentage}%` }}
@@ -224,7 +221,9 @@ export const TokenEstimationWarning = ({
       )}
       {isWarning && (
         <div
-          className={'mt-3 rounded-sm border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-600 dark:text-amber-400'}
+          className={
+            'mt-3 rounded-sm border border-amber-500/30 bg-amber-500/10 p-2 text-xs text-amber-600 dark:text-amber-400'
+          }
         >
           <strong>Approaching context limit.</strong> Consider removing unnecessary files to ensure optimal AI
           performance.

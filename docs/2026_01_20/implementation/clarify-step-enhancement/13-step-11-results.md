@@ -5,14 +5,14 @@
 
 ## Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                                  | Purpose                                   |
+| ----------------------------------------------------- | ----------------------------------------- |
 | `components/features/clarification/cost-estimate.tsx` | Pre-run cost estimation display component |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                                        | Changes                                             |
+| ----------------------------------------------------------- | --------------------------------------------------- |
 | `components/features/clarification/clarification-panel.tsx` | Integrated ClarificationCostEstimate in Ready State |
 
 ## Validation Results

@@ -91,9 +91,7 @@ export const QuestionsList = ({
 
       {/* Streaming Indicator */}
       {isStreaming && (
-        <p className={'text-xs text-muted-foreground'}>
-          Please wait until all questions have loaded before answering.
-        </p>
+        <p className={'text-xs text-muted-foreground'}>Please wait until all questions have loaded before answering.</p>
       )}
 
       {/* Question Cards */}

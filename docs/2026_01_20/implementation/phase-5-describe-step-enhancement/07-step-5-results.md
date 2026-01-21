@@ -28,5 +28,5 @@
 
 ## Notes
 
-- projectId aliased as _projectId temporarily to prevent unused var error
+- projectId aliased as \_projectId temporarily to prevent unused var error
 - Will be used properly in Step 6 for repository selection

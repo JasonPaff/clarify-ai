@@ -636,21 +636,21 @@ pnpm run lint:fix && pnpm run typecheck
 
 ### Critical Priority Files
 
-| File | Purpose |
-|------|---------|
-| `components/features/clarification/clarification-panel.tsx` | Main Clarify step component |
-| `components/features/workflow-steps.tsx` | Workflow navigation with step labels |
-| `components/features/workflow/step-settings-panel.tsx` | Reusable settings panel |
-| `components/features/workflow/run-history-dropdown.tsx` | Run history selector |
-| `components/features/workflow/stale-warning-banner.tsx` | Stale state warning |
-| `hooks/use-clarification.ts` | Clarification state and streaming |
-| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Feature workflow page |
-| `components/features/describe-step.tsx` | Describe step (triggers stale) |
+| File                                                           | Purpose                              |
+| -------------------------------------------------------------- | ------------------------------------ |
+| `components/features/clarification/clarification-panel.tsx`    | Main Clarify step component          |
+| `components/features/workflow-steps.tsx`                       | Workflow navigation with step labels |
+| `components/features/workflow/step-settings-panel.tsx`         | Reusable settings panel              |
+| `components/features/workflow/run-history-dropdown.tsx`        | Run history selector                 |
+| `components/features/workflow/stale-warning-banner.tsx`        | Stale state warning                  |
+| `hooks/use-clarification.ts`                                   | Clarification state and streaming    |
+| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Feature workflow page                |
+| `components/features/describe-step.tsx`                        | Describe step (triggers stale)       |
 
 ### Files to Create
 
-| File | Purpose |
-|------|---------|
-| `components/features/clarify-step.tsx` | New step wrapper component |
-| `components/features/clarification/cost-estimate.tsx` | Cost estimation display |
-| `hooks/use-stale-steps.ts` | Stale steps management hook |
+| File                                                  | Purpose                     |
+| ----------------------------------------------------- | --------------------------- |
+| `components/features/clarify-step.tsx`                | New step wrapper component  |
+| `components/features/clarification/cost-estimate.tsx` | Cost estimation display     |
+| `hooks/use-stale-steps.ts`                            | Stale steps management hook |

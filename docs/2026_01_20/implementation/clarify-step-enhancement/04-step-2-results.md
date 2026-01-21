@@ -5,14 +5,14 @@
 
 ## Files Created
 
-| File | Purpose |
-|------|---------|
+| File                                   | Purpose                                                               |
+| -------------------------------------- | --------------------------------------------------------------------- |
 | `components/features/clarify-step.tsx` | New step component wrapping ClarificationPanel with StepSettingsPanel |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                                           | Changes                                                                       |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Added import for ClarifyStep and integrated in step content for 'refine' step |
 
 ## Validation Results

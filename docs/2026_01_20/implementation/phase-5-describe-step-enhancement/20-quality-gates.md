@@ -5,10 +5,10 @@
 
 ## Validation Results
 
-| Check | Status |
-|-------|--------|
-| pnpm run lint --fix | PASS |
-| pnpm run typecheck | PASS |
+| Check               | Status |
+| ------------------- | ------ |
+| pnpm run lint --fix | PASS   |
+| pnpm run typecheck  | PASS   |
 
 ## Quality Gate Criteria
 

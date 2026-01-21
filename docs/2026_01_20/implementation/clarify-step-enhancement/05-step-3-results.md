@@ -5,14 +5,14 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `components/features/clarify-step.tsx` | Added useStepConfig hook, created modelConfig useMemo, passed to ClarificationPanel |
+| File                                                        | Changes                                                                                                       |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `components/features/clarify-step.tsx`                      | Added useStepConfig hook, created modelConfig useMemo, passed to ClarificationPanel                           |
 | `components/features/clarification/clarification-panel.tsx` | Exported ClarificationModelConfig interface, removed ModelSelector/AdvancedSettings, accepts modelConfig prop |
-| `hooks/use-clarification.ts` | Updated to accept modelConfig, changed startClarification signature |
-| `electron/ipc/ai-clarification.handlers.ts` | Extended ClarificationGenerateRequest with maxTokens, temperature, thinkingBudget |
-| `electron/ipc/lib/ai-utils.ts` | Updated buildThinkingProviderOptions to accept custom budget |
-| `components/features/describe-step.tsx` | Added useStepConfig for refine step to pass config when using ClarificationPanel |
+| `hooks/use-clarification.ts`                                | Updated to accept modelConfig, changed startClarification signature                                           |
+| `electron/ipc/ai-clarification.handlers.ts`                 | Extended ClarificationGenerateRequest with maxTokens, temperature, thinkingBudget                             |
+| `electron/ipc/lib/ai-utils.ts`                              | Updated buildThinkingProviderOptions to accept custom budget                                                  |
+| `components/features/describe-step.tsx`                     | Added useStepConfig for refine step to pass config when using ClarificationPanel                              |
 
 ## Validation Results
 

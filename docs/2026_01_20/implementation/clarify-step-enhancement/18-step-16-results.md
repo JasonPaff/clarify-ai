@@ -5,8 +5,8 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                                           | Changes                                                          |
+| -------------------------------------------------------------- | ---------------------------------------------------------------- |
 | `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Added useStaleSteps hook, passed staleStepNames to WorkflowSteps |
 
 ## Validation Results
@@ -24,11 +24,13 @@
 ## Implementation Details
 
 Used existing `useStaleSteps` hook to:
+
 1. Parse JSON staleSteps from feature request
 2. Extract step names into staleStepNames array
 3. Pass to WorkflowSteps component
 
 WorkflowSteps already implemented stale display:
+
 - Amber border on step circle
 - Warning icon badge in top-right
 - Amber text color for step title

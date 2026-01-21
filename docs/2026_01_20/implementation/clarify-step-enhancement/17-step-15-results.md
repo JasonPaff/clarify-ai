@@ -5,14 +5,14 @@
 
 ## Files Created
 
-| File | Purpose |
-|------|---------|
+| File                       | Purpose                                                |
+| -------------------------- | ------------------------------------------------------ |
 | `hooks/use-stale-steps.ts` | Reusable hook for managing stale steps across workflow |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                   | Changes                                             |
+| -------------------------------------- | --------------------------------------------------- |
 | `components/features/clarify-step.tsx` | Replaced inline stale logic with useStaleSteps hook |
 
 ## Validation Results

@@ -5,11 +5,11 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `hooks/use-clarification.ts` | Exposed isQuestionsComplete in return value (was internal) |
-| `components/features/clarification/questions-list.tsx` | Added isQuestionsComplete prop, skeleton loading, disabled state during streaming |
-| `components/features/clarification/clarification-panel.tsx` | Passed isQuestionsComplete to QuestionsList, updated allQuestionsAnswered check |
+| File                                                        | Changes                                                                           |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `hooks/use-clarification.ts`                                | Exposed isQuestionsComplete in return value (was internal)                        |
+| `components/features/clarification/questions-list.tsx`      | Added isQuestionsComplete prop, skeleton loading, disabled state during streaming |
+| `components/features/clarification/clarification-panel.tsx` | Passed isQuestionsComplete to QuestionsList, updated allQuestionsAnswered check   |
 
 ## Validation Results
 

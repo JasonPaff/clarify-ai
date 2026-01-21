@@ -18,12 +18,14 @@ Successfully transformed the entry-step into a comprehensive Describe Step compo
 ## Files Changed
 
 ### Created
+
 1. `components/features/describe-step.tsx` - Renamed and enhanced from entry-step
 2. `components/features/workflow/repository-overview-status-panel.tsx` - Overview status display
 3. `components/features/workflow/repository-overview-regenerate-dialog.tsx` - Regeneration dialog
 4. `components/features/workflow/token-estimation-warning.tsx` - Token usage warning
 
 ### Modified
+
 1. `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` - Step definitions, imports
 2. `components/features/workflow-steps.tsx` - Renamed 'entry' to 'describe'
 3. `components/features/workflow/step-settings-panel.tsx` - Added 'describe' case
@@ -35,6 +37,7 @@ Successfully transformed the entry-step into a comprehensive Describe Step compo
 9. `lib/validations/feature-request-repositories.ts` - Added repositorySelectionFormSchema
 
 ### Deleted
+
 1. `components/features/entry-step.tsx` - Replaced by describe-step.tsx
 
 ## Key Features Implemented

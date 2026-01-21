@@ -27,13 +27,7 @@ export function useClearStepsStale() {
   const { featureRequests } = useElectronDb();
 
   return useMutation({
-    mutationFn: async ({
-      featureRequestId,
-      steps,
-    }: {
-      featureRequestId: number;
-      steps: Array<string>;
-    }) => {
+    mutationFn: async ({ featureRequestId, steps }: { featureRequestId: number; steps: Array<string> }) => {
       // Get the current feature request to filter stale steps
       const current = await featureRequests.getById(featureRequestId);
       if (!current) {
@@ -124,13 +118,7 @@ export function useMarkStepsStale() {
   const { featureRequests } = useElectronDb();
 
   return useMutation({
-    mutationFn: async ({
-      featureRequestId,
-      steps,
-    }: {
-      featureRequestId: number;
-      steps: Array<string>;
-    }) => {
+    mutationFn: async ({ featureRequestId, steps }: { featureRequestId: number; steps: Array<string> }) => {
       // Get the current feature request to merge stale steps
       const current = await featureRequests.getById(featureRequestId);
       if (!current) {
@@ -154,9 +142,7 @@ export function useMarkStepsStale() {
 
       const newStaleSteps = [
         ...existingStaleSteps,
-        ...steps
-          .filter((step) => !existingStepNames.has(step))
-          .map((step) => ({ staleAt: timestamp, step })),
+        ...steps.filter((step) => !existingStepNames.has(step)).map((step) => ({ staleAt: timestamp, step })),
       ];
 
       // Update the feature request with merged stale steps

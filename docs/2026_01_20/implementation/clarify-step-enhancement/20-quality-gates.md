@@ -4,9 +4,9 @@
 
 ## Validation Results
 
-| Gate | Result |
-|------|--------|
-| pnpm lint | ✅ PASS |
+| Gate           | Result  |
+| -------------- | ------- |
+| pnpm lint      | ✅ PASS |
 | pnpm typecheck | ✅ PASS |
 
 ## Quality Criteria Verification

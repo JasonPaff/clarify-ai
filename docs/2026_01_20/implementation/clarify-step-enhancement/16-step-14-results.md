@@ -5,10 +5,10 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `components/features/clarify-step.tsx` | Added StaleWarningBanner with rerun/dismiss handlers, rerunKey state |
-| `hooks/queries/use-feature-requests.ts` | Added useClearStepsStale mutation function |
+| File                                    | Changes                                                              |
+| --------------------------------------- | -------------------------------------------------------------------- |
+| `components/features/clarify-step.tsx`  | Added StaleWarningBanner with rerun/dismiss handlers, rerunKey state |
+| `hooks/queries/use-feature-requests.ts` | Added useClearStepsStale mutation function                           |
 
 ## Validation Results
 
@@ -26,6 +26,7 @@
 ## Implementation Details
 
 **ClarifyStep changes**:
+
 - Added rerunKey state to force ClarificationPanel remount
 - Added staleSteps memo parsing JSON from featureRequest
 - Added isRefineStale computed value
@@ -34,6 +35,7 @@
 - Added key={rerunKey} to ClarificationPanel for remount
 
 **useClearStepsStale hook**:
+
 - Removes specified steps from staleSteps array
 - Sets staleSteps to null if no remaining stale steps
 - Updates query cache on success

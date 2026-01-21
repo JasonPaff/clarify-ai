@@ -247,11 +247,7 @@ export const ClarificationPanel = ({
       {status === 'skipped' && (
         <div className={'space-y-4'}>
           {analysis && (
-            <AnalysisSummary
-              analysis={analysis}
-              isLoading={isLoading}
-              onRequestOverride={handleForceQuestions}
-            />
+            <AnalysisSummary analysis={analysis} isLoading={isLoading} onRequestOverride={handleForceQuestions} />
           )}
 
           <Alert>

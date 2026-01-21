@@ -5,8 +5,8 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                         | Changes                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
 | `hooks/use-clarification.ts` | Added run creation, update, and set-current-run logic for feature_request_runs table |
 
 ## Validation Results

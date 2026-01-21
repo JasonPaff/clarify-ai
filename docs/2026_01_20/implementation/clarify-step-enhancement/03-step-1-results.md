@@ -5,12 +5,12 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `components/features/workflow-steps.tsx` | Updated `WORKFLOW_STEPS[1].title` from 'Refine' to 'Clarify' |
-| `components/features/workflow/step-settings-panel.tsx` | Updated `stepLabel` switch case for 'refine' to return 'Clarify' |
-| `components/features/workflow/restore-run-dialog.tsx` | Updated `stepLabel` ternary for 'refine' to return 'Clarification' |
-| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Updated `stepContent['refine'].title` to 'Clarify Requirements' |
+| File                                                           | Changes                                                            |
+| -------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `components/features/workflow-steps.tsx`                       | Updated `WORKFLOW_STEPS[1].title` from 'Refine' to 'Clarify'       |
+| `components/features/workflow/step-settings-panel.tsx`         | Updated `stepLabel` switch case for 'refine' to return 'Clarify'   |
+| `components/features/workflow/restore-run-dialog.tsx`          | Updated `stepLabel` ternary for 'refine' to return 'Clarification' |
+| `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` | Updated `stepContent['refine'].title` to 'Clarify Requirements'    |
 
 ## Validation Results
 

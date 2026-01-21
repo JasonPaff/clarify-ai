@@ -5,11 +5,11 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `components/features/clarification/analysis-summary.tsx` | Added onRequestOverride callback and isLoading props, override button for detailScore >= 4 |
-| `components/features/clarification/clarification-panel.tsx` | Enhanced 'skipped' state with clear messaging, added handleForceQuestions handler |
-| `hooks/use-clarification.ts` | Added StartClarificationOptions interface with forceQuestions flag |
+| File                                                        | Changes                                                                                    |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `components/features/clarification/analysis-summary.tsx`    | Added onRequestOverride callback and isLoading props, override button for detailScore >= 4 |
+| `components/features/clarification/clarification-panel.tsx` | Enhanced 'skipped' state with clear messaging, added handleForceQuestions handler          |
+| `hooks/use-clarification.ts`                                | Added StartClarificationOptions interface with forceQuestions flag                         |
 
 ## Validation Results
 

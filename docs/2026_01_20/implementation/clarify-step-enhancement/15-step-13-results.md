@@ -5,10 +5,10 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                    | Changes                               |
+| --------------------------------------- | ------------------------------------- |
 | `hooks/queries/use-feature-requests.ts` | Added useMarkStepsStale mutation hook |
-| `components/features/describe-step.tsx` | Integrated stale detection on save |
+| `components/features/describe-step.tsx` | Integrated stale detection on save    |
 
 ## Validation Results
 

@@ -80,7 +80,9 @@ export const ClarifyStep = ({ featureRequest }: ClarifyStepProps) => {
         <StaleWarningBanner
           onDismiss={handleStaleDismiss}
           onRerun={handleStaleRerun}
-          reason={'The feature description has been modified since clarification was last run. Results may no longer be accurate.'}
+          reason={
+            'The feature description has been modified since clarification was last run. Results may no longer be accurate.'
+          }
           stepName={'Clarification'}
         />
       )}

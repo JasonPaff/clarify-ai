@@ -5,10 +5,10 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `lib/validations/clarification.ts` | Added 'skipped_by_user' to clarificationStatusSchema enum with docs |
-| `hooks/use-clarification.ts` | Added skipClarification function that updates status to 'skipped_by_user' |
+| File                                                        | Changes                                                                             |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `lib/validations/clarification.ts`                          | Added 'skipped_by_user' to clarificationStatusSchema enum with docs                 |
+| `hooks/use-clarification.ts`                                | Added skipClarification function that updates status to 'skipped_by_user'           |
 | `components/features/clarification/clarification-panel.tsx` | Added Skip button with SkipForward icon, handler, and skipped_by_user state display |
 
 ## Validation Results

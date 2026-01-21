@@ -16,6 +16,7 @@ Implement Phase 6 of the feature request workflow - Clarify Step Enhancement. Th
 ## Context Provided
 
 ### Project Context (from CLAUDE.md)
+
 - Electron + Next.js 16 desktop application with TypeScript
 - Uses TanStack Query for data fetching, TanStack Form for forms
 - Drizzle ORM with SQLite database
@@ -26,6 +27,7 @@ Implement Phase 6 of the feature request workflow - Clarify Step Enhancement. Th
 - Query key factories for cache invalidation
 
 ### Dependencies (from package.json)
+
 - tokenlens: ^1.3.1 (for token counting and cost estimation)
 - ai: ^6.0.39 (Vercel AI SDK)
 - @ai-sdk/anthropic, @ai-sdk/openai, @ai-sdk/google, etc.
@@ -33,6 +35,7 @@ Implement Phase 6 of the feature request workflow - Clarify Step Enhancement. Th
 - drizzle-orm with better-sqlite3
 
 ### Prior Phase Context
+
 - Phases 1-5 have established all necessary infrastructure
 - StepSettingsPanel, RunHistoryDropdown, StaleWarningBanner components exist
 - Existing clarification-panel.tsx and useClarification hook for AI streaming
@@ -78,11 +81,11 @@ Implement Phase 6 of the feature request workflow to enhance the Clarify Step wi
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
+| Metric              | Value      |
+| ------------------- | ---------- |
 | Original Word Count | ~180 words |
-| Refined Word Count | ~450 words |
-| Expansion Ratio | 2.5x |
+| Refined Word Count  | ~450 words |
+| Expansion Ratio     | 2.5x       |
 
 **Assessment**: Within acceptable 2-4x range, refined request maintains scope while adding technical specificity.
 

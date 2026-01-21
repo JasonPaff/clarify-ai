@@ -12,11 +12,13 @@ Original Request: Plan the implementation of Phase 5 (Describe Step Enhancement)
 ## File Discovery Results
 
 ### Critical Priority (Must Modify)
+
 1. `components/features/entry-step.tsx` - Core file to rename to describe-step.tsx
 2. `components/features/workflow-steps.tsx` - Update 'entry' to 'describe' in step definitions
 3. `app/(app)/projects/[projectId]/features/[featureId]/page.tsx` - Update import to DescribeStep
 
 ### High Priority (Core Integration)
+
 4. `components/features/repository-selector.tsx` - Enhance for "inherit with edit" behavior
 5. `components/features/workflow/step-settings-panel.tsx` - Integrate into describe step
 6. `components/features/workflow/context-file-picker.tsx` - Add token estimation warnings
@@ -28,6 +30,7 @@ Original Request: Plan the implementation of Phase 5 (Describe Step Enhancement)
 12. `hooks/queries/use-feature-request-context-files.ts` - Context file management hooks
 
 ### Medium Priority (Reference)
+
 13. `components/features/research-step.tsx` - Pattern for step with repository selection
 14. `components/features/clarification/clarification-panel.tsx` - Complex step UI reference
 15. `hooks/queries/use-repositories.ts` - useRepositoriesWithOverviewStatus
@@ -35,6 +38,7 @@ Original Request: Plan the implementation of Phase 5 (Describe Step Enhancement)
 17. `lib/validations/feature-request.ts` - entryStepFormSchema
 
 ### Low Priority (Schema)
+
 18. `db/schema/step-configurations.schema.ts` - May need 'describe' step type
 
 ---

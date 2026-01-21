@@ -5,10 +5,10 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                                  | Changes                                                                      |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `components/features/clarification/cost-estimate.tsx` | Added variant prop (full/compact), compact shows inline summary with tooltip |
-| `components/features/clarify-step.tsx` | Added compact cost estimate in step header next to RunHistoryDropdown |
+| `components/features/clarify-step.tsx`                | Added compact cost estimate in step header next to RunHistoryDropdown        |
 
 ## Validation Results
 
@@ -32,5 +32,6 @@
 ## Auto-Update Behavior
 
 Estimate updates automatically when:
+
 1. Step configuration changes (different model selected)
 2. Feature request content changes (rawRequest field)

@@ -63,7 +63,12 @@ const RepositoryStatusItem = ({
   }, [generatedAt]);
 
   return (
-    <div className={cn('flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2', className)}>
+    <div
+      className={cn(
+        'flex items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2',
+        className
+      )}
+    >
       {/* Repository Info */}
       <div className={'flex min-w-0 flex-1 items-center gap-3'}>
         {/* Status Indicator */}
@@ -173,10 +178,16 @@ export const RepositoryOverviewStatusPanel = ({
   projectId,
   repositoryIds,
 }: RepositoryOverviewStatusPanelProps) => {
-  const { data: repositories, isError: isRepositoriesError, isPending: isRepositoriesPending } =
-    useRepositories(projectId);
-  const { data: overviewStatusMap, isError: isOverviewsError, isPending: isOverviewsPending } =
-    useRepositoryOverviewStatuses(repositoryIds);
+  const {
+    data: repositories,
+    isError: isRepositoriesError,
+    isPending: isRepositoriesPending,
+  } = useRepositories(projectId);
+  const {
+    data: overviewStatusMap,
+    isError: isOverviewsError,
+    isPending: isOverviewsPending,
+  } = useRepositoryOverviewStatuses(repositoryIds);
 
   const isPending = isRepositoriesPending || isOverviewsPending;
   const isError = isRepositoriesError || isOverviewsError;

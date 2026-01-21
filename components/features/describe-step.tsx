@@ -242,8 +242,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
   const isRepositoryDataLoading = isLoadingFeatureRepositories || isLoadingProjectRepositories;
   const isRepositoryDataError = isFeatureRepositoriesError || isProjectRepositoriesError;
   const hasNoProjectRepositories = !isLoadingProjectRepositories && projectRepositories.length === 0;
-  const isRepositorySelectionReady =
-    !isRepositoryDataLoading && !isRepositoryDataError && !hasNoProjectRepositories;
+  const isRepositorySelectionReady = !isRepositoryDataLoading && !isRepositoryDataError && !hasNoProjectRepositories;
 
   const saveStatusText = isSaving
     ? 'Saving...'
@@ -334,9 +333,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
             {isRepositoryDataError && !isRepositoryDataLoading && (
               <Alert variant={'destructive'}>
                 <AlertCircle className={'size-4'} />
-                <AlertDescription>
-                  Failed to load repository data. Please try refreshing the page.
-                </AlertDescription>
+                <AlertDescription>Failed to load repository data. Please try refreshing the page.</AlertDescription>
               </Alert>
             )}
 
@@ -385,9 +382,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
                 {setRepositories.isError && (
                   <Alert variant={'destructive'}>
                     <AlertCircle className={'size-4'} />
-                    <AlertDescription>
-                      Failed to save repository selection. Please try again.
-                    </AlertDescription>
+                    <AlertDescription>Failed to save repository selection. Please try again.</AlertDescription>
                   </Alert>
                 )}
 

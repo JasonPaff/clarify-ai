@@ -5,9 +5,9 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `hooks/use-clarification.ts` | Added requestMoreClarification function with previous Q&A context |
+| File                                                        | Changes                                                               |
+| ----------------------------------------------------------- | --------------------------------------------------------------------- |
+| `hooks/use-clarification.ts`                                | Added requestMoreClarification function with previous Q&A context     |
 | `components/features/clarification/clarification-panel.tsx` | Added "Request more clarification" button with MessageCirclePlus icon |
 
 ## Validation Results
