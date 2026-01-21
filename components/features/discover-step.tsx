@@ -1,8 +1,11 @@
 'use client';
 
+import type { MutableRefObject } from 'react';
+
 import { AlertCircle } from 'lucide-react';
-import { MutableRefObject, useEffectEvent } from 'react';
+import { useEffectEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
@@ -18,7 +21,9 @@ import { RepositoryOverviewStatusPanel } from '@/components/features/workflow/re
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
+import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { useWorkflow } from '@/components/providers/workflow-provider';
+import { DiscoverySkeleton } from '@/components/skeletons/discovery-skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -69,6 +74,8 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
 
   // Track re-run key to force component remount when re-running
   const [rerunKey, setRerunKey] = useState(0);
+  // Track error boundary key for resetting after errors
+  const [errorBoundaryKey, setErrorBoundaryKey] = useState(0);
 
   // Track last saved timestamp for discovery results
   // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
@@ -202,7 +209,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
 
   const hasRepositoriesMissingOverviews = repositoriesMissingOverviews.length > 0;
   const hasNoRepositoriesSelected = selectedRepositoryIds.length === 0;
-  const isDiscoveryComplete = status === 'completed' && files.length > 0;
+  const isDiscoveryComplete = status === 'completed';
   const isDiscoveryActive = status === 'scanning' || status === 'analyzing';
   const isDiscoveryIdle = status === 'idle';
 
@@ -284,6 +291,11 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     // This should navigate to the repository settings or trigger overview generation
   }, []);
 
+  const handleErrorBoundaryReset = useCallback(() => {
+    // Increment key to remount the component after error recovery
+    setErrorBoundaryKey((prev) => prev + 1);
+  }, []);
+
   // Build repository overviews for cost estimate
   const repositoryOverviewsForCostEstimate = useMemo((): Array<DiscoveryRepositoryOverview> => {
     if (!repositories || !overviewStatusMap) return [];
@@ -300,6 +312,11 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
         };
       });
   }, [repositories, overviewStatusMap, selectedRepositoryIds]);
+
+  // Show skeleton during initial configuration loading
+  if (isConfigLoading) {
+    return <DiscoverySkeleton />;
+  }
 
   return (
     <div className={'flex flex-col gap-6'} key={rerunKey}>
@@ -399,27 +416,39 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
 
       {/* Section 4: Discovery Progress */}
       {isDiscoveryActive && (
-        <DiscoveryProgress
-          currentStep={progress.currentStep}
-          filesDiscovered={files.length}
-          isLoading={isLoading}
-          onCancel={handleCancelDiscovery}
-          percentage={progress.percentage}
-          status={status}
-        />
+        <ErrorBoundary
+          fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Progress'} />}
+          key={`progress-${errorBoundaryKey}`}
+          onReset={handleErrorBoundaryReset}
+        >
+          <DiscoveryProgress
+            currentStep={progress.currentStep}
+            filesDiscovered={files.length}
+            isLoading={isLoading}
+            onCancel={handleCancelDiscovery}
+            percentage={progress.percentage}
+            status={status}
+          />
+        </ErrorBoundary>
       )}
 
       {/* Section 5: Discovery Results */}
       {isDiscoveryComplete && (
         <section className={'flex flex-col gap-3'}>
-          <DiscoveryResults
-            discoveredFiles={files}
-            onAddFile={addFile}
-            onRemoveFile={removeFile}
-            onUpdateFile={handleUpdateFile}
-            projectId={projectId}
-            repositories={repositoryOptions}
-          />
+          <ErrorBoundary
+            fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Results'} />}
+            key={`results-${errorBoundaryKey}`}
+            onReset={handleErrorBoundaryReset}
+          >
+            <DiscoveryResults
+              discoveredFiles={files}
+              onAddFile={addFile}
+              onRemoveFile={removeFile}
+              onUpdateFile={handleUpdateFile}
+              projectId={projectId}
+              repositories={repositoryOptions}
+            />
+          </ErrorBoundary>
 
           {/* Auto-Save Status */}
           <div className={'flex items-center justify-end'}>
@@ -428,7 +457,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
         </section>
       )}
 
-      {/* Section 6: Action Buttons */}
+      {/* Section 7: Action Buttons */}
       {isDiscoveryIdle && (
         <div className={'flex items-center gap-3'}>
           <Button disabled={!canStartDiscovery || isConfigLoading} onClick={handleStartDiscovery} size={'default'}>

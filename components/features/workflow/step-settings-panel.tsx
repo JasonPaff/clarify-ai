@@ -153,27 +153,31 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
         {/* Trigger */}
         <CollapsibleTrigger
           className={cn(
-            'flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-left text-sm',
+            'flex w-full items-center justify-between rounded-md border border-border bg-card px-2.5 py-1.5 text-left text-xs sm:px-3 sm:py-2 sm:text-sm',
             'transition-colors hover:bg-muted/50'
           )}
           isHideChevron
         >
-          <div className={'flex items-center gap-2'}>
-            <Settings2 className={'size-4 text-muted-foreground'} />
+          <div className={'flex items-center gap-1.5 sm:gap-2'}>
+            <Settings2 className={'size-3.5 text-muted-foreground sm:size-4'} />
             <span className={'font-medium'}>{stepLabel} Settings</span>
             {isCustomized && (
-              <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>Customized</span>
+              <span className={'hidden rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent sm:inline'}>
+                Customized
+              </span>
             )}
           </div>
-          <ChevronDown className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'} />
+          <ChevronDown
+            className={'size-3.5 text-muted-foreground transition-transform in-data-panel-open:rotate-180 sm:size-4'}
+          />
         </CollapsibleTrigger>
 
         {/* Content */}
         <CollapsibleContent className={'mt-2'}>
-          <div className={'space-y-6 rounded-md border border-border bg-card p-4'}>
+          <div className={'space-y-4 rounded-md border border-border bg-card p-3 sm:space-y-6 sm:p-4'}>
             {/* Model Selection */}
-            <div className={'flex flex-col gap-2'}>
-              <label className={'text-sm font-medium'}>Model</label>
+            <div className={'flex flex-col gap-1.5 sm:gap-2'}>
+              <label className={'text-xs font-medium sm:text-sm'}>Model</label>
               <ModelSelector
                 isDisabled={isLoading || upsertMutation.isPending}
                 onValueChange={handleModelChange}
@@ -181,31 +185,38 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
               />
             </div>
 
-            {/* Temperature Slider */}
-            <ParameterSlider
-              description={'Controls randomness. Lower values are more focused, higher values more creative.'}
-              formatValue={formatTemperature}
-              isDisabled={isLoading || upsertMutation.isPending}
-              label={'Temperature'}
-              max={2}
-              min={0}
-              onValueChange={handleTemperatureChange}
-              step={0.1}
-              value={config?.temperature ?? DEFAULT_TEMPERATURE}
-            />
+            {/* Parameter Controls - Stack on mobile, side-by-side on larger screens */}
+            <div className={'flex flex-col gap-4 sm:gap-6 md:flex-row md:gap-8'}>
+              {/* Temperature Slider */}
+              <div className={'flex-1'}>
+                <ParameterSlider
+                  description={'Controls randomness. Lower values are more focused, higher values more creative.'}
+                  formatValue={formatTemperature}
+                  isDisabled={isLoading || upsertMutation.isPending}
+                  label={'Temperature'}
+                  max={2}
+                  min={0}
+                  onValueChange={handleTemperatureChange}
+                  step={0.1}
+                  value={config?.temperature ?? DEFAULT_TEMPERATURE}
+                />
+              </div>
 
-            {/* Max Tokens Slider */}
-            <ParameterSlider
-              description={'Maximum number of tokens the model can generate in the response.'}
-              formatValue={formatMaxTokens}
-              isDisabled={isLoading || upsertMutation.isPending}
-              label={'Max Tokens'}
-              max={16000}
-              min={100}
-              onValueChange={handleMaxTokensChange}
-              step={100}
-              value={config?.maxTokens ?? DEFAULT_MAX_TOKENS}
-            />
+              {/* Max Tokens Slider */}
+              <div className={'flex-1'}>
+                <ParameterSlider
+                  description={'Maximum number of tokens the model can generate in the response.'}
+                  formatValue={formatMaxTokens}
+                  isDisabled={isLoading || upsertMutation.isPending}
+                  label={'Max Tokens'}
+                  max={16000}
+                  min={100}
+                  onValueChange={handleMaxTokensChange}
+                  step={100}
+                  value={config?.maxTokens ?? DEFAULT_MAX_TOKENS}
+                />
+              </div>
+            </div>
 
             {/* Thinking Budget Control */}
             <ThinkingBudgetControl
@@ -218,9 +229,9 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
             />
 
             {/* Custom System Prompt */}
-            <div className={'flex flex-col gap-2'}>
+            <div className={'flex flex-col gap-1.5 sm:gap-2'}>
               <div className={'flex items-center justify-between'}>
-                <label className={'text-sm font-medium'} htmlFor={`custom-prompt-${step}`}>
+                <label className={'text-xs font-medium sm:text-sm'} htmlFor={`custom-prompt-${step}`}>
                   Custom System Prompt
                 </label>
                 {config?.customSystemPrompt && (
@@ -237,7 +248,7 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
                 Override the default system prompt for this step. Leave empty to use the default.
               </p>
               <Textarea
-                className={'min-h-32 font-mono text-xs'}
+                className={'min-h-24 font-mono text-xs sm:min-h-32'}
                 defaultValue={config?.customSystemPrompt ?? ''}
                 disabled={isLoading || upsertMutation.isPending}
                 id={`custom-prompt-${step}`}

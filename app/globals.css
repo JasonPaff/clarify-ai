@@ -10,9 +10,76 @@
   /* Scrollbar dimensions */
   --scrollbar-width: 8px;
 
-  /* Stepper dimensions */
+  /* Stepper dimensions (desktop defaults) */
   --stepper-width: 220px;
   --stepper-gap: 24px;
+  --stepper-connector-height: 32px;
+
+  /* Workflow component dimensions */
+  --workflow-panel-min-width: 300px;
+  --workflow-panel-max-width: 800px;
+  --workflow-header-height: 64px;
+
+  /* Responsive gap values */
+  --gap-xs: 8px;
+  --gap-sm: 12px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+  --gap-xl: 32px;
+
+  /* Responsive padding values */
+  --padding-content-x: 24px;
+  --padding-content-y: 24px;
+
+  /*
+   * Responsive Breakpoints Reference (Tailwind defaults):
+   * - sm: 640px  (mobile landscape)
+   * - md: 768px  (tablet portrait)
+   * - lg: 1024px (tablet landscape / small desktop)
+   * - xl: 1280px (desktop)
+   * - 2xl: 1536px (large desktop)
+   */
+}
+
+/* Mobile breakpoint overrides (< 768px) */
+@media (max-width: 767px) {
+  :root {
+    /* Stepper goes horizontal on mobile */
+    --stepper-width: 100%;
+    --stepper-gap: 16px;
+    --stepper-connector-height: 24px;
+
+    /* Smaller gaps on mobile */
+    --gap-sm: 8px;
+    --gap-md: 12px;
+    --gap-lg: 16px;
+    --gap-xl: 24px;
+
+    /* Reduced padding on mobile */
+    --padding-content-x: 16px;
+    --padding-content-y: 16px;
+
+    /* Workflow adjustments */
+    --workflow-panel-min-width: 100%;
+    --workflow-header-height: 56px;
+  }
+}
+
+/* Small screens (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+  :root {
+    --stepper-gap: 20px;
+    --padding-content-x: 20px;
+  }
+}
+
+/* Tablet breakpoint (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --stepper-width: 180px;
+    --stepper-gap: 20px;
+    --padding-content-x: 20px;
+  }
 }
 
 /* Light mode colors - Baltimore Orioles inspired */
@@ -192,4 +259,77 @@
 
 .animate-shimmer {
   animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/*
+ * Container Query Support for Component-Level Responsiveness
+ * Use these classes to enable container queries on parent elements,
+ * then use @container queries in child components for responsive styling.
+ *
+ * Container query breakpoints (suggested naming):
+ * - @container (width < 300px): xs - extra small container
+ * - @container (width < 480px): sm - small container
+ * - @container (width < 640px): md - medium container
+ * - @container (width >= 640px): lg - large container
+ */
+
+/* Container context classes for workflow components */
+.workflow-container {
+  container-type: inline-size;
+  container-name: workflow;
+}
+
+.stepper-container {
+  container-type: inline-size;
+  container-name: stepper;
+}
+
+.panel-container {
+  container-type: inline-size;
+  container-name: panel;
+}
+
+/* Generic container class for any component needing responsive queries */
+.responsive-container {
+  container-type: inline-size;
+}
+
+/* Utility classes for container-based responsiveness */
+@layer utilities {
+  /* Hide on small containers (< 480px) */
+  @container (width < 480px) {
+    .container-hide-sm {
+      display: none;
+    }
+  }
+
+  /* Show only on small containers (< 480px) */
+  @container (width >= 480px) {
+    .container-show-sm-only {
+      display: none;
+    }
+  }
+
+  /* Flex direction changes based on container width */
+  @container (width < 480px) {
+    .container-col-sm {
+      flex-direction: column;
+    }
+  }
+
+  /* Stack workflow items vertically on narrow containers */
+  @container workflow (width < 600px) {
+    .workflow-stack {
+      flex-direction: column;
+      gap: var(--gap-md);
+    }
+  }
+
+  /* Stepper compact mode for narrow containers */
+  @container stepper (width < 400px) {
+    .stepper-compact {
+      --stepper-gap: 12px;
+      --stepper-connector-height: 20px;
+    }
+  }
 }

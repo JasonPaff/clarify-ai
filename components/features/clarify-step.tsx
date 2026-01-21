@@ -3,6 +3,7 @@
 import type { MutableRefObject } from 'react';
 
 import { useCallback, useMemo, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
@@ -14,6 +15,8 @@ import { RunHistoryDropdown } from '@/components/features/workflow/run-history-d
 import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
+import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
+import { ClarifyStepSkeleton } from '@/components/skeletons/clarify-step-skeleton';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
@@ -37,6 +40,8 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
   );
   // Track re-run key to force ClarificationPanel remount when re-running
   const [rerunKey, setRerunKey] = useState(0);
+  // Track error boundary key for resetting after errors
+  const [errorBoundaryKey, setErrorBoundaryKey] = useState(0);
 
   const { data: config, isLoading: isConfigLoading } = useStepConfig(featureRequest.projectId, 'refine');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'refine');
@@ -120,6 +125,16 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
     updateMutation.reset();
   }, [updateMutation]);
 
+  const handleErrorBoundaryReset = useCallback(() => {
+    // Increment key to remount the component after error recovery
+    setErrorBoundaryKey((prev) => prev + 1);
+  }, []);
+
+  // Show skeleton during initial configuration loading
+  if (isConfigLoading) {
+    return <ClarifyStepSkeleton />;
+  }
+
   return (
     <div className={'flex flex-col gap-6'}>
       {/* Stale Warning Banner */}
@@ -156,15 +171,21 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
 
       {/* Section 2: Clarification Content */}
       <section className={'flex flex-col gap-3'}>
-        <ClarificationPanel
-          currentRun={currentRun ?? undefined}
-          featureRequest={featureRequest}
-          isConfigLoading={isConfigLoading}
-          key={rerunKey}
-          modelConfig={modelConfig}
-          onCancelRegister={handleCancelRegister}
-          onComplete={handleClarificationComplete}
-        />
+        <ErrorBoundary
+          fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Clarification'} />}
+          key={errorBoundaryKey}
+          onReset={handleErrorBoundaryReset}
+        >
+          <ClarificationPanel
+            currentRun={currentRun ?? undefined}
+            featureRequest={featureRequest}
+            isConfigLoading={isConfigLoading}
+            key={rerunKey}
+            modelConfig={modelConfig}
+            onCancelRegister={handleCancelRegister}
+            onComplete={handleClarificationComplete}
+          />
+        </ErrorBoundary>
 
         {/* Auto-Save Status */}
         {isClarificationCompleted && (

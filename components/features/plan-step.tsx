@@ -2,7 +2,9 @@
 
 import type { MutableRefObject } from 'react';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ClipboardList } from 'lucide-react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
@@ -15,7 +17,10 @@ import { RunHistoryDropdown } from '@/components/features/workflow/run-history-d
 import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
+import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
+import { WorkflowEmptyState } from '@/components/features/workflow/workflow-empty-state';
 import { useWorkflow } from '@/components/providers/workflow-provider';
+import { PlanStepSkeleton } from '@/components/skeletons/plan-step-skeleton';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useRepositories } from '@/hooks/queries/use-repositories';
@@ -62,6 +67,8 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
 
   // Track re-run key to force PlanPanel remount when re-running
   const [rerunKey, setRerunKey] = useState(0);
+  // Track error boundary key for resetting after errors
+  const [errorBoundaryKey, setErrorBoundaryKey] = useState(0);
 
   // Track last saved timestamp for plan results
   // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
@@ -151,6 +158,27 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
     return parseDiscoveredFiles(featureRequest.researchFindings);
   }, [featureRequest.researchFindings]);
 
+  // Derived conditions for empty state
+  const hasExistingPlan = !!featureRequest.implementationPlan;
+  const hasCurrentRun = !!currentRun;
+  const hasDiscoveredFiles = discoveredFiles.length > 0;
+  const hasRepositoryOverviews = repositoryOverviews.length > 0;
+
+  // Show empty state when plan step is accessed without prerequisites completed
+  // This provides guidance before showing the more detailed PlanPanel
+  const shouldShowEmptyState = !hasExistingPlan && !hasCurrentRun && !hasDiscoveredFiles;
+
+  // Determine the appropriate empty state message based on missing prerequisites
+  const emptyStateDescription = useMemo(() => {
+    if (!hasDiscoveredFiles && !hasRepositoryOverviews) {
+      return 'Complete the Discovery step to identify relevant files before generating an implementation plan. The Discovery step analyzes your repositories to find files related to your feature request.';
+    }
+    if (!hasDiscoveredFiles) {
+      return 'Complete the Discovery step first to identify relevant files in your codebase. These discovered files provide the context needed to create an accurate implementation plan.';
+    }
+    return 'Configure your model settings and click "Generate Plan" to create an implementation plan for this feature request.';
+  }, [hasDiscoveredFiles, hasRepositoryOverviews]);
+
   const handleRunRestored = useCallback(() => {
     // When a run is restored via RunHistoryDropdown, the currentRun query
     // is automatically invalidated and will refetch the new current run.
@@ -206,6 +234,16 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
     [cancelCallbackRef]
   );
 
+  const handleErrorBoundaryReset = useCallback(() => {
+    // Increment key to remount the component after error recovery
+    setErrorBoundaryKey((prev) => prev + 1);
+  }, []);
+
+  // Show skeleton during initial configuration loading
+  if (isConfigLoading) {
+    return <PlanStepSkeleton />;
+  }
+
   return (
     <div className={'flex flex-col gap-6'} key={rerunKey}>
       {/* Stale Warning Banner */}
@@ -244,22 +282,39 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
 
       {/* Section 2: Plan Content */}
       <section className={'flex flex-col gap-3'}>
-        <PlanPanel
-          currentRun={currentRun ?? undefined}
-          featureRequest={featureRequest}
-          isConfigLoading={isConfigLoading}
-          modelConfig={modelConfig}
-          onCancelRegister={handleCancelRegister}
-          onGenerationComplete={handleGenerationComplete}
-          onGenerationError={handleGenerationError}
-          onGenerationStart={handleGenerationStart}
-          repositoryOverviews={repositoryOverviews}
-        />
+        {shouldShowEmptyState ? (
+          <WorkflowEmptyState
+            customDescription={emptyStateDescription}
+            customIcon={<ClipboardList className={'size-6'} />}
+            customTitle={'No Implementation Plan'}
+            variant={'noResults'}
+          />
+        ) : (
+          <Fragment>
+            <ErrorBoundary
+              fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Plan Generation'} />}
+              key={errorBoundaryKey}
+              onReset={handleErrorBoundaryReset}
+            >
+              <PlanPanel
+                currentRun={currentRun ?? undefined}
+                featureRequest={featureRequest}
+                isConfigLoading={isConfigLoading}
+                modelConfig={modelConfig}
+                onCancelRegister={handleCancelRegister}
+                onGenerationComplete={handleGenerationComplete}
+                onGenerationError={handleGenerationError}
+                onGenerationStart={handleGenerationStart}
+                repositoryOverviews={repositoryOverviews}
+              />
+            </ErrorBoundary>
 
-        {/* Auto-Save Status */}
-        <div className={'flex items-center justify-end'}>
-          <AutoSaveStatus isSaving={isGenerating} lastSavedAt={lastSavedAt} />
-        </div>
+            {/* Auto-Save Status */}
+            <div className={'flex items-center justify-end'}>
+              <AutoSaveStatus isSaving={isGenerating} lastSavedAt={lastSavedAt} />
+            </div>
+          </Fragment>
+        )}
       </section>
     </div>
   );

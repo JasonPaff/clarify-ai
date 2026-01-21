@@ -3,7 +3,7 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, History } from 'lucide-react';
+import { Clock, History, ListX } from 'lucide-react';
 import { useState } from 'react';
 
 import type { FeatureRequestRun, FeatureRequestRunStep } from '@/db/schema/feature-request-runs.schema';
@@ -98,10 +98,18 @@ export const RunHistoryDropdown = ({
     <div className={cn('flex items-center', className)} ref={ref} {...props}>
       {/* Dropdown */}
       <SelectRoot onValueChange={handleRunSelect} value={currentRun?.id?.toString() ?? ''}>
-        <SelectTrigger className={'min-w-[200px]'} disabled={isEmptyState} size={'sm'}>
+        <SelectTrigger
+          className={cn('min-w-[200px]', isEmptyState && 'cursor-not-allowed opacity-60')}
+          disabled={isEmptyState}
+          size={'sm'}
+        >
           <div className={'flex items-center gap-2'}>
-            <History aria-hidden={'true'} className={'size-4 text-muted-foreground'} />
-            <SelectValue placeholder={isEmptyState ? 'No history' : 'Select version...'}>
+            {isEmptyState ? (
+              <ListX aria-hidden={'true'} className={'size-4 text-muted-foreground'} />
+            ) : (
+              <History aria-hidden={'true'} className={'size-4 text-muted-foreground'} />
+            )}
+            <SelectValue placeholder={isEmptyState ? 'No run history yet' : 'Select version...'}>
               {currentRun ? (
                 <span className={'flex items-center gap-2'}>
                   <Clock aria-hidden={'true'} className={'size-3.5 text-muted-foreground'} />
@@ -112,7 +120,11 @@ export const RunHistoryDropdown = ({
                 </span>
               ) : (
                 <span className={'text-muted-foreground'}>
-                  {isLoadingRuns ? 'Loading...' : isEmptyState ? 'No history' : 'Select version...'}
+                  {isLoadingRuns
+                    ? 'Loading...'
+                    : isEmptyState
+                      ? 'No run history yet'
+                      : 'Select version...'}
                 </span>
               )}
             </SelectValue>

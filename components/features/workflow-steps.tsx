@@ -1,7 +1,9 @@
 'use client';
 
+import type { KeyboardEvent } from 'react';
+
 import { AlertTriangle, ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { Button } from '@/components/ui/button';
@@ -72,8 +74,43 @@ export const WorkflowSteps = ({
 }: WorkflowStepsProps) => {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [pendingStepId, setPendingStepId] = useState<null | string>(null);
+  const [focusedIndex, setFocusedIndex] = useState(currentIndex);
+  const stepRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const liveRegionRef = useRef<HTMLDivElement>(null);
 
   const isLastStep = (index: number) => index === WORKFLOW_STEPS.length - 1;
+
+  // Announce status changes via live region
+  const announce = useCallback((message: string) => {
+    if (liveRegionRef.current) {
+      // Clear first to ensure re-announcement of same message
+      liveRegionRef.current.textContent = '';
+      requestAnimationFrame(() => {
+        if (liveRegionRef.current) {
+          liveRegionRef.current.textContent = message;
+        }
+      });
+    }
+  }, []);
+
+  // Announce step changes
+  useEffect(() => {
+    const step = WORKFLOW_STEPS[currentIndex];
+    if (step) {
+      announce(`Step ${currentIndex + 1} of ${totalSteps}: ${step.title}. ${step.description}`);
+    }
+  }, [currentIndex, totalSteps, announce]);
+
+  // Announce stale step warnings
+  useEffect(() => {
+    if (staleSteps.length > 0) {
+      const staleStepNames = staleSteps
+        .map((id) => WORKFLOW_STEPS.find((s) => s.id === id)?.title)
+        .filter(Boolean)
+        .join(', ');
+      announce(`Warning: The following steps are outdated and may need to be re-run: ${staleStepNames}`);
+    }
+  }, [staleSteps, announce]);
 
   const handleStepClick = (stepId: string, isClickable: boolean) => {
     if (!isClickable) return;
@@ -104,12 +141,69 @@ export const WorkflowSteps = ({
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const { key } = event;
+    let newIndex = focusedIndex;
+
+    switch (key) {
+      case ' ':
+      case 'Enter': {
+        event.preventDefault();
+        const step = WORKFLOW_STEPS[focusedIndex];
+        const isCompleted = focusedIndex < currentIndex;
+        const isCurrent = step?.id === currentStep;
+        const isClickable = onStepClick && (isCompleted || isCurrent);
+        if (step && isClickable) {
+          handleStepClick(step.id, true);
+        }
+        return;
+      }
+      case 'ArrowDown':
+        event.preventDefault();
+        newIndex = Math.min(focusedIndex + 1, WORKFLOW_STEPS.length - 1);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        newIndex = Math.max(focusedIndex - 1, 0);
+        break;
+      case 'End':
+        event.preventDefault();
+        newIndex = WORKFLOW_STEPS.length - 1;
+        break;
+      case 'Home':
+        event.preventDefault();
+        newIndex = 0;
+        break;
+      default:
+        return;
+    }
+
+    if (newIndex !== focusedIndex) {
+      setFocusedIndex(newIndex);
+      stepRefs.current[newIndex]?.focus();
+    }
+  };
+
   return (
-    <div
-      className={'flex flex-col rounded-lg border border-border/50 bg-muted/30 p-4'}
-      style={{ width: 'var(--stepper-width)' }}
+    <nav
+      aria-label={'Workflow progress'}
+      className={
+        'flex flex-col rounded-lg border border-border/50 bg-muted/30 p-3 sm:p-4 md:w-(--stepper-width)'
+      }
+      onKeyDown={handleKeyDown}
+      role={'navigation'}
     >
-      {WORKFLOW_STEPS.map((step, index) => {
+      {/* Hidden live region for screen reader announcements */}
+      <div
+        aria-atomic={'true'}
+        aria-live={'polite'}
+        className={'sr-only'}
+        ref={liveRegionRef}
+        role={'status'}
+      />
+
+      <ol aria-label={'Workflow steps'} role={'list'}>
+        {WORKFLOW_STEPS.map((step, index) => {
         const isCompleted = index < currentIndex;
         const isCurrent = step.id === currentStep;
         const isClickable = onStepClick && (isCompleted || isCurrent);
@@ -117,12 +211,12 @@ export const WorkflowSteps = ({
 
         const stepIndicator = (
           <div className={'relative shrink-0'}>
-            {/* Step indicator */}
+            {/* Step indicator - min 44x44px on mobile for touch accessibility, 40x40px on md+ */}
             <div
               className={cn(
                 `
-                  flex size-10 items-center justify-center rounded-full
-                  border-2 text-sm font-medium transition-colors
+                  flex size-11 items-center justify-center rounded-full border-2 text-sm
+                  font-medium transition-colors md:size-10
                 `,
                 isCompleted && 'border-accent bg-accent text-accent-foreground',
                 isCurrent && 'border-accent bg-background text-accent shadow-sm',
@@ -130,7 +224,7 @@ export const WorkflowSteps = ({
                 isStale && 'border-amber-500'
               )}
             >
-              {isCompleted ? <Check className={'size-5'} /> : index + 1}
+              {isCompleted ? <Check className={'size-4 md:size-5'} /> : index + 1}
             </div>
 
             {/* Stale warning indicator */}
@@ -147,19 +241,30 @@ export const WorkflowSteps = ({
         );
 
         const isNavigationBlocked = isAiOperationRunning && isClickable && step.id !== currentStep;
+        const stepStatus = isCompleted ? 'completed' : isCurrent ? 'current' : 'upcoming';
+        const ariaLabel = `Step ${index + 1}: ${step.title}. ${step.description}. Status: ${stepStatus}${isStale ? '. Warning: This step is outdated.' : ''}`;
 
         return (
-          <div className={'flex flex-col'} key={step.id}>
+          <li className={'flex flex-col'} key={step.id} role={'listitem'}>
             {/* Step Row */}
             <button
+              aria-current={isCurrent ? 'step' : undefined}
+              aria-describedby={isStale ? `stale-warning-${step.id}` : undefined}
+              aria-disabled={!isClickable}
+              aria-label={ariaLabel}
               className={cn(
-                'flex items-center gap-3 text-left',
+                'flex items-center gap-2 text-left sm:gap-3',
                 isClickable && !isNavigationBlocked && 'cursor-pointer',
                 !isClickable && 'cursor-default',
                 isNavigationBlocked && 'cursor-not-allowed opacity-60'
               )}
               disabled={!isClickable}
               onClick={() => handleStepClick(step.id, !!isClickable)}
+              onFocus={() => setFocusedIndex(index)}
+              ref={(el) => {
+                stepRefs.current[index] = el;
+              }}
+              tabIndex={index === focusedIndex ? 0 : -1}
               type={'button'}
             >
               {/* Step indicator with optional stale tooltip */}
@@ -184,32 +289,45 @@ export const WorkflowSteps = ({
                 >
                   {step.title}
                 </span>
-                <span className={'truncate text-xs text-muted-foreground'}>{step.description}</span>
+                {/* Description hidden on small screens, visible on md+ */}
+                <span className={'hidden truncate text-xs text-muted-foreground sm:block'}>
+                  {step.description}
+                </span>
               </div>
             </button>
 
-            {/* Vertical connector line */}
+            {/* Hidden stale warning for aria-describedby */}
+            {isStale && (
+              <span className={'sr-only'} id={`stale-warning-${step.id}`}>
+                This step is outdated due to changes in a previous step and may need to be re-run.
+              </span>
+            )}
+
+            {/* Vertical connector line - centered under step indicator */}
             {!isLastStep(index) && (
-              <div className={'my-2 ml-[19px]'}>
-                <div className={cn('h-5 w-0.5', index < currentIndex ? 'bg-accent' : 'bg-border/60')} />
+              <div aria-hidden={'true'} className={'my-1.5 ml-[21px] sm:my-2 md:ml-[19px]'}>
+                <div
+                  className={cn('h-4 w-0.5 sm:h-5', index < currentIndex ? 'bg-accent' : 'bg-border/60')}
+                />
               </div>
             )}
-          </div>
+          </li>
         );
       })}
+      </ol>
 
       {/* Navigation */}
-      <div className={'mt-4 flex flex-col gap-3 border-t border-border/50 pt-4'}>
+      <div className={'mt-3 flex flex-col gap-2 border-t border-border/50 pt-3 sm:mt-4 sm:gap-3 sm:pt-4'}>
         <span className={'text-center text-xs text-muted-foreground'}>
           Step {currentIndex + 1} of {totalSteps}
         </span>
         <div className={'flex gap-2'}>
           <Button className={'flex-1'} disabled={!canGoBack} onClick={onGoBack} size={'sm'} variant={'outline'}>
             <ArrowLeft className={'size-4'} />
-            Previous
+            <span className={'hidden sm:inline'}>Previous</span>
           </Button>
           <Button className={'flex-1'} disabled={!canGoNext} onClick={onGoNext} size={'sm'}>
-            Next
+            <span className={'hidden sm:inline'}>Next</span>
             <ArrowRight className={'size-4'} />
           </Button>
         </div>
@@ -222,6 +340,6 @@ export const WorkflowSteps = ({
         open={isCancelDialogOpen}
         stepName={activeOperationStepName}
       />
-    </div>
+    </nav>
   );
 };
