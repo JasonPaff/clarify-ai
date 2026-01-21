@@ -22,7 +22,7 @@ interface ClarifyStepProps {
 }
 
 export const ClarifyStep = ({ featureRequest }: ClarifyStepProps) => {
-  const { data: config, isLoading: isConfigLoading } = useStepConfig(featureRequest.id, 'refine');
+  const { data: config, isLoading: isConfigLoading } = useStepConfig(featureRequest.projectId, 'refine');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'refine');
 
   // Use the centralized stale steps hook
@@ -89,7 +89,7 @@ export const ClarifyStep = ({ featureRequest }: ClarifyStepProps) => {
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
       <div className={'flex items-center justify-between gap-4'}>
-        <StepSettingsPanel className={'flex-1'} featureRequestId={featureRequest.id} step={'refine'} />
+        <StepSettingsPanel className={'flex-1'} projectId={featureRequest.projectId} step={'refine'} />
 
         {/* Cost Estimate and Run History */}
         <div className={'flex items-center gap-3'}>

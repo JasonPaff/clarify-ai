@@ -37,11 +37,12 @@ export function RestoreRunDialog({
     setIsOpen(false);
   };
 
+  const parseSqliteTimestamp = (value: string) => new Date(value.endsWith('Z') ? value : `${value}Z`);
   const formattedDate = run.completedAt
-    ? new Date(run.completedAt).toLocaleString()
-    : new Date(run.createdAt).toLocaleString();
+    ? parseSqliteTimestamp(run.completedAt).toLocaleString()
+    : parseSqliteTimestamp(run.createdAt).toLocaleString();
 
-  const stepLabel = run.step === 'refine' ? 'Clarification' : run.step === 'research' ? 'Research' : 'Planning';
+  const stepLabel = run.step === 'refine' ? 'Clarification' : run.step === 'research' ? 'Discover' : 'Planning';
 
   return (
     <AlertDialog.Root onOpenChange={handleOpenChange} open={isOpen}>

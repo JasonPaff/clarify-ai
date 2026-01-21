@@ -25,9 +25,9 @@ export const WORKFLOW_STEPS: Array<Step> = [
     title: 'Clarify',
   },
   {
-    description: 'Analyze codebase context',
+    description: 'Discover relevant codebase context',
     id: 'research',
-    title: 'Research',
+    title: 'Discover',
   },
   {
     description: 'Generate implementation plan',

@@ -17,8 +17,8 @@ export function useCreateStepConfiguration() {
     onSuccess: (config) => {
       if (config) {
         queryClient.setQueryData(stepConfigurationKeys.detail(config.id).queryKey, config);
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequest._def });
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequestAndStep._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProject._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProjectAndStep._def });
       }
     },
   });
@@ -37,14 +37,14 @@ export function useDeleteStepConfiguration() {
   });
 }
 
-export function useStepConfig(featureRequestId: number, step: StepConfigurationStep) {
+export function useStepConfig(projectId: number, step: StepConfigurationStep) {
   const { isElectron, stepConfigurations } = useElectronDb();
 
   return useQuery({
-    ...stepConfigurationKeys.byFeatureRequestAndStep(featureRequestId, step),
-    enabled: isElectron && featureRequestId > 0,
+    ...stepConfigurationKeys.byProjectAndStep(projectId, step),
+    enabled: isElectron && projectId > 0,
     queryFn: async () => {
-      const result = await stepConfigurations.getByFeatureRequestIdAndStep(featureRequestId, step);
+      const result = await stepConfigurations.getByProjectIdAndStep(projectId, step);
       return result ?? null;
     },
   });
@@ -60,13 +60,13 @@ export function useStepConfiguration(id: number) {
   });
 }
 
-export function useStepConfigurations(featureRequestId: number) {
+export function useStepConfigurations(projectId: number) {
   const { isElectron, stepConfigurations } = useElectronDb();
 
   return useQuery({
-    ...stepConfigurationKeys.byFeatureRequest(featureRequestId),
-    enabled: isElectron && featureRequestId > 0,
-    queryFn: () => stepConfigurations.getByFeatureRequestId(featureRequestId),
+    ...stepConfigurationKeys.byProject(projectId),
+    enabled: isElectron && projectId > 0,
+    queryFn: () => stepConfigurations.getByProjectId(projectId),
   });
 }
 
@@ -80,8 +80,8 @@ export function useUpdateStepConfig() {
     onSuccess: (config) => {
       if (config) {
         queryClient.setQueryData(stepConfigurationKeys.detail(config.id).queryKey, config);
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequest._def });
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequestAndStep._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProject._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProjectAndStep._def });
       }
     },
   });
@@ -94,18 +94,18 @@ export function useUpsertStepConfig() {
   return useMutation({
     mutationFn: ({
       data,
-      featureRequestId,
+      projectId,
       step,
     }: {
       data: Parameters<typeof stepConfigurations.upsert>[2];
-      featureRequestId: number;
+      projectId: number;
       step: StepConfigurationStep;
-    }) => stepConfigurations.upsert(featureRequestId, step, data),
+    }) => stepConfigurations.upsert(projectId, step, data),
     onSuccess: (config) => {
       if (config) {
         queryClient.setQueryData(stepConfigurationKeys.detail(config.id).queryKey, config);
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequest._def });
-        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byFeatureRequestAndStep._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProject._def });
+        void queryClient.invalidateQueries({ queryKey: stepConfigurationKeys.byProjectAndStep._def });
       }
     },
   });

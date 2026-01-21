@@ -13,21 +13,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { IconButton } from '@/components/ui/icon-button';
 import { cn } from '@/lib/utils';
 
-type FeatureRequestStatus = 'completed' | 'draft' | 'planning' | 'refining' | 'researching';
+type FeatureRequestStatus = 'clarifying' | 'completed' | 'describing' | 'draft' | 'failed' | 'planning' | 'researching';
 
 const statusLabels: Record<FeatureRequestStatus, string> = {
+  clarifying: 'Clarifying',
   completed: 'Completed',
+  describing: 'Describing',
   draft: 'Draft',
+  failed: 'Failed',
   planning: 'Planning',
-  refining: 'Refining',
   researching: 'Researching',
 };
 
 const statusVariantMap: Record<FeatureRequestStatus, VariantProps<typeof badgeVariants>['variant']> = {
+  clarifying: 'clarifying',
   completed: 'completed',
+  describing: 'describing',
   draft: 'draft',
+  failed: 'failed',
   planning: 'planning',
-  refining: 'refining',
   researching: 'researching',
 };
 

@@ -18,14 +18,12 @@ interface EditFeatureRequestFormProps {
 }
 
 const statusLabels: Record<FeatureRequestStatus, string> = {
+  clarifying: 'Clarifying',
   completed: 'Completed',
+  describing: 'Describing',
   draft: 'Draft',
   failed: 'Failed',
-  planned: 'Planned',
   planning: 'Planning',
-  refined: 'Refined',
-  refining: 'Refining',
-  researched: 'Researched',
   researching: 'Researching',
 };
 

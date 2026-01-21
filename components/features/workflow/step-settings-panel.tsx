@@ -23,12 +23,12 @@ const DEFAULT_MAX_TOKENS = 4096;
 const DEFAULT_THINKING_BUDGET = 8192;
 
 interface StepSettingsPanelProps extends ComponentPropsWithRef<'div'> {
-  featureRequestId: number;
+  projectId: number;
   step: StepConfigurationStep;
 }
 
-export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...props }: StepSettingsPanelProps) => {
-  const { data: config, isLoading } = useStepConfig(featureRequestId, step);
+export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }: StepSettingsPanelProps) => {
+  const { data: config, isLoading } = useStepConfig(projectId, step);
   const upsertMutation = useUpsertStepConfig();
 
   const currentModelId = useMemo(() => {
@@ -67,7 +67,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
         modelId,
         modelProvider: provider,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -77,7 +77,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       data: {
         temperature: value,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -87,7 +87,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       data: {
         maxTokens: value,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -98,7 +98,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
         thinkingBudget: isEnabled ? (config?.thinkingBudget ?? DEFAULT_THINKING_BUDGET) : null,
         thinkingEnabled: isEnabled,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -108,7 +108,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       data: {
         thinkingBudget: budget,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -118,7 +118,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       data: {
         customSystemPrompt: value || null,
       },
-      featureRequestId,
+      projectId,
       step,
     });
   };
@@ -132,7 +132,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       case 'refine':
         return 'Clarify';
       case 'research':
-        return 'Research';
+        return 'Discover';
       default:
         return step;
     }

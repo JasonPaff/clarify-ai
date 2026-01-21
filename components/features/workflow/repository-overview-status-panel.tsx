@@ -42,6 +42,7 @@ const RepositoryStatusItem = ({
   repositoryName,
   repositoryPath,
 }: RepositoryStatusItemProps) => {
+  const parseSqliteTimestamp = (value: string) => new Date(value.endsWith('Z') ? value : `${value}Z`);
   const hasOverview = overviewStatus?.hasOverview ?? false;
   const generatedAt = overviewStatus?.generatedAt;
   const modelId = overviewStatus?.modelId;
@@ -59,7 +60,7 @@ const RepositoryStatusItem = ({
   // Format the generated date
   const formattedGeneratedAt = useMemo(() => {
     if (!generatedAt) return null;
-    return formatDistanceToNow(new Date(generatedAt), { addSuffix: true });
+    return formatDistanceToNow(parseSqliteTimestamp(generatedAt), { addSuffix: true });
   }, [generatedAt]);
 
   return (

@@ -306,22 +306,22 @@ export interface ElectronAPI {
         data: import('../db/schema/step-configurations.schema').NewStepConfiguration
       ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration>;
       delete(id: number): Promise<boolean>;
-      getByFeatureRequestId(
-        featureRequestId: number
+      getById(id: number): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
+      getByProjectId(
+        projectId: number
       ): Promise<Array<import('../db/schema/step-configurations.schema').StepConfiguration>>;
-      getByFeatureRequestIdAndStep(
-        featureRequestId: number,
+      getByProjectIdAndStep(
+        projectId: number,
         step: import('../db/schema/step-configurations.schema').StepConfigurationStep
       ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
-      getById(id: number): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
       update(
         id: number,
         data: Partial<import('../db/schema/step-configurations.schema').NewStepConfiguration>
       ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration | undefined>;
       upsert(
-        featureRequestId: number,
+        projectId: number,
         step: import('../db/schema/step-configurations.schema').StepConfigurationStep,
-        data: Omit<import('../db/schema/step-configurations.schema').NewStepConfiguration, 'featureRequestId' | 'step'>
+        data: Omit<import('../db/schema/step-configurations.schema').NewStepConfiguration, 'projectId' | 'step'>
       ): Promise<import('../db/schema/step-configurations.schema').StepConfiguration>;
     };
   };

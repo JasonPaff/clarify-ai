@@ -97,9 +97,9 @@ export const IpcChannels = {
     stepConfigurations: {
       create: 'db:stepConfigurations:create',
       delete: 'db:stepConfigurations:delete',
-      getByFeatureRequestId: 'db:stepConfigurations:getByFeatureRequestId',
-      getByFeatureRequestIdAndStep: 'db:stepConfigurations:getByFeatureRequestIdAndStep',
       getById: 'db:stepConfigurations:getById',
+      getByProjectId: 'db:stepConfigurations:getByProjectId',
+      getByProjectIdAndStep: 'db:stepConfigurations:getByProjectIdAndStep',
       update: 'db:stepConfigurations:update',
       upsert: 'db:stepConfigurations:upsert',
     },

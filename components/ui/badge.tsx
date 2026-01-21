@@ -36,6 +36,10 @@ export const badgeVariants = cva(
           bg-amber-500/15 text-amber-700
           dark:bg-amber-500/20 dark:text-amber-400
         `,
+        clarifying: `
+          bg-yellow-500/15 text-yellow-700
+          dark:bg-yellow-500/20 dark:text-yellow-400
+        `,
         cohere: `
           bg-rose-500/15 text-rose-700
           dark:bg-rose-500/20 dark:text-rose-400
@@ -51,6 +55,10 @@ export const badgeVariants = cva(
         default: `
           bg-muted text-muted-foreground
         `,
+        describing: `
+          bg-neutral-500/15 text-neutral-700
+          dark:bg-neutral-500/20 dark:text-neutral-400
+        `,
         draft: `
           bg-neutral-500/15 text-neutral-700
           dark:bg-neutral-500/20 dark:text-neutral-400
@@ -58,6 +66,10 @@ export const badgeVariants = cva(
         environment: `
           bg-cyan-500/15 text-cyan-700
           dark:bg-cyan-500/20 dark:text-cyan-400
+        `,
+        failed: `
+          bg-red-500/15 text-red-700
+          dark:bg-red-500/20 dark:text-red-400
         `,
         google: `
           bg-blue-500/15 text-blue-700
@@ -86,10 +98,6 @@ export const badgeVariants = cva(
         planning: `
           bg-purple-500/15 text-purple-700
           dark:bg-purple-500/20 dark:text-purple-400
-        `,
-        refining: `
-          bg-yellow-500/15 text-yellow-700
-          dark:bg-yellow-500/20 dark:text-yellow-400
         `,
         researching: `
           bg-blue-500/15 text-blue-700

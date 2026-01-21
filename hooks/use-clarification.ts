@@ -485,6 +485,45 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
       setIsQuestionsComplete(false);
       setStatus('analyzing');
 
+      // Build additional context prompt explaining this is a follow-up request
+      const additionalContextPrompt = `
+This is a follow-up clarification request. The user has already answered the initial questions and wants more detailed clarification.
+
+Previous Questions and Answers:
+${previousQAContext}
+
+Please generate additional clarifying questions that:
+1. Go deeper into areas that may still be ambiguous
+2. Don't repeat questions that were already asked
+3. Build upon the answers provided to uncover more specific requirements
+`;
+
+      const combinedPrompt = additionalContextPrompt + (modelConfig.customPrompt ?? '');
+
+      const inputContent = [featureRequest.rawRequest ?? '', 'Previous Questions and Answers:', previousQAContext]
+        .filter((value) => value.length > 0)
+        .join('\n\n');
+
+      // Create a new run for the follow-up clarification
+      const createdRun = await createRunMutation.mutateAsync({
+        featureRequestId: featureRequest.id,
+        inputContent,
+        modelId: modelConfig.modelId,
+        parameters: JSON.stringify({
+          enableThinking,
+          followUp: true,
+          maxTokens: modelConfig.maxTokens,
+          temperature: modelConfig.temperature,
+          thinkingBudget: modelConfig.thinkingBudget,
+        }),
+        promptUsed: combinedPrompt,
+        startedAt: new Date().toISOString(),
+        status: 'running',
+        step: 'refine',
+      });
+
+      runIdRef.current = createdRun?.id ?? null;
+
       // Set up stream listener
       unsubscribeRef.current = api.ai.clarification.onStream((chunk: ClarificationStreamChunk) => {
         switch (chunk.type) {
@@ -496,6 +535,16 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
             setStatus('questions_ready');
             // Restore existing questions on error
             setQuestions(existingQuestions);
+            if (runIdRef.current) {
+              void updateRunMutation.mutateAsync({
+                data: {
+                  completedAt: new Date().toISOString(),
+                  errorMessage: chunk.content ?? 'Unknown error',
+                  status: 'failed',
+                },
+                id: runIdRef.current,
+              });
+            }
             break;
 
           case 'finish':
@@ -576,9 +625,17 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
 
                 void updateRunMutation.mutateAsync({
                   data: {
+                    completedAt: new Date().toISOString(),
                     outputContent,
+                    status: 'completed',
                   },
                   id: runIdRef.current,
+                });
+
+                void setCurrentRunMutation.mutateAsync({
+                  featureRequestId: featureRequest.id,
+                  runId: runIdRef.current,
+                  step: 'refine',
                 });
               }
             }
@@ -586,22 +643,9 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
         }
       });
 
-      // Build additional context prompt explaining this is a follow-up request
-      const additionalContextPrompt = `
-This is a follow-up clarification request. The user has already answered the initial questions and wants more detailed clarification.
-
-Previous Questions and Answers:
-${previousQAContext}
-
-Please generate additional clarifying questions that:
-1. Go deeper into areas that may still be ambiguous
-2. Don't repeat questions that were already asked
-3. Build upon the answers provided to uncover more specific requirements
-`;
-
       // Start generation with context from step settings
       const result = await api.ai.clarification.generate({
-        customPrompt: additionalContextPrompt + (modelConfig.customPrompt ?? ''),
+        customPrompt: combinedPrompt,
         enableThinking,
         featureRequest: featureRequest.rawRequest ?? '',
         featureRequestId: featureRequest.id,
@@ -623,17 +667,29 @@ Please generate additional clarifying questions that:
         setStatus('questions_ready');
         // Restore existing questions on failure
         setQuestions(existingQuestions);
+        if (runIdRef.current) {
+          void updateRunMutation.mutateAsync({
+            data: {
+              completedAt: new Date().toISOString(),
+              errorMessage: result.error ?? 'Generation failed',
+              status: 'failed',
+            },
+            id: runIdRef.current,
+          });
+        }
       }
     },
     [
       analysis,
       answers,
       api,
+      createRunMutation,
       featureRequest.id,
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
       questions,
+      setCurrentRunMutation,
       updateRunMutation,
     ]
   );
@@ -651,8 +707,21 @@ Please generate additional clarifying questions that:
     }
 
     setIsLoading(false);
+    setIsReasoningStreaming(false);
+    setIsQuestionsComplete(true);
     setStatus('idle');
-  }, [api, isElectron]);
+
+    if (runIdRef.current) {
+      void updateRunMutation.mutateAsync({
+        data: {
+          completedAt: new Date().toISOString(),
+          errorMessage: 'Generation cancelled',
+          status: 'failed',
+        },
+        id: runIdRef.current,
+      });
+    }
+  }, [api, isElectron, updateRunMutation]);
 
   // Set an answer for a question
   const setAnswer = useCallback((questionId: string, selectedValue: null | string, customText?: string) => {

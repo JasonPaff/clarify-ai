@@ -152,17 +152,14 @@ export interface ElectronAPI {
     stepConfigurations: {
       create(data: NewStepConfiguration): Promise<StepConfiguration>;
       delete(id: number): Promise<boolean>;
-      getByFeatureRequestId(featureRequestId: number): Promise<Array<StepConfiguration>>;
-      getByFeatureRequestIdAndStep(
-        featureRequestId: number,
-        step: StepConfigurationStep
-      ): Promise<StepConfiguration | undefined>;
       getById(id: number): Promise<StepConfiguration | undefined>;
+      getByProjectId(projectId: number): Promise<Array<StepConfiguration>>;
+      getByProjectIdAndStep(projectId: number, step: StepConfigurationStep): Promise<StepConfiguration | undefined>;
       update(id: number, data: Partial<NewStepConfiguration>): Promise<StepConfiguration | undefined>;
       upsert(
-        featureRequestId: number,
+        projectId: number,
         step: StepConfigurationStep,
-        data: Omit<NewStepConfiguration, 'featureRequestId' | 'step'>
+        data: Omit<NewStepConfiguration, 'projectId' | 'step'>
       ): Promise<StepConfiguration>;
     };
   };
@@ -385,14 +382,13 @@ const electronAPI: ElectronAPI = {
     stepConfigurations: {
       create: (data) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.create, data),
       delete: (id) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.delete, id),
-      getByFeatureRequestId: (featureRequestId) =>
-        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByFeatureRequestId, featureRequestId),
-      getByFeatureRequestIdAndStep: (featureRequestId, step) =>
-        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByFeatureRequestIdAndStep, featureRequestId, step),
       getById: (id) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getById, id),
+      getByProjectId: (projectId) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByProjectId, projectId),
+      getByProjectIdAndStep: (projectId, step) =>
+        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.getByProjectIdAndStep, projectId, step),
       update: (id, data) => ipcRenderer.invoke(IpcChannels.db.stepConfigurations.update, id, data),
-      upsert: (featureRequestId, step, data) =>
-        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.upsert, featureRequestId, step, data),
+      upsert: (projectId, step, data) =>
+        ipcRenderer.invoke(IpcChannels.db.stepConfigurations.upsert, projectId, step, data),
     },
   },
   dialog: {

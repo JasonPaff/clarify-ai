@@ -13,14 +13,14 @@ import { stepConfigurations } from '../schema/step-configurations.schema';
 export interface StepConfigurationsRepository {
   create(data: NewStepConfiguration): StepConfiguration;
   delete(id: number): boolean;
-  getByFeatureRequestId(featureRequestId: number): Array<StepConfiguration>;
-  getByFeatureRequestIdAndStep(featureRequestId: number, step: StepConfigurationStep): StepConfiguration | undefined;
   getById(id: number): StepConfiguration | undefined;
+  getByProjectId(projectId: number): Array<StepConfiguration>;
+  getByProjectIdAndStep(projectId: number, step: StepConfigurationStep): StepConfiguration | undefined;
   update(id: number, data: Partial<NewStepConfiguration>): StepConfiguration | undefined;
   upsert(
-    featureRequestId: number,
+    projectId: number,
     step: StepConfigurationStep,
-    data: Omit<NewStepConfiguration, 'featureRequestId' | 'step'>
+    data: Omit<NewStepConfiguration, 'projectId' | 'step'>
   ): StepConfiguration;
 }
 
@@ -35,24 +35,20 @@ export function createStepConfigurationsRepository(db: DrizzleDatabase): StepCon
       return result.changes > 0;
     },
 
-    getByFeatureRequestId(featureRequestId: number): Array<StepConfiguration> {
-      return db
-        .select()
-        .from(stepConfigurations)
-        .where(eq(stepConfigurations.featureRequestId, featureRequestId))
-        .all();
-    },
-
-    getByFeatureRequestIdAndStep(featureRequestId: number, step: StepConfigurationStep): StepConfiguration | undefined {
-      return db
-        .select()
-        .from(stepConfigurations)
-        .where(and(eq(stepConfigurations.featureRequestId, featureRequestId), eq(stepConfigurations.step, step)))
-        .get();
-    },
-
     getById(id: number): StepConfiguration | undefined {
       return db.select().from(stepConfigurations).where(eq(stepConfigurations.id, id)).get();
+    },
+
+    getByProjectId(projectId: number): Array<StepConfiguration> {
+      return db.select().from(stepConfigurations).where(eq(stepConfigurations.projectId, projectId)).all();
+    },
+
+    getByProjectIdAndStep(projectId: number, step: StepConfigurationStep): StepConfiguration | undefined {
+      return db
+        .select()
+        .from(stepConfigurations)
+        .where(and(eq(stepConfigurations.projectId, projectId), eq(stepConfigurations.step, step)))
+        .get();
     },
 
     update(id: number, data: Partial<NewStepConfiguration>): StepConfiguration | undefined {
@@ -65,14 +61,14 @@ export function createStepConfigurationsRepository(db: DrizzleDatabase): StepCon
     },
 
     upsert(
-      featureRequestId: number,
+      projectId: number,
       step: StepConfigurationStep,
-      data: Omit<NewStepConfiguration, 'featureRequestId' | 'step'>
+      data: Omit<NewStepConfiguration, 'projectId' | 'step'>
     ): StepConfiguration {
       const existing = db
         .select()
         .from(stepConfigurations)
-        .where(and(eq(stepConfigurations.featureRequestId, featureRequestId), eq(stepConfigurations.step, step)))
+        .where(and(eq(stepConfigurations.projectId, projectId), eq(stepConfigurations.step, step)))
         .get();
 
       if (existing) {
@@ -86,7 +82,7 @@ export function createStepConfigurationsRepository(db: DrizzleDatabase): StepCon
 
       return db
         .insert(stepConfigurations)
-        .values({ ...data, featureRequestId, step })
+        .values({ ...data, projectId, step })
         .returning()
         .get();
     },

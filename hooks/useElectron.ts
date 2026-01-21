@@ -352,27 +352,27 @@ export function useElectronDb() {
         if (!api) throw new Error('Electron API not available');
         return api.db.stepConfigurations.delete(id);
       },
-      getByFeatureRequestId: (featureRequestId: number) =>
-        api?.db.stepConfigurations.getByFeatureRequestId(featureRequestId) ?? Promise.resolve([]),
-      getByFeatureRequestIdAndStep: (featureRequestId: number, step: StepConfigurationStep) => {
-        if (!api) return Promise.resolve(undefined);
-        return api.db.stepConfigurations.getByFeatureRequestIdAndStep(featureRequestId, step);
-      },
       getById: (id: number) => {
         if (!api) return Promise.resolve(undefined);
         return api.db.stepConfigurations.getById(id);
+      },
+      getByProjectId: (projectId: number) =>
+        api?.db.stepConfigurations.getByProjectId(projectId) ?? Promise.resolve([]),
+      getByProjectIdAndStep: (projectId: number, step: StepConfigurationStep) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.stepConfigurations.getByProjectIdAndStep(projectId, step);
       },
       update: (id: number, data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['update']>[1]) => {
         if (!api) throw new Error('Electron API not available');
         return api.db.stepConfigurations.update(id, data);
       },
       upsert: (
-        featureRequestId: number,
+        projectId: number,
         step: StepConfigurationStep,
         data: Parameters<NonNullable<typeof api>['db']['stepConfigurations']['upsert']>[2]
       ) => {
         if (!api) throw new Error('Electron API not available');
-        return api.db.stepConfigurations.upsert(featureRequestId, step, data);
+        return api.db.stepConfigurations.upsert(projectId, step, data);
       },
     }),
     [api]

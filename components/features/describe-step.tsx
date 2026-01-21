@@ -73,7 +73,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
   const { data: contextFiles = [] } = useContextFiles(featureRequest.id);
 
   // Step configuration for clarification
-  const { data: refineConfig, isLoading: isRefineConfigLoading } = useStepConfig(featureRequest.id, 'refine');
+  const { data: refineConfig, isLoading: isRefineConfigLoading } = useStepConfig(projectId, 'refine');
 
   const clarificationModelConfig = useMemo(() => {
     if (!refineConfig) return null;
@@ -255,7 +255,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
   return (
     <div className={'flex flex-col gap-6'}>
       {/* Section 1: Settings Panel (collapsed by default) */}
-      <StepSettingsPanel featureRequestId={featureRequest.id} step={'describe'} />
+      <StepSettingsPanel projectId={projectId} step={'describe'} />
 
       {/* Section 2: Feature Description (always visible) */}
       <section className={'flex flex-col gap-3'}>

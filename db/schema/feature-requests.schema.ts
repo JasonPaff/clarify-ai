@@ -6,24 +6,20 @@ import { projects } from './projects.schema';
 /**
  * Feature request status values for the orchestration workflow:
  * - 'draft': Initial state, not yet started
- * - 'refining': Currently running the refine step
- * - 'refined': Refine step completed
- * - 'researching': Currently running the research/file discovery step
- * - 'researched': Research step completed
- * - 'planning': Currently running the planning step
- * - 'planned': Planning step completed
+ * - 'describing': Currently in the Describe step
+ * - 'clarifying': Currently in the Clarify step
+ * - 'researching': Currently in the Discover step
+ * - 'planning': Currently in the Plan step
  * - 'completed': All steps finished successfully
  * - 'failed': An error occurred during processing
  */
 export type FeatureRequestStatus =
+  | 'clarifying'
   | 'completed'
+  | 'describing'
   | 'draft'
   | 'failed'
-  | 'planned'
   | 'planning'
-  | 'refined'
-  | 'refining'
-  | 'researched'
   | 'researching';
 
 export const featureRequests = sqliteTable(

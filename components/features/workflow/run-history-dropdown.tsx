@@ -38,6 +38,7 @@ export const RunHistoryDropdown = ({
   step,
   ...props
 }: RunHistoryDropdownProps) => {
+  const parseSqliteTimestamp = (value: string) => new Date(value.endsWith('Z') ? value : `${value}Z`);
   const [selectedRun, setSelectedRun] = useState<FeatureRequestRun | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -104,7 +105,7 @@ export const RunHistoryDropdown = ({
               {currentRun ? (
                 <span className={'flex items-center gap-2'}>
                   <Clock aria-hidden={'true'} className={'size-3.5 text-muted-foreground'} />
-                  <span>{formatDistanceToNow(new Date(currentRun.createdAt), { addSuffix: true })}</span>
+                  <span>{formatDistanceToNow(parseSqliteTimestamp(currentRun.createdAt), { addSuffix: true })}</span>
                   <span className={'rounded-full bg-accent/10 px-1.5 py-0.5 text-xs font-medium text-accent'}>
                     Current
                   </span>
@@ -126,7 +127,7 @@ export const RunHistoryDropdown = ({
                   <SelectGroup>
                     {runs.map((run) => {
                       const isCurrentRunItem = run.id === currentRun?.id;
-                      const formattedTimestamp = formatDistanceToNow(new Date(run.createdAt), {
+                      const formattedTimestamp = formatDistanceToNow(parseSqliteTimestamp(run.createdAt), {
                         addSuffix: true,
                       });
 

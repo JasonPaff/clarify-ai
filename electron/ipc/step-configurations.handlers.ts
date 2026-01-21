@@ -18,20 +18,16 @@ export function registerStepConfigurationsHandlers(stepConfigurationsRepository:
   );
 
   ipcMain.handle(
-    IpcChannels.db.stepConfigurations.getByFeatureRequestId,
-    (_event: IpcMainInvokeEvent, featureRequestId: number): Array<StepConfiguration> => {
-      return stepConfigurationsRepository.getByFeatureRequestId(featureRequestId);
+    IpcChannels.db.stepConfigurations.getByProjectId,
+    (_event: IpcMainInvokeEvent, projectId: number): Array<StepConfiguration> => {
+      return stepConfigurationsRepository.getByProjectId(projectId);
     }
   );
 
   ipcMain.handle(
-    IpcChannels.db.stepConfigurations.getByFeatureRequestIdAndStep,
-    (
-      _event: IpcMainInvokeEvent,
-      featureRequestId: number,
-      step: StepConfigurationStep
-    ): StepConfiguration | undefined => {
-      return stepConfigurationsRepository.getByFeatureRequestIdAndStep(featureRequestId, step);
+    IpcChannels.db.stepConfigurations.getByProjectIdAndStep,
+    (_event: IpcMainInvokeEvent, projectId: number, step: StepConfigurationStep): StepConfiguration | undefined => {
+      return stepConfigurationsRepository.getByProjectIdAndStep(projectId, step);
     }
   );
 
@@ -53,11 +49,11 @@ export function registerStepConfigurationsHandlers(stepConfigurationsRepository:
     IpcChannels.db.stepConfigurations.upsert,
     (
       _event: IpcMainInvokeEvent,
-      featureRequestId: number,
+      projectId: number,
       step: StepConfigurationStep,
-      data: Omit<NewStepConfiguration, 'featureRequestId' | 'step'>
+      data: Omit<NewStepConfiguration, 'projectId' | 'step'>
     ): StepConfiguration => {
-      return stepConfigurationsRepository.upsert(featureRequestId, step, data);
+      return stepConfigurationsRepository.upsert(projectId, step, data);
     }
   );
 

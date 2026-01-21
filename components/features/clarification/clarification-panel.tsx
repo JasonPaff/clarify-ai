@@ -6,6 +6,7 @@ import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema'
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
+import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -205,9 +206,9 @@ export const ClarificationPanel = ({
           )}
 
           <StreamingAnalysis isLoading={isLoading} text={streamingText} />
-          <Button onClick={cancelClarification} variant={'outline'}>
-            Cancel
-          </Button>
+          <CancelAiDialog onConfirm={cancelClarification} stepName={'Clarification'}>
+            <Button variant={'outline'}>Cancel</Button>
+          </CancelAiDialog>
         </div>
       )}
 

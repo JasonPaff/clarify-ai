@@ -1,13 +1,13 @@
 'use client';
 
 import type { VariantProps } from 'class-variance-authority';
-import type { ReactNode } from 'react';
 
 import { ArrowLeft, ArrowRight, FileText, Lightbulb, Loader2, Search, Sparkles } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import Link from 'next/link';
-import { use, useState } from 'react';
+import { ReactNode, useEffectEvent } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 
 import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 
@@ -28,23 +28,27 @@ import { useStaleSteps } from '@/hooks/use-stale-steps';
 type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ['describe', 'refine', 'research', 'plan'] as const;
 
-type FeatureRequestStatus = 'completed' | 'draft' | 'planning' | 'refining' | 'researching';
+type FeatureRequestStatus = 'clarifying' | 'completed' | 'describing' | 'draft' | 'failed' | 'planning' | 'researching';
 
 type StepId = (typeof STEP_ORDER)[number];
 
 const statusLabels: Record<FeatureRequestStatus, string> = {
+  clarifying: 'Clarifying',
   completed: 'Completed',
+  describing: 'Describing',
   draft: 'Draft',
+  failed: 'Failed',
   planning: 'Planning',
-  refining: 'Refining',
   researching: 'Researching',
 };
 
 const statusVariantMap: Record<FeatureRequestStatus, VariantProps<typeof badgeVariants>['variant']> = {
+  clarifying: 'clarifying',
   completed: 'completed',
+  describing: 'describing',
   draft: 'draft',
+  failed: 'failed',
   planning: 'planning',
-  refining: 'refining',
   researching: 'researching',
 };
 
@@ -54,6 +58,7 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   const { featureId, projectId } = use(routeParams);
 
   const [currentStep, setCurrentStep] = useState<StepId>('describe');
+  const lastFeatureIdRef = useRef<null | number>(null);
 
   const { data: featureRequest, error, isLoading } = useFeatureRequest(featureId);
 
@@ -61,6 +66,18 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
     featureRequestId: featureId,
     staleStepsJson: featureRequest?.staleSteps ?? null,
   });
+
+  const updateCurrentStep = useEffectEvent((status: FeatureRequestStatus) => {
+    setCurrentStep(getStepFromStatus(status));
+  });
+
+  useEffect(() => {
+    if (!featureRequest) return;
+    if (lastFeatureIdRef.current !== featureRequest.id) {
+      lastFeatureIdRef.current = featureRequest.id;
+      updateCurrentStep(featureRequest.status as FeatureRequestStatus);
+    }
+  }, [featureRequest]);
 
   // Loading state
   if (isLoading) {
@@ -131,10 +148,9 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       title: 'Clarify Requirements',
     },
     research: {
-      description:
-        'AI analyzes your connected repositories to understand the codebase context and identify relevant patterns.',
+      description: 'AI discovers relevant files and patterns across your connected repositories.',
       icon: <Search className={'size-6'} />,
-      title: 'Codebase Research',
+      title: 'Discover Relevant Files',
     },
   };
 
@@ -221,4 +237,22 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       </div>
     </div>
   );
+}
+
+function getStepFromStatus(status: FeatureRequestStatus): StepId {
+  switch (status) {
+    case 'clarifying':
+      return 'refine';
+    case 'completed':
+      return 'plan';
+    case 'planning':
+      return 'plan';
+    case 'researching':
+      return 'research';
+    case 'describing':
+    case 'draft':
+    case 'failed':
+    default:
+      return 'describe';
+  }
 }

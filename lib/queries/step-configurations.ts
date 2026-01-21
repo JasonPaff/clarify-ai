@@ -3,7 +3,7 @@ import { createQueryKeys } from '@lukemorales/query-key-factory';
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
 
 export const stepConfigurationKeys = createQueryKeys('stepConfigurations', {
-  byFeatureRequest: (featureRequestId: number) => [featureRequestId],
-  byFeatureRequestAndStep: (featureRequestId: number, step: StepConfigurationStep) => [featureRequestId, step],
+  byProject: (projectId: number) => [projectId],
+  byProjectAndStep: (projectId: number, step: StepConfigurationStep) => [projectId, step],
   detail: (id: number) => [id],
 });
