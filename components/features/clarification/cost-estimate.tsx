@@ -99,6 +99,7 @@ export const costEstimateVariants = cva(
 
 interface ClarificationCostEstimateProps
   extends Omit<ComponentPropsWithRef<'div'>, 'children'>, VariantProps<typeof costEstimateVariants> {
+  customPrompt?: string;
   featureRequestContent: string;
   isLoading?: boolean;
   modelId: FullModelId | null;
@@ -106,6 +107,7 @@ interface ClarificationCostEstimateProps
 
 export const ClarificationCostEstimate = ({
   className,
+  customPrompt,
   featureRequestContent,
   isLoading = false,
   modelId,
@@ -124,7 +126,8 @@ export const ClarificationCostEstimate = ({
 
     // Calculate input tokens from feature request + system prompt
     const featureRequestTokens = estimateTokensFromText(featureRequestContent);
-    const systemPromptTokens = estimateTokensFromText(DEFAULT_CLARIFICATION_PROMPT);
+    const systemPrompt = customPrompt && customPrompt.trim() ? customPrompt : DEFAULT_CLARIFICATION_PROMPT;
+    const systemPromptTokens = estimateTokensFromText(systemPrompt);
     const totalInputTokens = featureRequestTokens + systemPromptTokens;
 
     // Estimate cost using tokenlens
@@ -151,7 +154,7 @@ export const ClarificationCostEstimate = ({
       systemPromptTokens,
       totalInputTokens,
     };
-  }, [modelId, featureRequestContent]);
+  }, [customPrompt, modelId, featureRequestContent]);
 
   // Don't render if no model is configured
   if (!modelId) {

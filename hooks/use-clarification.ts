@@ -127,6 +127,7 @@ export function useClarification({
 
   // Track the previous current run ID to detect external changes
   const previousCurrentRunIdRef = useRef<null | number>(currentRun?.id ?? null);
+  const hasMountedRef = useRef(false);
 
   // Effect to restore from current run when it changes externally
   // Uses queueMicrotask to defer state updates and avoid the lint warning
@@ -137,9 +138,17 @@ export function useClarification({
     // Update the ref for next comparison
     previousCurrentRunIdRef.current = newId;
 
-    // Skip if no change or if this is the initial mount with no previous run
-    if (previousId === newId || previousId === null) {
+    // Skip if no change
+    if (previousId === newId) {
       return;
+    }
+
+    // Skip initial mount with no previous run, but allow null -> id transitions after mount
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
+      if (previousId === null) {
+        return;
+      }
     }
 
     // Skip if no current run
@@ -240,6 +249,7 @@ export function useClarification({
       setError(null);
       setIsLoading(true);
       setIsQuestionsComplete(false);
+      setAnswers([]);
       setQuestions([]);
       setAnalysis(null);
 

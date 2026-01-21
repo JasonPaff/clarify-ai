@@ -92,6 +92,7 @@ export const ClarifyStep = ({ featureRequest }: ClarifyStepProps) => {
         {/* Cost Estimate and Run History */}
         <div className={'flex items-center gap-3'}>
           <ClarificationCostEstimate
+            customPrompt={modelConfig?.customPrompt}
             featureRequestContent={featureRequest.rawRequest ?? ''}
             isLoading={isConfigLoading}
             modelId={modelConfig?.modelId ?? null}

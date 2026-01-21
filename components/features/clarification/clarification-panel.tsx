@@ -168,6 +168,7 @@ export const ClarificationPanel = ({
             <div className={'flex flex-col gap-3'}>
               {/* Cost Estimate */}
               <ClarificationCostEstimate
+                customPrompt={modelConfig?.customPrompt}
                 featureRequestContent={featureRequest.rawRequest ?? ''}
                 modelId={modelConfig?.modelId ?? null}
               />
@@ -177,11 +178,16 @@ export const ClarificationPanel = ({
                 <Button disabled={isLoading} onClick={() => handleStartClarification()}>
                   Analyze Request
                 </Button>
-                <Button disabled={isLoading} onClick={handleSkipClarification} variant={'outline'}>
-                  <SkipForward className={'mr-2 size-4'} />
-                  Skip Clarification
-                </Button>
               </div>
+            </div>
+          )}
+
+          {!isLoading && (
+            <div className={'flex'}>
+              <Button onClick={handleSkipClarification} variant={'outline'}>
+                <SkipForward className={'mr-2 size-4'} />
+                Skip Clarification
+              </Button>
             </div>
           )}
         </div>
