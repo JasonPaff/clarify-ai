@@ -9,6 +9,10 @@
 
   /* Scrollbar dimensions */
   --scrollbar-width: 8px;
+
+  /* Stepper dimensions */
+  --stepper-width: 220px;
+  --stepper-gap: 24px;
 }
 
 /* Light mode colors - Baltimore Orioles inspired */

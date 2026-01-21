@@ -180,46 +180,53 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
 
       <Separator />
 
-      {/* Workflow Steps */}
-      <div className={'py-2'}>
-        <WorkflowSteps
-          currentStep={currentStep}
-          onStepClick={(stepId) => setCurrentStep(stepId as StepId)}
-          staleSteps={staleStepNames}
-        />
+      {/* Two-Column Grid Layout: Content Left, Stepper Right */}
+      <div
+        className={'grid'}
+        style={{
+          gap: 'var(--stepper-gap)',
+          gridTemplateColumns: '1fr var(--stepper-width)',
+        }}
+      >
+        {/* Step Content - Left Column */}
+        <Card>
+          <CardHeader>
+            <div className={'flex items-center gap-3'}>
+              <div className={'flex size-12 items-center justify-center rounded-lg bg-accent/10'}>
+                <div className={'text-accent'}>{current.icon}</div>
+              </div>
+              <div>
+                <CardTitle>{current.title}</CardTitle>
+                <CardDescription>{current.description}</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {currentStep === 'describe' ? (
+              <DescribeStep featureRequest={featureRequest} projectId={projectId} />
+            ) : currentStep === 'refine' ? (
+              <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
+            ) : currentStep === 'research' ? (
+              <DiscoverStep featureRequest={featureRequest} projectId={projectId} />
+            ) : (
+              <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
+                <p className={'text-sm text-muted-foreground'}>
+                  {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Workflow Steps - Right Column */}
+        <div className={'sticky top-0 self-start'}>
+          <WorkflowSteps
+            currentStep={currentStep}
+            onStepClick={(stepId) => setCurrentStep(stepId as StepId)}
+            staleSteps={staleStepNames}
+          />
+        </div>
       </div>
-
-      <Separator />
-
-      {/* Step Content */}
-      <Card>
-        <CardHeader>
-          <div className={'flex items-center gap-3'}>
-            <div className={'flex size-12 items-center justify-center rounded-lg bg-accent/10'}>
-              <div className={'text-accent'}>{current.icon}</div>
-            </div>
-            <div>
-              <CardTitle>{current.title}</CardTitle>
-              <CardDescription>{current.description}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {currentStep === 'describe' ? (
-            <DescribeStep featureRequest={featureRequest} projectId={projectId} />
-          ) : currentStep === 'refine' ? (
-            <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
-          ) : currentStep === 'research' ? (
-            <DiscoverStep featureRequest={featureRequest} projectId={projectId} />
-          ) : (
-            <div className={'min-h-75 rounded-lg border border-dashed border-border p-8 text-center'}>
-              <p className={'text-sm text-muted-foreground'}>
-                {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)} step content coming soon
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Navigation */}
       <div className={'flex items-center justify-between'}>

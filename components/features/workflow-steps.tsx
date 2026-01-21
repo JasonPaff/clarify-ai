@@ -1,7 +1,6 @@
 'use client';
 
 import { AlertTriangle, Check } from 'lucide-react';
-import { Fragment } from 'react';
 
 import { Tooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -44,9 +43,13 @@ interface WorkflowStepsProps {
 
 export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: WorkflowStepsProps) => {
   const currentIndex = WORKFLOW_STEPS.findIndex((s) => s.id === currentStep);
+  const isLastStep = (index: number) => index === WORKFLOW_STEPS.length - 1;
 
   return (
-    <div className={'flex items-center justify-between'}>
+    <div
+      className={'flex flex-col rounded-lg border border-border/50 bg-muted/30 p-4'}
+      style={{ width: 'var(--stepper-width)' }}
+    >
       {WORKFLOW_STEPS.map((step, index) => {
         const isCompleted = index < currentIndex;
         const isCurrent = step.id === currentStep;
@@ -54,7 +57,7 @@ export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: Wor
         const isStale = staleSteps.includes(step.id);
 
         const stepIndicator = (
-          <div className={'relative'}>
+          <div className={'relative shrink-0'}>
             {/* Step indicator */}
             <div
               className={cn(
@@ -63,8 +66,8 @@ export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: Wor
                   border-2 text-sm font-medium transition-colors
                 `,
                 isCompleted && 'border-accent bg-accent text-accent-foreground',
-                isCurrent && 'border-accent bg-background text-accent',
-                !isCompleted && !isCurrent && 'border-border bg-background text-muted-foreground',
+                isCurrent && 'border-accent bg-background text-accent shadow-sm',
+                !isCompleted && !isCurrent && 'border-border/60 bg-background text-muted-foreground/70',
                 isStale && 'border-amber-500'
               )}
             >
@@ -85,10 +88,11 @@ export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: Wor
         );
 
         return (
-          <Fragment key={step.id}>
+          <div className={'flex flex-col'} key={step.id}>
+            {/* Step Row */}
             <button
               className={cn(
-                'flex flex-col items-center text-center',
+                'flex items-center gap-3 text-left',
                 isClickable && 'cursor-pointer',
                 !isClickable && 'cursor-default'
               )}
@@ -98,32 +102,37 @@ export const WorkflowSteps = ({ currentStep, onStepClick, staleSteps = [] }: Wor
             >
               {/* Step indicator with optional stale tooltip */}
               {isStale ? (
-                <Tooltip content={'This step is outdated due to changes in a previous step'} side={'top'}>
+                <Tooltip content={'This step is outdated due to changes in a previous step'} side={'right'}>
                   {stepIndicator}
                 </Tooltip>
               ) : (
                 stepIndicator
               )}
 
-              {/* Step label */}
-              <span
-                className={cn(
-                  'mt-2 text-sm font-medium',
-                  isCurrent && 'text-foreground',
-                  !isCurrent && 'text-muted-foreground',
-                  isStale && 'text-amber-500'
-                )}
-              >
-                {step.title}
-              </span>
-              <span className={'mt-0.5 text-xs text-muted-foreground'}>{step.description}</span>
+              {/* Step labels */}
+              <div className={'flex min-w-0 flex-col'}>
+                <span
+                  className={cn(
+                    'truncate text-sm font-medium',
+                    isCurrent && 'text-foreground',
+                    isCompleted && !isStale && 'text-muted-foreground',
+                    !isCompleted && !isCurrent && 'text-muted-foreground/70',
+                    isStale && 'text-amber-500'
+                  )}
+                >
+                  {step.title}
+                </span>
+                <span className={'truncate text-xs text-muted-foreground'}>{step.description}</span>
+              </div>
             </button>
 
-            {/* Connector line */}
-            {index < WORKFLOW_STEPS.length - 1 && (
-              <div className={cn('mx-2 h-0.5 flex-1', index < currentIndex ? 'bg-accent' : 'bg-border')} />
+            {/* Vertical connector line */}
+            {!isLastStep(index) && (
+              <div className={'my-2 ml-[19px]'}>
+                <div className={cn('h-5 w-0.5', index < currentIndex ? 'bg-accent' : 'bg-border/60')} />
+              </div>
             )}
-          </Fragment>
+          </div>
         );
       })}
     </div>
