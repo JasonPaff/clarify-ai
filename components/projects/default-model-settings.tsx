@@ -111,10 +111,7 @@ export const DefaultModelSettings = ({ className, projectId, ref, ...props }: De
               const isStepPending = upsertMutation.isPending;
 
               return (
-                <div
-                  className={'flex flex-col gap-2 rounded-lg border border-border p-4'}
-                  key={stepInfo.step}
-                >
+                <div className={'flex flex-col gap-2 rounded-lg border border-border p-4'} key={stepInfo.step}>
                   {/* Step Info */}
                   <div className={'flex flex-col gap-0.5'}>
                     <label className={'text-sm font-medium'}>{stepInfo.label}</label>

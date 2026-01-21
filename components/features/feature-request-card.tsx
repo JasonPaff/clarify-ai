@@ -104,10 +104,7 @@ export const FeatureRequestCard = ({
 
   return (
     <Card
-      className={cn(
-        isClickable && 'cursor-pointer transition-colors hover:border-accent',
-        isArchived && 'opacity-60'
-      )}
+      className={cn(isClickable && 'cursor-pointer transition-colors hover:border-accent', isArchived && 'opacity-60')}
       onClick={handleCardClick}
     >
       {/* Header */}
@@ -118,11 +115,7 @@ export const FeatureRequestCard = ({
           </div>
           <div className={'flex gap-1'}>
             {isArchived ? (
-              <IconButton
-                aria-label={'Unarchive feature request'}
-                onClick={handleUnarchiveClick}
-                type={'button'}
-              >
+              <IconButton aria-label={'Unarchive feature request'} onClick={handleUnarchiveClick} type={'button'}>
                 <ArchiveRestore className={'size-4'} />
               </IconButton>
             ) : (

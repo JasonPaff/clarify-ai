@@ -120,11 +120,7 @@ export const RunHistoryDropdown = ({
                 </span>
               ) : (
                 <span className={'text-muted-foreground'}>
-                  {isLoadingRuns
-                    ? 'Loading...'
-                    : isEmptyState
-                      ? 'No run history yet'
-                      : 'Select version...'}
+                  {isLoadingRuns ? 'Loading...' : isEmptyState ? 'No run history yet' : 'Select version...'}
                 </span>
               )}
             </SelectValue>

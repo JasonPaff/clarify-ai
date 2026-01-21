@@ -187,133 +187,121 @@ export const WorkflowSteps = ({
   return (
     <nav
       aria-label={'Workflow progress'}
-      className={
-        'flex flex-col rounded-lg border border-border/50 bg-muted/30 p-3 sm:p-4 md:w-(--stepper-width)'
-      }
+      className={'flex flex-col rounded-lg border border-border/50 bg-muted/30 p-3 sm:p-4 md:w-(--stepper-width)'}
       onKeyDown={handleKeyDown}
       role={'navigation'}
     >
       {/* Hidden live region for screen reader announcements */}
-      <div
-        aria-atomic={'true'}
-        aria-live={'polite'}
-        className={'sr-only'}
-        ref={liveRegionRef}
-        role={'status'}
-      />
+      <div aria-atomic={'true'} aria-live={'polite'} className={'sr-only'} ref={liveRegionRef} role={'status'} />
 
       <ol aria-label={'Workflow steps'} role={'list'}>
         {WORKFLOW_STEPS.map((step, index) => {
-        const isCompleted = index < currentIndex;
-        const isCurrent = step.id === currentStep;
-        const isClickable = onStepClick && (isCompleted || isCurrent);
-        const isStale = staleSteps.includes(step.id);
+          const isCompleted = index < currentIndex;
+          const isCurrent = step.id === currentStep;
+          const isClickable = onStepClick && (isCompleted || isCurrent);
+          const isStale = staleSteps.includes(step.id);
 
-        const stepIndicator = (
-          <div className={'relative shrink-0'}>
-            {/* Step indicator - min 44x44px on mobile for touch accessibility, 40x40px on md+ */}
-            <div
-              className={cn(
-                `
+          const stepIndicator = (
+            <div className={'relative shrink-0'}>
+              {/* Step indicator - min 44x44px on mobile for touch accessibility, 40x40px on md+ */}
+              <div
+                className={cn(
+                  `
                   flex size-11 items-center justify-center rounded-full border-2 text-sm
                   font-medium transition-colors md:size-10
                 `,
-                isCompleted && 'border-accent bg-accent text-accent-foreground',
-                isCurrent && 'border-accent bg-background text-accent shadow-sm',
-                !isCompleted && !isCurrent && 'border-border/60 bg-background text-muted-foreground/70',
-                isStale && 'border-amber-500'
-              )}
-            >
-              {isCompleted ? <Check className={'size-4 md:size-5'} /> : index + 1}
-            </div>
-
-            {/* Stale warning indicator */}
-            {isStale && (
-              <div
-                className={
-                  'absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-amber-500 text-white'
-                }
+                  isCompleted && 'border-accent bg-accent text-accent-foreground',
+                  isCurrent && 'border-accent bg-background text-accent shadow-sm',
+                  !isCompleted && !isCurrent && 'border-border/60 bg-background text-muted-foreground/70',
+                  isStale && 'border-amber-500'
+                )}
               >
-                <AlertTriangle className={'size-3'} />
+                {isCompleted ? <Check className={'size-4 md:size-5'} /> : index + 1}
               </div>
-            )}
-          </div>
-        );
 
-        const isNavigationBlocked = isAiOperationRunning && isClickable && step.id !== currentStep;
-        const stepStatus = isCompleted ? 'completed' : isCurrent ? 'current' : 'upcoming';
-        const ariaLabel = `Step ${index + 1}: ${step.title}. ${step.description}. Status: ${stepStatus}${isStale ? '. Warning: This step is outdated.' : ''}`;
-
-        return (
-          <li className={'flex flex-col'} key={step.id} role={'listitem'}>
-            {/* Step Row */}
-            <button
-              aria-current={isCurrent ? 'step' : undefined}
-              aria-describedby={isStale ? `stale-warning-${step.id}` : undefined}
-              aria-disabled={!isClickable}
-              aria-label={ariaLabel}
-              className={cn(
-                'flex items-center gap-2 text-left sm:gap-3',
-                isClickable && !isNavigationBlocked && 'cursor-pointer',
-                !isClickable && 'cursor-default',
-                isNavigationBlocked && 'cursor-not-allowed opacity-60'
-              )}
-              disabled={!isClickable}
-              onClick={() => handleStepClick(step.id, !!isClickable)}
-              onFocus={() => setFocusedIndex(index)}
-              ref={(el) => {
-                stepRefs.current[index] = el;
-              }}
-              tabIndex={index === focusedIndex ? 0 : -1}
-              type={'button'}
-            >
-              {/* Step indicator with optional stale tooltip */}
-              {isStale ? (
-                <Tooltip content={'This step is outdated due to changes in a previous step'} side={'right'}>
-                  {stepIndicator}
-                </Tooltip>
-              ) : (
-                stepIndicator
-              )}
-
-              {/* Step labels */}
-              <div className={'flex min-w-0 flex-col'}>
-                <span
-                  className={cn(
-                    'truncate text-sm font-medium',
-                    isCurrent && 'text-foreground',
-                    isCompleted && !isStale && 'text-muted-foreground',
-                    !isCompleted && !isCurrent && 'text-muted-foreground/70',
-                    isStale && 'text-amber-500'
-                  )}
-                >
-                  {step.title}
-                </span>
-                {/* Description hidden on small screens, visible on md+ */}
-                <span className={'hidden truncate text-xs text-muted-foreground sm:block'}>
-                  {step.description}
-                </span>
-              </div>
-            </button>
-
-            {/* Hidden stale warning for aria-describedby */}
-            {isStale && (
-              <span className={'sr-only'} id={`stale-warning-${step.id}`}>
-                This step is outdated due to changes in a previous step and may need to be re-run.
-              </span>
-            )}
-
-            {/* Vertical connector line - centered under step indicator */}
-            {!isLastStep(index) && (
-              <div aria-hidden={'true'} className={'my-1.5 ml-[21px] sm:my-2 md:ml-[19px]'}>
+              {/* Stale warning indicator */}
+              {isStale && (
                 <div
-                  className={cn('h-4 w-0.5 sm:h-5', index < currentIndex ? 'bg-accent' : 'bg-border/60')}
-                />
-              </div>
-            )}
-          </li>
-        );
-      })}
+                  className={
+                    'absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-amber-500 text-white'
+                  }
+                >
+                  <AlertTriangle className={'size-3'} />
+                </div>
+              )}
+            </div>
+          );
+
+          const isNavigationBlocked = isAiOperationRunning && isClickable && step.id !== currentStep;
+          const stepStatus = isCompleted ? 'completed' : isCurrent ? 'current' : 'upcoming';
+          const ariaLabel = `Step ${index + 1}: ${step.title}. ${step.description}. Status: ${stepStatus}${isStale ? '. Warning: This step is outdated.' : ''}`;
+
+          return (
+            <li className={'flex flex-col'} key={step.id} role={'listitem'}>
+              {/* Step Row */}
+              <button
+                aria-current={isCurrent ? 'step' : undefined}
+                aria-describedby={isStale ? `stale-warning-${step.id}` : undefined}
+                aria-disabled={!isClickable}
+                aria-label={ariaLabel}
+                className={cn(
+                  'flex items-center gap-2 text-left sm:gap-3',
+                  isClickable && !isNavigationBlocked && 'cursor-pointer',
+                  !isClickable && 'cursor-default',
+                  isNavigationBlocked && 'cursor-not-allowed opacity-60'
+                )}
+                disabled={!isClickable}
+                onClick={() => handleStepClick(step.id, !!isClickable)}
+                onFocus={() => setFocusedIndex(index)}
+                ref={(el) => {
+                  stepRefs.current[index] = el;
+                }}
+                tabIndex={index === focusedIndex ? 0 : -1}
+                type={'button'}
+              >
+                {/* Step indicator with optional stale tooltip */}
+                {isStale ? (
+                  <Tooltip content={'This step is outdated due to changes in a previous step'} side={'right'}>
+                    {stepIndicator}
+                  </Tooltip>
+                ) : (
+                  stepIndicator
+                )}
+
+                {/* Step labels */}
+                <div className={'flex min-w-0 flex-col'}>
+                  <span
+                    className={cn(
+                      'truncate text-sm font-medium',
+                      isCurrent && 'text-foreground',
+                      isCompleted && !isStale && 'text-muted-foreground',
+                      !isCompleted && !isCurrent && 'text-muted-foreground/70',
+                      isStale && 'text-amber-500'
+                    )}
+                  >
+                    {step.title}
+                  </span>
+                  {/* Description hidden on small screens, visible on md+ */}
+                  <span className={'hidden truncate text-xs text-muted-foreground sm:block'}>{step.description}</span>
+                </div>
+              </button>
+
+              {/* Hidden stale warning for aria-describedby */}
+              {isStale && (
+                <span className={'sr-only'} id={`stale-warning-${step.id}`}>
+                  This step is outdated due to changes in a previous step and may need to be re-run.
+                </span>
+              )}
+
+              {/* Vertical connector line - centered under step indicator */}
+              {!isLastStep(index) && (
+                <div aria-hidden={'true'} className={'my-1.5 ml-[21px] sm:my-2 md:ml-[19px]'}>
+                  <div className={cn('h-4 w-0.5 sm:h-5', index < currentIndex ? 'bg-accent' : 'bg-border/60')} />
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ol>
 
       {/* Navigation */}

@@ -61,11 +61,7 @@ export const QueryErrorBoundary = ({ children, fallback }: QueryErrorBoundaryPro
                       Try Again
                     </Button>
                   }
-                  description={
-                    errorType
-                      ? `${errorType}: ${errorMessage}`
-                      : errorMessage
-                  }
+                  description={errorType ? `${errorType}: ${errorMessage}` : errorMessage}
                   icon={<AlertCircle aria-hidden={'true'} className={'size-6'} />}
                   title={'Failed to load data'}
                 />

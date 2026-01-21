@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-import {
-  repositoryIdsSchema,
-  requiredRepositoryIdsSchema,
-} from './feature-request-repositories';
+import { repositoryIdsSchema, requiredRepositoryIdsSchema } from './feature-request-repositories';
 
 /**
  * Status enum for feature request workflow stages:
