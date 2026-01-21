@@ -29,6 +29,7 @@ export const DEFAULT_THINKING_BUDGET = 10000;
  *
  * @param provider - The AI provider type
  * @param shouldEnableThinking - Whether thinking should be enabled (based on model support AND user preference)
+ * @param customBudget - Optional custom thinking budget in tokens (defaults to DEFAULT_THINKING_BUDGET)
  * @returns Provider-specific options object or undefined if thinking should not be enabled
  *
  * @example
@@ -36,28 +37,35 @@ export const DEFAULT_THINKING_BUDGET = 10000;
  * // => { anthropic: { thinking: { budgetTokens: 10000, type: 'enabled' } } }
  *
  * @example
+ * const options = buildThinkingProviderOptions('anthropic', true, 20000);
+ * // => { anthropic: { thinking: { budgetTokens: 20000, type: 'enabled' } } }
+ *
+ * @example
  * const options = buildThinkingProviderOptions('openai', false);
  * // => undefined
  */
 export function buildThinkingProviderOptions(
   provider: ApiKeyProvider,
-  shouldEnableThinking: boolean
+  shouldEnableThinking: boolean,
+  customBudget?: number
 ): Record<string, unknown> | undefined {
   if (!shouldEnableThinking) {
     return undefined;
   }
 
+  const budget = customBudget ?? DEFAULT_THINKING_BUDGET;
+
   switch (provider) {
     case 'anthropic':
       return {
         anthropic: {
-          thinking: { budgetTokens: DEFAULT_THINKING_BUDGET, type: 'enabled' },
+          thinking: { budgetTokens: budget, type: 'enabled' },
         },
       };
     case 'google':
       return {
         google: {
-          thinkingConfig: { includeThoughts: true, thinkingBudget: DEFAULT_THINKING_BUDGET },
+          thinkingConfig: { includeThoughts: true, thinkingBudget: budget },
         },
       };
     case 'openai':

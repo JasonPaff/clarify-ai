@@ -14,7 +14,10 @@ export interface ClarificationGenerateRequest {
   enableThinking?: boolean;
   featureRequest: string;
   featureRequestId: number;
+  maxTokens?: number;
   modelId: string; // Format: "provider:modelId"
+  temperature?: number;
+  thinkingBudget?: number;
 }
 
 /** Stream chunk sent to renderer during clarification generation */
@@ -49,7 +52,15 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         return { error: 'Main window not available', success: false };
       }
 
-      const { customPrompt, enableThinking = true, featureRequest, modelId } = request;
+      const {
+        customPrompt,
+        enableThinking = true,
+        featureRequest,
+        maxTokens,
+        modelId,
+        temperature,
+        thinkingBudget,
+      } = request;
 
       // Parse the model ID to get provider and model
       const { modelId: model, provider } = parseModelId(modelId);
@@ -81,14 +92,20 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
         const shouldEnableThinking = supportsThinking && enableThinking;
-        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, shouldEnableThinking);
+        const providerOptions = buildThinkingProviderOptions(
+          provider as ApiKeyProvider,
+          shouldEnableThinking,
+          thinkingBudget
+        );
 
         // Stream the response
         const result = streamText({
           abortSignal: activeAbortController.signal,
+          ...(maxTokens && { maxTokens }),
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
           stopWhen: stepCountIs(2), // Allow tool call and response
+          ...(temperature !== undefined && { temperature }),
           tools: {
             generateClarifyingQuestions: clarificationTool,
           },

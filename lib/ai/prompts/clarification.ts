@@ -40,6 +40,7 @@ Call the \`generateClarifyingQuestions\` tool with:
 
 // Build the prompt with the feature request
 export function buildClarificationPrompt(featureRequest: string, customPrompt?: string): string {
-  const template = customPrompt ?? DEFAULT_CLARIFICATION_PROMPT;
+  // Use customPrompt only if it's a non-empty string, otherwise use the default
+  const template = customPrompt && customPrompt.trim() ? customPrompt : DEFAULT_CLARIFICATION_PROMPT;
   return template.replace('{featureRequest}', featureRequest);
 }

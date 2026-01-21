@@ -1,26 +1,38 @@
 'use client';
 
-import { ChevronDown, FileText, ListChecks, Target } from 'lucide-react';
+import { ChevronDown, FileText, ListChecks, MessageCircleQuestion, Target } from 'lucide-react';
 
 import type { ClarificationAnalysis } from '@/lib/validations/clarification';
 
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
 type AnalysisSummaryProps = ClassName & {
   analysis: ClarificationAnalysis;
   defaultOpen?: boolean;
+  isLoading?: boolean;
+  onRequestOverride?: () => void;
 };
 
 /**
  * Collapsible section displaying AI analysis findings.
+ * Optionally shows an override button for high detail scores.
  */
-export const AnalysisSummary = ({ analysis, className, defaultOpen = true }: AnalysisSummaryProps) => {
+export const AnalysisSummary = ({
+  analysis,
+  className,
+  defaultOpen = true,
+  isLoading = false,
+  onRequestOverride,
+}: AnalysisSummaryProps) => {
   const scoreLabel = getScoreLabel(analysis.detailScore);
   const scoreColor = getScoreColor(analysis.detailScore);
 
   const hasAmbiguities = analysis.ambiguities && analysis.ambiguities.length > 0;
   const hasAffectedAreas = analysis.affectedAreas && analysis.affectedAreas.length > 0;
+  const isHighDetailScore = analysis.detailScore >= 4;
+  const isShowOverrideButton = isHighDetailScore && onRequestOverride;
 
   return (
     <Collapsible className={className} defaultOpen={defaultOpen}>
@@ -85,6 +97,21 @@ export const AnalysisSummary = ({ analysis, className, defaultOpen = true }: Ana
                     {area}
                   </span>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Override Option for High Detail Scores */}
+          {isShowOverrideButton && (
+            <div className={'border-t border-border pt-3'}>
+              <div className={'flex items-center justify-between gap-3'}>
+                <p className={'text-sm text-muted-foreground'}>
+                  Your request has sufficient detail. Still want clarification?
+                </p>
+                <Button disabled={isLoading} onClick={onRequestOverride} size={'sm'} variant={'outline'}>
+                  <MessageCircleQuestion className={'mr-1.5 size-3.5'} />
+                  Request Clarification Anyway
+                </Button>
               </div>
             </div>
           )}

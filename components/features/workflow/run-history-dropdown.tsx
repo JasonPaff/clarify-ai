@@ -26,10 +26,18 @@ import { RestoreRunDialog } from './restore-run-dialog';
 
 interface RunHistoryDropdownProps extends Omit<ComponentPropsWithRef<'div'>, 'children'> {
   featureRequestId: number;
+  onRunRestored?: () => void;
   step: FeatureRequestRunStep;
 }
 
-export const RunHistoryDropdown = ({ className, featureRequestId, ref, step, ...props }: RunHistoryDropdownProps) => {
+export const RunHistoryDropdown = ({
+  className,
+  featureRequestId,
+  onRunRestored,
+  ref,
+  step,
+  ...props
+}: RunHistoryDropdownProps) => {
   const [selectedRun, setSelectedRun] = useState<FeatureRequestRun | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -58,11 +66,18 @@ export const RunHistoryDropdown = ({ className, featureRequestId, ref, step, ...
       return;
     }
 
-    setCurrentRunMutation.mutate({
-      featureRequestId,
-      runId: selectedRun.id,
-      step,
-    });
+    setCurrentRunMutation.mutate(
+      {
+        featureRequestId,
+        runId: selectedRun.id,
+        step,
+      },
+      {
+        onSuccess: () => {
+          onRunRestored?.();
+        },
+      }
+    );
 
     setSelectedRun(null);
     setIsDialogOpen(false);

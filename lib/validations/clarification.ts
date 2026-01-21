@@ -1,7 +1,20 @@
 import { z } from 'zod';
 
 // Status enum for clarification workflow stages
-export const clarificationStatusSchema = z.enum(['analyzing', 'completed', 'idle', 'questions_ready', 'skipped']);
+// - 'idle': Initial state, not started
+// - 'analyzing': AI is analyzing the request
+// - 'questions_ready': AI generated questions for user
+// - 'completed': User answered questions and saved
+// - 'skipped': AI determined request is detailed enough (high detail score)
+// - 'skipped_by_user': User explicitly chose to skip clarification
+export const clarificationStatusSchema = z.enum([
+  'analyzing',
+  'completed',
+  'idle',
+  'questions_ready',
+  'skipped',
+  'skipped_by_user',
+]);
 
 export type ClarificationStatus = z.infer<typeof clarificationStatusSchema>;
 

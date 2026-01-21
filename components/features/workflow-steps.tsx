@@ -22,7 +22,7 @@ export const WORKFLOW_STEPS: Array<Step> = [
   {
     description: 'Clarify and expand requirements',
     id: 'refine',
-    title: 'Refine',
+    title: 'Clarify',
   },
   {
     description: 'Analyze codebase context',

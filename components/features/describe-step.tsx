@@ -8,6 +8,7 @@ import { AlertCircle, ChevronDown, FileText, FolderGit2, Loader2, MessageSquareM
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
+import type { FullModelId } from '@/lib/ai/models';
 
 import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { RepositorySelector } from '@/components/features/repository-selector';
@@ -25,9 +26,10 @@ import {
   useFeatureRequestRepositories,
   useSetFeatureRequestRepositories,
 } from '@/hooks/queries/use-feature-request-repositories';
-import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { useMarkStepsStale, useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useRepositoryOverviewTokens } from '@/hooks/queries/use-repository-overviews';
+import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
@@ -52,6 +54,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
   const [selectedRepositoryIdForRegenerate, setSelectedRepositoryIdForRegenerate] = useState<null | number>(null);
 
   const updateMutation = useUpdateFeatureRequest();
+  const markStepsStaleMutation = useMarkStepsStale();
 
   // Repository selection hooks
   const {
@@ -68,6 +71,27 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
   // Context files and token estimation hooks
   const { data: contextFiles = [] } = useContextFiles(featureRequest.id);
+
+  // Step configuration for clarification
+  const { data: refineConfig, isLoading: isRefineConfigLoading } = useStepConfig(featureRequest.id, 'refine');
+
+  const clarificationModelConfig = useMemo(() => {
+    if (!refineConfig) return null;
+
+    const modelId =
+      refineConfig.modelProvider && refineConfig.modelId
+        ? (`${refineConfig.modelProvider}:${refineConfig.modelId}` as FullModelId)
+        : null;
+
+    return {
+      customPrompt: refineConfig.customSystemPrompt ?? undefined,
+      maxTokens: refineConfig.maxTokens ?? undefined,
+      modelId,
+      temperature: refineConfig.temperature ?? undefined,
+      thinkingBudget: refineConfig.thinkingBudget ?? undefined,
+      thinkingEnabled: refineConfig.thinkingEnabled,
+    };
+  }, [refineConfig]);
 
   // Repository selection form
   const repositoryForm = useAppForm({
@@ -104,9 +128,19 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
       id: featureRequest.id,
     });
 
+    // Check if clarification was previously completed - if so, mark 'refine' step as stale
+    // since the upstream content has changed
+    const clarificationWasCompleted = featureRequest.clarificationStatus === 'completed';
+    if (clarificationWasCompleted) {
+      void markStepsStaleMutation.mutateAsync({
+        featureRequestId: featureRequest.id,
+        steps: ['refine'],
+      });
+    }
+
     setOriginalContent(content);
     setLastSavedAt(new Date());
-  }, [content, featureRequest.id, originalContent, updateMutation]);
+  }, [content, featureRequest, markStepsStaleMutation, originalContent, updateMutation]);
 
   const handleContentChange = useCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
     setContent(event.target.value);
@@ -430,6 +464,8 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
       {showClarification && (
         <ClarificationPanel
           featureRequest={featureRequest}
+          isConfigLoading={isRefineConfigLoading}
+          modelConfig={clarificationModelConfig}
           onClose={() => setShowClarification(false)}
           onComplete={() => setShowClarification(false)}
         />

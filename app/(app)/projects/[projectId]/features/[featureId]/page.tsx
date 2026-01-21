@@ -12,6 +12,7 @@ import { use, useState } from 'react';
 import type { PageProps } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
 
 import { Route } from '@/app/(app)/projects/[projectId]/features/[featureId]/route-type';
+import { ClarifyStep } from '@/components/features/clarify-step';
 import { DescribeStep } from '@/components/features/describe-step';
 import { ResearchStep } from '@/components/features/research-step';
 import { WorkflowSteps } from '@/components/features/workflow-steps';
@@ -22,6 +23,7 @@ import { IconButton } from '@/components/ui/icon-button';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { useStaleSteps } from '@/hooks/use-stale-steps';
 
 type FeatureWorkflowPageProps = PageProps;
 const STEP_ORDER = ['describe', 'refine', 'research', 'plan'] as const;
@@ -54,6 +56,11 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   const [currentStep, setCurrentStep] = useState<StepId>('describe');
 
   const { data: featureRequest, error, isLoading } = useFeatureRequest(featureId);
+
+  const { staleStepNames } = useStaleSteps({
+    featureRequestId: featureId,
+    staleStepsJson: featureRequest?.staleSteps ?? null,
+  });
 
   // Loading state
   if (isLoading) {
@@ -121,7 +128,7 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
     refine: {
       description: 'Work with AI to clarify requirements, identify edge cases, and expand on your initial idea.',
       icon: <Sparkles className={'size-6'} />,
-      title: 'Refine Requirements',
+      title: 'Clarify Requirements',
     },
     research: {
       description:
@@ -159,7 +166,11 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
 
       {/* Workflow Steps */}
       <div className={'py-2'}>
-        <WorkflowSteps currentStep={currentStep} onStepClick={(stepId) => setCurrentStep(stepId as StepId)} />
+        <WorkflowSteps
+          currentStep={currentStep}
+          onStepClick={(stepId) => setCurrentStep(stepId as StepId)}
+          staleSteps={staleStepNames}
+        />
       </div>
 
       <Separator />
@@ -180,6 +191,8 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
         <CardContent>
           {currentStep === 'describe' ? (
             <DescribeStep featureRequest={featureRequest} projectId={projectId} />
+          ) : currentStep === 'refine' ? (
+            <ClarifyStep featureRequest={featureRequest} projectId={projectId} />
           ) : currentStep === 'research' ? (
             <ResearchStep featureRequestId={featureId} projectId={projectId} />
           ) : (

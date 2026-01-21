@@ -1,73 +1,98 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, SkipForward, X } from 'lucide-react';
-import { useState } from 'react';
+import { AlertCircle, CheckCircle2, Loader2, MessageCirclePlus, SkipForward, X } from 'lucide-react';
 
+import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
-import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { useClarification } from '@/hooks/use-clarification';
 import { getModelInfo } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
 
-import { AdvancedSettings } from './advanced-settings';
 import { AnalysisSummary } from './analysis-summary';
-import { ModelSelector } from './model-selector';
+import { ClarificationCostEstimate } from './cost-estimate';
 import { QuestionsList } from './questions-list';
 import { StreamingAnalysis } from './streaming-analysis';
 
+export interface ClarificationModelConfig {
+  customPrompt?: string;
+  maxTokens?: number;
+  modelId: FullModelId | null;
+  temperature?: number;
+  thinkingBudget?: number;
+  thinkingEnabled: boolean;
+}
+
 type ClarificationPanelProps = ClassName & {
+  currentRun?: FeatureRequestRun;
   featureRequest: FeatureRequest;
+  isConfigLoading?: boolean;
+  modelConfig: ClarificationModelConfig | null;
   onClose?: () => void;
   onComplete?: () => void;
 };
 
 /**
  * Main panel component for the clarification workflow.
- * Orchestrates model selection, AI analysis, questions display, and answer submission.
+ * Orchestrates AI analysis, questions display, and answer submission.
+ * Model configuration is now managed via StepSettingsPanel.
  */
-export const ClarificationPanel = ({ className, featureRequest, onClose, onComplete }: ClarificationPanelProps) => {
-  const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
-
-  const { isThinkingEnabled } = useThinkingPreference();
-
+export const ClarificationPanel = ({
+  className,
+  currentRun,
+  featureRequest,
+  isConfigLoading = false,
+  modelConfig,
+  onClose,
+  onComplete,
+}: ClarificationPanelProps) => {
   const {
     analysis,
     answers,
     cancelClarification,
     error,
     isLoading,
+    isQuestionsComplete,
     isReasoningStreaming,
     questions,
     reasoningText,
+    requestMoreClarification,
     resetClarification,
     saveAnswers,
     setAnswer,
+    skipClarification,
     startClarification,
     status,
     streamingText,
-  } = useClarification({ featureRequest });
+  } = useClarification({ currentRun, featureRequest, modelConfig });
 
-  const handleStartClarification = async () => {
-    if (!selectedModel) return;
-    const isModelSupportsThinking = getModelInfo(selectedModel)?.supportsThinking ?? false;
-    const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
-    await startClarification(
-      selectedModel,
-      customPrompt || undefined,
-      isModelSupportsThinking ? effectiveThinking : undefined
-    );
+  const handleStartClarification = async (forceQuestions = false) => {
+    if (!modelConfig?.modelId) return;
+
+    const isModelSupportsThinking = getModelInfo(modelConfig.modelId)?.supportsThinking ?? false;
+    const effectiveThinking = isModelSupportsThinking ? modelConfig.thinkingEnabled : false;
+
+    await startClarification({
+      enableThinking: effectiveThinking,
+      forceQuestions,
+    });
+  };
+
+  const handleForceQuestions = async () => {
+    await handleStartClarification(true);
   };
 
   const handleSaveAndContinue = async () => {
     await saveAnswers();
+    onComplete?.();
+  };
+
+  const handleSkipClarification = async () => {
+    await skipClarification();
     onComplete?.();
   };
 
@@ -80,16 +105,22 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
     }
   };
 
-  const handleThinkingToggle = (isChecked: boolean) => {
-    setThinkingOverride(isChecked);
+  const handleRequestMoreClarification = async () => {
+    if (!modelConfig?.modelId) return;
+
+    const isModelSupportsThinking = getModelInfo(modelConfig.modelId)?.supportsThinking ?? false;
+    const effectiveThinking = isModelSupportsThinking ? modelConfig.thinkingEnabled : false;
+
+    await requestMoreClarification(effectiveThinking);
   };
 
   const allQuestionsAnswered =
-    questions.length > 0 && questions.every((q) => answers.some((a) => a.questionId === q.id && a.selectedValue));
-  const modelInfo = selectedModel ? getModelInfo(selectedModel) : undefined;
-  const isModelSupportsThinking = modelInfo?.supportsThinking ?? false;
+    isQuestionsComplete &&
+    questions.length > 0 &&
+    questions.every((q) => answers.some((a) => a.questionId === q.id && a.selectedValue));
   const hasReasoningContent = reasoningText.length > 0;
-  const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
+  const hasModelConfigured = modelConfig?.modelId !== null;
+  const isReady = !isConfigLoading && hasModelConfigured;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -110,39 +141,47 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
         </Alert>
       )}
 
-      {/* Idle state: Model selection and start button */}
+      {/* Idle state: Start button */}
       {status === 'idle' && (
         <div className={'space-y-3'}>
-          <div className={'flex items-end gap-2'}>
-            <div className={'flex-1'}>
-              <label className={'mb-1.5 block text-sm font-medium'}>AI Model</label>
-              <ModelSelector isDisabled={isLoading} onValueChange={setSelectedModel} value={selectedModel} />
+          {/* Loading Config State */}
+          {isConfigLoading && (
+            <div className={'flex items-center gap-2 rounded-md border border-border bg-muted/30 p-4'}>
+              <Loader2 className={'size-4 animate-spin text-muted-foreground'} />
+              <span className={'text-sm text-muted-foreground'}>Loading configuration...</span>
             </div>
-            <Button disabled={!selectedModel || isLoading} onClick={handleStartClarification}>
-              Analyze Request
-            </Button>
-          </div>
+          )}
 
-          <AdvancedSettings customPrompt={customPrompt} onCustomPromptChange={setCustomPrompt} />
+          {/* No Model Configured State */}
+          {!isConfigLoading && !hasModelConfigured && (
+            <Alert>
+              <AlertCircle className={'size-4'} />
+              <AlertTitle>Model Not Configured</AlertTitle>
+              <AlertDescription>
+                Please configure a model in the Clarify Settings panel above before analyzing the request.
+              </AlertDescription>
+            </Alert>
+          )}
 
-          {/* Thinking Toggle - Only shown for models that support thinking */}
-          {isModelSupportsThinking && (
-            <div className={'flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2'}>
-              <div className={'flex flex-col gap-0.5'}>
-                <label className={'text-sm font-medium'} htmlFor={'clarification-thinking-toggle'}>
-                  Enable thinking for this request
-                </label>
-                <span className={'text-xs text-muted-foreground'}>
-                  {thinkingOverride === null
-                    ? `Using global preference (${isThinkingEnabled ? 'enabled' : 'disabled'})`
-                    : 'Override for this request'}
-                </span>
-              </div>
-              <Switch
-                checked={effectiveThinking}
-                id={'clarification-thinking-toggle'}
-                onCheckedChange={handleThinkingToggle}
+          {/* Ready State */}
+          {isReady && (
+            <div className={'flex flex-col gap-3'}>
+              {/* Cost Estimate */}
+              <ClarificationCostEstimate
+                featureRequestContent={featureRequest.rawRequest ?? ''}
+                modelId={modelConfig?.modelId ?? null}
               />
+
+              {/* Action Buttons */}
+              <div className={'flex items-center gap-2'}>
+                <Button disabled={isLoading} onClick={() => handleStartClarification()}>
+                  Analyze Request
+                </Button>
+                <Button disabled={isLoading} onClick={handleSkipClarification} variant={'outline'}>
+                  <SkipForward className={'mr-2 size-4'} />
+                  Skip Clarification
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -171,12 +210,25 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
         <div className={'space-y-4'}>
           {analysis && <AnalysisSummary analysis={analysis} />}
 
-          <QuestionsList answers={answers} onAnswerChange={setAnswer} questions={questions} />
+          <QuestionsList
+            answers={answers}
+            isQuestionsComplete={isQuestionsComplete}
+            onAnswerChange={setAnswer}
+            questions={questions}
+          />
 
-          <div className={'flex gap-2'}>
+          <div className={'flex flex-wrap gap-2'}>
             <Button disabled={!allQuestionsAnswered} onClick={handleSaveAndContinue}>
               <CheckCircle2 className={'mr-2 size-4'} />
               Save & Continue
+            </Button>
+            <Button
+              disabled={!allQuestionsAnswered || isLoading}
+              onClick={handleRequestMoreClarification}
+              variant={'outline'}
+            >
+              <MessageCirclePlus className={'mr-2 size-4'} />
+              Request More Clarification
             </Button>
             <Button onClick={handleCancel} variant={'outline'}>
               Cancel
@@ -185,17 +237,24 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
         </div>
       )}
 
-      {/* Skipped state: Request was detailed enough */}
+      {/* Skipped state: Request was detailed enough (AI determined) */}
       {status === 'skipped' && (
         <div className={'space-y-4'}>
-          {analysis && <AnalysisSummary analysis={analysis} />}
+          {analysis && (
+            <AnalysisSummary
+              analysis={analysis}
+              isLoading={isLoading}
+              onRequestOverride={handleForceQuestions}
+            />
+          )}
 
           <Alert>
             <SkipForward className={'size-4'} />
             <AlertTitle>Request is Detailed Enough</AlertTitle>
             <AlertDescription>
-              Your feature request has sufficient detail (score: {analysis?.detailScore}/5). You can proceed directly to
-              refining requirements.
+              Your feature request scored {analysis?.detailScore}/5 for detail level, which indicates sufficient clarity
+              for implementation. The AI determined that clarification questions are not necessary. You can proceed
+              directly to refining requirements, or request clarification anyway if you prefer.
             </AlertDescription>
           </Alert>
 
@@ -207,10 +266,29 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
             >
               Continue to Refine
             </Button>
-            <Button onClick={resetClarification} variant={'outline'}>
+            <Button disabled={isLoading} onClick={handleForceQuestions} variant={'outline'}>
+              <MessageCirclePlus className={'mr-2 size-4'} />
               Ask Questions Anyway
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Skipped by user state: User chose to skip clarification */}
+      {status === 'skipped_by_user' && (
+        <div className={'space-y-4'}>
+          <Alert>
+            <SkipForward className={'size-4'} />
+            <AlertTitle>Clarification Skipped</AlertTitle>
+            <AlertDescription>
+              You chose to skip clarification. You can proceed directly to refining requirements or run clarification if
+              needed.
+            </AlertDescription>
+          </Alert>
+
+          <Button onClick={resetClarification} variant={'outline'}>
+            Run Clarification
+          </Button>
         </div>
       )}
 
@@ -227,9 +305,15 @@ export const ClarificationPanel = ({ className, featureRequest, onClose, onCompl
             </AlertDescription>
           </Alert>
 
-          <Button onClick={resetClarification} variant={'outline'}>
-            Re-run Clarification
-          </Button>
+          <div className={'flex flex-wrap gap-2'}>
+            <Button disabled={isLoading} onClick={handleRequestMoreClarification} variant={'outline'}>
+              <MessageCirclePlus className={'mr-2 size-4'} />
+              Request More Clarification
+            </Button>
+            <Button onClick={resetClarification} variant={'outline'}>
+              Re-run Clarification
+            </Button>
+          </div>
         </div>
       )}
     </div>

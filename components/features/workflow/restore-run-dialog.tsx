@@ -41,7 +41,7 @@ export function RestoreRunDialog({
     ? new Date(run.completedAt).toLocaleString()
     : new Date(run.createdAt).toLocaleString();
 
-  const stepLabel = run.step === 'refine' ? 'Refinement' : run.step === 'research' ? 'Research' : 'Planning';
+  const stepLabel = run.step === 'refine' ? 'Clarification' : run.step === 'research' ? 'Research' : 'Planning';
 
   return (
     <AlertDialog.Root onOpenChange={handleOpenChange} open={isOpen}>

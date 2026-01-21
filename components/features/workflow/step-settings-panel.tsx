@@ -130,7 +130,7 @@ export const StepSettingsPanel = ({ className, featureRequestId, ref, step, ...p
       case 'plan':
         return 'Plan';
       case 'refine':
-        return 'Refine';
+        return 'Clarify';
       case 'research':
         return 'Research';
       default:
