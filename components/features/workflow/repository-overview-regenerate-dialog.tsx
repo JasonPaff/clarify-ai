@@ -21,6 +21,8 @@ interface RepositoryOverviewRegenerateDialogProps {
   onOpenChange: (isOpen: boolean) => void;
   /** Whether the dialog is open */
   open: boolean;
+  /** Project ID for step configuration */
+  projectId: number;
   /** Repository ID to regenerate overview for */
   repositoryId: number;
   /** Repository display name */
@@ -36,6 +38,7 @@ interface RepositoryOverviewRegenerateDialogProps {
 export const RepositoryOverviewRegenerateDialog = ({
   onOpenChange,
   open,
+  projectId,
   repositoryId,
   repositoryName,
   repositoryPath,
@@ -83,6 +86,7 @@ export const RepositoryOverviewRegenerateDialog = ({
             <RepositoryOverviewGenerator
               onCancel={handleCancel}
               onSave={handleSaveGenerated}
+              projectId={projectId}
               repositoryId={repositoryId}
               repositoryPath={repositoryPath}
             />

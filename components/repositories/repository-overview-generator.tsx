@@ -15,6 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { getModelInfo } from '@/lib/ai/models';
 import { cn } from '@/lib/utils';
@@ -26,6 +27,7 @@ type GenerationStatus = 'complete' | 'error' | 'generating' | 'idle' | 'stopped'
 type RepositoryOverviewGeneratorProps = ClassName & {
   onCancel: () => void;
   onSave: (data: SaveData) => void;
+  projectId: number;
   repositoryId: number;
   repositoryPath: string;
 };
@@ -44,6 +46,7 @@ export const RepositoryOverviewGenerator = ({
   className,
   onCancel,
   onSave,
+  projectId,
   repositoryId,
   repositoryPath,
 }: RepositoryOverviewGeneratorProps) => {
@@ -60,6 +63,16 @@ export const RepositoryOverviewGenerator = ({
 
   const { isThinkingEnabled } = useThinkingPreference();
   const { cancel, generate, subscribeToStream } = useElectronAiOverview();
+  const { data: overviewConfig } = useStepConfig(projectId, 'overview');
+
+  // Compute the default model from config
+  const configDefaultModel =
+    overviewConfig?.modelProvider && overviewConfig?.modelId
+      ? (`${overviewConfig.modelProvider}:${overviewConfig.modelId}` as FullModelId)
+      : null;
+
+  // Use user-selected model if available, otherwise fall back to config default
+  const effectiveSelectedModel = selectedModel ?? configDefaultModel;
 
   const handleStreamChunk = useCallback((chunk: RepositoryOverviewStreamChunk) => {
     switch (chunk.type) {
@@ -109,9 +122,9 @@ export const RepositoryOverviewGenerator = ({
   }, [cancel]);
 
   const handleGenerate = async () => {
-    if (!selectedModel) return;
+    if (!effectiveSelectedModel) return;
 
-    const modelSupportsThinking = getModelInfo(selectedModel)?.supportsThinking ?? false;
+    const modelSupportsThinking = getModelInfo(effectiveSelectedModel)?.supportsThinking ?? false;
 
     setStatus('generating');
     setStreamingContent('');
@@ -120,11 +133,14 @@ export const RepositoryOverviewGenerator = ({
     setError(null);
 
     const result = await generate({
-      customPrompt: customPrompt || undefined,
+      customPrompt: customPrompt || overviewConfig?.customSystemPrompt || undefined,
       enableThinking: modelSupportsThinking ? effectiveThinking : undefined,
-      modelId: selectedModel,
+      maxTokens: overviewConfig?.maxTokens ?? undefined,
+      modelId: effectiveSelectedModel,
       repositoryId,
       repositoryPath,
+      temperature: overviewConfig?.temperature ?? undefined,
+      thinkingBudget: overviewConfig?.thinkingBudget ?? undefined,
     });
 
     if (!result.success) {
@@ -154,11 +170,11 @@ export const RepositoryOverviewGenerator = ({
   };
 
   const handleSave = () => {
-    if (streamingContent && selectedModel) {
+    if (streamingContent && effectiveSelectedModel) {
       onSave({
         content: streamingContent,
         customPrompt,
-        modelId: selectedModel,
+        modelId: effectiveSelectedModel,
       });
     }
   };
@@ -178,10 +194,10 @@ export const RepositoryOverviewGenerator = ({
   const isFinishedState = isComplete || isStopped || isError;
   const canSave = (isComplete || isStopped) && hasStreamingContent;
 
-  const modelInfo = selectedModel ? getModelInfo(selectedModel) : undefined;
+  const modelInfo = effectiveSelectedModel ? getModelInfo(effectiveSelectedModel) : undefined;
   const supportsThinking = modelInfo?.supportsThinking ?? false;
   const hasReasoningContent = reasoningContent.length > 0;
-  const effectiveThinking = thinkingOverride ?? isThinkingEnabled;
+  const effectiveThinking = thinkingOverride ?? overviewConfig?.thinkingEnabled ?? isThinkingEnabled;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -203,7 +219,7 @@ export const RepositoryOverviewGenerator = ({
         <Fragment>
           <div>
             <label className={'mb-1.5 block text-sm font-medium'}>AI Model</label>
-            <ModelSelector isDisabled={isGenerating} onValueChange={setSelectedModel} value={selectedModel} />
+            <ModelSelector isDisabled={isGenerating} onValueChange={setSelectedModel} value={effectiveSelectedModel} />
           </div>
 
           {/* Custom Prompt Section */}
@@ -320,7 +336,7 @@ export const RepositoryOverviewGenerator = ({
             <Button onClick={onCancel} variant={'outline'}>
               Cancel
             </Button>
-            <Button disabled={!selectedModel} onClick={handleGenerate}>
+            <Button disabled={!effectiveSelectedModel} onClick={handleGenerate}>
               Generate
             </Button>
           </Fragment>

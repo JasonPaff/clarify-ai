@@ -435,6 +435,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
         <RepositoryOverviewRegenerateDialog
           onOpenChange={handleRegenerateDialogOpenChange}
           open={isRegenerateDialogOpen}
+          projectId={projectId}
           repositoryId={selectedRepositoryForRegenerate.id}
           repositoryName={selectedRepositoryForRegenerate.name}
           repositoryPath={selectedRepositoryForRegenerate.path}

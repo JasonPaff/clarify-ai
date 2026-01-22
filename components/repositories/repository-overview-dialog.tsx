@@ -29,6 +29,7 @@ type DialogMode = 'generate' | 'view';
 
 interface RepositoryOverviewDialogProps {
   children: ReactNode;
+  projectId: number;
   repositoryId: number;
   repositoryName: string;
   repositoryPath: string;
@@ -40,6 +41,7 @@ interface RepositoryOverviewDialogProps {
  */
 export function RepositoryOverviewDialog({
   children,
+  projectId,
   repositoryId,
   repositoryName,
   repositoryPath,
@@ -137,6 +139,7 @@ export function RepositoryOverviewDialog({
               <RepositoryOverviewGenerator
                 onCancel={handleCancelGenerate}
                 onSave={handleSaveGenerated}
+                projectId={projectId}
                 repositoryId={repositoryId}
                 repositoryPath={repositoryPath}
               />

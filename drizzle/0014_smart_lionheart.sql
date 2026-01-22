@@ -1,0 +1,1 @@
+ALTER TABLE `step_configurations` DROP COLUMN `custom_user_prompt_template`;

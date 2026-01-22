@@ -3,12 +3,11 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { Bot, Loader2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
-import type { FullModelId } from '@/lib/ai/models';
 
-import { ModelSelector } from '@/components/features/clarification/model-selector';
+import { type StepModelDefaults, StepModelSection } from '@/components/features/workflow/step-model-section';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useStepConfigurations, useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
 import { cn } from '@/lib/utils';
@@ -35,6 +34,11 @@ const WORKFLOW_STEPS: Array<StepInfo> = [
     label: 'Plan',
     step: 'plan',
   },
+  {
+    description: 'Generates AI-powered repository overviews',
+    label: 'Overview',
+    step: 'overview',
+  },
 ];
 
 interface DefaultModelSettingsProps extends ComponentPropsWithRef<'div'> {
@@ -46,37 +50,40 @@ export const DefaultModelSettings = ({ className, projectId, ref, ...props }: De
   const upsertMutation = useUpsertStepConfig();
 
   const configurationMap = useMemo(() => {
-    const map = new Map<StepConfigurationStep, FullModelId | null>();
+    const map = new Map<StepConfigurationStep, StepModelDefaults | undefined>();
 
     for (const stepInfo of WORKFLOW_STEPS) {
-      map.set(stepInfo.step, null);
+      map.set(stepInfo.step, undefined);
     }
 
     if (configurations) {
       for (const config of configurations) {
-        if (config.modelProvider && config.modelId) {
-          const fullId = `${config.modelProvider}:${config.modelId}` as FullModelId;
-          map.set(config.step, fullId);
-        }
+        const defaults: StepModelDefaults = {
+          customSystemPrompt: config.customSystemPrompt ?? undefined,
+          maxTokens: config.maxTokens ?? undefined,
+          modelId: config.modelId ?? undefined,
+          modelProvider: config.modelProvider ?? undefined,
+          temperature: config.temperature ?? undefined,
+          thinkingBudget: config.thinkingBudget ?? undefined,
+          thinkingEnabled: config.thinkingEnabled ?? undefined,
+        };
+        map.set(config.step, defaults);
       }
     }
 
     return map;
   }, [configurations]);
 
-  const handleModelChange = (step: StepConfigurationStep, fullModelId: FullModelId) => {
-    const [provider, ...modelParts] = fullModelId.split(':');
-    const modelId = modelParts.join(':');
-
-    upsertMutation.mutate({
-      data: {
-        modelId,
-        modelProvider: provider,
-      },
-      projectId,
-      step,
-    });
-  };
+  const handleStepUpdate = useCallback(
+    (step: StepConfigurationStep) => (updates: StepModelDefaults) => {
+      upsertMutation.mutate({
+        data: updates,
+        projectId,
+        step,
+      });
+    },
+    [projectId, upsertMutation]
+  );
 
   return (
     <Card className={cn(className)} ref={ref} {...props}>
@@ -88,7 +95,7 @@ export const DefaultModelSettings = ({ className, projectId, ref, ...props }: De
           </div>
           <div>
             <CardTitle>Default AI Models</CardTitle>
-            <CardDescription>Configure the default AI model for each workflow step</CardDescription>
+            <CardDescription>Configure the default AI model settings for each workflow step</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -101,27 +108,17 @@ export const DefaultModelSettings = ({ className, projectId, ref, ...props }: De
           </div>
         ) : (
           <div className={'space-y-4'}>
-            {WORKFLOW_STEPS.map((stepInfo) => {
-              const currentModelId = configurationMap.get(stepInfo.step) ?? null;
-              const isStepPending = upsertMutation.isPending;
-
-              return (
-                <div className={'flex flex-col gap-2 rounded-lg border border-border p-4'} key={stepInfo.step}>
-                  {/* Step Info */}
-                  <div className={'flex flex-col gap-0.5'}>
-                    <label className={'text-sm font-medium'}>{stepInfo.label}</label>
-                    <p className={'text-xs text-muted-foreground'}>{stepInfo.description}</p>
-                  </div>
-
-                  {/* Model Selector */}
-                  <ModelSelector
-                    isDisabled={isStepPending}
-                    onValueChange={(value) => handleModelChange(stepInfo.step, value)}
-                    value={currentModelId}
-                  />
-                </div>
-              );
-            })}
+            {WORKFLOW_STEPS.map((stepInfo) => (
+              <StepModelSection
+                defaults={configurationMap.get(stepInfo.step)}
+                description={stepInfo.description}
+                isDisabled={upsertMutation.isPending}
+                key={stepInfo.step}
+                label={stepInfo.label}
+                onUpdate={handleStepUpdate(stepInfo.step)}
+                step={stepInfo.step}
+              />
+            ))}
           </div>
         )}
       </CardContent>

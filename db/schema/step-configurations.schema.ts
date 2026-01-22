@@ -6,11 +6,12 @@ import { projects } from './projects.schema';
 /**
  * Step configuration step values for the orchestration workflow:
  * - 'describe': Feature description step (initial user input)
+ * - 'overview': Repository overview generation step
+ * - 'plan': Implementation planning step
  * - 'refine': Feature refinement/clarification step
  * - 'research': File discovery/research step
- * - 'plan': Implementation planning step
  */
-export type StepConfigurationStep = 'describe' | 'plan' | 'refine' | 'research';
+export type StepConfigurationStep = 'describe' | 'overview' | 'plan' | 'refine' | 'research';
 
 export const stepConfigurations = sqliteTable(
   'step_configurations',
@@ -19,7 +20,6 @@ export const stepConfigurations = sqliteTable(
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
     customSystemPrompt: text('custom_system_prompt'),
-    customUserPromptTemplate: text('custom_user_prompt_template'),
     id: integer('id').primaryKey({ autoIncrement: true }),
     maxTokens: integer('max_tokens'),
     modelId: text('model_id'),

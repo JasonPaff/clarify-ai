@@ -99,6 +99,13 @@
       "when": 1769035337884,
       "tag": "0013_nifty_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1769050550736,
+      "tag": "0014_smart_lionheart",
+      "breakpoints": true
     }
   ]
 }

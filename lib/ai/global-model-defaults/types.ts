@@ -26,7 +26,6 @@ export interface GlobalModelDefaultsContextValue {
  */
 export interface GlobalStepModelDefaults {
   customSystemPrompt?: string;
-  customUserPromptTemplate?: string;
   maxTokens?: number;
   modelId?: string;
   modelProvider?: string;
