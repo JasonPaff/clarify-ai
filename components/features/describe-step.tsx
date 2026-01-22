@@ -46,8 +46,6 @@ const parseSqliteUtc = (value: null | string | undefined): Date | null => {
 export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) => {
   const [content, setContent] = useState(featureRequest.rawRequest ?? '');
   const [originalContent, setOriginalContent] = useState(featureRequest.rawRequest ?? '');
-  // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
-  // to ensure JavaScript parses it as UTC, not local time
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
     featureRequest.rawRequest ? parseSqliteUtc(featureRequest.updatedAt) : null
   );
@@ -240,47 +238,6 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
   return (
     <div className={'flex flex-col gap-6'}>
-      {/* Section 1: Feature Description (always visible) */}
-      <section className={'flex flex-col gap-3'}>
-        <div className={'flex items-center gap-2'}>
-          <h3 className={'text-sm font-semibold'}>Feature Description</h3>
-        </div>
-
-        <Textarea
-          className={'min-h-64'}
-          onBlur={handleContentBlur}
-          onChange={handleContentChange}
-          placeholder={
-            'Describe your feature request in detail...\n\n' +
-            'For example:\n' +
-            '- What problem does this feature solve?\n' +
-            '- Who will use this feature?\n' +
-            '- What should the user experience be like?\n' +
-            '- Are there any specific technical requirements?'
-          }
-          rows={12}
-          value={content}
-        />
-
-        {/* Save Status */}
-        <div className={'flex items-center justify-between'}>
-          <span className={'text-xs text-muted-foreground'}>{saveStatusText}</span>
-        </div>
-
-        {/* Save Error */}
-        {updateMutation.isError && (
-          <Alert variant={'destructive'}>
-            <AlertCircle className={'size-4'} />
-            <AlertDescription>
-              Failed to save changes. Your content is preserved locally and will be retried automatically.
-            </AlertDescription>
-          </Alert>
-        )}
-      </section>
-
-      {/* Visual Separator */}
-      <hr className={'border-border'} />
-
       {/* Section 2: Repository Context (collapsed by default) */}
       <Collapsible defaultOpen={false}>
         <CollapsibleTrigger
@@ -433,6 +390,47 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Visual Separator */}
+      <hr className={'border-border'} />
+
+      {/* Section 1: Feature Description (always visible) */}
+      <section className={'flex flex-col gap-3'}>
+        <div className={'flex items-center gap-2'}>
+          <h3 className={'text-sm font-semibold'}>Feature Description</h3>
+        </div>
+
+        <Textarea
+          className={'min-h-64'}
+          onBlur={handleContentBlur}
+          onChange={handleContentChange}
+          placeholder={
+            'Describe your feature request in detail...\n\n' +
+            'For example:\n' +
+            '- What problem does this feature solve?\n' +
+            '- Who will use this feature?\n' +
+            '- What should the user experience be like?\n' +
+            '- Are there any specific technical requirements?'
+          }
+          rows={12}
+          value={content}
+        />
+
+        {/* Save Status */}
+        <div className={'flex items-center justify-between'}>
+          <span className={'text-xs text-muted-foreground'}>{saveStatusText}</span>
+        </div>
+
+        {/* Save Error */}
+        {updateMutation.isError && (
+          <Alert variant={'destructive'}>
+            <AlertCircle className={'size-4'} />
+            <AlertDescription>
+              Failed to save changes. Your content is preserved locally and will be retried automatically.
+            </AlertDescription>
+          </Alert>
+        )}
+      </section>
 
       {/* Visual Separator */}
       <hr className={'border-border'} />

@@ -10,8 +10,8 @@ import { QuestionCard } from './question-card';
 
 type QuestionsListProps = ClassName & {
   answers: Array<ClarificationAnswer>;
-  isReadOnly?: boolean;
   isQuestionsComplete?: boolean;
+  isReadOnly?: boolean;
   onAnswerChange: (questionId: string, selectedValue: null | string, customText?: string) => void;
   questions: Array<ClarificationQuestion>;
 };
@@ -64,8 +64,8 @@ const QuestionsLoadingSkeleton = () => {
 export const QuestionsList = ({
   answers,
   className,
-  isReadOnly = false,
   isQuestionsComplete = true,
+  isReadOnly = false,
   onAnswerChange,
   questions,
 }: QuestionsListProps) => {

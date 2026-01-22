@@ -1,5 +1,6 @@
 'use client';
 
+import { Brain } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
@@ -26,6 +27,7 @@ import { cn } from '@/lib/utils';
 interface ModelOption {
   group: string;
   label: string;
+  supportsThinking?: boolean;
   value: string;
 }
 
@@ -69,6 +71,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
           options.push({
             group: groupLabel,
             label: model.name,
+            supportsThinking: model.supportsThinking,
             value: model.fullId,
           });
         }
@@ -155,7 +158,12 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
                     .map((option) => (
                       <ComboboxItem key={option.value} value={option}>
                         <ComboboxItemIndicator />
-                        <span className={'col-start-2'}>{option.label}</span>
+                        <span className={'col-start-2 flex items-center gap-1.5'}>
+                          {option.label}
+                          {option.supportsThinking && (
+                            <Brain className={'size-3.5 text-muted-foreground'} />
+                          )}
+                        </span>
                       </ComboboxItem>
                     ))}
                 </ComboboxGroup>
