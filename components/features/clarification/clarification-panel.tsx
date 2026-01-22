@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, History, Loader2, MessageCirclePlus, SkipForward, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, History, Loader2, MessageCirclePlus, SkipForward } from 'lucide-react';
 import { useEffect } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -170,9 +170,6 @@ export const ClarificationPanel = ({
       {/* Header with close button */}
       <div className={'flex items-center justify-between'}>
         <h3 className={'font-medium'}>Clarify Request</h3>
-        <Button onClick={handleCancel} size={'sm'} variant={'ghost'}>
-          <X className={'size-4'} />
-        </Button>
       </div>
 
       {/* Error display */}
