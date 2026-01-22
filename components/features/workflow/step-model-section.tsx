@@ -235,7 +235,6 @@ export const StepModelSection = ({
               value={localSystemPrompt}
             />
           </div>
-
         </div>
       </CollapsibleContent>
     </Collapsible>

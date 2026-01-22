@@ -5,8 +5,4 @@ export {
   DEFAULT_THINKING_BUDGET,
   GLOBAL_MODEL_DEFAULTS_STORAGE_KEY,
 } from './constants';
-export type {
-  GlobalModelDefaults,
-  GlobalModelDefaultsContextValue,
-  GlobalStepModelDefaults,
-} from './types';
+export type { GlobalModelDefaults, GlobalModelDefaultsContextValue, GlobalStepModelDefaults } from './types';

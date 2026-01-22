@@ -49,8 +49,15 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         return { error: 'Main window not available', success: false };
       }
 
-      const { customPrompt, enableThinking = true, maxTokens, modelId, repositoryPath, temperature, thinkingBudget } =
-        request;
+      const {
+        customPrompt,
+        enableThinking = true,
+        maxTokens,
+        modelId,
+        repositoryPath,
+        temperature,
+        thinkingBudget,
+      } = request;
 
       // Parse the model ID to get provider and model
       const { modelId: model, provider } = parseModelId(modelId);
@@ -87,7 +94,11 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
         const shouldEnableThinking = supportsThinking && enableThinking;
-        const providerOptions = buildThinkingProviderOptions(provider as ApiKeyProvider, shouldEnableThinking, thinkingBudget);
+        const providerOptions = buildThinkingProviderOptions(
+          provider as ApiKeyProvider,
+          shouldEnableThinking,
+          thinkingBudget
+        );
 
         // Stream the response
         const result = streamText({

@@ -44,7 +44,9 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
     if (project) {
       // Apply global model defaults to the new project
       if (globalDefaults) {
-        const steps = Object.entries(globalDefaults) as Array<[StepConfigurationStep, typeof globalDefaults[StepConfigurationStep]]>;
+        const steps = Object.entries(globalDefaults) as Array<
+          [StepConfigurationStep, (typeof globalDefaults)[StepConfigurationStep]]
+        >;
         for (const [step, stepDefaults] of steps) {
           if (stepDefaults && Object.keys(stepDefaults).length > 0) {
             await upsertStepConfig.mutateAsync({
