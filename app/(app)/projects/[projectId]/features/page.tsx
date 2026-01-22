@@ -1,8 +1,9 @@
 'use client';
 
-import { Lightbulb, Plus, X } from 'lucide-react';
+import { AlertTriangle, Lightbulb, Plus, X } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 import { Fragment, use, useEffect, useMemo, useState } from 'react';
@@ -19,7 +20,8 @@ import { FeatureRequestFilterToolbar } from '@/components/features/feature-reque
 import { NewFeatureRequestDialog } from '@/components/features/new-feature-request-dialog';
 import { PageHeader } from '@/components/layout/page-header';
 import { FeatureRequestsSkeleton } from '@/components/skeletons/feature-requests-skeleton';
-import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import {
@@ -27,8 +29,10 @@ import {
   useFeatureRequests,
   useUnarchiveFeatureRequest,
 } from '@/hooks/queries/use-feature-requests';
+import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { useElectronStore } from '@/hooks/useElectron';
+import { cn } from '@/lib/utils';
 
 type FeaturesPageProps = PageProps;
 
@@ -63,12 +67,14 @@ function EditDialogWithData({
 }
 
 function FeaturesContent({
+  canCreateFeatureRequest,
   onClearFilters,
   projectId,
   searchQuery,
   showArchived,
   statusFilter,
 }: {
+  canCreateFeatureRequest: boolean;
   onClearFilters: () => void;
   projectId: number;
   searchQuery: string;
@@ -145,12 +151,22 @@ function FeaturesContent({
     return (
       <EmptyState
         action={
-          <NewFeatureRequestDialog projectId={projectId}>
-            <Button>
+          canCreateFeatureRequest ? (
+            <NewFeatureRequestDialog projectId={projectId}>
+              <Button>
+                <Plus className={'size-4'} />
+                Create your first feature request
+              </Button>
+            </NewFeatureRequestDialog>
+          ) : (
+            <Link
+              className={cn(buttonVariants(), 'pointer-events-auto')}
+              href={$path({ route: '/projects/[projectId]/repositories', routeParams: { projectId } })}
+            >
               <Plus className={'size-4'} />
-              Create your first feature request
-            </Button>
-          </NewFeatureRequestDialog>
+              Connect a repository
+            </Link>
+          )
         }
         description={'Feature requests help you plan and track implementation ideas for this project.'}
         icon={<Lightbulb className={'size-6'} />}
@@ -227,6 +243,9 @@ function FeaturesContent({
 function FeaturesPage({ routeParams }: FeaturesPageProps) {
   const { projectId } = use(routeParams);
   const { get: getStoreValue, set: setStoreValue } = useElectronStore();
+  const { data: repositories = [], isPending: isRepositoriesPending } = useRepositories(projectId);
+  const hasRepositories = repositories.length > 0;
+  const canCreateFeatureRequest = !isRepositoriesPending && hasRepositories;
 
   // Step 4: URL state management with nuqs
   const [statusFilter, setStatusFilter] = useQueryState(
@@ -302,16 +321,42 @@ function FeaturesPage({ routeParams }: FeaturesPageProps) {
     <Fragment>
       <PageHeader
         action={
-          <NewFeatureRequestDialog projectId={projectId}>
-            <Button>
+          canCreateFeatureRequest ? (
+            <NewFeatureRequestDialog projectId={projectId}>
+              <Button>
+                <Plus className={'size-4'} />
+                New Feature Request
+              </Button>
+            </NewFeatureRequestDialog>
+          ) : (
+            <Button disabled>
               <Plus className={'size-4'} />
               New Feature Request
             </Button>
-          </NewFeatureRequestDialog>
+          )
         }
         description={'Create and manage feature requests to transform into actionable implementation plans.'}
         title={'Feature Requests'}
       />
+
+      {!isRepositoriesPending && !hasRepositories && (
+        <Alert className={'mb-6'} variant={'warning'}>
+          <AlertTriangle className={'mt-0.5 size-4 shrink-0'} />
+          <div className={'flex flex-1 flex-col gap-2'}>
+            <AlertTitle>Connect a repository to create feature requests</AlertTitle>
+            <AlertDescription>
+              Feature requests require at least one connected repository for discovery and planning. Visit the
+              repositories page to connect your codebase.
+            </AlertDescription>
+            <Link
+              className={cn('text-sm font-medium text-accent underline-offset-4 hover:underline')}
+              href={$path({ route: '/projects/[projectId]/repositories', routeParams: { projectId } })}
+            >
+              Go to repositories
+            </Link>
+          </div>
+        </Alert>
+      )}
 
       {/* Filter Toolbar */}
       <FeatureRequestFilterToolbar
@@ -327,6 +372,7 @@ function FeaturesPage({ routeParams }: FeaturesPageProps) {
       <QueryErrorBoundary>
         {isArchivePreferenceLoaded && (
           <FeaturesContent
+            canCreateFeatureRequest={canCreateFeatureRequest}
             onClearFilters={handleClearFilters}
             projectId={projectId}
             searchQuery={localSearchQuery}
