@@ -9,12 +9,14 @@ import type { StepConfigurationStep } from '@/db/schema/step-configurations.sche
 import type { FullModelId } from '@/lib/ai/models';
 
 import { ModelSelector } from '@/components/features/clarification/model-selector';
+import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
 import { ParameterSlider } from '@/components/features/workflow/parameter-slider';
 import { ThinkingBudgetControl } from '@/components/features/workflow/thinking-budget-control';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 import { DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE, DEFAULT_THINKING_BUDGET } from '@/lib/ai/global-model-defaults';
 import { getModelInfo } from '@/lib/ai/models';
+import { getPromptMetadata } from '@/lib/ai/prompts/prompt-metadata';
 import { cn } from '@/lib/utils';
 
 /**
@@ -124,6 +126,16 @@ export const StepModelSection = ({
     }
   }, [defaults?.customSystemPrompt, localSystemPrompt, onUpdate]);
 
+  const promptMetadata = useMemo(() => getPromptMetadata(step), [step]);
+
+  const handleUseAsStartingPoint = useCallback(
+    (prompt: string) => {
+      setLocalSystemPrompt(prompt);
+      onUpdate({ customSystemPrompt: prompt });
+    },
+    [onUpdate]
+  );
+
   const formatTemperature = (value: number) => value.toFixed(1);
 
   const formatMaxTokens = (value: number) => {
@@ -218,7 +230,7 @@ export const StepModelSection = ({
                   }}
                   type={'button'}
                 >
-                  Reset
+                  Clear custom prompt (use default)
                 </button>
               )}
             </div>
@@ -233,6 +245,14 @@ export const StepModelSection = ({
               onChange={(e) => setLocalSystemPrompt(e.target.value)}
               placeholder={'Enter custom system prompt...'}
               value={localSystemPrompt}
+            />
+
+            {/* Default Prompt Viewer */}
+            <DefaultPromptViewer
+              defaultPrompt={promptMetadata.defaultPrompt}
+              isDisabled={isDisabled}
+              onUseAsStartingPoint={handleUseAsStartingPoint}
+              variables={promptMetadata.variables}
             />
           </div>
         </div>

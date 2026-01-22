@@ -1,11 +1,12 @@
 'use client';
 
 import { AlertCircle, Loader2, RefreshCw, Save, Square } from 'lucide-react';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
+import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
 import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
@@ -18,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { getModelInfo } from '@/lib/ai/models';
+import { getPromptMetadata } from '@/lib/ai/prompts/prompt-metadata';
 import { cn } from '@/lib/utils';
 
 import { ModelSelector } from '../features/clarification/model-selector';
@@ -199,6 +201,18 @@ export const RepositoryOverviewGenerator = ({
   const hasReasoningContent = reasoningContent.length > 0;
   const effectiveThinking = thinkingOverride ?? overviewConfig?.thinkingEnabled ?? isThinkingEnabled;
 
+  const promptMetadata = useMemo(() => getPromptMetadata('overview'), []);
+
+  const handleUseAsStartingPoint = useCallback(
+    (prompt: string) => {
+      setCustomPrompt(prompt);
+      if (!isCustomPromptOpen) {
+        setIsCustomPromptOpen(true);
+      }
+    },
+    [isCustomPromptOpen]
+  );
+
   return (
     <div className={cn('space-y-4', className)}>
       {/* Repository Path Display */}
@@ -237,14 +251,31 @@ export const RepositoryOverviewGenerator = ({
             </button>
 
             {isCustomPromptOpen && (
-              <div className={'mt-2'}>
+              <div className={'mt-2 space-y-2'}>
                 <Textarea
                   className={'min-h-24'}
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder={'Add any specific instructions for the AI to follow when generating the overview...'}
                   value={customPrompt}
                 />
+                {/* Default Prompt Viewer - shown when custom prompt section is open */}
+                <DefaultPromptViewer
+                  defaultPrompt={promptMetadata.defaultPrompt}
+                  isDisabled={isGenerating}
+                  onUseAsStartingPoint={handleUseAsStartingPoint}
+                  variables={promptMetadata.variables}
+                />
               </div>
+            )}
+
+            {/* Default Prompt Viewer - shown when custom prompt section is collapsed for discoverability */}
+            {!isCustomPromptOpen && (
+              <DefaultPromptViewer
+                defaultPrompt={promptMetadata.defaultPrompt}
+                isDisabled={isGenerating}
+                onUseAsStartingPoint={handleUseAsStartingPoint}
+                variables={promptMetadata.variables}
+              />
             )}
           </div>
 

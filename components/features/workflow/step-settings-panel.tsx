@@ -3,16 +3,18 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { ChevronDown, Settings2 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
 import type { FullModelId } from '@/lib/ai/models';
 
 import { ModelSelector } from '@/components/features/clarification/model-selector';
+import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 import { useStepConfig, useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
 import { getModelInfo } from '@/lib/ai/models';
+import { getPromptMetadata } from '@/lib/ai/prompts/prompt-metadata';
 import { cn } from '@/lib/utils';
 
 import { ParameterSlider } from './parameter-slider';
@@ -57,6 +59,24 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
       (config.customSystemPrompt !== null && config.customSystemPrompt !== '')
     );
   }, [config]);
+
+  // Track the server value to detect when it changes externally
+  const serverPromptRef = useRef(config?.customSystemPrompt ?? '');
+  const [localPrompt, setLocalPrompt] = useState(config?.customSystemPrompt ?? '');
+
+  // Sync local state when server value changes (e.g., after mutation or different config loads)
+  const serverPrompt = config?.customSystemPrompt ?? '';
+  if (serverPromptRef.current !== serverPrompt) {
+    serverPromptRef.current = serverPrompt;
+    setLocalPrompt(serverPrompt);
+  }
+
+  const promptMetadata = useMemo(() => getPromptMetadata(step), [step]);
+
+  const handleUseAsStartingPoint = (prompt: string) => {
+    setLocalPrompt(prompt);
+    handleCustomPromptBlur(prompt);
+  };
 
   const handleModelChange = (fullModelId: FullModelId) => {
     const [provider, ...modelParts] = fullModelId.split(':');
@@ -232,13 +252,16 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
                 <label className={'text-xs font-medium sm:text-sm'} htmlFor={`custom-prompt-${step}`}>
                   Custom System Prompt
                 </label>
-                {config?.customSystemPrompt && (
+                {localPrompt && (
                   <button
                     className={'text-xs text-muted-foreground hover:text-foreground'}
-                    onClick={() => handleCustomPromptBlur('')}
+                    onClick={() => {
+                      setLocalPrompt('');
+                      handleCustomPromptBlur('');
+                    }}
                     type={'button'}
                   >
-                    Reset
+                    Clear custom prompt (use default)
                   </button>
                 )}
               </div>
@@ -247,11 +270,20 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
               </p>
               <Textarea
                 className={'min-h-24 font-mono text-xs sm:min-h-32'}
-                defaultValue={config?.customSystemPrompt ?? ''}
                 disabled={isLoading || upsertMutation.isPending}
                 id={`custom-prompt-${step}`}
                 onBlur={(e) => handleCustomPromptBlur(e.target.value)}
+                onChange={(e) => setLocalPrompt(e.target.value)}
                 placeholder={'Enter custom system prompt...'}
+                value={localPrompt}
+              />
+
+              {/* Default Prompt Viewer */}
+              <DefaultPromptViewer
+                defaultPrompt={promptMetadata.defaultPrompt}
+                isDisabled={isLoading || upsertMutation.isPending}
+                onUseAsStartingPoint={handleUseAsStartingPoint}
+                variables={promptMetadata.variables}
               />
             </div>
           </div>
