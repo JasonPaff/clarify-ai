@@ -24,6 +24,7 @@ import {
   parseClarificationAnswers,
   parseClarificationQuestions,
   parseClarificationStatus,
+  parseRunOutputContent,
   stringifyClarificationAnalysis,
   stringifyClarificationAnswers,
   stringifyClarificationQuestions,
@@ -48,10 +49,14 @@ interface UseClarificationResult {
   analysis: ClarificationAnalysis | null;
   answers: Array<ClarificationAnswer>;
   cancelClarification: () => void;
+  /** Clear the parse error state */
+  clearParseError: () => void;
   error: null | string;
   isLoading: boolean;
   isQuestionsComplete: boolean;
   isReasoningStreaming: boolean;
+  /** Error from parsing stored JSON data (feature request or run) */
+  parseError: null | string;
   questions: Array<ClarificationQuestion>;
   reasoningText: string;
   requestMoreClarification: (enableThinking?: boolean) => Promise<void>;
@@ -63,6 +68,8 @@ interface UseClarificationResult {
   startClarification: (options?: StartClarificationOptions) => Promise<void>;
   status: ClarificationStatus;
   streamingText: string;
+  /** Whether the current state was restored from a run (for UI feedback) */
+  wasRestored: boolean;
 }
 
 /**
@@ -86,43 +93,93 @@ export function useClarification({
   // Track the feature request ID for reset detection
   const [trackedId, setTrackedId] = useState(featureRequest.id);
 
-  // Helper to derive status from stored data
-  const deriveStatusFromStoredData = (fr: FeatureRequest): ClarificationStatus => {
-    const storedStatus = parseClarificationStatus(fr.clarificationStatus);
-    // If status is completed or skipped, use it
-    if (storedStatus === 'completed' || storedStatus === 'skipped') {
+  // Helper to derive status from parsed data
+  const deriveStatusFromData = (
+    storedStatus: ClarificationStatus,
+    analysisData: ClarificationAnalysis | null,
+    questionsData: Array<ClarificationQuestion>,
+    answersData: Array<ClarificationAnswer>
+  ): ClarificationStatus => {
+    // If status is completed, skipped, or skipped_by_user, use it
+    if (storedStatus === 'completed' || storedStatus === 'skipped' || storedStatus === 'skipped_by_user') {
       return storedStatus;
     }
     // Fallback: if we have answers stored, we're completed
-    const storedAnswers = parseClarificationAnswers(fr.clarificationAnswers);
-    if (storedAnswers.length > 0) {
+    if (answersData.length > 0 && questionsData.length > 0) {
       return 'completed';
     }
     // Another fallback: if we have questions stored but no answers, we're in questions_ready
-    const storedQuestions = parseClarificationQuestions(fr.clarificationQuestions);
-    if (storedQuestions.length > 0) {
+    if (questionsData.length > 0) {
       return 'questions_ready';
+    }
+    // If we have analysis with high detail score, we're skipped
+    if (analysisData && analysisData.detailScore >= 4) {
+      return 'skipped';
     }
     return storedStatus;
   };
 
-  // Parse initial state from feature request
-  const [status, setStatus] = useState<ClarificationStatus>(() => deriveStatusFromStoredData(featureRequest));
-  const [analysis, setAnalysis] = useState<ClarificationAnalysis | null>(() =>
-    parseClarificationAnalysis(featureRequest.clarificationAnalysis)
-  );
-  const [questions, setQuestions] = useState<Array<ClarificationQuestion>>(() =>
-    parseClarificationQuestions(featureRequest.clarificationQuestions)
-  );
-  const [answers, setAnswers] = useState<Array<ClarificationAnswer>>(() =>
-    parseClarificationAnswers(featureRequest.clarificationAnswers)
-  );
+  /**
+   * Initialize state from either currentRun (preferred) or featureRequest.
+   * Returns initial values and any parse errors encountered.
+   */
+  const computeInitialState = (
+    fr: FeatureRequest,
+    run?: FeatureRequestRun
+  ): {
+    analysis: ClarificationAnalysis | null;
+    answers: Array<ClarificationAnswer>;
+    parseError: null | string;
+    questions: Array<ClarificationQuestion>;
+    status: ClarificationStatus;
+    wasRestored: boolean;
+  } => {
+    // If we have a current run, prefer its data (source of truth)
+    if (run?.outputContent) {
+      const parsed = parseRunOutputContent(run.outputContent);
+      const status = deriveStatusFromData('idle', parsed.analysis, parsed.questions, parsed.answers);
+      return {
+        analysis: parsed.analysis,
+        answers: parsed.answers,
+        parseError: parsed.error,
+        questions: parsed.questions,
+        status,
+        wasRestored: true,
+      };
+    }
+
+    // Fall back to feature request columns
+    const storedStatus = parseClarificationStatus(fr.clarificationStatus);
+    const storedAnalysis = parseClarificationAnalysis(fr.clarificationAnalysis);
+    const storedQuestions = parseClarificationQuestions(fr.clarificationQuestions);
+    const storedAnswers = parseClarificationAnswers(fr.clarificationAnswers);
+
+    return {
+      analysis: storedAnalysis,
+      answers: storedAnswers,
+      parseError: null,
+      questions: storedQuestions,
+      status: deriveStatusFromData(storedStatus, storedAnalysis, storedQuestions, storedAnswers),
+      wasRestored: false,
+    };
+  };
+
+  // Compute initial state (prefer currentRun if available)
+  const initialState = computeInitialState(featureRequest, currentRun);
+
+  // Parse initial state from feature request or currentRun
+  const [status, setStatus] = useState<ClarificationStatus>(() => initialState.status);
+  const [analysis, setAnalysis] = useState<ClarificationAnalysis | null>(() => initialState.analysis);
+  const [questions, setQuestions] = useState<Array<ClarificationQuestion>>(() => initialState.questions);
+  const [answers, setAnswers] = useState<Array<ClarificationAnswer>>(() => initialState.answers);
   const [streamingText, setStreamingText] = useState('');
   const [reasoningText, setReasoningText] = useState('');
   const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isQuestionsComplete, setIsQuestionsComplete] = useState(true);
+  const [parseError, setParseError] = useState<null | string>(() => initialState.parseError);
+  const [wasRestored, setWasRestored] = useState(() => initialState.wasRestored);
 
   // Stream handler reference for cleanup
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -134,16 +191,20 @@ export function useClarification({
   // This is the recommended React pattern for resetting state on prop changes
   if (featureRequest.id !== trackedId) {
     setTrackedId(featureRequest.id);
-    setStatus(deriveStatusFromStoredData(featureRequest));
-    setAnalysis(parseClarificationAnalysis(featureRequest.clarificationAnalysis));
-    setQuestions(parseClarificationQuestions(featureRequest.clarificationQuestions));
-    setAnswers(parseClarificationAnswers(featureRequest.clarificationAnswers));
+    // Recompute initial state with new feature request and current run
+    const newState = computeInitialState(featureRequest, currentRun);
+    setStatus(newState.status);
+    setAnalysis(newState.analysis);
+    setQuestions(newState.questions);
+    setAnswers(newState.answers);
     setStreamingText('');
     setReasoningText('');
     setIsReasoningStreaming(false);
     setError(null);
     setIsLoading(false);
     setIsQuestionsComplete(true);
+    setParseError(newState.parseError);
+    setWasRestored(newState.wasRestored);
   }
 
   // Reset run tracking ref when feature request changes
@@ -194,57 +255,39 @@ export function useClarification({
 
     // Use queueMicrotask to defer the state updates to after the current render
     queueMicrotask(() => {
-      // Parse the run's outputContent
-      let restoredAnalysis: ClarificationAnalysis | null = null;
-      let restoredQuestions: Array<ClarificationQuestion> = [];
-      let restoredAnswers: Array<ClarificationAnswer> = [];
-      let restoredStatus: ClarificationStatus = 'idle';
+      // Parse the run's outputContent using the helper
+      const parsed = parseRunOutputContent(currentRun.outputContent);
 
-      if (currentRun.outputContent) {
-        try {
-          const parsed = JSON.parse(currentRun.outputContent) as {
-            analysis?: ClarificationAnalysis;
-            answers?: Array<ClarificationAnswer>;
-            questions?: Array<ClarificationQuestion>;
-          };
-
-          restoredAnalysis = parsed.analysis ?? null;
-          restoredQuestions = parsed.questions ?? [];
-          restoredAnswers = parsed.answers ?? [];
-
-          // Determine status based on restored data
-          if (restoredAnswers.length > 0 && restoredQuestions.length > 0) {
-            restoredStatus = 'completed';
-          } else if (restoredQuestions.length > 0) {
-            restoredStatus = 'questions_ready';
-          } else if (restoredAnalysis && restoredAnalysis.detailScore >= 4) {
-            restoredStatus = 'skipped';
-          }
-        } catch {
-          setError('Failed to restore run data');
-          return;
-        }
+      // If there was a parse error, set it and don't proceed with restore
+      if (parsed.error) {
+        setParseError(parsed.error);
+        return;
       }
 
+      // Determine status based on restored data
+      const restoredStatus = deriveStatusFromData('idle', parsed.analysis, parsed.questions, parsed.answers);
+
       // Update local state with restored data
-      setAnalysis(restoredAnalysis);
-      setQuestions(restoredQuestions);
-      setAnswers(restoredAnswers);
+      setAnalysis(parsed.analysis);
+      setQuestions(parsed.questions);
+      setAnswers(parsed.answers);
       setStatus(restoredStatus);
       setStreamingText('');
       setReasoningText('');
       setIsReasoningStreaming(false);
       setError(null);
       setIsLoading(false);
+      setParseError(null);
+      setWasRestored(true);
       runIdRef.current = currentRun.id;
 
       // Update the feature request in the database with restored clarification data
       void updateMutation.mutateAsync({
         data: {
-          clarificationAnalysis: restoredAnalysis ? stringifyClarificationAnalysis(restoredAnalysis) : null,
-          clarificationAnswers: restoredAnswers.length > 0 ? stringifyClarificationAnswers(restoredAnswers) : null,
+          clarificationAnalysis: parsed.analysis ? stringifyClarificationAnalysis(parsed.analysis) : null,
+          clarificationAnswers: parsed.answers.length > 0 ? stringifyClarificationAnswers(parsed.answers) : null,
           clarificationQuestions:
-            restoredQuestions.length > 0 ? stringifyClarificationQuestions(restoredQuestions) : null,
+            parsed.questions.length > 0 ? stringifyClarificationQuestions(parsed.questions) : null,
           clarificationStatus: restoredStatus,
         },
         id: featureRequest.id,
@@ -278,6 +321,8 @@ export function useClarification({
       setAnswers([]);
       setQuestions([]);
       setAnalysis(null);
+      setParseError(null);
+      setWasRestored(false);
 
       // Build parameters object for run record
       const parameters = JSON.stringify({
@@ -828,63 +873,52 @@ Please generate additional clarifying questions that:
     setIsReasoningStreaming(false);
     setError(null);
     setIsLoading(false);
+    setParseError(null);
+    setWasRestored(false);
     runIdRef.current = null;
+  }, []);
+
+  // Clear parse error (allows recovery from corrupted data)
+  const clearParseError = useCallback(() => {
+    setParseError(null);
   }, []);
 
   // Restore state from a previous run (public API)
   const restoreFromRun = useCallback(
     async (run: FeatureRequestRun) => {
-      // Parse the run's outputContent
-      let restoredAnalysis: ClarificationAnalysis | null = null;
-      let restoredQuestions: Array<ClarificationQuestion> = [];
-      let restoredAnswers: Array<ClarificationAnswer> = [];
-      let restoredStatus: ClarificationStatus = 'idle';
+      // Parse the run's outputContent using the helper
+      const parsed = parseRunOutputContent(run.outputContent);
 
-      if (run.outputContent) {
-        try {
-          const parsed = JSON.parse(run.outputContent) as {
-            analysis?: ClarificationAnalysis;
-            answers?: Array<ClarificationAnswer>;
-            questions?: Array<ClarificationQuestion>;
-          };
-
-          restoredAnalysis = parsed.analysis ?? null;
-          restoredQuestions = parsed.questions ?? [];
-          restoredAnswers = parsed.answers ?? [];
-
-          // Determine status based on restored data
-          if (restoredAnswers.length > 0 && restoredQuestions.length > 0) {
-            restoredStatus = 'completed';
-          } else if (restoredQuestions.length > 0) {
-            restoredStatus = 'questions_ready';
-          } else if (restoredAnalysis && restoredAnalysis.detailScore >= 4) {
-            restoredStatus = 'skipped';
-          }
-        } catch {
-          setError('Failed to restore run data');
-          return;
-        }
+      // If there was a parse error, set it and don't proceed with restore
+      if (parsed.error) {
+        setParseError(parsed.error);
+        return;
       }
 
+      // Determine status based on restored data
+      const restoredStatus = deriveStatusFromData('idle', parsed.analysis, parsed.questions, parsed.answers);
+
       // Update local state with restored data
-      setAnalysis(restoredAnalysis);
-      setQuestions(restoredQuestions);
-      setAnswers(restoredAnswers);
+      setAnalysis(parsed.analysis);
+      setQuestions(parsed.questions);
+      setAnswers(parsed.answers);
       setStatus(restoredStatus);
       setStreamingText('');
       setReasoningText('');
       setIsReasoningStreaming(false);
       setError(null);
       setIsLoading(false);
+      setParseError(null);
+      setWasRestored(true);
       runIdRef.current = run.id;
 
       // Update the feature request in the database with restored clarification data
       await updateMutation.mutateAsync({
         data: {
-          clarificationAnalysis: restoredAnalysis ? stringifyClarificationAnalysis(restoredAnalysis) : null,
-          clarificationAnswers: restoredAnswers.length > 0 ? stringifyClarificationAnswers(restoredAnswers) : null,
+          clarificationAnalysis: parsed.analysis ? stringifyClarificationAnalysis(parsed.analysis) : null,
+          clarificationAnswers: parsed.answers.length > 0 ? stringifyClarificationAnswers(parsed.answers) : null,
           clarificationQuestions:
-            restoredQuestions.length > 0 ? stringifyClarificationQuestions(restoredQuestions) : null,
+            parsed.questions.length > 0 ? stringifyClarificationQuestions(parsed.questions) : null,
           clarificationStatus: restoredStatus,
         },
         id: featureRequest.id,
@@ -906,10 +940,12 @@ Please generate additional clarifying questions that:
     analysis,
     answers,
     cancelClarification,
+    clearParseError,
     error,
     isLoading,
     isQuestionsComplete,
     isReasoningStreaming,
+    parseError,
     questions,
     reasoningText,
     requestMoreClarification,
@@ -921,5 +957,6 @@ Please generate additional clarifying questions that:
     startClarification,
     status,
     streamingText,
+    wasRestored,
   };
 }

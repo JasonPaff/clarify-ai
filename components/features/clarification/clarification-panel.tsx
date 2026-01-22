@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, Loader2, MessageCirclePlus, SkipForward, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, History, Loader2, MessageCirclePlus, SkipForward, X } from 'lucide-react';
 import { useEffect } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -67,10 +67,12 @@ export const ClarificationPanel = ({
     analysis,
     answers,
     cancelClarification,
+    clearParseError,
     error,
     isLoading,
     isQuestionsComplete,
     isReasoningStreaming,
+    parseError,
     questions,
     reasoningText,
     requestMoreClarification,
@@ -81,6 +83,7 @@ export const ClarificationPanel = ({
     startClarification,
     status,
     streamingText,
+    wasRestored,
   } = useClarification({ contextFiles, currentRun, featureRequest, modelConfig, repositoryOverviews });
 
   // Register/unregister AI operation with workflow context when loading state changes
@@ -146,6 +149,11 @@ export const ClarificationPanel = ({
     await requestMoreClarification(effectiveThinking);
   };
 
+  const handleResetFromError = () => {
+    clearParseError();
+    resetClarification();
+  };
+
   const allQuestionsAnswered =
     isQuestionsComplete &&
     questions.length > 0 &&
@@ -153,6 +161,8 @@ export const ClarificationPanel = ({
   const hasReasoningContent = reasoningText.length > 0;
   const hasModelConfigured = modelConfig?.modelId !== null;
   const isReady = !isConfigLoading && hasModelConfigured;
+  const _showRestoredIndicator = wasRestored && status !== 'idle' && status !== 'analyzing';
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const handleReadOnlyAnswerChange = () => {};
 
   return (
@@ -172,6 +182,28 @@ export const ClarificationPanel = ({
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {/* Parse error display with recovery option */}
+      {parseError && (
+        <Alert variant={'destructive'}>
+          <AlertCircle className={'size-4'} />
+          <AlertTitle>Data Recovery Error</AlertTitle>
+          <AlertDescription className={'space-y-2'}>
+            <p>{parseError}</p>
+            <Button onClick={handleResetFromError} size={'sm'} variant={'outline'}>
+              Reset Clarification
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Restored from run indicator */}
+      {_showRestoredIndicator && (
+        <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
+          <History className={'size-3'} />
+          <span>Restored from previous run</span>
+        </div>
       )}
 
       {/* Idle state: Start button */}

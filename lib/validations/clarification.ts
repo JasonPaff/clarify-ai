@@ -68,6 +68,12 @@ export const clarificationAnalysisSchema = z.object({
 
 export type ClarificationAnalysis = z.infer<typeof clarificationAnalysisSchema>;
 
+// Parse result type for functions that need error information
+export interface ParseResult<T> {
+  data: T;
+  error: null | string;
+}
+
 export function parseClarificationAnalysis(json: null | string | undefined): ClarificationAnalysis | null {
   if (!json) return null;
   try {
@@ -78,6 +84,25 @@ export function parseClarificationAnalysis(json: null | string | undefined): Cla
   }
 }
 
+/**
+ * Parse clarification analysis with error reporting.
+ * Returns both the parsed data (or null) and any error that occurred.
+ */
+export function parseClarificationAnalysisWithError(
+  json: null | string | undefined
+): ParseResult<ClarificationAnalysis | null> {
+  if (!json) return { data: null, error: null };
+  try {
+    const parsed = JSON.parse(json);
+    return { data: clarificationAnalysisSchema.parse(parsed), error: null };
+  } catch (e) {
+    return {
+      data: null,
+      error: `Failed to parse clarification analysis: ${e instanceof Error ? e.message : 'Invalid JSON'}`,
+    };
+  }
+}
+
 export function parseClarificationAnswers(json: null | string | undefined): ClarificationAnswers {
   if (!json) return [];
   try {
@@ -85,6 +110,23 @@ export function parseClarificationAnswers(json: null | string | undefined): Clar
     return clarificationAnswersSchema.parse(parsed);
   } catch {
     return [];
+  }
+}
+
+/**
+ * Parse clarification answers with error reporting.
+ * Returns both the parsed data (empty array fallback) and any error that occurred.
+ */
+export function parseClarificationAnswersWithError(json: null | string | undefined): ParseResult<ClarificationAnswers> {
+  if (!json) return { data: [], error: null };
+  try {
+    const parsed = JSON.parse(json);
+    return { data: clarificationAnswersSchema.parse(parsed), error: null };
+  } catch (e) {
+    return {
+      data: [],
+      error: `Failed to parse clarification answers: ${e instanceof Error ? e.message : 'Invalid JSON'}`,
+    };
   }
 }
 
@@ -99,10 +141,101 @@ export function parseClarificationQuestions(json: null | string | undefined): Cl
   }
 }
 
+/**
+ * Parse clarification questions with error reporting.
+ * Returns both the parsed data (empty array fallback) and any error that occurred.
+ */
+export function parseClarificationQuestionsWithError(
+  json: null | string | undefined
+): ParseResult<ClarificationQuestions> {
+  if (!json) return { data: [], error: null };
+  try {
+    const parsed = JSON.parse(json);
+    return { data: clarificationQuestionsSchema.parse(parsed), error: null };
+  } catch (e) {
+    return {
+      data: [],
+      error: `Failed to parse clarification questions: ${e instanceof Error ? e.message : 'Invalid JSON'}`,
+    };
+  }
+}
+
 export function parseClarificationStatus(status: null | string | undefined): ClarificationStatus {
   if (!status) return 'idle';
   const result = clarificationStatusSchema.safeParse(status);
   return result.success ? result.data : 'idle';
+}
+
+/**
+ * Parse run outputContent JSON with error reporting.
+ * Returns structured data and any parse error.
+ */
+export function parseRunOutputContent(outputContent: null | string | undefined): {
+  analysis: ClarificationAnalysis | null;
+  answers: ClarificationAnswers;
+  error: null | string;
+  questions: ClarificationQuestions;
+} {
+  if (!outputContent) {
+    return { analysis: null, answers: [], error: null, questions: [] };
+  }
+
+  try {
+    const parsed = JSON.parse(outputContent) as {
+      analysis?: unknown;
+      answers?: unknown;
+      questions?: unknown;
+    };
+
+    const errors: Array<string> = [];
+
+    // Parse analysis
+    let analysis: ClarificationAnalysis | null = null;
+    if (parsed.analysis) {
+      const result = clarificationAnalysisSchema.safeParse(parsed.analysis);
+      if (result.success) {
+        analysis = result.data;
+      } else {
+        errors.push('Invalid analysis data');
+      }
+    }
+
+    // Parse questions
+    let questions: ClarificationQuestions = [];
+    if (parsed.questions) {
+      const result = clarificationQuestionsSchema.safeParse(parsed.questions);
+      if (result.success) {
+        questions = result.data;
+      } else {
+        errors.push('Invalid questions data');
+      }
+    }
+
+    // Parse answers
+    let answers: ClarificationAnswers = [];
+    if (parsed.answers) {
+      const result = clarificationAnswersSchema.safeParse(parsed.answers);
+      if (result.success) {
+        answers = result.data;
+      } else {
+        errors.push('Invalid answers data');
+      }
+    }
+
+    return {
+      analysis,
+      answers,
+      error: errors.length > 0 ? `Run data corrupted: ${errors.join(', ')}` : null,
+      questions,
+    };
+  } catch (e) {
+    return {
+      analysis: null,
+      answers: [],
+      error: `Failed to parse run output: ${e instanceof Error ? e.message : 'Invalid JSON'}`,
+      questions: [],
+    };
+  }
 }
 
 export function stringifyClarificationAnalysis(analysis: ClarificationAnalysis): string {
