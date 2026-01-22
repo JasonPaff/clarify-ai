@@ -18,9 +18,14 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
   anthropic: [
     { id: 'claude-opus-4-5-20251101', name: 'Claude Opus 4.5', supportsThinking: true },
     { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet 4.5', supportsThinking: true },
+    { id: 'claude-opus-4-1-20250805', name: 'Claude Opus 4.1', supportsThinking: true },
     { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', supportsThinking: true },
+    { id: 'claude-opus-4-20250514', name: 'Claude Opus 4', supportsThinking: true },
+    { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5', supportsThinking: true },
+    { id: 'claude-3-7-sonnet-20250219', name: 'Claude Sonnet 3.7', supportsThinking: true },
     { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', supportsThinking: false },
     { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', supportsThinking: false },
+    { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', supportsThinking: false },
   ],
   // Enterprise providers
   azure: [
@@ -66,10 +71,15 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
   ],
 
   google: [
+    { id: 'gemini-3-pro', name: 'Gemini 3 Pro', supportsThinking: true },
+    { id: 'gemini-3-flash', name: 'Gemini 3 Flash', supportsThinking: true },
     { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', supportsThinking: true },
     { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', supportsThinking: true },
     { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', supportsThinking: false },
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', supportsThinking: false },
+    { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite', supportsThinking: false },
+    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', supportsThinking: false },
+    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', supportsThinking: false },
   ],
   groq: [
     { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B Versatile', supportsThinking: false },
@@ -104,12 +114,18 @@ export const AI_MODELS: Partial<Record<ApiKeyProvider, Array<AIModel>>> = {
     { id: 'gpt-5.1', name: 'GPT-5.1', supportsThinking: true },
     { id: 'gpt-5', name: 'GPT-5', supportsThinking: true },
     { id: 'gpt-5-mini', name: 'GPT-5 Mini', supportsThinking: true },
+    { id: 'o3', name: 'o3', supportsThinking: true },
+    { id: 'o3-pro', name: 'o3 Pro', supportsThinking: true },
+    { id: 'o3-mini', name: 'o3 Mini', supportsThinking: true },
+    { id: 'o4-mini', name: 'o4-mini', supportsThinking: true },
+    { id: 'o1', name: 'o1', supportsThinking: true },
     { id: 'gpt-4.1', name: 'GPT-4.1', supportsThinking: false },
     { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', supportsThinking: false },
-    { id: 'o3-mini', name: 'o3 Mini', supportsThinking: true },
-    { id: 'o1', name: 'o1', supportsThinking: true },
+    { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', supportsThinking: false },
+    { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', supportsThinking: false },
     { id: 'gpt-4o', name: 'GPT-4o', supportsThinking: false },
     { id: 'gpt-4o-mini', name: 'GPT-4o Mini', supportsThinking: false },
+    { id: 'gpt-4', name: 'GPT-4', supportsThinking: false },
   ],
   openrouter: [
     // Anthropic models via OpenRouter
