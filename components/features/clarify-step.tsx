@@ -1,12 +1,13 @@
 'use client';
 
-import type { MutableRefObject } from 'react';
+import type { RefObject } from 'react';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
+import type { ClarificationContextFile, ClarificationRepositoryOverview } from '@/types/electron';
 
 import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { ClarificationCostEstimate } from '@/components/features/clarification/cost-estimate';
@@ -17,14 +18,21 @@ import { StaleWarningBanner } from '@/components/features/workflow/stale-warning
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { ClarifyStepSkeleton } from '@/components/skeletons/clarify-step-skeleton';
+import { useContextFiles } from '@/hooks/queries/use-feature-request-context-files';
+import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { useRepositories } from '@/hooks/queries/use-repositories';
+import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/hooks/queries/use-repository-overviews';
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
+import { useElectronFs } from '@/hooks/useElectron';
+
+const MAX_CONTEXT_FILE_EXCERPT_CHARS = 2000;
 
 interface ClarifyStepProps {
   /** Ref to register the cancel callback for external cancellation */
-  cancelCallbackRef?: MutableRefObject<(() => void) | null>;
+  cancelCallbackRef?: RefObject<(() => void) | null>;
   featureRequest: FeatureRequest;
   // projectId is accepted for API consistency with other step components
   // but not currently used by ClarificationPanel
@@ -45,6 +53,12 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
 
   const { data: config, isLoading: isConfigLoading } = useStepConfig(featureRequest.projectId, 'refine');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'refine');
+  const { data: contextFiles = [] } = useContextFiles(featureRequest.id);
+  const { data: repositories } = useRepositories(featureRequest.projectId);
+  const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
+  const { data: overviewStatusMap } = useRepositoryOverviewStatuses(featureRequestRepositories ?? []);
+  const { data: overviewContentsMap } = useRepositoryOverviewContents(featureRequestRepositories ?? []);
+  const { isElectron, readFile } = useElectronFs();
   const updateMutation = useUpdateFeatureRequest();
 
   // Use the centralized stale steps hook
@@ -67,6 +81,70 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
   const saveError = updateMutation.error;
 
   const isRefineStale = isStale('refine');
+
+  const selectedRepositoryIds = useMemo(() => {
+    return featureRequestRepositories ?? [];
+  }, [featureRequestRepositories]);
+
+  const repositoryOverviews = useMemo((): Array<ClarificationRepositoryOverview> => {
+    if (!repositories || !overviewStatusMap) return [];
+
+    return selectedRepositoryIds
+      .filter((repoId) => overviewStatusMap.get(repoId)?.hasOverview)
+      .map((repoId) => {
+        const repo = repositories.find((item) => item.id === repoId);
+        return {
+          overview: overviewContentsMap?.get(repoId) ?? '',
+          repositoryId: repoId,
+          repositoryName: repo?.name ?? 'Unknown',
+          repositoryPath: repo?.path ?? '',
+        };
+      });
+  }, [overviewContentsMap, overviewStatusMap, repositories, selectedRepositoryIds]);
+
+  const includedContextFiles = useMemo(() => {
+    return contextFiles.filter((file) => file.includedInContext && file.fileType !== 'image');
+  }, [contextFiles]);
+
+  const [contextFileExcerpts, setContextFileExcerpts] = useState<Array<ClarificationContextFile>>([]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadContextFiles = async () => {
+      if (!isElectron) return;
+
+      if (includedContextFiles.length === 0) {
+        setContextFileExcerpts([]);
+        return;
+      }
+
+      const results = await Promise.all(
+        includedContextFiles.map(async (file) => {
+          const result = await readFile(file.filePath);
+          const excerpt =
+            result.success && result.content ? result.content.slice(0, MAX_CONTEXT_FILE_EXCERPT_CHARS) : undefined;
+
+          return {
+            displayName: file.displayName,
+            excerpt,
+            filePath: file.filePath,
+            fileType: file.fileType,
+          };
+        })
+      );
+
+      if (isActive) {
+        setContextFileExcerpts(results);
+      }
+    };
+
+    void loadContextFiles();
+
+    return () => {
+      isActive = false;
+    };
+  }, [includedContextFiles, isElectron, readFile]);
 
   const modelConfig = useMemo(() => {
     if (!config) return null;
@@ -177,6 +255,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
           onReset={handleErrorBoundaryReset}
         >
           <ClarificationPanel
+            contextFiles={contextFileExcerpts}
             currentRun={currentRun ?? undefined}
             featureRequest={featureRequest}
             isConfigLoading={isConfigLoading}
@@ -184,6 +263,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
             modelConfig={modelConfig}
             onCancelRegister={handleCancelRegister}
             onComplete={handleClarificationComplete}
+            repositoryOverviews={repositoryOverviews}
           />
         </ErrorBoundary>
 

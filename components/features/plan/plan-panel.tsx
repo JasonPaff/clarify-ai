@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertCircle, CheckCircle2, ClipboardList, Loader2, RefreshCw } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
@@ -13,6 +13,7 @@ import { ExportDialog } from '@/components/features/plan/export-dialog';
 import { PlanCostEstimate } from '@/components/features/plan/plan-cost-estimate';
 import { PlanProgress } from '@/components/features/plan/plan-progress';
 import { PlanResults } from '@/components/features/plan/plan-results';
+import { buildClarificationContext } from '@/lib/ai/clarification-context';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -86,7 +87,9 @@ export const PlanPanel = ({
   const discoveredFiles = parseDiscoveredFiles(featureRequest.researchFindings);
 
   // Get clarification context from the feature request
-  const clarificationContext = featureRequest.clarificationAnswers ?? undefined;
+  const clarificationContext = useMemo(() => {
+    return buildClarificationContext(featureRequest.clarificationQuestions, featureRequest.clarificationAnswers);
+  }, [featureRequest.clarificationAnswers, featureRequest.clarificationQuestions]);
 
   const handleStartGeneration = async () => {
     if (!modelConfig?.modelId) return;
@@ -95,7 +98,7 @@ export const PlanPanel = ({
     const effectiveThinking = isModelSupportsThinking ? modelConfig.thinkingEnabled : false;
 
     await startPlanGeneration({
-      clarificationContext,
+      clarificationContext: clarificationContext ?? undefined,
       discoveredFiles,
       enableThinking: effectiveThinking,
       repositoryOverviews,

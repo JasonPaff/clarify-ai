@@ -21,7 +21,12 @@ export type {
 } from '../db/schema/step-configurations.schema';
 
 // Re-export AI clarification types for renderer use
-export type { ClarificationGenerateRequest, ClarificationStreamChunk } from '../electron/ipc/ai-clarification.handlers';
+export type {
+  ClarificationContextFile,
+  ClarificationGenerateRequest,
+  ClarificationRepositoryOverview,
+  ClarificationStreamChunk,
+} from '../electron/ipc/ai-clarification.handlers';
 
 // Re-export AI discovery types for renderer use
 export type {

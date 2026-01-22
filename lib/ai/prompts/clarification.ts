@@ -8,6 +8,7 @@ export const DEFAULT_CLARIFICATION_PROMPT = `You are an expert software architec
    - What context is provided
    - What technical areas might be affected
    - What details are missing or ambiguous
+   - Any relevant context from repository overviews and provided files
 
 2. **Assess Detail Level**: Score the request from 1-5:
    - 1: Very vague, lacks almost all necessary details
@@ -31,16 +32,85 @@ Call the \`generateClarifyingQuestions\` tool with:
 - The detail score (1-5)
 - Your reasoning for the score
 - Any ambiguities you identified
-- Areas of the codebase that might be affected
-- The clarifying questions (if score < 4)
+   - Areas of the codebase that might be affected
+   - The clarifying questions (if score < 4)
+
+## Repository Context
+
+{repositoryOverviews}
+
+## Additional Context Files
+
+{contextFiles}
 
 ## Feature Request
 
 {featureRequest}`;
 
-// Build the prompt with the feature request
-export function buildClarificationPrompt(featureRequest: string, customPrompt?: string): string {
+/** Context file data for clarification prompt */
+export interface ClarificationContextFile {
+  displayName: string;
+  excerpt?: string;
+  filePath: string;
+  fileType: string;
+}
+
+/** Repository overview data for clarification prompt */
+export interface ClarificationRepositoryOverview {
+  overview: string;
+  repositoryId: number;
+  repositoryName: string;
+  repositoryPath: string;
+}
+
+// Build the prompt with the feature request and optional context
+export function buildClarificationPrompt(
+  featureRequest: string,
+  repositoryOverviews?: Array<ClarificationRepositoryOverview>,
+  contextFiles?: Array<ClarificationContextFile>,
+  customPrompt?: string
+): string {
   // Use customPrompt only if it's a non-empty string, otherwise use the default
   const template = customPrompt && customPrompt.trim() ? customPrompt : DEFAULT_CLARIFICATION_PROMPT;
-  return template.replace('{featureRequest}', featureRequest);
+
+  const repositoryOverviewsSection = buildRepositoryOverviewsSection(repositoryOverviews ?? []);
+  const contextFilesSection = buildContextFilesSection(contextFiles ?? []);
+
+  return template
+    .replace('{repositoryOverviews}', repositoryOverviewsSection)
+    .replace('{contextFiles}', contextFilesSection)
+    .replace('{featureRequest}', featureRequest);
+}
+
+function buildContextFilesSection(contextFiles: Array<ClarificationContextFile>): string {
+  if (contextFiles.length === 0) {
+    return 'No additional context files provided.';
+  }
+
+  const sections = contextFiles.map((file) => {
+    const excerpt = file.excerpt?.trim();
+    const excerptSection = excerpt ? `\n\nExcerpt (truncated):\n${excerpt}` : '\n\nExcerpt not available.';
+
+    return `### ${file.displayName}
+**Path**: ${file.filePath}
+**Type**: ${file.fileType}${excerptSection}`;
+  });
+
+  return sections.join('\n\n---\n\n');
+}
+
+function buildRepositoryOverviewsSection(repositoryOverviews: Array<ClarificationRepositoryOverview>): string {
+  if (repositoryOverviews.length === 0) {
+    return 'No repository overviews available.';
+  }
+
+  const sections = repositoryOverviews.map((repo) => {
+    return `### ${repo.repositoryName}
+**Path**: ${repo.repositoryPath}
+**Repository ID**: ${repo.repositoryId}
+
+${repo.overview}`;
+  });
+
+  return sections.join('\n\n---\n\n');
 }

@@ -2,7 +2,11 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron';
 
 import { ipcMain } from 'electron';
 
+import type { ClarificationContextFile, ClarificationRepositoryOverview } from '@/lib/ai/prompts/clarification';
+
 import type { ApiKeyProvider } from './lib/provider-types';
+
+export type { ClarificationContextFile, ClarificationRepositoryOverview } from '../../lib/ai/prompts/clarification';
 
 import { IpcChannels } from './channels';
 import { buildThinkingProviderOptions } from './lib/ai-utils';
@@ -10,12 +14,14 @@ import { createProvider, getProviderCredentials, parseModelId } from './lib/prov
 
 /** Request payload for generating clarifying questions */
 export interface ClarificationGenerateRequest {
+  contextFiles?: Array<ClarificationContextFile>;
   customPrompt?: string;
   enableThinking?: boolean;
   featureRequest: string;
   featureRequestId: number;
   maxTokens?: number;
   modelId: string; // Format: "provider:modelId"
+  repositoryOverviews?: Array<ClarificationRepositoryOverview>;
   temperature?: number;
   thinkingBudget?: number;
 }
@@ -53,11 +59,13 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
       }
 
       const {
+        contextFiles,
         customPrompt,
         enableThinking = true,
         featureRequest,
         maxTokens,
         modelId,
+        repositoryOverviews,
         temperature,
         thinkingBudget,
       } = request;
@@ -85,7 +93,7 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         const providerInstance = await createProvider(provider, credentials);
 
         // Build the prompt
-        const prompt = buildClarificationPrompt(featureRequest, customPrompt);
+        const prompt = buildClarificationPrompt(featureRequest, repositoryOverviews, contextFiles, customPrompt);
 
         // Check if the model supports thinking and build provider options
         // Only enable thinking when both the model supports it AND the user has enabled it

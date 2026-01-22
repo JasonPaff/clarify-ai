@@ -1,6 +1,6 @@
 'use client';
 
-import type { MutableRefObject } from 'react';
+import type { RefObject } from 'react';
 
 import { AlertCircle } from 'lucide-react';
 import { useEffectEvent } from 'react';
@@ -34,10 +34,11 @@ import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useDiscovery } from '@/hooks/use-discovery';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
+import { buildClarificationContext } from '@/lib/ai/clarification-context';
 
 interface DiscoverStepProps {
   /** Ref to register the cancel callback for external cancellation */
-  cancelCallbackRef?: MutableRefObject<(() => void) | null>;
+  cancelCallbackRef?: RefObject<(() => void) | null>;
   featureRequest: FeatureRequest;
   projectId: number;
 }
@@ -95,6 +96,10 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
   });
 
   const isDiscoverStale = isStale('research');
+
+  const clarificationContext = useMemo(() => {
+    return buildClarificationContext(featureRequest.clarificationQuestions, featureRequest.clarificationAnswers);
+  }, [featureRequest.clarificationAnswers, featureRequest.clarificationQuestions]);
 
   // Build model config from step configuration
   const modelConfig = useMemo(() => {
@@ -257,11 +262,13 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     }
 
     await startDiscovery({
+      clarificationContext: clarificationContext ?? undefined,
       enableThinking: modelConfig?.thinkingEnabled,
       repositoryOverviews,
       scopeConfig,
     });
   }, [
+    clarificationContext,
     repositories,
     overviewStatusMap,
     overviewContentsMap,
@@ -382,9 +389,8 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
         {/* Missing Overview Warning */}
         {hasRepositoriesMissingOverviews && (
           <div
-            className={
-              'flex items-start gap-3 rounded-md border border-amber-500/50 bg-amber-500/5 p-3 text-sm text-amber-600 dark:text-amber-400'
-            }
+            className={`flex items-start gap-3 rounded-md border border-amber-500/50
+               bg-amber-500/5 p-3 text-sm text-amber-600 dark:text-amber-400`}
           >
             <span className={'font-medium'}>Missing Overviews:</span>
             <span>

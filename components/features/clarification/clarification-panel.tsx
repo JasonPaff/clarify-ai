@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
+import type { ClarificationContextFile, ClarificationRepositoryOverview } from '@/types/electron';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { useWorkflow } from '@/components/providers/workflow-provider';
@@ -31,6 +32,7 @@ export interface ClarificationModelConfig {
 }
 
 type ClarificationPanelProps = ClassName & {
+  contextFiles?: Array<ClarificationContextFile>;
   currentRun?: FeatureRequestRun;
   featureRequest: FeatureRequest;
   isConfigLoading?: boolean;
@@ -39,6 +41,7 @@ type ClarificationPanelProps = ClassName & {
   onCancelRegister?: (cancelFn: () => void) => void;
   onClose?: () => void;
   onComplete?: () => void;
+  repositoryOverviews?: Array<ClarificationRepositoryOverview>;
 };
 
 /**
@@ -48,6 +51,7 @@ type ClarificationPanelProps = ClassName & {
  */
 export const ClarificationPanel = ({
   className,
+  contextFiles,
   currentRun,
   featureRequest,
   isConfigLoading = false,
@@ -55,6 +59,7 @@ export const ClarificationPanel = ({
   onCancelRegister,
   onClose,
   onComplete,
+  repositoryOverviews,
 }: ClarificationPanelProps) => {
   const { registerAiOperation, unregisterAiOperation } = useWorkflow();
 
@@ -76,7 +81,7 @@ export const ClarificationPanel = ({
     startClarification,
     status,
     streamingText,
-  } = useClarification({ currentRun, featureRequest, modelConfig });
+  } = useClarification({ contextFiles, currentRun, featureRequest, modelConfig, repositoryOverviews });
 
   // Register/unregister AI operation with workflow context when loading state changes
   useEffect(() => {

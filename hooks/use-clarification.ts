@@ -11,7 +11,11 @@ import type {
   ClarificationQuestion,
   ClarificationStatus,
 } from '@/lib/validations/clarification';
-import type { ClarificationStreamChunk } from '@/types/electron';
+import type {
+  ClarificationContextFile,
+  ClarificationRepositoryOverview,
+  ClarificationStreamChunk,
+} from '@/types/electron';
 
 import { useCreateRun, useSetCurrentRun, useUpdateRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
@@ -33,9 +37,11 @@ interface StartClarificationOptions {
 }
 
 interface UseClarificationOptions {
+  contextFiles?: Array<ClarificationContextFile>;
   currentRun?: FeatureRequestRun;
   featureRequest: FeatureRequest;
   modelConfig: ClarificationModelConfig | null;
+  repositoryOverviews?: Array<ClarificationRepositoryOverview>;
 }
 
 interface UseClarificationResult {
@@ -65,9 +71,11 @@ interface UseClarificationResult {
  * Model configuration is now passed in from the parent component via modelConfig.
  */
 export function useClarification({
+  contextFiles,
   currentRun,
   featureRequest,
   modelConfig,
+  repositoryOverviews,
 }: UseClarificationOptions): UseClarificationResult {
   const { api, isElectron } = useElectron();
   const updateMutation = useUpdateFeatureRequest();
@@ -406,12 +414,14 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
 
       // Start generation with config from step settings
       const result = await api.ai.clarification.generate({
+        contextFiles,
         customPrompt,
         enableThinking,
         featureRequest: featureRequest.rawRequest ?? '',
         featureRequestId: featureRequest.id,
         maxTokens: modelConfig.maxTokens,
         modelId: modelConfig.modelId,
+        repositoryOverviews,
         temperature: modelConfig.temperature,
         thinkingBudget: modelConfig.thinkingBudget,
       });
@@ -441,11 +451,13 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
     },
     [
       api,
+      contextFiles,
       createRunMutation,
       featureRequest.id,
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      repositoryOverviews,
       setCurrentRunMutation,
       updateRunMutation,
     ]
@@ -645,12 +657,14 @@ Please generate additional clarifying questions that:
 
       // Start generation with context from step settings
       const result = await api.ai.clarification.generate({
+        contextFiles,
         customPrompt: combinedPrompt,
         enableThinking,
         featureRequest: featureRequest.rawRequest ?? '',
         featureRequestId: featureRequest.id,
         maxTokens: modelConfig.maxTokens,
         modelId: modelConfig.modelId,
+        repositoryOverviews,
         temperature: modelConfig.temperature,
         thinkingBudget: modelConfig.thinkingBudget,
       });
@@ -683,12 +697,14 @@ Please generate additional clarifying questions that:
       analysis,
       answers,
       api,
+      contextFiles,
       createRunMutation,
       featureRequest.id,
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
       questions,
+      repositoryOverviews,
       setCurrentRunMutation,
       updateRunMutation,
     ]
