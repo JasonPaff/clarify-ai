@@ -5,8 +5,10 @@ import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
 import type { CreateProjectFormValues } from '@/lib/validations/project';
 
+import { useGlobalModelDefaults } from '@/components/providers/global-model-defaults-provider';
 import {
   DialogBackdrop,
   DialogClose,
@@ -19,6 +21,7 @@ import {
 } from '@/components/ui/dialog';
 import { IconButton } from '@/components/ui/icon-button';
 import { useCreateProject } from '@/hooks/queries/use-projects';
+import { useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
 
 import { CreateProjectForm } from './create-project-form';
 
@@ -29,6 +32,8 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
 
   const router = useRouter();
   const createProject = useCreateProject();
+  const upsertStepConfig = useUpsertStepConfig();
+  const { defaults: globalDefaults } = useGlobalModelDefaults();
 
   const handleSubmit = async (values: CreateProjectFormValues) => {
     const project = await createProject.mutateAsync({
@@ -37,6 +42,20 @@ export function NewProjectDialog({ children }: NewProjectDialogProps) {
     });
 
     if (project) {
+      // Apply global model defaults to the new project
+      if (globalDefaults) {
+        const steps = Object.entries(globalDefaults) as Array<[StepConfigurationStep, typeof globalDefaults[StepConfigurationStep]]>;
+        for (const [step, stepDefaults] of steps) {
+          if (stepDefaults && Object.keys(stepDefaults).length > 0) {
+            await upsertStepConfig.mutateAsync({
+              data: stepDefaults,
+              projectId: project.id,
+              step,
+            });
+          }
+        }
+      }
+
       setOpen(false);
       router.push(
         $path({

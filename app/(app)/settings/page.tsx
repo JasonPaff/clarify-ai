@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { ApiKeysSection } from '@/components/settings/api-keys-section';
+import { GlobalModelDefaultsSection } from '@/components/settings/global-model-defaults-section';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -90,6 +91,11 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Separator />
+
+        {/* Default AI Models Section */}
+        <GlobalModelDefaultsSection />
 
         {/* API Keys Section */}
         <ApiKeysSection />
