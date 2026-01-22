@@ -282,7 +282,7 @@ export const WorkflowSteps = ({
                     {step.title}
                   </span>
                   {/* Description hidden on small screens, visible on md+ */}
-                  <span className={'hidden truncate text-xs text-muted-foreground sm:block'}>{step.description}</span>
+                  <span className={'hidden text-xs text-muted-foreground sm:block'}>{step.description}</span>
                 </div>
               </button>
 
