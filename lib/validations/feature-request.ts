@@ -65,9 +65,10 @@ export const updateFeatureRequestSchema = z.object({
 export type UpdateFeatureRequestFormValues = z.infer<typeof updateFeatureRequestSchema>;
 
 // Schema for the edit form (requires all fields since form always provides them)
+// Requires at least one repository to be selected for discovery and planning workflow
 export const editFeatureRequestFormSchema = z.object({
   description: featureRequestDescriptionSchema,
-  repositoryIds: repositoryIdsSchema,
+  repositoryIds: requiredRepositoryIdsSchema,
   status: featureRequestStatusSchema,
   title: featureRequestTitleSchema,
 });

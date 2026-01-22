@@ -51,7 +51,9 @@ export const MultiSelectField = ({
 }: MultiSelectFieldProps) => {
   const field = useFieldContext<Array<number>>();
 
-  const error = field.state.meta.errors[0]?.message;
+  // Handle both string and object error formats from TanStack Form
+  const rawError = field.state.meta.errors[0];
+  const error = typeof rawError === 'string' ? rawError : rawError?.message;
   const hasError = Boolean(error);
 
   const selectedValues = field.state.value ?? [];

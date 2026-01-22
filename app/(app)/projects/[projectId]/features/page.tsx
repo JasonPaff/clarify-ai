@@ -88,6 +88,11 @@ function FeaturesContent({
   const archiveMutation = useArchiveFeatureRequest();
   const unarchiveMutation = useUnarchiveFeatureRequest();
 
+  // Compute active (non-archived) feature requests for empty state logic
+  const activeFeatureRequests = useMemo(() => {
+    return featureRequests.filter((request) => request.archivedAt === null);
+  }, [featureRequests]);
+
   // Step 7: Client-side filtering logic
   const filteredFeatureRequests = useMemo(() => {
     return featureRequests.filter((featureRequest) => {
@@ -136,7 +141,7 @@ function FeaturesContent({
     return <FeatureRequestsSkeleton />;
   }
 
-  if (!isLoading && featureRequests.length === 0) {
+  if (!isLoading && activeFeatureRequests.length === 0) {
     return (
       <EmptyState
         action={

@@ -82,7 +82,7 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
   const hasMissingDescription = describeWarnings.some((w) => w.type === 'missing_description');
   if (hasMissingDescription) {
     warnings.push({
-      message: 'The Describe step is incomplete. Complete the description before clarifying requirements.',
+      message: 'The Describe step is incomplete. Add a feature request before clarifying requirements.',
       severity: 'caution',
       type: 'missing_prerequisite',
     });
@@ -145,7 +145,7 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
  * Validates the Describe step for completeness.
  *
  * Checks:
- * - Feature description is present and not empty
+ * - Feature request is present and not empty
  * - At least one repository is linked
  *
  * @param context - Validation context with feature request and linked repositories
@@ -155,11 +155,11 @@ export function validateDescribeStep(context: ValidationContext): Array<Validati
   const { featureRequest, linkedRepositoryIds } = context;
   const warnings: Array<ValidationWarning> = [];
 
-  // Check for empty or missing description
-  const description = featureRequest.description?.trim();
-  if (!description) {
+  // Check for empty or missing feature request content
+  const requestContent = featureRequest.rawRequest?.trim();
+  if (!requestContent) {
     warnings.push({
-      message: 'Feature description is empty. Add a description to help the AI understand your request.',
+      message: 'Feature request is empty. Add details in the Describe step to proceed.',
       severity: 'caution',
       type: 'missing_description',
     });
@@ -243,7 +243,7 @@ export function validatePlanStep(context: ValidationContext): Array<ValidationWa
   const describeWarnings = validateDescribeStep(context);
   if (describeWarnings.some((w) => w.type === 'missing_description')) {
     warnings.push({
-      message: 'Feature description is missing. A description is required for plan generation.',
+      message: 'Feature request is missing. The Describe step is required for plan generation.',
       severity: 'caution',
       type: 'missing_prerequisite',
     });

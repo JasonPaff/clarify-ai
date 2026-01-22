@@ -30,7 +30,6 @@ export function CreateFeatureRequestForm({
       await onSubmit(value);
     },
     validators: {
-      onChange: createFeatureRequestSchema,
       onSubmit: createFeatureRequestSchema,
     },
   });
@@ -79,11 +78,6 @@ export function CreateFeatureRequestForm({
             />
           )}
         </form.AppField>
-
-        {/* Form Error Display */}
-        <form.AppForm>
-          <form.FormError className={'mt-2'} />
-        </form.AppForm>
 
         {/* Action Buttons */}
         <div className={'mt-2 flex justify-end gap-3'}>

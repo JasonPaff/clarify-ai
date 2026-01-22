@@ -4,21 +4,17 @@ import type { ChangeEvent } from 'react';
 
 import { useStore } from '@tanstack/react-form';
 import { formatDistanceToNow } from 'date-fns';
-import { AlertCircle, ChevronDown, FileText, FolderGit2, Loader2, MessageSquareMore } from 'lucide-react';
+import { AlertCircle, ChevronDown, FileText, FolderGit2, Loader2 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
-import type { FullModelId } from '@/lib/ai/models';
 
-import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { RepositorySelector } from '@/components/features/repository-selector';
 import { ContextFilePicker } from '@/components/features/workflow/context-file-picker';
 import { RepositoryOverviewRegenerateDialog } from '@/components/features/workflow/repository-overview-regenerate-dialog';
 import { RepositoryOverviewStatusPanel } from '@/components/features/workflow/repository-overview-status-panel';
-import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { TokenEstimationWarning } from '@/components/features/workflow/token-estimation-warning';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 import { useContextFiles } from '@/hooks/queries/use-feature-request-context-files';
@@ -29,7 +25,6 @@ import {
 import { useMarkStepsStale, useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useRepositoryOverviewTokens } from '@/hooks/queries/use-repository-overviews';
-import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { useAppForm } from '@/lib/forms/form-hook';
 import { cn } from '@/lib/utils';
@@ -50,7 +45,6 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
     featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null
   );
   const [trackedFeatureId, setTrackedFeatureId] = useState(featureRequest.id);
-  const [showClarification, setShowClarification] = useState(false);
   const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
   const [selectedRepositoryIdForRegenerate, setSelectedRepositoryIdForRegenerate] = useState<null | number>(null);
 
@@ -73,27 +67,6 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
   // Context files and token estimation hooks
   const { data: contextFiles = [] } = useContextFiles(featureRequest.id);
 
-  // Step configuration for clarification
-  const { data: refineConfig, isLoading: isRefineConfigLoading } = useStepConfig(projectId, 'refine');
-
-  const clarificationModelConfig = useMemo(() => {
-    if (!refineConfig) return null;
-
-    const modelId =
-      refineConfig.modelProvider && refineConfig.modelId
-        ? (`${refineConfig.modelProvider}:${refineConfig.modelId}` as FullModelId)
-        : null;
-
-    return {
-      customPrompt: refineConfig.customSystemPrompt ?? undefined,
-      maxTokens: refineConfig.maxTokens ?? undefined,
-      modelId,
-      temperature: refineConfig.temperature ?? undefined,
-      thinkingBudget: refineConfig.thinkingBudget ?? undefined,
-      thinkingEnabled: refineConfig.thinkingEnabled,
-    };
-  }, [refineConfig]);
-
   // Repository selection form
   const repositoryForm = useAppForm({
     defaultValues: {
@@ -113,13 +86,11 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
     setContent(featureRequest.rawRequest ?? '');
     setOriginalContent(featureRequest.rawRequest ?? '');
     setLastSavedAt(featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null);
-    setShowClarification(false);
     repositoryForm.reset();
   }
 
   const isDirty = content !== originalContent;
   const isSaving = updateMutation.isPending;
-  const hasContent = content.trim().length > 0;
 
   const handleSave = useCallback(async () => {
     if (content === originalContent || updateMutation.isPending) return;
@@ -209,6 +180,10 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
   const handleRepositoryChange = useCallback(
     async (newRepositoryIds: Array<number>) => {
+      // Prevent saving if no repositories selected - at least one is required
+      if (newRepositoryIds.length === 0) {
+        return;
+      }
       await setRepositories.mutateAsync({
         featureRequestId: featureRequest.id,
         repositoryIds: newRepositoryIds,
@@ -258,10 +233,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
   return (
     <div className={'flex flex-col gap-6'}>
-      {/* Section 1: Settings Panel (collapsed by default) */}
-      <StepSettingsPanel projectId={projectId} step={'describe'} />
-
-      {/* Section 2: Feature Description (always visible) */}
+      {/* Section 1: Feature Description (always visible) */}
       <section className={'flex flex-col gap-3'}>
         <div className={'flex items-center gap-2'}>
           <h3 className={'text-sm font-semibold'}>Feature Description</h3>
@@ -302,8 +274,8 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
       {/* Visual Separator */}
       <hr className={'border-border'} />
 
-      {/* Section 3: Repository Context (expanded by default) */}
-      <Collapsible defaultOpen>
+      {/* Section 2: Repository Context (collapsed by default) */}
+      <Collapsible defaultOpen={false}>
         <CollapsibleTrigger
           className={cn(
             'flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-left text-sm',
@@ -371,6 +343,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
                           : 'Based on project defaults. Changes apply only to this feature.'
                       }
                       isDisabled={isRepositorySaving}
+                      isRequired
                       label={'Target Repositories'}
                       projectId={projectId}
                     />
@@ -390,6 +363,16 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
                   </Alert>
                 )}
 
+                {/* No Repository Warning */}
+                {!hasSelectedRepositories && (
+                  <Alert variant={'destructive'}>
+                    <AlertCircle className={'size-4'} />
+                    <AlertDescription>
+                      At least one repository must be selected for AI planning to work.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 {/* Repository Overview Status Panel */}
                 {hasSelectedRepositories && (
                   <RepositoryOverviewStatusPanel
@@ -404,7 +387,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Section 4: Additional Context (collapsed by default) */}
+      {/* Section 3: Additional Context (collapsed by default) */}
       <Collapsible defaultOpen={false}>
         <CollapsibleTrigger
           className={cn(
@@ -446,29 +429,6 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
       {/* Visual Separator */}
       <hr className={'border-border'} />
-
-      {/* Section 5: Actions */}
-      {hasContent && !showClarification && (
-        <section className={'flex flex-col gap-3'}>
-          <div className={'flex gap-2'}>
-            <Button disabled={isSaving} onClick={() => setShowClarification(true)} variant={'outline'}>
-              <MessageSquareMore className={'size-4'} />
-              Clarify Request
-            </Button>
-          </div>
-        </section>
-      )}
-
-      {/* Clarification Panel */}
-      {showClarification && (
-        <ClarificationPanel
-          featureRequest={featureRequest}
-          isConfigLoading={isRefineConfigLoading}
-          modelConfig={clarificationModelConfig}
-          onClose={() => setShowClarification(false)}
-          onComplete={() => setShowClarification(false)}
-        />
-      )}
 
       {/* Repository Overview Regenerate Dialog */}
       {selectedRepositoryForRegenerate && (

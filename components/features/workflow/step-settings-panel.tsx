@@ -125,8 +125,6 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
 
   const stepLabel = useMemo(() => {
     switch (step) {
-      case 'describe':
-        return 'Describe';
       case 'plan':
         return 'Plan';
       case 'refine':

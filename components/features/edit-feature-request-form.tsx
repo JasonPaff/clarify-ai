@@ -99,7 +99,8 @@ export function EditFeatureRequestForm({
         <form.AppField name={'repositoryIds'}>
           {() => (
             <RepositorySelector
-              description={'Select repositories to analyze (optional)'}
+              description={'Select at least one repository to analyze'}
+              isRequired
               label={'Target Repositories'}
               projectId={projectId}
             />

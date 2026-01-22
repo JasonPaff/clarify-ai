@@ -209,7 +209,9 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
 
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   const canGoBack = currentIndex > 0;
-  const canGoNext = currentIndex < STEP_ORDER.length - 1;
+  const hasDescribeContent = (featureRequest.rawRequest ?? '').trim().length > 0;
+  const isDescribeBlocked = currentStep === 'describe' && !hasDescribeContent;
+  const canGoNext = currentIndex < STEP_ORDER.length - 1 && !isDescribeBlocked;
 
   const handleGoBack = () => {
     if (canGoBack) {

@@ -21,11 +21,6 @@ interface StepInfo {
 
 const WORKFLOW_STEPS: Array<StepInfo> = [
   {
-    description: 'Initial feature description and context',
-    label: 'Describe',
-    step: 'describe',
-  },
-  {
     description: 'Generates clarifying questions to refine the feature',
     label: 'Clarify',
     step: 'refine',
