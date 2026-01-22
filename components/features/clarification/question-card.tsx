@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 type QuestionCardProps = ClassName & {
   answer?: ClarificationAnswer;
+  isReadOnly?: boolean;
   onAnswerChange: (selectedValue: null | string, customText?: string) => void;
   question: ClarificationQuestion;
   questionNumber: number;
@@ -16,7 +17,14 @@ type QuestionCardProps = ClassName & {
 /**
  * Single question card with radio options and optional custom text input.
  */
-export const QuestionCard = ({ answer, className, onAnswerChange, question, questionNumber }: QuestionCardProps) => {
+export const QuestionCard = ({
+  answer,
+  className,
+  isReadOnly = false,
+  onAnswerChange,
+  question,
+  questionNumber,
+}: QuestionCardProps) => {
   const isOtherSelected = answer?.selectedValue === '__other__';
 
   return (
@@ -31,7 +39,9 @@ export const QuestionCard = ({ answer, className, onAnswerChange, question, ques
 
       {/* Options */}
       <RadioGroup
+        disabled={isReadOnly}
         onValueChange={(value) => {
+          if (isReadOnly) return;
           if (value === '__other__') {
             onAnswerChange(value, answer?.customText);
           } else {
@@ -42,7 +52,7 @@ export const QuestionCard = ({ answer, className, onAnswerChange, question, ques
       >
         {question.options.map((option) => (
           <div className={'flex items-start gap-2'} key={option.value}>
-            <RadioGroupItem className={'mt-0.5'} label={option.label} value={option.value} />
+            <RadioGroupItem className={'mt-0.5'} disabled={isReadOnly} label={option.label} value={option.value} />
             {option.description && <span className={'text-xs text-muted-foreground'}>- {option.description}</span>}
           </div>
         ))}
@@ -50,7 +60,7 @@ export const QuestionCard = ({ answer, className, onAnswerChange, question, ques
         {/* Other option */}
         {question.allowCustom && (
           <div className={'flex items-start gap-2'}>
-            <RadioGroupItem className={'mt-0.5'} label={'Other'} value={'__other__'} />
+            <RadioGroupItem className={'mt-0.5'} disabled={isReadOnly} label={'Other'} value={'__other__'} />
           </div>
         )}
       </RadioGroup>
@@ -60,7 +70,11 @@ export const QuestionCard = ({ answer, className, onAnswerChange, question, ques
         <div className={'mt-2 ml-6'}>
           <Input
             className={'text-sm'}
-            onChange={(e) => onAnswerChange('__other__', e.target.value)}
+            disabled={isReadOnly}
+            onChange={(e) => {
+              if (isReadOnly) return;
+              onAnswerChange('__other__', e.target.value);
+            }}
             placeholder={'Enter your answer...'}
             value={answer?.customText ?? ''}
           />

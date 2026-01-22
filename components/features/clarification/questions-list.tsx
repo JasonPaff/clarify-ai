@@ -10,6 +10,7 @@ import { QuestionCard } from './question-card';
 
 type QuestionsListProps = ClassName & {
   answers: Array<ClarificationAnswer>;
+  isReadOnly?: boolean;
   isQuestionsComplete?: boolean;
   onAnswerChange: (questionId: string, selectedValue: null | string, customText?: string) => void;
   questions: Array<ClarificationQuestion>;
@@ -63,11 +64,17 @@ const QuestionsLoadingSkeleton = () => {
 export const QuestionsList = ({
   answers,
   className,
+  isReadOnly = false,
   isQuestionsComplete = true,
   onAnswerChange,
   questions,
 }: QuestionsListProps) => {
   const isStreaming = !isQuestionsComplete;
+  const headingText = isReadOnly
+    ? 'Clarification questions and answers:'
+    : isStreaming
+      ? 'Questions are being generated...'
+      : 'Please answer the following questions:';
 
   // Show skeleton while streaming and no questions yet
   if (isStreaming && questions.length === 0) {
@@ -84,13 +91,11 @@ export const QuestionsList = ({
       {/* Header */}
       <div className={'flex items-center gap-2'}>
         {isStreaming && <Loader2 className={'size-4 animate-spin text-muted-foreground'} />}
-        <h3 className={'text-sm font-medium text-foreground'}>
-          {isStreaming ? 'Questions are being generated...' : 'Please answer the following questions:'}
-        </h3>
+        <h3 className={'text-sm font-medium text-foreground'}>{headingText}</h3>
       </div>
 
       {/* Streaming Indicator */}
-      {isStreaming && (
+      {isStreaming && !isReadOnly && (
         <p className={'text-xs text-muted-foreground'}>Please wait until all questions have loaded before answering.</p>
       )}
 
@@ -102,6 +107,7 @@ export const QuestionsList = ({
             <QuestionCard
               answer={answer}
               className={'mt-3 first:mt-0'}
+              isReadOnly={isReadOnly}
               key={question.id}
               onAnswerChange={(selectedValue, customText) => onAnswerChange(question.id, selectedValue, customText)}
               question={question}

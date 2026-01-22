@@ -153,6 +153,7 @@ export const ClarificationPanel = ({
   const hasReasoningContent = reasoningText.length > 0;
   const hasModelConfigured = modelConfig?.modelId !== null;
   const isReady = !isConfigLoading && hasModelConfigured;
+  const handleReadOnlyAnswerChange = () => {};
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -339,11 +340,21 @@ export const ClarificationPanel = ({
 
           <Alert variant={'success'}>
             <CheckCircle2 className={'size-4'} />
-            <AlertTitle>Clarification Complete</AlertTitle>
-            <AlertDescription>
-              Your answers have been saved. You can now proceed to refine requirements.
-            </AlertDescription>
+            <div>
+              <AlertTitle>Clarification Complete</AlertTitle>
+              <AlertDescription>
+                Your answers have been saved. You can now proceed to refine requirements.
+              </AlertDescription>
+            </div>
           </Alert>
+
+          <QuestionsList
+            answers={answers}
+            isQuestionsComplete={isQuestionsComplete}
+            isReadOnly={true}
+            onAnswerChange={handleReadOnlyAnswerChange}
+            questions={questions}
+          />
 
           <div className={'flex flex-wrap gap-2'}>
             <Button disabled={isLoading} onClick={handleRequestMoreClarification} variant={'outline'}>
