@@ -1,6 +1,6 @@
 'use client';
 
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isValid } from 'date-fns';
 
 interface AutoSaveStatusProps {
   hasUnsavedChanges?: boolean;
@@ -11,7 +11,7 @@ interface AutoSaveStatusProps {
 export const AutoSaveStatus = ({ hasUnsavedChanges = false, isSaving, lastSavedAt }: AutoSaveStatusProps) => {
   const statusText = isSaving
     ? 'Saving...'
-    : lastSavedAt
+    : lastSavedAt && isValid(lastSavedAt)
       ? `Last saved ${formatDistanceToNow(lastSavedAt, { addSuffix: true })}`
       : hasUnsavedChanges
         ? 'Not saved yet'
