@@ -37,7 +37,7 @@ export function createRepositoryOverviewsRepository(db: DrizzleDatabase): Reposi
     update(id: number, data: Partial<NewRepositoryOverview>): RepositoryOverview | undefined {
       return db
         .update(repositoryOverviews)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(repositoryOverviews.id, id))
         .returning()
         .get();
@@ -53,7 +53,7 @@ export function createRepositoryOverviewsRepository(db: DrizzleDatabase): Reposi
       if (existing) {
         return db
           .update(repositoryOverviews)
-          .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+          .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
           .where(eq(repositoryOverviews.id, existing.id))
           .returning()
           .get();

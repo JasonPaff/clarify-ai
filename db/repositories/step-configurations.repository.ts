@@ -54,7 +54,7 @@ export function createStepConfigurationsRepository(db: DrizzleDatabase): StepCon
     update(id: number, data: Partial<NewStepConfiguration>): StepConfiguration | undefined {
       return db
         .update(stepConfigurations)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(stepConfigurations.id, id))
         .returning()
         .get();
@@ -74,7 +74,7 @@ export function createStepConfigurationsRepository(db: DrizzleDatabase): StepCon
       if (existing) {
         return db
           .update(stepConfigurations)
-          .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+          .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
           .where(eq(stepConfigurations.id, existing.id))
           .returning()
           .get();

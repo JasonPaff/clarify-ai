@@ -359,14 +359,14 @@ export const ScopeSelector = ({
       <div className={'divide-y divide-border'}>
         {/* Include Patterns Section */}
         <Collapsible defaultOpen>
-          <CollapsibleTrigger className={'w-full justify-between p-4'}>
+          <CollapsibleTrigger className={'w-full p-4'}>
             <span className={'text-sm font-medium'}>Include Patterns</span>
             {hasIncludePatterns && (
-              <span className={'ml-2 text-xs text-muted-foreground'}>({includePatterns.length} active)</span>
+              <span className={'ml-auto text-xs text-muted-foreground'}>({includePatterns.length} active)</span>
             )}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className={'space-y-3 px-4 pb-4'}>
+            <div className={'space-y-3 px-4 py-2.5'}>
               {/* Preset Buttons */}
               <div className={'flex flex-wrap gap-2'}>
                 {PRESET_INCLUSIONS.map((preset) => {
@@ -442,14 +442,14 @@ export const ScopeSelector = ({
 
         {/* Exclude Patterns Section */}
         <Collapsible defaultOpen>
-          <CollapsibleTrigger className={'w-full justify-between p-4'}>
+          <CollapsibleTrigger className={'w-full p-4'}>
             <span className={'text-sm font-medium'}>Exclude Patterns</span>
             {hasExcludePatterns && (
-              <span className={'ml-2 text-xs text-muted-foreground'}>({excludePatterns.length} active)</span>
+              <span className={'ml-auto text-xs text-muted-foreground'}>({excludePatterns.length} active)</span>
             )}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className={'space-y-3 px-4 pb-4'}>
+            <div className={'space-y-3 px-4 py-2.5'}>
               {/* Preset Buttons */}
               <div className={'flex flex-wrap gap-2'}>
                 {PRESET_EXCLUSIONS.map((preset) => {
@@ -525,11 +525,11 @@ export const ScopeSelector = ({
 
         {/* Advanced Settings Section */}
         <Collapsible>
-          <CollapsibleTrigger className={'w-full justify-between p-4'}>
+          <CollapsibleTrigger className={'w-full p-4'}>
             <span className={'text-sm font-medium'}>Advanced Settings</span>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <div className={'space-y-4 px-4 pb-4'}>
+            <div className={'space-y-4 px-4 py-2.5'}>
               {/* Max Files Limit */}
               <div className={'flex items-center justify-between'}>
                 <div>

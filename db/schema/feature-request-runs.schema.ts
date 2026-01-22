@@ -26,7 +26,7 @@ export const featureRequestRuns = sqliteTable(
   {
     completedAt: text('completed_at'),
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     durationMs: integer('duration_ms'),
     errorMessage: text('error_message'),
@@ -47,7 +47,7 @@ export const featureRequestRuns = sqliteTable(
     status: text('status').$type<FeatureRequestRunStatus>().notNull().default('pending'),
     step: text('step').$type<FeatureRequestRunStep>().notNull(),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [

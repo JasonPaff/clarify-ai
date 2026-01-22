@@ -5,7 +5,7 @@ export const projects = sqliteTable(
   'projects',
   {
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     description: text('description'),
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -13,7 +13,7 @@ export const projects = sqliteTable(
     name: text('name').notNull(),
     planExportFolder: text('plan_export_folder'),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [

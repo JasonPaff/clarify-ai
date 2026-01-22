@@ -3,7 +3,7 @@
 import type { ChangeEvent } from 'react';
 
 import { useStore } from '@tanstack/react-form';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, isValid } from 'date-fns';
 import { AlertCircle, ChevronDown, FileText, FolderGit2, Loader2 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -36,13 +36,20 @@ interface DescribeStepProps {
   projectId: number;
 }
 
+const parseSqliteUtc = (value: null | string | undefined): Date | null => {
+  if (!value) return null;
+  const normalized = value.endsWith('Z') ? value : `${value}Z`;
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
 export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) => {
   const [content, setContent] = useState(featureRequest.rawRequest ?? '');
   const [originalContent, setOriginalContent] = useState(featureRequest.rawRequest ?? '');
   // SQLite CURRENT_TIMESTAMP stores UTC without 'Z' suffix, so we append it
   // to ensure JavaScript parses it as UTC, not local time
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
-    featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null
+    featureRequest.rawRequest ? parseSqliteUtc(featureRequest.updatedAt) : null
   );
   const [trackedFeatureId, setTrackedFeatureId] = useState(featureRequest.id);
   const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
@@ -85,7 +92,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
     setTrackedFeatureId(featureRequest.id);
     setContent(featureRequest.rawRequest ?? '');
     setOriginalContent(featureRequest.rawRequest ?? '');
-    setLastSavedAt(featureRequest.rawRequest ? new Date(featureRequest.updatedAt + 'Z') : null);
+    setLastSavedAt(featureRequest.rawRequest ? parseSqliteUtc(featureRequest.updatedAt) : null);
     repositoryForm.reset();
   }
 
@@ -225,7 +232,7 @@ export const DescribeStep = ({ featureRequest, projectId }: DescribeStepProps) =
 
   const saveStatusText = isSaving
     ? 'Saving...'
-    : lastSavedAt
+    : lastSavedAt && isValid(lastSavedAt)
       ? `Last saved ${formatDistanceToNow(lastSavedAt, { addSuffix: true })}`
       : 'Not saved yet';
 

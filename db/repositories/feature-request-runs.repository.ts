@@ -113,14 +113,14 @@ export function createFeatureRequestRunsRepository(db: DrizzleDatabase): Feature
     setCurrentRun(featureRequestId: number, step: FeatureRequestRunStep, runId: number): FeatureRequestRun | undefined {
       // First, set isCurrentRun=false for ALL runs matching featureRequestId and step
       db.update(featureRequestRuns)
-        .set({ isCurrentRun: false, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ isCurrentRun: false, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(and(eq(featureRequestRuns.featureRequestId, featureRequestId), eq(featureRequestRuns.step, step)))
         .run();
 
       // Then, set isCurrentRun=true for the specific runId
       return db
         .update(featureRequestRuns)
-        .set({ isCurrentRun: true, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ isCurrentRun: true, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(featureRequestRuns.id, runId))
         .returning()
         .get();
@@ -129,7 +129,7 @@ export function createFeatureRequestRunsRepository(db: DrizzleDatabase): Feature
     update(id: number, data: Partial<NewFeatureRequestRun>): FeatureRequestRun | undefined {
       return db
         .update(featureRequestRuns)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(featureRequestRuns.id, id))
         .returning()
         .get();

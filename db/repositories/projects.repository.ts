@@ -63,7 +63,7 @@ export function createProjectsRepository(db: DrizzleDatabase): ProjectsRepositor
     update(id: number, data: Partial<NewProject>): Project | undefined {
       return db
         .update(projects)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(projects.id, id))
         .returning()
         .get();

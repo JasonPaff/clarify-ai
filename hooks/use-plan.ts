@@ -78,10 +78,19 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
   // Track the feature request ID for reset detection
   const [trackedId, setTrackedId] = useState(featureRequest.id);
 
+  // Helper to derive status from stored data
+  const deriveStatusFromStoredData = (fr: FeatureRequest): PlanStatus => {
+    // If we have a stored plan with steps, status should be completed
+    const storedPlan = parseImplementationPlan(fr.implementationPlan);
+    if (storedPlan?.steps && storedPlan.steps.length > 0) {
+      return 'completed';
+    }
+    // Otherwise check if currently planning
+    return parsePlanStatus(fr.status === 'planning' ? 'generating' : undefined);
+  };
+
   // Parse initial state from feature request
-  const [status, setStatus] = useState<PlanStatus>(() =>
-    parsePlanStatus(featureRequest.status === 'planning' ? 'generating' : undefined)
-  );
+  const [status, setStatus] = useState<PlanStatus>(() => deriveStatusFromStoredData(featureRequest));
   const [plan, setPlan] = useState<ImplementationPlan | null>(() =>
     parseImplementationPlan(featureRequest.implementationPlan)
   );
@@ -102,7 +111,7 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
   // This is the recommended React pattern for resetting state on prop changes
   if (featureRequest.id !== trackedId) {
     setTrackedId(featureRequest.id);
-    setStatus(parsePlanStatus(featureRequest.status === 'planning' ? 'generating' : undefined));
+    setStatus(deriveStatusFromStoredData(featureRequest));
     setPlan(parseImplementationPlan(featureRequest.implementationPlan));
     setProgress({});
     setStreamingText('');

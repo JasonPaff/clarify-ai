@@ -206,15 +206,21 @@ export const ClarificationPanel = ({
               />
 
               {/* Action Buttons */}
-              <div className={'flex items-center gap-2'}>
+              <div className={'flex flex-wrap items-center gap-2'}>
                 <Button disabled={isLoading} onClick={() => handleStartClarification()}>
                   Analyze Request
                 </Button>
+                {!isLoading && (
+                  <Button onClick={handleSkipClarification} variant={'outline'}>
+                    <SkipForward className={'mr-2 size-4'} />
+                    Skip Clarification
+                  </Button>
+                )}
               </div>
             </div>
           )}
 
-          {!isLoading && (
+          {!isReady && !isLoading && (
             <div className={'flex'}>
               <Button onClick={handleSkipClarification} variant={'outline'}>
                 <SkipForward className={'mr-2 size-4'} />

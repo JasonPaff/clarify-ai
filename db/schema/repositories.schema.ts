@@ -7,7 +7,7 @@ export const repositories = sqliteTable(
   'repositories',
   {
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     fileCount: integer('file_count'),
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -18,7 +18,7 @@ export const repositories = sqliteTable(
       .notNull()
       .references(() => projects.id, { onDelete: 'cascade' }),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [index('repositories_project_id_idx').on(table.projectId), index('repositories_path_idx').on(table.path)]

@@ -259,11 +259,11 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
       )}
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
-      <div className={'flex items-center justify-between gap-4'}>
-        <StepSettingsPanel className={'flex-1'} projectId={projectId} step={'plan'} />
+      <div className={'flex flex-col gap-3'}>
+        <StepSettingsPanel projectId={projectId} step={'plan'} />
 
         {/* Cost Estimate and Run History */}
-        <div className={'flex items-center gap-3'}>
+        <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <PlanCostEstimate
             customPrompt={modelConfig?.customPrompt}
             discoveredFiles={discoveredFiles}

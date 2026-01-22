@@ -35,7 +35,7 @@ export function createFeatureRequestsRepository(db: DrizzleDatabase): FeatureReq
     update(id: number, data: Partial<NewFeatureRequest>): FeatureRequest | undefined {
       return db
         .update(featureRequests)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(featureRequests.id, id))
         .returning()
         .get();

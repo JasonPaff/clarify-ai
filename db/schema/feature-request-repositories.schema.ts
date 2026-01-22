@@ -8,7 +8,7 @@ export const featureRequestRepositories = sqliteTable(
   'feature_request_repositories',
   {
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     featureRequestId: integer('feature_request_id')
       .notNull()

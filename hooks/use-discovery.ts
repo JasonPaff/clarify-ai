@@ -98,10 +98,19 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
   // Track the feature request ID for reset detection
   const [trackedId, setTrackedId] = useState(featureRequest.id);
 
+  // Helper to derive status from stored data
+  const deriveStatusFromStoredData = (fr: FeatureRequest): DiscoveryStatus => {
+    // If we have stored files, status should be completed
+    const storedResults = parseDiscoveryResults(fr.researchFindings);
+    if (storedResults?.files && storedResults.files.length > 0) {
+      return 'completed';
+    }
+    // Otherwise check if currently researching
+    return parseDiscoveryStatus(fr.status === 'researching' ? 'scanning' : undefined);
+  };
+
   // Parse initial state from feature request
-  const [status, setStatus] = useState<DiscoveryStatus>(() =>
-    parseDiscoveryStatus(featureRequest.status === 'researching' ? 'scanning' : undefined)
-  );
+  const [status, setStatus] = useState<DiscoveryStatus>(() => deriveStatusFromStoredData(featureRequest));
   const [files, setFiles] = useState<Array<DiscoveredFileEntry>>(() =>
     parseDiscoveredFiles(featureRequest.researchFindings)
   );
@@ -125,7 +134,7 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
   // This is the recommended React pattern for resetting state on prop changes
   if (featureRequest.id !== trackedId) {
     setTrackedId(featureRequest.id);
-    setStatus(parseDiscoveryStatus(featureRequest.status === 'researching' ? 'scanning' : undefined));
+    setStatus(deriveStatusFromStoredData(featureRequest));
     setFiles(parseDiscoveredFiles(featureRequest.researchFindings));
     setResults(parseDiscoveryResults(featureRequest.researchFindings));
     setProgress({});

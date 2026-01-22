@@ -15,7 +15,7 @@ export const featureRequestContextFiles = sqliteTable(
   'feature_request_context_files',
   {
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     displayName: text('display_name').notNull(),
     featureRequestId: integer('feature_request_id')
@@ -27,7 +27,7 @@ export const featureRequestContextFiles = sqliteTable(
     includedInContext: integer('included_in_context', { mode: 'boolean' }).notNull().default(true),
     sizeBytes: integer('size_bytes').notNull(),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [

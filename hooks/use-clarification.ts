@@ -86,10 +86,28 @@ export function useClarification({
   // Track the feature request ID for reset detection
   const [trackedId, setTrackedId] = useState(featureRequest.id);
 
+  // Helper to derive status from stored data
+  const deriveStatusFromStoredData = (fr: FeatureRequest): ClarificationStatus => {
+    const storedStatus = parseClarificationStatus(fr.clarificationStatus);
+    // If status is completed or skipped, use it
+    if (storedStatus === 'completed' || storedStatus === 'skipped') {
+      return storedStatus;
+    }
+    // Fallback: if we have answers stored, we're completed
+    const storedAnswers = parseClarificationAnswers(fr.clarificationAnswers);
+    if (storedAnswers.length > 0) {
+      return 'completed';
+    }
+    // Another fallback: if we have questions stored but no answers, we're in questions_ready
+    const storedQuestions = parseClarificationQuestions(fr.clarificationQuestions);
+    if (storedQuestions.length > 0) {
+      return 'questions_ready';
+    }
+    return storedStatus;
+  };
+
   // Parse initial state from feature request
-  const [status, setStatus] = useState<ClarificationStatus>(() =>
-    parseClarificationStatus(featureRequest.clarificationStatus)
-  );
+  const [status, setStatus] = useState<ClarificationStatus>(() => deriveStatusFromStoredData(featureRequest));
   const [analysis, setAnalysis] = useState<ClarificationAnalysis | null>(() =>
     parseClarificationAnalysis(featureRequest.clarificationAnalysis)
   );
@@ -116,7 +134,7 @@ export function useClarification({
   // This is the recommended React pattern for resetting state on prop changes
   if (featureRequest.id !== trackedId) {
     setTrackedId(featureRequest.id);
-    setStatus(parseClarificationStatus(featureRequest.clarificationStatus));
+    setStatus(deriveStatusFromStoredData(featureRequest));
     setAnalysis(parseClarificationAnalysis(featureRequest.clarificationAnalysis));
     setQuestions(parseClarificationQuestions(featureRequest.clarificationQuestions));
     setAnswers(parseClarificationAnswers(featureRequest.clarificationAnswers));

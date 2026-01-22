@@ -17,7 +17,7 @@ export const stepConfigurations = sqliteTable(
   'step_configurations',
   {
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     customSystemPrompt: text('custom_system_prompt'),
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -32,7 +32,7 @@ export const stepConfigurations = sqliteTable(
     thinkingBudget: integer('thinking_budget'),
     thinkingEnabled: integer('thinking_enabled', { mode: 'boolean' }).notNull().default(false),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [

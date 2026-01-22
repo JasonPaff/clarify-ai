@@ -228,11 +228,11 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
       )}
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
-      <div className={'flex items-center justify-between gap-4'}>
-        <StepSettingsPanel className={'flex-1'} projectId={featureRequest.projectId} step={'refine'} />
+      <div className={'flex flex-col gap-3'}>
+        <StepSettingsPanel projectId={featureRequest.projectId} step={'refine'} />
 
         {/* Cost Estimate and Run History */}
-        <div className={'flex items-center gap-3'}>
+        <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <ClarificationCostEstimate
             customPrompt={modelConfig?.customPrompt}
             featureRequestContent={featureRequest.rawRequest ?? ''}

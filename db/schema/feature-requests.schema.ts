@@ -34,7 +34,7 @@ export const featureRequests = sqliteTable(
     clarificationQuestions: text('clarification_questions'),
     clarificationStatus: text('clarification_status'),
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     description: text('description'),
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -49,7 +49,7 @@ export const featureRequests = sqliteTable(
     status: text('status').$type<FeatureRequestStatus>().notNull().default('draft'),
     title: text('title').notNull(),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [

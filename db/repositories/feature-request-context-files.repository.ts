@@ -70,7 +70,7 @@ export function createFeatureRequestContextFilesRepository(db: DrizzleDatabase):
     setIncludedInContext(id: number, includedInContext: boolean): FeatureRequestContextFile | undefined {
       return db
         .update(featureRequestContextFiles)
-        .set({ includedInContext, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ includedInContext, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(featureRequestContextFiles.id, id))
         .returning()
         .get();
@@ -79,7 +79,7 @@ export function createFeatureRequestContextFilesRepository(db: DrizzleDatabase):
     update(id: number, data: Partial<NewFeatureRequestContextFile>): FeatureRequestContextFile | undefined {
       return db
         .update(featureRequestContextFiles)
-        .set({ ...data, updatedAt: sql`(CURRENT_TIMESTAMP)` })
+        .set({ ...data, updatedAt: sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` })
         .where(eq(featureRequestContextFiles.id, id))
         .returning()
         .get();

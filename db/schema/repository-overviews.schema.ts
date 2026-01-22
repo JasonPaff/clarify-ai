@@ -8,7 +8,7 @@ export const repositoryOverviews = sqliteTable(
   {
     content: text('content').notNull(),
     createdAt: text('created_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
     generatedAt: text('generated_at').notNull(),
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -21,7 +21,7 @@ export const repositoryOverviews = sqliteTable(
       .references(() => repositories.id, { onDelete: 'cascade' })
       .unique(),
     updatedAt: text('updated_at')
-      .default(sql`(CURRENT_TIMESTAMP)`)
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
   },
   (table) => [index('repository_overviews_repository_id_idx').on(table.repositoryId)]
