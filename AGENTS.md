@@ -299,14 +299,14 @@ clarify-ai/
 
 Custom commands in `.claude/commands/` provide high-level workflows. Use slash commands to invoke them.
 
-| Command           | Description                                                                                    |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
+| Command           | Description                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
 | `/plan-feature`   | Generate implementation plans through 3-4 step orchestration (clarify → refine → discover → plan) |
-| `/implement-plan` | Execute implementation plans with structured tracking using subagent architecture             |
-| `/gemini-review`  | Run AI-powered code reviews using Gemini CLI with Gemini 3 Pro                                |
-| `/create-schema`  | Create or modify database schemas using natural language descriptions                         |
-| `/fix-file`       | Fix a file to follow project patterns using specialist agents with automatic review           |
-| `/next-feature`   | Identify the next logical feature area based on design document and codebase analysis         |
+| `/implement-plan` | Execute implementation plans with structured tracking using subagent architecture                 |
+| `/gemini-review`  | Run AI-powered code reviews using Gemini CLI with Gemini 3 Pro                                    |
+| `/create-schema`  | Create or modify database schemas using natural language descriptions                             |
+| `/fix-file`       | Fix a file to follow project patterns using specialist agents with automatic review               |
+| `/next-feature`   | Identify the next logical feature area based on design document and codebase analysis             |
 
 ## 10. Specialist Subagents
 

@@ -374,7 +374,9 @@ export interface ElectronAPI {
     /** Cancel an ongoing search operation */
     cancel(): Promise<void>;
     /** Subscribe to search progress updates. Returns an unsubscribe function. */
-    onProgress(callback: (progress: import('../electron/ipc/file-search.handlers').FileSearchProgress) => void): () => void;
+    onProgress(
+      callback: (progress: import('../electron/ipc/file-search.handlers').FileSearchProgress) => void
+    ): () => void;
     /** Execute a file search across repositories */
     search(
       request: import('../lib/validations/file-search').FileSearchRequest,

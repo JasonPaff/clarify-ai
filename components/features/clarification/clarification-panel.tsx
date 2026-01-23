@@ -1,7 +1,17 @@
 'use client';
 
 import { format } from 'date-fns';
-import { AlertCircle, CheckCircle2, Clock, History, Loader2, MessageCirclePlus, RefreshCw, SkipForward, XCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  History,
+  Loader2,
+  MessageCirclePlus,
+  RefreshCw,
+  SkipForward,
+  XCircle,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -62,7 +72,7 @@ function getModelDisplayName(modelId: string): string {
     'gpt-4.1-mini': 'GPT-4.1 Mini',
     'gpt-4o': 'GPT-4o',
     'gpt-4o-mini': 'GPT-4o Mini',
-    'o3': 'o3',
+    o3: 'o3',
     'o3-mini': 'o3 Mini',
     'o4-mini': 'o4 Mini',
   };
@@ -297,9 +307,7 @@ export const ClarificationPanel = ({
                 <Alert variant={'warning'}>
                   <AlertCircle className={'size-4'} />
                   <AlertTitle>No Repositories Linked</AlertTitle>
-                  <AlertDescription>
-                    Linking repositories provides code context for better analysis.
-                  </AlertDescription>
+                  <AlertDescription>Linking repositories provides code context for better analysis.</AlertDescription>
                 </Alert>
               )}
 

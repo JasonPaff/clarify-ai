@@ -91,10 +91,7 @@ type StepValidator = (context: ValidationContext, options?: ValidationOptions) =
  * @param options - Validation options (checkCompleteness defaults to true)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validateClarifyStep(
-  context: ValidationContext,
-  options?: ValidationOptions
-): Array<ValidationWarning> {
+export function validateClarifyStep(context: ValidationContext, options?: ValidationOptions): Array<ValidationWarning> {
   const { checkCompleteness = true } = options ?? {};
   const { featureRequest } = context;
   const warnings: Array<ValidationWarning> = [];
@@ -280,10 +277,7 @@ export function validateDiscoverStep(
  * @param options - Validation options (Plan step always checks all requirements)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validatePlanStep(
-  context: ValidationContext,
-  options?: ValidationOptions
-): Array<ValidationWarning> {
+export function validatePlanStep(context: ValidationContext, options?: ValidationOptions): Array<ValidationWarning> {
   void options; // Intentionally unused - Plan step always checks all requirements
   const { featureRequest } = context;
   const warnings: Array<ValidationWarning> = [];

@@ -107,16 +107,17 @@ export const FileSearchDialog = ({
 
       // Determine which repositories to search
       const searchRepos =
-        selectedRepositoryId !== null
-          ? repositories.filter((r) => r.id === selectedRepositoryId)
-          : repositories;
+        selectedRepositoryId !== null ? repositories.filter((r) => r.id === selectedRepositoryId) : repositories;
 
       if (searchRepos.length === 0) {
         return;
       }
 
       // Convert form values to search request
-      const request = formValuesToSearchRequest(value, searchRepos.map((r) => r.id));
+      const request = formValuesToSearchRequest(
+        value,
+        searchRepos.map((r) => r.id)
+      );
 
       // Clear previous selections
       setSelectedFiles(new Set());
@@ -480,7 +481,9 @@ export const FileSearchDialog = ({
                                 key={idx}
                               >
                                 <span className={'text-muted-foreground/70'}>{snippet.lineNumber}:</span>{' '}
-                                {snippet.content.length > 80 ? `${snippet.content.substring(0, 80)}...` : snippet.content}
+                                {snippet.content.length > 80
+                                  ? `${snippet.content.substring(0, 80)}...`
+                                  : snippet.content}
                               </div>
                             ))}
                           </div>

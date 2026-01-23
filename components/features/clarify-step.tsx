@@ -31,7 +31,6 @@ import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { useElectronFs } from '@/hooks/useElectron';
 
-
 interface ClarifyStepProps {
   /** Ref to register the cancel callback for external cancellation */
   cancelCallbackRef?: RefObject<(() => void) | null>;
@@ -143,7 +142,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
       const results = await Promise.all(
         includedContextFiles.map(async (file) => {
           const result = await readFile(file.filePath);
-          const excerpt = result.success ? result.content ?? undefined : undefined;
+          const excerpt = result.success ? (result.content ?? undefined) : undefined;
 
           return {
             displayName: file.displayName,
