@@ -175,6 +175,12 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
               break;
 
             case 'tool-call':
+              console.log('[DEBUG] Tool call received:');
+              console.log('  toolName:', part.toolName);
+              console.log('  toolCallId:', part.toolCallId);
+              console.log('  input type:', typeof part.input);
+              console.log('  input constructor:', part.input?.constructor?.name);
+              console.log('  input value:', JSON.stringify(part.input, null, 2)?.slice(0, 500));
               chunk = {
                 toolArgs: part.input,
                 toolCallId: part.toolCallId,

@@ -12,6 +12,7 @@ type QuestionCardProps = ClassName & {
   onAnswerChange: (selectedValue: null | string, customText?: string) => void;
   question: ClarificationQuestion;
   questionNumber: number;
+  showError?: boolean;
 };
 
 /**
@@ -24,8 +25,10 @@ export const QuestionCard = ({
   onAnswerChange,
   question,
   questionNumber,
+  showError = false,
 }: QuestionCardProps) => {
   const isOtherSelected = answer?.selectedValue === '__other__';
+  const hasEmptyCustomText = isOtherSelected && !answer?.customText?.trim();
 
   return (
     <div className={cn('rounded-md border border-border bg-card p-4', className)}>
@@ -69,7 +72,7 @@ export const QuestionCard = ({
       {question.allowCustom && isOtherSelected && (
         <div className={'mt-2 ml-6'}>
           <Input
-            className={'text-sm'}
+            className={cn('text-sm', showError && hasEmptyCustomText && 'border-destructive')}
             disabled={isReadOnly}
             onChange={(e) => {
               if (isReadOnly) return;
@@ -78,6 +81,9 @@ export const QuestionCard = ({
             placeholder={'Enter your answer...'}
             value={answer?.customText ?? ''}
           />
+          {showError && hasEmptyCustomText && (
+            <p className={'mt-1 text-xs text-destructive'}>Please provide a custom answer</p>
+          )}
         </div>
       )}
     </div>

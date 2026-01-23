@@ -14,6 +14,7 @@ type QuestionsListProps = ClassName & {
   isReadOnly?: boolean;
   onAnswerChange: (questionId: string, selectedValue: null | string, customText?: string) => void;
   questions: Array<ClarificationQuestion>;
+  showValidationErrors?: boolean;
 };
 
 /**
@@ -68,6 +69,7 @@ export const QuestionsList = ({
   isReadOnly = false,
   onAnswerChange,
   questions,
+  showValidationErrors = false,
 }: QuestionsListProps) => {
   const isStreaming = !isQuestionsComplete;
   const headingText = isReadOnly
@@ -112,6 +114,7 @@ export const QuestionsList = ({
               onAnswerChange={(selectedValue, customText) => onAnswerChange(question.id, selectedValue, customText)}
               question={question}
               questionNumber={index + 1}
+              showError={showValidationErrors}
             />
           );
         })}

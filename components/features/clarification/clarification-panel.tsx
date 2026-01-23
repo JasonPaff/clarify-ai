@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertCircle, CheckCircle2, History, Loader2, MessageCirclePlus, SkipForward } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
@@ -154,10 +154,22 @@ export const ClarificationPanel = ({
     resetClarification();
   };
 
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
+
   const allQuestionsAnswered =
     isQuestionsComplete &&
     questions.length > 0 &&
-    questions.every((q) => answers.some((a) => a.questionId === q.id && a.selectedValue));
+    questions.every((q) =>
+      answers.some((a) => {
+        if (a.questionId !== q.id) return false;
+        if (!a.selectedValue) return false;
+        // When "Other" is selected, require non-empty custom text
+        if (a.selectedValue === '__other__') {
+          return a.customText?.trim() !== '' && a.customText !== undefined;
+        }
+        return true;
+      })
+    );
   const hasReasoningContent = reasoningText.length > 0;
   const hasModelConfigured = modelConfig?.modelId !== null;
   const isReady = !isConfigLoading && hasModelConfigured;
@@ -289,10 +301,20 @@ export const ClarificationPanel = ({
             isQuestionsComplete={isQuestionsComplete}
             onAnswerChange={setAnswer}
             questions={questions}
+            showValidationErrors={showValidationErrors}
           />
 
           <div className={'flex flex-wrap gap-2'}>
-            <Button disabled={!allQuestionsAnswered} onClick={handleSaveAndContinue}>
+            <Button
+              disabled={!allQuestionsAnswered}
+              onClick={() => {
+                if (!allQuestionsAnswered) {
+                  setShowValidationErrors(true);
+                  return;
+                }
+                handleSaveAndContinue();
+              }}
+            >
               <CheckCircle2 className={'mr-2 size-4'} />
               Save & Continue
             </Button>

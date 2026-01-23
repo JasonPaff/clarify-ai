@@ -105,7 +105,7 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
   if (!hasAnswers) {
     warnings.push({
       message: 'Clarification questions have not been answered. Answering questions improves plan quality.',
-      severity: 'warning',
+      severity: 'caution',
       type: 'incomplete_answers',
     });
   } else {
@@ -128,7 +128,7 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
       if (unansweredCount > 0) {
         warnings.push({
           message: `${unansweredCount} clarification question${unansweredCount > 1 ? 's remain' : ' remains'} unanswered. Complete answers improve plan accuracy.`,
-          severity: 'warning',
+          severity: 'caution',
           type: 'incomplete_answers',
         });
       }
