@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type {
@@ -14,6 +16,7 @@ import type { DiscoveryGenerateRequest, DiscoveryRepositoryOverview, DiscoverySt
 
 import { useCreateRun, useSetCurrentRun, useUpdateRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { featureRequestRunKeys } from '@/lib/queries/feature-request-runs';
 import {
   parseDiscoveredFiles,
   parseDiscoveryResults,
@@ -90,6 +93,7 @@ interface UseDiscoveryResult {
  */
 export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDiscoveryOptions): UseDiscoveryResult {
   const { api, isElectron } = useElectron();
+  const queryClient = useQueryClient();
   const updateMutation = useUpdateFeatureRequest();
   const createRunMutation = useCreateRun();
   const updateRunMutation = useUpdateRun();
@@ -295,6 +299,15 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
       // Store run ID for async updates
       runIdRef.current = createdRun?.id ?? null;
 
+      // Immediately set as current run for instant UI feedback
+      if (createdRun?.id) {
+        void setCurrentRunMutation.mutateAsync({
+          featureRequestId: featureRequest.id,
+          runId: createdRun.id,
+          step: 'research',
+        });
+      }
+
       // Set up stream listener
       unsubscribeRef.current = api.ai.discovery.onStream((chunk: DiscoveryStreamChunk) => {
         switch (chunk.type) {
@@ -350,6 +363,11 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
 
           case 'result':
           case 'tool_result':
+            // Ignore intermediate tool results (like searchFiles)
+            if (chunk.type === 'tool_result' && chunk.toolName !== 'discoverFiles') {
+              break;
+            }
+
             // Tool result received - parse and set discovered files
             if (chunk.toolResult && typeof chunk.toolResult === 'object') {
               const toolResult = chunk.toolResult as DiscoveryToolResultData;
@@ -391,12 +409,17 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
                   id: runIdRef.current,
                 });
 
-                // Set this run as the current run for the discover step
-                void setCurrentRunMutation.mutateAsync({
-                  featureRequestId: featureRequest.id,
-                  runId: runIdRef.current,
-                  step: 'research',
-                });
+                // Only set current on completion if we haven't switched to another run
+                const currentRunData = queryClient.getQueryData(
+                  featureRequestRunKeys.currentRun(featureRequest.id, 'research').queryKey
+                ) as { id?: number } | undefined;
+                if (!currentRunData || currentRunData.id === runIdRef.current) {
+                  void setCurrentRunMutation.mutateAsync({
+                    featureRequestId: featureRequest.id,
+                    runId: runIdRef.current,
+                    step: 'research',
+                  });
+                }
               }
             }
             break;
@@ -462,6 +485,7 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      queryClient,
       setCurrentRunMutation,
       updateMutation,
       updateRunMutation,

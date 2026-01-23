@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import type { ClarificationModelConfig } from '@/components/features/clarification/clarification-panel';
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
@@ -19,6 +21,7 @@ import type {
 
 import { useCreateRun, useSetCurrentRun, useUpdateRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { featureRequestRunKeys } from '@/lib/queries/feature-request-runs';
 import {
   parseClarificationAnalysis,
   parseClarificationAnswers,
@@ -87,6 +90,7 @@ export function useClarification({
   repositoryOverviews,
 }: UseClarificationOptions): UseClarificationResult {
   const { api, isElectron } = useElectron();
+  const queryClient = useQueryClient();
   const updateMutation = useUpdateFeatureRequest();
   const createRunMutation = useCreateRun();
   const updateRunMutation = useUpdateRun();
@@ -356,6 +360,15 @@ export function useClarification({
       // Store run ID for async updates
       runIdRef.current = createdRun?.id ?? null;
 
+      // Immediately set as current run for instant UI feedback
+      if (createdRun?.id) {
+        void setCurrentRunMutation.mutateAsync({
+          featureRequestId: featureRequest.id,
+          runId: createdRun.id,
+          step: 'refine',
+        });
+      }
+
       // Set up stream listener
       unsubscribeRef.current = api.ai.clarification.onStream((chunk: ClarificationStreamChunk) => {
         switch (chunk.type) {
@@ -467,12 +480,17 @@ export function useClarification({
                   id: runIdRef.current,
                 });
 
-                // Set this run as the current run for the refine step
-                void setCurrentRunMutation.mutateAsync({
-                  featureRequestId: featureRequest.id,
-                  runId: runIdRef.current,
-                  step: 'refine',
-                });
+                // Only set current on completion if we haven't switched to another run
+                const currentRunData = queryClient.getQueryData(
+                  featureRequestRunKeys.currentRun(featureRequest.id, 'refine').queryKey
+                ) as { id?: number } | undefined;
+                if (!currentRunData || currentRunData.id === runIdRef.current) {
+                  void setCurrentRunMutation.mutateAsync({
+                    featureRequestId: featureRequest.id,
+                    runId: runIdRef.current,
+                    step: 'refine',
+                  });
+                }
               }
             }
             break;
@@ -543,6 +561,7 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      queryClient,
       questions,
       repositoryOverviews,
       setCurrentRunMutation,
@@ -622,6 +641,15 @@ Please generate additional clarifying questions that:
       });
 
       runIdRef.current = createdRun?.id ?? null;
+
+      // Immediately set as current run for instant UI feedback
+      if (createdRun?.id) {
+        void setCurrentRunMutation.mutateAsync({
+          featureRequestId: featureRequest.id,
+          runId: createdRun.id,
+          step: 'refine',
+        });
+      }
 
       // Set up stream listener
       unsubscribeRef.current = api.ai.clarification.onStream((chunk: ClarificationStreamChunk) => {
@@ -731,11 +759,17 @@ Please generate additional clarifying questions that:
                   id: runIdRef.current,
                 });
 
-                void setCurrentRunMutation.mutateAsync({
-                  featureRequestId: featureRequest.id,
-                  runId: runIdRef.current,
-                  step: 'refine',
-                });
+                // Only set current on completion if we haven't switched to another run
+                const currentRunData = queryClient.getQueryData(
+                  featureRequestRunKeys.currentRun(featureRequest.id, 'refine').queryKey
+                ) as { id?: number } | undefined;
+                if (!currentRunData || currentRunData.id === runIdRef.current) {
+                  void setCurrentRunMutation.mutateAsync({
+                    featureRequestId: featureRequest.id,
+                    runId: runIdRef.current,
+                    step: 'refine',
+                  });
+                }
               }
             }
             break;
@@ -790,6 +824,7 @@ Please generate additional clarifying questions that:
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      queryClient,
       questions,
       repositoryOverviews,
       setCurrentRunMutation,

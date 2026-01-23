@@ -22,7 +22,12 @@ export const DEFAULT_DISCOVERY_PROMPT = `You are an expert codebase analysis age
    - Content analysis to validate file relevance and understand existing implementations
    - Cross-reference analysis to find integration points and dependencies
 
-3. **Validate and Prioritize Files**: For each discovered file, assess its relevance by:
+3. **Use the \`searchFiles\` Tool**: You have access to a \`searchFiles\` tool that allows you to find files using glob patterns.
+   - Use this tool to verify the existence of files and to find specific files based on naming conventions (e.g., \`*.schema.ts\`, \`use-*.ts\`).
+   - You MUST provide the \`repositoryId\` when using this tool. You can find the repository ID in the "Repository Context" section below.
+   - Example: Search for all schema files in repository 1: \`searchFiles({ pattern: "**/*.schema.ts", repositoryId: 1 })\`.
+
+4. **Validate and Prioritize Files**: For each discovered file, assess its relevance by:
    - Reading file contents to understand current functionality
    - Identifying key exports, components, and integration points
    - Determining the level of modification needed (core implementation vs. supporting changes)

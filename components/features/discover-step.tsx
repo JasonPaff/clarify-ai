@@ -126,6 +126,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     files,
     isLoading,
     progress,
+    reasoningText,
     removeFile,
     resetDiscovery,
     startDiscovery,
@@ -441,6 +442,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
             isLoading={isLoading}
             onCancel={handleCancelDiscovery}
             percentage={progress.percentage}
+            reasoning={reasoningText}
             status={status}
           />
         </ErrorBoundary>

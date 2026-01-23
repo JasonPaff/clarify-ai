@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { DiscoveredFileEntry } from '@/lib/validations/discovery';
@@ -10,6 +12,7 @@ import type { PlanGenerateRequest, PlanRepositoryOverview, PlanScopeConfig, Plan
 
 import { useCreateRun, useSetCurrentRun, useUpdateRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
+import { featureRequestRunKeys } from '@/lib/queries/feature-request-runs';
 import { parseImplementationPlan, parsePlanStatus, stringifyImplementationPlan } from '@/lib/validations/plan';
 
 import { useElectron } from './useElectron';
@@ -70,6 +73,7 @@ interface UsePlanResult {
  */
 export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOptions): UsePlanResult {
   const { api, isElectron } = useElectron();
+  const queryClient = useQueryClient();
   const updateMutation = useUpdateFeatureRequest();
   const createRunMutation = useCreateRun();
   const updateRunMutation = useUpdateRun();
@@ -271,6 +275,15 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
       // Store run ID for async updates
       runIdRef.current = createdRun?.id ?? null;
 
+      // Immediately set as current run for instant UI feedback
+      if (createdRun?.id) {
+        void setCurrentRunMutation.mutateAsync({
+          featureRequestId: featureRequest.id,
+          runId: createdRun.id,
+          step: 'plan',
+        });
+      }
+
       // Set up stream listener
       unsubscribeRef.current = api.ai.plan.onStream((chunk: PlanStreamChunk) => {
         switch (chunk.type) {
@@ -331,12 +344,17 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
                   id: runIdRef.current,
                 });
 
-                // Set this run as the current run for the plan step
-                void setCurrentRunMutation.mutateAsync({
-                  featureRequestId: featureRequest.id,
-                  runId: runIdRef.current,
-                  step: 'plan',
-                });
+                // Only set current on completion if we haven't switched to another run
+                const currentRunData = queryClient.getQueryData(
+                  featureRequestRunKeys.currentRun(featureRequest.id, 'plan').queryKey
+                ) as { id?: number } | undefined;
+                if (!currentRunData || currentRunData.id === runIdRef.current) {
+                  void setCurrentRunMutation.mutateAsync({
+                    featureRequestId: featureRequest.id,
+                    runId: runIdRef.current,
+                    step: 'plan',
+                  });
+                }
               }
             }
             break;
@@ -433,6 +451,7 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      queryClient,
       setCurrentRunMutation,
       updateMutation,
       updateRunMutation,

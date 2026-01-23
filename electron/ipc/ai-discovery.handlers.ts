@@ -157,6 +157,7 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
         // Dynamic imports for AI SDK
         const { stepCountIs, streamText } = await import('ai');
         const { discoveryTool } = await import('../../lib/ai/tools/discovery-tool');
+        const { createFileSearchTool } = await import('./lib/ai/tools/file-search-tool');
         const { buildDiscoveryPrompt } = await import('../../lib/ai/prompts/discovery');
         const { getModelInfo } = await import('../../lib/ai/models');
 
@@ -171,6 +172,15 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
           },
           type: 'progress',
         } satisfies DiscoveryStreamChunk);
+
+        // Build repository path map for search tool
+        const repositoryMap = new Map<number, string>();
+        for (const repo of repositoryOverviews) {
+          repositoryMap.set(repo.repositoryId, repo.repositoryPath);
+        }
+
+        // Create search tool
+        const searchFilesTool = createFileSearchTool(repositoryMap, scopeConfig);
 
         // Build the prompt with repository overviews
         const prompt = buildDiscoveryPrompt(
@@ -207,10 +217,11 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
           ...(maxTokens && { maxTokens }),
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
-          stopWhen: stepCountIs(2), // Allow tool call and response
+          stopWhen: stepCountIs(10), // Allow multiple tool calls (search) before final discovery
           ...(temperature !== undefined && { temperature }),
           tools: {
             discoverFiles: discoveryTool,
+            searchFiles: searchFilesTool,
           },
           ...(providerOptions && { providerOptions }),
         } as Parameters<typeof streamText>[0]);
@@ -298,8 +309,8 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
               // Send progress update when tool is being called
               mainWindow.webContents.send(IpcChannels.ai.discovery.stream, {
                 progress: {
-                  currentStep: 'Compiling discovered files...',
-                  percentage: 75,
+                  currentStep: part.toolName === 'searchFiles' ? 'Searching for files...' : 'Compiling discovered files...',
+                  percentage: part.toolName === 'searchFiles' ? 50 : 75,
                 },
                 type: 'progress',
               } satisfies DiscoveryStreamChunk);
@@ -331,11 +342,17 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
               };
               mainWindow.webContents.send(IpcChannels.ai.discovery.stream, chunk);
 
-              // Also send as a result chunk for easier consumption
-              chunk = {
-                toolResult: part.output as DiscoveryToolResultData,
-                type: 'result',
-              };
+              // Also send as a result chunk for easier consumption IF it is the discovery tool
+              if (part.toolName === 'discoverFiles') {
+                chunk = {
+                  toolResult: part.output as DiscoveryToolResultData,
+                  type: 'result',
+                };
+              } else {
+                // For other tools, we don't send a 'result' chunk that would trigger completion
+                // We just continue the loop (the tool_result was already sent above)
+                continue;
+              }
               break;
 
             default:

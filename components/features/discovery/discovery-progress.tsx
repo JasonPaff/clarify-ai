@@ -3,13 +3,16 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { Progress } from '@base-ui/react/progress';
-import { CheckCircle2, FileSearch, Loader2, XCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle2, FileSearch, Loader2, Sparkles, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 import type { DiscoveryStatus } from '@/lib/validations/discovery';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { useStickToBottom } from 'use-stick-to-bottom';
 
 type DiscoveryProgressProps = ComponentPropsWithRef<'div'> & {
   /** Current step text describing what is happening */
@@ -22,6 +25,8 @@ type DiscoveryProgressProps = ComponentPropsWithRef<'div'> & {
   onCancel?: () => void;
   /** Overall progress percentage (0-100) */
   percentage?: number;
+  /** Reasoning output from the AI model */
+  reasoning?: string;
   /** Per-repository progress information */
   repositoryProgress?: Array<RepositoryProgress>;
   /** Current discovery workflow status */
@@ -52,11 +57,17 @@ export const DiscoveryProgress = ({
   isLoading,
   onCancel,
   percentage = 0,
+  reasoning,
   ref,
   repositoryProgress = [],
   status,
   ...props
 }: DiscoveryProgressProps) => {
+  const [isReasoningOpen, setIsReasoningOpen] = useState(true);
+  const { scrollRef } = useStickToBottom({
+    resize: 'smooth',
+  });
+
   const isActive = status === 'scanning' || status === 'analyzing';
   const isCompleted = status === 'completed';
   const isFailed = status === 'failed';
@@ -67,6 +78,7 @@ export const DiscoveryProgress = ({
   const hasRepositoryFilesDiscovered = (repo: RepositoryProgress) =>
     repo.filesDiscovered !== undefined && repo.filesDiscovered > 0;
   const shouldRender = !isIdle || isLoading;
+  const hasReasoning = !!reasoning && reasoning.length > 0;
 
   const handleCancelConfirm = () => {
     onCancel?.();
@@ -110,81 +122,111 @@ export const DiscoveryProgress = ({
   }
 
   return (
-    <div className={cn('rounded-md border border-border bg-muted/30 p-4', className)} ref={ref} {...props}>
-      {/* Header Section */}
-      <div className={'flex items-center justify-between gap-3'}>
-        <div className={'flex items-center gap-2'}>
-          {renderStatusIcon()}
-          <span className={'text-sm font-medium text-foreground'}>{getStatusText()}</span>
+    <div className={cn('flex flex-col gap-4', className)} ref={ref} {...props}>
+      <div className={'rounded-md border border-border bg-muted/30 p-4'}>
+        {/* Header Section */}
+        <div className={'flex items-center justify-between gap-3'}>
+          <div className={'flex items-center gap-2'}>
+            {renderStatusIcon()}
+            <span className={'text-sm font-medium text-foreground'}>{getStatusText()}</span>
+          </div>
+
+          {/* File Count Badge */}
+          {shouldShowFileCount && (
+            <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent'}>
+              {filesDiscovered} {filesDiscovered === 1 ? 'file' : 'files'} found
+            </span>
+          )}
         </div>
 
-        {/* File Count Badge */}
-        {shouldShowFileCount && (
-          <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent'}>
-            {filesDiscovered} {filesDiscovered === 1 ? 'file' : 'files'} found
-          </span>
+        {/* Progress Bar Section */}
+        {isActive && (
+          <div className={'mt-3'}>
+            <Progress.Root className={'w-full'} value={percentage}>
+              <div className={'mb-1 flex items-center justify-between'}>
+                <Progress.Label className={'text-xs text-muted-foreground'}>Progress</Progress.Label>
+                <Progress.Value className={'text-xs text-muted-foreground'} />
+              </div>
+              <Progress.Track className={'h-2 w-full overflow-hidden rounded-full bg-muted shadow-inner'}>
+                <Progress.Indicator className={'block h-full bg-accent transition-all duration-300 ease-out'} />
+              </Progress.Track>
+            </Progress.Root>
+          </div>
+        )}
+
+        {/* Repository Progress Section */}
+        {repositoryProgress.length > 0 && (
+          <div className={'mt-3 space-y-2'}>
+            <span className={'text-xs font-medium text-muted-foreground'}>Repository Status</span>
+            <div className={'space-y-1'}>
+              {repositoryProgress.map((repo) => (
+                <div
+                  className={'flex items-center justify-between rounded-sm bg-background/50 px-2 py-1'}
+                  key={repo.repositoryId}
+                >
+                  {/* Repository Name */}
+                  <div className={'flex items-center gap-2'}>
+                    {repo.status === 'scanning' && <Loader2 className={'size-3 animate-spin text-accent'} />}
+                    {repo.status === 'completed' && (
+                      <CheckCircle2 className={'size-3 text-green-600 dark:text-green-400'} />
+                    )}
+                    {repo.status === 'error' && <XCircle className={'size-3 text-destructive'} />}
+                    {repo.status === 'pending' && (
+                      <div className={'size-3 rounded-full border border-muted-foreground'} />
+                    )}
+                    <span className={'truncate text-xs text-foreground'}>{repo.name}</span>
+                  </div>
+
+                  {/* Repository File Count */}
+                  {hasRepositoryFilesDiscovered(repo) && (
+                    <span className={'text-xs text-muted-foreground'}>
+                      {repo.filesDiscovered} {repo.filesDiscovered === 1 ? 'file' : 'files'}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Cancel Button Section */}
+        {isActive && onCancel && (
+          <div className={'mt-4'}>
+            <CancelAiDialog onConfirm={handleCancelConfirm} stepName={'Discovery'}>
+              <Button size={'sm'} variant={'outline'}>
+                Cancel
+              </Button>
+            </CancelAiDialog>
+          </div>
         )}
       </div>
 
-      {/* Progress Bar Section */}
-      {isActive && (
-        <div className={'mt-3'}>
-          <Progress.Root className={'w-full'} value={percentage}>
-            <div className={'mb-1 flex items-center justify-between'}>
-              <Progress.Label className={'text-xs text-muted-foreground'}>Progress</Progress.Label>
-              <Progress.Value className={'text-xs text-muted-foreground'} />
+      {/* Reasoning Output Section */}
+      {hasReasoning && (
+        <Collapsible
+          className={'overflow-hidden rounded-md border border-border bg-background'}
+          onOpenChange={setIsReasoningOpen}
+          open={isReasoningOpen}
+        >
+          <CollapsibleTrigger
+            className={'flex w-full items-center justify-between bg-muted/30 px-4 py-2 hover:bg-muted/50'}
+          >
+            <div className={'flex items-center gap-2'}>
+              <Sparkles className={'size-4 text-purple-500'} />
+              <span className={'text-sm font-medium'}>AI Reasoning</span>
             </div>
-            <Progress.Track className={'h-2 w-full overflow-hidden rounded-full bg-muted shadow-inner'}>
-              <Progress.Indicator className={'block h-full bg-accent transition-all duration-300 ease-out'} />
-            </Progress.Track>
-          </Progress.Root>
-        </div>
-      )}
-
-      {/* Repository Progress Section */}
-      {repositoryProgress.length > 0 && (
-        <div className={'mt-3 space-y-2'}>
-          <span className={'text-xs font-medium text-muted-foreground'}>Repository Status</span>
-          <div className={'space-y-1'}>
-            {repositoryProgress.map((repo) => (
-              <div
-                className={'flex items-center justify-between rounded-sm bg-background/50 px-2 py-1'}
-                key={repo.repositoryId}
-              >
-                {/* Repository Name */}
-                <div className={'flex items-center gap-2'}>
-                  {repo.status === 'scanning' && <Loader2 className={'size-3 animate-spin text-accent'} />}
-                  {repo.status === 'completed' && (
-                    <CheckCircle2 className={'size-3 text-green-600 dark:text-green-400'} />
-                  )}
-                  {repo.status === 'error' && <XCircle className={'size-3 text-destructive'} />}
-                  {repo.status === 'pending' && (
-                    <div className={'size-3 rounded-full border border-muted-foreground'} />
-                  )}
-                  <span className={'truncate text-xs text-foreground'}>{repo.name}</span>
-                </div>
-
-                {/* Repository File Count */}
-                {hasRepositoryFilesDiscovered(repo) && (
-                  <span className={'text-xs text-muted-foreground'}>
-                    {repo.filesDiscovered} {repo.filesDiscovered === 1 ? 'file' : 'files'}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Cancel Button Section */}
-      {isActive && onCancel && (
-        <div className={'mt-4'}>
-          <CancelAiDialog onConfirm={handleCancelConfirm} stepName={'Discovery'}>
-            <Button size={'sm'} variant={'outline'}>
-              Cancel
-            </Button>
-          </CancelAiDialog>
-        </div>
+            {isReasoningOpen ? (
+              <ChevronDown className={'size-4 text-muted-foreground'} />
+            ) : (
+              <ChevronRight className={'size-4 text-muted-foreground'} />
+            )}
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className={'max-h-60 overflow-y-auto bg-muted/10 p-4 text-xs font-mono text-muted-foreground'} ref={scrollRef}>
+              <div className={'whitespace-pre-wrap'}>{reasoning}</div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   );
