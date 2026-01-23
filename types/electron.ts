@@ -28,14 +28,6 @@ export type {
   ClarificationStreamChunk,
 } from '../electron/ipc/ai-clarification.handlers';
 
-// Re-export AI-assisted discovery types for renderer use
-export type {
-  AiDiscoveryAssistedGenerateRequest,
-  AiDiscoveryAssistedRepositoryOverview,
-  AiDiscoveryAssistedStreamChunk,
-  AiDiscoveryAssistedToolResultData,
-} from '../electron/ipc/ai-discovery-assisted.handlers';
-
 // Re-export AI discovery types for renderer use
 export type {
   DiscoveredFile,
@@ -117,15 +109,6 @@ export type {
 export interface ElectronAPI {
   /** AI-related operations including clarification, discovery, plan, and repository overview generation */
   ai: {
-    aiDiscovery: {
-      cancel(): Promise<void>;
-      generate(
-        request: import('../electron/ipc/ai-discovery-assisted.handlers').AiDiscoveryAssistedGenerateRequest
-      ): Promise<{ error?: string; success: boolean }>;
-      onStream(
-        callback: (chunk: import('../electron/ipc/ai-discovery-assisted.handlers').AiDiscoveryAssistedStreamChunk) => void
-      ): () => void;
-    };
     clarification: {
       cancel(): Promise<void>;
       generate(

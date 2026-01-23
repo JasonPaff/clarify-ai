@@ -2,7 +2,7 @@
 
 import type { RefObject } from 'react';
 
-import { AlertCircle, Sparkles, Zap } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useEffectEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -11,9 +11,7 @@ import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { FullModelId } from '@/lib/ai/models';
 import type { DiscoveryRepositoryOverview } from '@/lib/ai/prompts/discovery';
 import type { DiscoveryScopeConfig } from '@/lib/validations/discovery';
-import type { AiDiscoveryAssistedRepositoryOverview } from '@/types/electron';
 
-import { AiDiscoveryPanel } from '@/components/features/discovery/ai-discovery-panel';
 import { DiscoveryCostEstimate } from '@/components/features/discovery/discovery-cost-estimate';
 import { DiscoveryProgress } from '@/components/features/discovery/discovery-progress';
 import { DiscoveryResults } from '@/components/features/discovery/discovery-results';
@@ -29,7 +27,6 @@ import { DiscoverySkeleton } from '@/components/skeletons/discovery-skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { TabsIndicator, TabsList, TabsPanel, TabsRoot, TabsTrigger } from '@/components/ui/tabs';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useRepositories } from '@/hooks/queries/use-repositories';
@@ -37,7 +34,6 @@ import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useDiscovery } from '@/hooks/use-discovery';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
-import { useElectronFs } from '@/hooks/useElectron';
 import { buildClarificationContext } from '@/lib/ai/clarification-context';
 
 interface DiscoverStepProps {
@@ -47,26 +43,14 @@ interface DiscoverStepProps {
   projectId: number;
 }
 
-/** Discovery mode type */
-type DiscoveryMode = 'ai' | 'fast';
-
 export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: DiscoverStepProps) => {
   const { data: config, isLoading: isConfigLoading } = useStepConfig(projectId, 'research');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'research');
   const { data: repositories } = useRepositories(projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
-  const { collectRepositoryData } = useElectronFs();
 
   // Workflow context for AI operation tracking
   const { registerAiOperation, unregisterAiOperation } = useWorkflow();
-
-  // Discovery mode state - persists during session
-  const [discoveryMode, setDiscoveryMode] = useState<DiscoveryMode>('fast');
-
-  // AI Discovery file tree state
-  const [aiFileTree, setAiFileTree] = useState<string>('');
-  const [aiEstimatedTokens, setAiEstimatedTokens] = useState<number>(0);
-  const [isLoadingFileTree, setIsLoadingFileTree] = useState(false);
 
   // Get selected repository IDs from feature request repositories
   // The query returns an array of repository IDs directly
@@ -236,93 +220,6 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
 
   // Determine if we can start discovery
   const canStartDiscovery = !hasNoRepositoriesSelected && !hasRepositoriesMissingOverviews && modelConfig?.modelId;
-
-  // Build repository overviews for AI Discovery panel
-  const aiRepositoryOverviews = useMemo((): Array<AiDiscoveryAssistedRepositoryOverview> => {
-    if (!repositories || !overviewStatusMap || !overviewContentsMap) return [];
-
-    return selectedRepositoryIds
-      .filter((repoId) => overviewStatusMap.get(repoId)?.hasOverview)
-      .map((repoId) => {
-        const repo = repositories.find((r) => r.id === repoId);
-        return {
-          overview: overviewContentsMap.get(repoId) ?? '',
-          repositoryId: repoId,
-          repositoryName: repo?.name ?? 'Unknown',
-          repositoryPath: repo?.path ?? '',
-        };
-      });
-  }, [repositories, overviewStatusMap, overviewContentsMap, selectedRepositoryIds]);
-
-  // Build AI Discovery model config
-  const aiModelConfig = useMemo(() => {
-    if (!modelConfig?.modelId) return null;
-    return {
-      customPrompt: modelConfig.customPrompt,
-      enableThinking: modelConfig.thinkingEnabled,
-      maxTokens: modelConfig.maxTokens,
-      modelId: modelConfig.modelId,
-      temperature: modelConfig.temperature,
-      thinkingBudget: modelConfig.thinkingBudget,
-    };
-  }, [modelConfig]);
-
-  // Build file tree when switching to AI Discovery mode or when repositories change
-  useEffect(() => {
-    if (discoveryMode !== 'ai') return;
-    if (!repositories || selectedRepositoryIds.length === 0) {
-      setAiFileTree('');
-      setAiEstimatedTokens(0);
-      return;
-    }
-
-    let isCancelled = false;
-
-    const buildFileTree = async () => {
-      setIsLoadingFileTree(true);
-
-      try {
-        // Collect file trees from all selected repositories
-        const fileTrees: Array<string> = [];
-        let totalTokens = 0;
-
-        for (const repoId of selectedRepositoryIds) {
-          if (isCancelled) return;
-
-          const repo = repositories.find((r) => r.id === repoId);
-          if (!repo) continue;
-
-          const result = await collectRepositoryData(repo.path);
-          if (result.success && result.data) {
-            fileTrees.push(`# Repository: ${repo.name}\n${result.data.fileTree}`);
-            // Estimate tokens (roughly 4 characters per token)
-            totalTokens += Math.ceil(result.data.fileTree.length / 4);
-          }
-        }
-
-        if (!isCancelled) {
-          setAiFileTree(fileTrees.join('\n\n'));
-          setAiEstimatedTokens(totalTokens);
-        }
-      } catch {
-        // Silently handle errors - the panel will show appropriate warnings
-        if (!isCancelled) {
-          setAiFileTree('');
-          setAiEstimatedTokens(0);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsLoadingFileTree(false);
-        }
-      }
-    };
-
-    void buildFileTree();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [discoveryMode, repositories, selectedRepositoryIds, collectRepositoryData]);
 
   const handleRunRestored = useCallback(() => {
     // When a run is restored via RunHistoryDropdown, the currentRun query
@@ -505,128 +402,84 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
         )}
       </section>
 
-      {/* Section 3: Discovery Mode Tabs */}
-      <TabsRoot
-        defaultValue={'fast'}
-        onValueChange={(value) => setDiscoveryMode(value as DiscoveryMode)}
-        value={discoveryMode}
-      >
-        <TabsList>
-          <TabsTrigger value={'fast'}>
-            <Zap className={'mr-2 size-4'} />
-            Fast Discovery
-          </TabsTrigger>
-          <TabsTrigger value={'ai'}>
-            <Sparkles className={'mr-2 size-4'} />
-            AI Discovery
-          </TabsTrigger>
-          <TabsIndicator />
-        </TabsList>
+      {/* Section 3: Scope Configuration */}
+      {!isDiscoveryActive && !isDiscoveryComplete && (
+        <Collapsible>
+          <CollapsibleTrigger className={'w-full justify-between rounded-md border border-border bg-muted/30 p-3'}>
+            <span className={'text-sm font-medium'}>Scope Configuration</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className={'mt-2'}>
+              <ScopeSelector
+                onScopeChange={handleScopeChange}
+                repositories={repositories?.map((r) => ({ id: r.id, name: r.name, path: r.path })) ?? []}
+                scopeConfig={scopeConfig}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
-        {/* Fast Discovery Panel */}
-        <TabsPanel value={'fast'}>
-          <div className={'flex flex-col gap-6'}>
-            {/* Scope Configuration */}
-            {!isDiscoveryActive && !isDiscoveryComplete && (
-              <Collapsible>
-                <CollapsibleTrigger
-                  className={'w-full justify-between rounded-md border border-border bg-muted/30 p-3'}
-                >
-                  <span className={'text-sm font-medium'}>Scope Configuration</span>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className={'mt-2'}>
-                    <ScopeSelector
-                      onScopeChange={handleScopeChange}
-                      repositories={repositories?.map((r) => ({ id: r.id, name: r.name, path: r.path })) ?? []}
-                      scopeConfig={scopeConfig}
-                    />
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            )}
-
-            {/* Discovery Progress */}
-            {isDiscoveryActive && (
-              <ErrorBoundary
-                fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Progress'} />}
-                key={`progress-${errorBoundaryKey}`}
-                onReset={handleErrorBoundaryReset}
-              >
-                <DiscoveryProgress
-                  currentStep={progress.currentStep}
-                  filesDiscovered={files.length}
-                  isLoading={isLoading}
-                  onCancel={handleCancelDiscovery}
-                  percentage={progress.percentage}
-                  status={status}
-                />
-              </ErrorBoundary>
-            )}
-
-            {/* Discovery Results */}
-            {isDiscoveryComplete && (
-              <section className={'flex flex-col gap-3'}>
-                <ErrorBoundary
-                  fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Results'} />}
-                  key={`results-${errorBoundaryKey}`}
-                  onReset={handleErrorBoundaryReset}
-                >
-                  <DiscoveryResults
-                    discoveredFiles={files}
-                    onAddFile={addFile}
-                    onRemoveFile={removeFile}
-                    onUpdateFile={handleUpdateFile}
-                    projectId={projectId}
-                    repositories={repositoryOptions}
-                  />
-                </ErrorBoundary>
-
-                {/* Auto-Save Status */}
-                <div className={'flex items-center justify-end'}>
-                  <AutoSaveStatus isSaving={isLoading} lastSavedAt={lastSavedAt} />
-                </div>
-              </section>
-            )}
-
-            {/* Action Buttons */}
-            {isDiscoveryIdle && (
-              <div className={'flex items-center gap-3'}>
-                <Button
-                  disabled={!canStartDiscovery || isConfigLoading}
-                  onClick={handleStartDiscovery}
-                  size={'default'}
-                >
-                  {isConfigLoading ? 'Loading...' : 'Start Discovery'}
-                </Button>
-                {!canStartDiscovery && !isConfigLoading && (
-                  <p className={'text-sm text-muted-foreground'}>
-                    {hasNoRepositoriesSelected
-                      ? 'Select at least one repository'
-                      : hasRepositoriesMissingOverviews
-                        ? 'Generate missing repository overviews first'
-                        : 'Configure a model in step settings'}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </TabsPanel>
-
-        {/* AI Discovery Panel */}
-        <TabsPanel value={'ai'}>
-          <AiDiscoveryPanel
-            clarificationContext={clarificationContext ?? undefined}
-            estimatedTokens={aiEstimatedTokens}
-            featureDescription={featureRequest.rawRequest ?? ''}
-            featureRequestId={featureRequest.id}
-            fileTree={aiFileTree}
-            isLoadingFileTree={isLoadingFileTree}
-            modelConfig={aiModelConfig}
-            repositoryOverviews={aiRepositoryOverviews}
+      {/* Section 4: Discovery Progress */}
+      {isDiscoveryActive && (
+        <ErrorBoundary
+          fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Progress'} />}
+          key={`progress-${errorBoundaryKey}`}
+          onReset={handleErrorBoundaryReset}
+        >
+          <DiscoveryProgress
+            currentStep={progress.currentStep}
+            filesDiscovered={files.length}
+            isLoading={isLoading}
+            onCancel={handleCancelDiscovery}
+            percentage={progress.percentage}
+            status={status}
           />
-        </TabsPanel>
-      </TabsRoot>
+        </ErrorBoundary>
+      )}
+
+      {/* Section 5: Discovery Results */}
+      {isDiscoveryComplete && (
+        <section className={'flex flex-col gap-3'}>
+          <ErrorBoundary
+            fallbackRender={(props) => <StreamingErrorFallback {...props} stepName={'Discovery Results'} />}
+            key={`results-${errorBoundaryKey}`}
+            onReset={handleErrorBoundaryReset}
+          >
+            <DiscoveryResults
+              discoveredFiles={files}
+              onAddFile={addFile}
+              onRemoveFile={removeFile}
+              onUpdateFile={handleUpdateFile}
+              projectId={projectId}
+              repositories={repositoryOptions}
+            />
+          </ErrorBoundary>
+
+          {/* Auto-Save Status */}
+          <div className={'flex items-center justify-end'}>
+            <AutoSaveStatus isSaving={isLoading} lastSavedAt={lastSavedAt} />
+          </div>
+        </section>
+      )}
+
+      {/* Section 7: Action Buttons */}
+      {isDiscoveryIdle && (
+        <div className={'flex items-center gap-3'}>
+          <Button disabled={!canStartDiscovery || isConfigLoading} onClick={handleStartDiscovery} size={'default'}>
+            {isConfigLoading ? 'Loading...' : 'Start Discovery'}
+          </Button>
+          {!canStartDiscovery && !isConfigLoading && (
+            <p className={'text-sm text-muted-foreground'}>
+              {hasNoRepositoriesSelected
+                ? 'Select at least one repository'
+                : hasRepositoriesMissingOverviews
+                  ? 'Generate missing repository overviews first'
+                  : 'Configure a model in step settings'}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

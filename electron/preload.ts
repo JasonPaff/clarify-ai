@@ -23,10 +23,6 @@ import type {
 import type { FileSearchRequest, FileSearchResponse } from '@/lib/validations/file-search';
 
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
-import type {
-  AiDiscoveryAssistedGenerateRequest,
-  AiDiscoveryAssistedStreamChunk,
-} from './ipc/ai-discovery-assisted.handlers';
 import type { DiscoveryGenerateRequest, DiscoveryStreamChunk } from './ipc/ai-discovery.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
 import type { PlanGenerateRequest, PlanStreamChunk } from './ipc/ai-plan.handlers';
@@ -40,11 +36,6 @@ import { IpcChannels } from './ipc/channels';
 
 export interface ElectronAPI {
   ai: {
-    aiDiscovery: {
-      cancel(): Promise<void>;
-      generate(request: AiDiscoveryAssistedGenerateRequest): Promise<{ error?: string; success: boolean }>;
-      onStream(callback: (chunk: AiDiscoveryAssistedStreamChunk) => void): () => void;
-    };
     clarification: {
       cancel(): Promise<void>;
       generate(request: ClarificationGenerateRequest): Promise<{ error?: string; success: boolean }>;
@@ -233,20 +224,6 @@ export interface ElectronAPI {
 
 const electronAPI: ElectronAPI = {
   ai: {
-    aiDiscovery: {
-      cancel: () => ipcRenderer.invoke(IpcChannels.ai.aiDiscovery.cancel),
-      generate: (request) => ipcRenderer.invoke(IpcChannels.ai.aiDiscovery.generate, request),
-      onStream: (callback) => {
-        const handler = (_event: Electron.IpcRendererEvent, chunk: AiDiscoveryAssistedStreamChunk) => {
-          callback(chunk);
-        };
-        ipcRenderer.on(IpcChannels.ai.aiDiscovery.stream, handler);
-        // Return unsubscribe function
-        return () => {
-          ipcRenderer.removeListener(IpcChannels.ai.aiDiscovery.stream, handler);
-        };
-      },
-    },
     clarification: {
       cancel: () => ipcRenderer.invoke(IpcChannels.ai.clarification.cancel),
       generate: (request) => ipcRenderer.invoke(IpcChannels.ai.clarification.generate, request),

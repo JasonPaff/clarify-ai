@@ -68,8 +68,6 @@ You do NOT implement code. Subagents implement code.
 
 ---
 
-@CLAUDE.MD
-
 ## Command Usage
 
 ```

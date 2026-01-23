@@ -16,9 +16,6 @@ export type StepConfigurationStep = 'describe' | 'overview' | 'plan' | 'refine' 
 export const stepConfigurations = sqliteTable(
   'step_configurations',
   {
-    aiDiscoveryIgnorePatterns: text('ai_discovery_ignore_patterns'),
-    aiDiscoveryMaxFiles: integer('ai_discovery_max_files').default(50),
-    aiDiscoveryTokenBudget: integer('ai_discovery_token_budget'),
     createdAt: text('created_at')
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`)
       .notNull(),
