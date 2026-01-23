@@ -452,7 +452,9 @@ export const DiscoveryResults = ({
                   <FileCard discoveredFile={file} />
                   {/* Action Overlay Buttons */}
                   <div
-                    className={'absolute top-2 right-32 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'}
+                    className={
+                      'absolute top-2 right-32 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100'
+                    }
                   >
                     <Button onClick={() => handleEditStart(file)} size={'sm'} variant={'ghost'}>
                       Edit

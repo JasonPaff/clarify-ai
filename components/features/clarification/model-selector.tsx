@@ -160,9 +160,7 @@ export const ModelSelector = ({ className, isDisabled, onValueChange, value }: M
                         <ComboboxItemIndicator />
                         <span className={'col-start-2 flex items-center gap-1.5'}>
                           {option.label}
-                          {option.supportsThinking && (
-                            <Brain className={'size-3.5 text-muted-foreground'} />
-                          )}
+                          {option.supportsThinking && <Brain className={'size-3.5 text-muted-foreground'} />}
                         </span>
                       </ComboboxItem>
                     ))}
