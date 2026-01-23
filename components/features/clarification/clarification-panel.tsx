@@ -1,7 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
-import { AlertCircle, CheckCircle2, Clock, History, Loader2, MessageCirclePlus, SkipForward, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, History, Loader2, MessageCirclePlus, RefreshCw, SkipForward, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -33,10 +33,12 @@ export interface ClarificationModelConfig {
 }
 
 type ClarificationPanelProps = ClassName & {
+  contextFileCount?: number;
   contextFiles?: Array<ClarificationContextFile>;
   currentRun?: FeatureRequestRun;
   featureRequest: FeatureRequest;
   isConfigLoading?: boolean;
+  linkedRepositoriesCount?: number;
   modelConfig: ClarificationModelConfig | null;
   /** Callback to register the cancel function for external cancellation */
   onCancelRegister?: (cancelFn: () => void) => void;
@@ -74,10 +76,12 @@ function getModelDisplayName(modelId: string): string {
  */
 export const ClarificationPanel = ({
   className,
+  contextFileCount = 0,
   contextFiles,
   currentRun,
   featureRequest,
   isConfigLoading = false,
+  linkedRepositoriesCount,
   modelConfig,
   onCancelRegister,
   onClose,
@@ -208,12 +212,18 @@ export const ClarificationPanel = ({
         <h3 className={'font-medium'}>Clarify Request</h3>
       </div>
 
-      {/* Error display */}
+      {/* Error display with retry option */}
       {error && (
         <Alert variant={'destructive'}>
           <AlertCircle className={'size-4'} />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className={'space-y-2'}>
+            <p>{error}</p>
+            <Button onClick={() => handleStartClarification()} size={'sm'} variant={'outline'}>
+              <RefreshCw className={'mr-2 size-3'} />
+              Retry
+            </Button>
+          </AlertDescription>
         </Alert>
       )}
 
@@ -282,12 +292,30 @@ export const ClarificationPanel = ({
           {/* Ready State */}
           {isReady && (
             <div className={'flex flex-col gap-3'}>
+              {/* No repositories warning */}
+              {linkedRepositoriesCount === 0 && (
+                <Alert variant={'warning'}>
+                  <AlertCircle className={'size-4'} />
+                  <AlertTitle>No Repositories Linked</AlertTitle>
+                  <AlertDescription>
+                    Linking repositories provides code context for better analysis.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               {/* Cost Estimate */}
               <ClarificationCostEstimate
                 customPrompt={modelConfig?.customPrompt}
                 featureRequestContent={featureRequest.rawRequest ?? ''}
                 modelId={modelConfig?.modelId ?? null}
               />
+
+              {/* Context file count */}
+              {contextFileCount > 0 && (
+                <p className={'text-xs text-muted-foreground'}>
+                  {contextFileCount} context {contextFileCount === 1 ? 'file' : 'files'} included
+                </p>
+              )}
 
               {/* Action Buttons */}
               <div className={'flex flex-wrap items-center gap-2'}>

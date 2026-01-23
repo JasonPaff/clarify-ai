@@ -179,7 +179,7 @@ export function useClarification({
   const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
   const [error, setError] = useState<null | string>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isQuestionsComplete, setIsQuestionsComplete] = useState(true);
+  const [isQuestionsComplete, setIsQuestionsComplete] = useState(() => initialState.questions.length > 0);
   const [parseError, setParseError] = useState<null | string>(() => initialState.parseError);
   const [wasCancelled, setWasCancelled] = useState(false);
   const [wasRestored, setWasRestored] = useState(() => initialState.wasRestored);
@@ -313,6 +313,10 @@ export function useClarification({
         return;
       }
 
+      // Store existing Q&A for restoration on error
+      const existingQuestions = [...questions];
+      const existingAnswers = [...answers];
+
       // Reset state for new run
       setStatus('analyzing');
       setStreamingText('');
@@ -359,7 +363,14 @@ export function useClarification({
             setError(chunk.content ?? 'Unknown error');
             setIsLoading(false);
             setIsReasoningStreaming(false);
-            setStatus('idle');
+            // Restore previous Q&A if they existed
+            if (existingQuestions.length > 0) {
+              setQuestions(existingQuestions);
+              setAnswers(existingAnswers);
+              setStatus('questions_ready');
+            } else {
+              setStatus('idle');
+            }
             // Update run with error status
             if (runIdRef.current) {
               void updateRunMutation.mutateAsync({
@@ -502,7 +513,14 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
       if (!result.success) {
         setError(result.error ?? 'Generation failed');
         setIsLoading(false);
-        setStatus('idle');
+        // Restore previous Q&A if they existed
+        if (existingQuestions.length > 0) {
+          setQuestions(existingQuestions);
+          setAnswers(existingAnswers);
+          setStatus('questions_ready');
+        } else {
+          setStatus('idle');
+        }
         // Update run with error status
         if (runIdRef.current) {
           void updateRunMutation.mutateAsync({
@@ -517,6 +535,7 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
       }
     },
     [
+      answers,
       api,
       contextFiles,
       createRunMutation,
@@ -524,6 +543,7 @@ Focus on uncovering edge cases, implementation preferences, or potential ambigui
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
+      questions,
       repositoryOverviews,
       setCurrentRunMutation,
       updateRunMutation,
@@ -791,7 +811,8 @@ Please generate additional clarifying questions that:
 
     setIsLoading(false);
     setIsReasoningStreaming(false);
-    setIsQuestionsComplete(true);
+    // Only mark questions complete if we have questions from a previous tool_result
+    setIsQuestionsComplete(questions.length > 0);
     setStatus('idle');
     setWasCancelled(true);
 
@@ -805,7 +826,7 @@ Please generate additional clarifying questions that:
         id: runIdRef.current,
       });
     }
-  }, [api, isElectron, updateRunMutation]);
+  }, [api, isElectron, questions, updateRunMutation]);
 
   // Set an answer for a question
   const setAnswer = useCallback((questionId: string, selectedValue: null | string, customText?: string) => {

@@ -255,11 +255,13 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
           onReset={handleErrorBoundaryReset}
         >
           <ClarificationPanel
+            contextFileCount={includedContextFiles.length}
             contextFiles={contextFileExcerpts}
             currentRun={currentRun ?? undefined}
             featureRequest={featureRequest}
             isConfigLoading={isConfigLoading}
             key={rerunKey}
+            linkedRepositoriesCount={selectedRepositoryIds.length}
             modelConfig={modelConfig}
             onCancelRegister={handleCancelRegister}
             onComplete={handleClarificationComplete}
