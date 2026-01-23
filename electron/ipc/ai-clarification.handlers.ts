@@ -9,7 +9,7 @@ import type { ApiKeyProvider } from './lib/provider-types';
 export type { ClarificationContextFile, ClarificationRepositoryOverview } from '../../lib/ai/prompts/clarification';
 
 import { IpcChannels } from './channels';
-import { buildThinkingProviderOptions } from './lib/ai-utils';
+import { buildThinkingStreamOptions } from './lib/ai-utils';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
 
 /** Request payload for generating clarifying questions */
@@ -95,14 +95,15 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
         // Build the prompt
         const prompt = buildClarificationPrompt(featureRequest, repositoryOverviews, contextFiles, customPrompt);
 
-        // Check if the model supports thinking and build provider options
+        // Check if the model supports thinking and build stream options
         // Only enable thinking when both the model supports it AND the user has enabled it
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
         const shouldEnableThinking = supportsThinking && enableThinking;
-        const providerOptions = buildThinkingProviderOptions(
+        const thinkingOptions = buildThinkingStreamOptions(
           provider as ApiKeyProvider,
           shouldEnableThinking,
+          temperature,
           thinkingBudget
         );
 
@@ -113,11 +114,10 @@ export function registerAiClarificationHandlers(getMainWindow: () => BrowserWind
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
           stopWhen: stepCountIs(2), // Allow tool call and response
-          ...(temperature !== undefined && { temperature }),
           tools: {
             generateClarifyingQuestions: clarificationTool,
           },
-          ...(providerOptions && { providerOptions }),
+          ...thinkingOptions,
         } as Parameters<typeof streamText>[0]);
 
         // Process the stream and send chunks to renderer

@@ -7,7 +7,7 @@ import type { ImplementationPlan, PlanRisk, PlanStep, TestingStrategy } from '..
 import type { ApiKeyProvider } from './lib/provider-types';
 
 import { IpcChannels } from './channels';
-import { buildThinkingProviderOptions } from './lib/ai-utils';
+import { buildThinkingStreamOptions } from './lib/ai-utils';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
 
 // Re-export types from validations for backward compatibility
@@ -194,14 +194,15 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
           customPrompt
         );
 
-        // Check if the model supports thinking and build provider options
+        // Check if the model supports thinking and build stream options
         // Only enable thinking when both the model supports it AND the user has enabled it
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
         const shouldEnableThinking = supportsThinking && enableThinking;
-        const providerOptions = buildThinkingProviderOptions(
+        const thinkingOptions = buildThinkingStreamOptions(
           provider as ApiKeyProvider,
           shouldEnableThinking,
+          temperature,
           thinkingBudget
         );
 
@@ -221,11 +222,10 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
           stopWhen: stepCountIs(2), // Allow tool call and response
-          ...(temperature !== undefined && { temperature }),
           tools: {
             generatePlan: planTool,
           },
-          ...(providerOptions && { providerOptions }),
+          ...thinkingOptions,
         } as Parameters<typeof streamText>[0]);
 
         // Track progress through the stream

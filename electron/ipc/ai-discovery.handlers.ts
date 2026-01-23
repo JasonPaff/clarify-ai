@@ -6,7 +6,7 @@ import type { DiscoveredFileEntry, DiscoveryScopeConfig } from '../../lib/valida
 import type { ApiKeyProvider } from './lib/provider-types';
 
 import { IpcChannels } from './channels';
-import { buildThinkingProviderOptions } from './lib/ai-utils';
+import { buildThinkingStreamOptions } from './lib/ai-utils';
 import { createProvider, getProviderCredentials, parseModelId } from './lib/provider-factory';
 
 // Re-export DiscoveryScopeConfig from validations for backward compatibility
@@ -158,6 +158,10 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
         const { stepCountIs, streamText } = await import('ai');
         const { discoveryTool } = await import('../../lib/ai/tools/discovery-tool');
         const { createFileSearchTool } = await import('./lib/ai/tools/file-search-tool');
+        const { createContentSearchTool } = await import('./lib/ai/tools/content-search-tool');
+        const { createFileReadTool } = await import('./lib/ai/tools/file-read-tool');
+        const { createProjectStructureTool } = await import('./lib/ai/tools/project-structure-tool');
+        const { createRelatedFilesTool } = await import('./lib/ai/tools/related-files-tool');
         const { buildDiscoveryPrompt } = await import('../../lib/ai/prompts/discovery');
         const { getModelInfo } = await import('../../lib/ai/models');
 
@@ -179,8 +183,12 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
           repositoryMap.set(repo.repositoryId, repo.repositoryPath);
         }
 
-        // Create search tool
+        // Create AI tools for codebase exploration
         const searchFilesTool = createFileSearchTool(repositoryMap, scopeConfig);
+        const contentSearchTool = createContentSearchTool(repositoryMap, scopeConfig);
+        const fileReadTool = createFileReadTool(repositoryMap);
+        const projectStructureTool = createProjectStructureTool(repositoryMap);
+        const relatedFilesTool = createRelatedFilesTool(repositoryMap);
 
         // Build the prompt with repository overviews
         const prompt = buildDiscoveryPrompt(
@@ -191,14 +199,15 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
           customPrompt
         );
 
-        // Check if the model supports thinking and build provider options
+        // Check if the model supports thinking and build stream options
         // Only enable thinking when both the model supports it AND the user has enabled it
         const modelInfo = getModelInfo(modelId as `${ApiKeyProvider}:${string}`);
         const supportsThinking = modelInfo?.supportsThinking ?? false;
         const shouldEnableThinking = supportsThinking && enableThinking;
-        const providerOptions = buildThinkingProviderOptions(
+        const thinkingOptions = buildThinkingStreamOptions(
           provider as ApiKeyProvider,
           shouldEnableThinking,
+          temperature,
           thinkingBudget
         );
 
@@ -218,12 +227,15 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
           model: providerInstance.model(model) as Parameters<typeof streamText>[0]['model'],
           prompt,
           stopWhen: stepCountIs(10), // Allow multiple tool calls (search) before final discovery
-          ...(temperature !== undefined && { temperature }),
           tools: {
             discoverFiles: discoveryTool,
+            findRelatedFiles: relatedFilesTool,
+            getProjectStructure: projectStructureTool,
+            readFile: fileReadTool,
+            searchContent: contentSearchTool,
             searchFiles: searchFilesTool,
           },
-          ...(providerOptions && { providerOptions }),
+          ...thinkingOptions,
         } as Parameters<typeof streamText>[0]);
 
         // Track progress through the stream
@@ -305,12 +317,24 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
               };
               break;
 
-            case 'tool-call':
+            case 'tool-call': {
+              // Map tool names to progress descriptions
+              const toolProgressMap: Record<string, { pct: number; step: string }> = {
+                discoverFiles: { pct: 80, step: 'Compiling discovered files...' },
+                findRelatedFiles: { pct: 60, step: 'Analyzing file relationships...' },
+                getProjectStructure: { pct: 35, step: 'Exploring project structure...' },
+                readFile: { pct: 55, step: 'Reading file contents...' },
+                searchContent: { pct: 50, step: 'Searching file contents...' },
+                searchFiles: { pct: 45, step: 'Searching for files...' },
+              };
+
+              const progress = toolProgressMap[part.toolName] ?? { pct: 50, step: 'Processing...' };
+
               // Send progress update when tool is being called
               mainWindow.webContents.send(IpcChannels.ai.discovery.stream, {
                 progress: {
-                  currentStep: part.toolName === 'searchFiles' ? 'Searching for files...' : 'Compiling discovered files...',
-                  percentage: part.toolName === 'searchFiles' ? 50 : 75,
+                  currentStep: progress.step,
+                  percentage: progress.pct,
                 },
                 type: 'progress',
               } satisfies DiscoveryStreamChunk);
@@ -321,6 +345,7 @@ export function registerAiDiscoveryHandlers(getMainWindow: () => BrowserWindow |
                 type: 'tool_call',
               };
               break;
+            }
 
             case 'tool-result':
               // Send progress update when results are ready
