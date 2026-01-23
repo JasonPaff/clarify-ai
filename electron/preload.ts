@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
+import type { AiLogFilterParams, AiLogQueryResult } from '@/db/repositories/ai-logs.repository';
+import type { AiLog, NewAiLog } from '@/db/schema/ai-logs.schema';
 import type {
   ContextFileType,
   FeatureRequestContextFile,
@@ -21,6 +23,7 @@ import type {
   StepConfigurationStep,
 } from '@/db/schema/step-configurations.schema';
 import type { FileSearchRequest, FileSearchResponse } from '@/lib/validations/file-search';
+import type { AiLogConfig } from '@/types/ai-log';
 
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { DiscoveryGenerateRequest, DiscoveryStreamChunk } from './ipc/ai-discovery.handlers';
@@ -57,6 +60,11 @@ export interface ElectronAPI {
       onStream(callback: (chunk: RepositoryOverviewStreamChunk) => void): () => void;
     };
   };
+  aiDebugLogging: {
+    getConfig(): Promise<AiLogConfig>;
+    openWindow(): Promise<boolean>;
+    setConfig(config: AiLogConfig): Promise<boolean>;
+  };
   apiKeys: {
     delete(provider: ApiKeyProvider): Promise<{ error?: string; success: boolean }>;
     get(provider: ApiKeyProvider): Promise<{
@@ -76,6 +84,17 @@ export interface ElectronAPI {
     getVersion(): Promise<string>;
   };
   db: {
+    aiLogs: {
+      create(data: NewAiLog): Promise<AiLog>;
+      delete(id: number): Promise<boolean>;
+      getById(id: number): Promise<AiLog | undefined>;
+      getByRequestId(requestId: string): Promise<AiLog | undefined>;
+      getCount(filters?: AiLogFilterParams): Promise<number>;
+      getLatest(limit?: number): Promise<Array<AiLog>>;
+      purge(date: string): Promise<number>;
+      query(params: AiLogFilterParams): Promise<AiLogQueryResult>;
+      update(id: number, data: Partial<NewAiLog>): Promise<AiLog | undefined>;
+    };
     featureRequestContextFiles: {
       bulkCreate(data: Array<NewFeatureRequestContextFile>): Promise<Array<FeatureRequestContextFile>>;
       create(data: NewFeatureRequestContextFile): Promise<FeatureRequestContextFile>;
@@ -281,6 +300,11 @@ const electronAPI: ElectronAPI = {
       },
     },
   },
+  aiDebugLogging: {
+    getConfig: () => ipcRenderer.invoke(IpcChannels.aiDebugLogging.getConfig),
+    openWindow: () => ipcRenderer.invoke(IpcChannels.aiDebugLogging.openWindow),
+    setConfig: (config) => ipcRenderer.invoke(IpcChannels.aiDebugLogging.setConfig, config),
+  },
   apiKeys: {
     delete: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.delete, provider),
     get: (provider) => ipcRenderer.invoke(IpcChannels.apiKeys.get, provider),
@@ -295,6 +319,17 @@ const electronAPI: ElectronAPI = {
     getVersion: () => ipcRenderer.invoke(IpcChannels.app.getVersion),
   },
   db: {
+    aiLogs: {
+      create: (data) => ipcRenderer.invoke(IpcChannels.db.aiLogs.create, data),
+      delete: (id) => ipcRenderer.invoke(IpcChannels.db.aiLogs.delete, id),
+      getById: (id) => ipcRenderer.invoke(IpcChannels.db.aiLogs.getById, id),
+      getByRequestId: (requestId) => ipcRenderer.invoke(IpcChannels.db.aiLogs.getByRequestId, requestId),
+      getCount: (filters) => ipcRenderer.invoke(IpcChannels.db.aiLogs.getCount, filters),
+      getLatest: (limit) => ipcRenderer.invoke(IpcChannels.db.aiLogs.getLatest, limit),
+      purge: (date) => ipcRenderer.invoke(IpcChannels.db.aiLogs.purge, date),
+      query: (params) => ipcRenderer.invoke(IpcChannels.db.aiLogs.query, params),
+      update: (id, data) => ipcRenderer.invoke(IpcChannels.db.aiLogs.update, id, data),
+    },
     featureRequestContextFiles: {
       bulkCreate: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.bulkCreate, data),
       create: (data) => ipcRenderer.invoke(IpcChannels.db.featureRequestContextFiles.create, data),

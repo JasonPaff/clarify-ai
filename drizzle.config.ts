@@ -7,6 +7,7 @@ export default defineConfig({
   dialect: 'sqlite',
   out: './drizzle',
   schema: [
+    './db/schema/ai-logs.schema.ts',
     './db/schema/feature-request-context-files.schema.ts',
     './db/schema/feature-request-repositories.schema.ts',
     './db/schema/feature-request-runs.schema.ts',

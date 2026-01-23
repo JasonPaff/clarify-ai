@@ -4,6 +4,7 @@ import { ipcMain } from 'electron';
 
 import type { DiscoveredFileEntry } from '../../lib/validations/discovery';
 import type { ImplementationPlan, PlanRisk, PlanStep, TestingStrategy } from '../../lib/validations/plan';
+import type { AiLoggingService } from './lib/ai-logging-service';
 import type { ApiKeyProvider } from './lib/provider-types';
 
 import { IpcChannels } from './channels';
@@ -102,7 +103,10 @@ export interface PlanToolResultData {
 // Active abort controller for cancellation
 let activeAbortController: AbortController | null = null;
 
-export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null): void {
+export function registerAiPlanHandlers(
+  getMainWindow: () => BrowserWindow | null,
+  loggingService: AiLoggingService
+): void {
   // Generate implementation plan with streaming
   ipcMain.handle(
     IpcChannels.ai.plan.generate,
@@ -147,6 +151,15 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
       if (!credentials) {
         return { error: `No credentials configured for ${provider}`, success: false };
       }
+
+      // Start logging operation (outside try block so it's accessible in catch)
+      const logResult = loggingService.startOperation({
+        featureRequestId: request.featureRequestId,
+        modelId,
+        requestBody: request,
+        workflowStep: 'plan',
+      });
+      const requestId = logResult?.requestId;
 
       try {
         // Create abort controller for cancellation
@@ -260,6 +273,16 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
                     }
                   : undefined,
               };
+
+              // Complete logging operation
+              if (requestId) {
+                loggingService.completeOperation({
+                  inputTokens: usage?.inputTokens,
+                  outputTokens: usage?.outputTokens,
+                  reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
+                  requestId,
+                });
+              }
               break;
             }
 
@@ -279,6 +302,15 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
                 content: part.text,
                 type: 'reasoning',
               };
+
+              // Log reasoning chunk
+              if (requestId) {
+                loggingService.recordStreamChunk({
+                  content: part.text,
+                  requestId,
+                  type: 'reasoning',
+                });
+              }
               break;
 
             case 'reasoning-end':
@@ -305,6 +337,15 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
                 content: part.text,
                 type: 'text',
               };
+
+              // Log text chunk
+              if (requestId) {
+                loggingService.recordStreamChunk({
+                  content: part.text,
+                  requestId,
+                  type: 'text',
+                });
+              }
               break;
 
             case 'tool-call':
@@ -322,6 +363,16 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
                 toolName: part.toolName,
                 type: 'tool_call',
               };
+
+              // Log tool call
+              if (requestId) {
+                loggingService.recordToolCall({
+                  args: part.input,
+                  requestId,
+                  toolCallId: part.toolCallId,
+                  toolName: part.toolName,
+                });
+              }
               break;
 
             case 'tool-result': {
@@ -346,6 +397,15 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
                 type: 'tool_result',
               };
               mainWindow.webContents.send(IpcChannels.ai.plan.stream, chunk);
+
+              // Log tool result
+              if (requestId) {
+                loggingService.recordToolResult({
+                  requestId,
+                  result: part.output,
+                  toolCallId: part.toolCallId,
+                });
+              }
 
               // Also send as a plan chunk for easier consumption by the UI
               const plan = convertToolResultToPlan(toolResultData);
@@ -380,10 +440,25 @@ export function registerAiPlanHandlers(getMainWindow: () => BrowserWindow | null
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
+          // Log cancellation as failure
+          if (requestId) {
+            loggingService.failOperation({
+              error: 'Generation cancelled',
+              requestId,
+            });
+          }
           return { error: 'Generation cancelled', success: false };
         }
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during plan generation';
+
+        // Log the failure
+        if (requestId) {
+          loggingService.failOperation({
+            error: errorMessage,
+            requestId,
+          });
+        }
 
         // Send error chunk to renderer
         mainWindow.webContents.send(IpcChannels.ai.plan.stream, {

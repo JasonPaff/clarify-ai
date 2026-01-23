@@ -21,6 +21,11 @@ export const IpcChannels = {
       stream: 'ai:repositoryOverview:stream',
     },
   },
+  aiDebugLogging: {
+    getConfig: 'aiDebugLogging:getConfig',
+    openWindow: 'aiDebugLogging:openWindow',
+    setConfig: 'aiDebugLogging:setConfig',
+  },
   apiKeys: {
     delete: 'apiKeys:delete',
     get: 'apiKeys:get',
@@ -35,6 +40,17 @@ export const IpcChannels = {
     getVersion: 'app:getVersion',
   },
   db: {
+    aiLogs: {
+      create: 'db:aiLogs:create',
+      delete: 'db:aiLogs:delete',
+      getById: 'db:aiLogs:getById',
+      getByRequestId: 'db:aiLogs:getByRequestId',
+      getCount: 'db:aiLogs:getCount',
+      getLatest: 'db:aiLogs:getLatest',
+      purge: 'db:aiLogs:purge',
+      query: 'db:aiLogs:query',
+      update: 'db:aiLogs:update',
+    },
     featureRequestContextFiles: {
       bulkCreate: 'db:featureRequestContextFiles:bulkCreate',
       create: 'db:featureRequestContextFiles:create',

@@ -1,4 +1,7 @@
+// Re-export AI logs repository types for renderer use
+export type { AiLogFilterParams, AiLogQueryResult, AiLogTimeRange } from '../db/repositories/ai-logs.repository';
 // Re-export database types for renderer use
+export type { AiLog, AiLogStatus, AiLogWorkflowStep, NewAiLog } from '../db/schema/ai-logs.schema';
 export type {
   ContextFileType,
   FeatureRequestContextFile,
@@ -14,6 +17,7 @@ export type { FeatureRequest, NewFeatureRequest } from '../db/schema/feature-req
 export type { NewProject, Project, ProjectWithFeatureCount } from '../db/schema/projects.schema';
 export type { NewRepository, Repository } from '../db/schema/repositories.schema';
 export type { NewRepositoryOverview, RepositoryOverview } from '../db/schema/repository-overviews.schema';
+
 export type {
   NewStepConfiguration,
   StepConfiguration,
@@ -59,11 +63,11 @@ export type {
 
 // Re-export API key types for renderer use (excluding ApiKeyProvider and ProviderCredentials which come from provider-types)
 export type { ApiKeyInfo, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
+
 // Re-export file search types for renderer use
 export type { FileSearchProgress } from '../electron/ipc/file-search.handlers';
 // Re-export file system types for renderer use
 export type { CollectRepositoryDataResult, DetectedFramework, RepositoryData } from '../electron/ipc/fs.handlers';
-
 // Re-export provider types from centralized module (single source of truth)
 export type {
   ApiKeyProvider,
@@ -90,9 +94,9 @@ export {
   providerRequiresApiKey,
   validateProviderCredentials,
 } from '../electron/ipc/lib/provider-types';
+
 // Re-export OpenRouter models types for renderer use
 export type { OpenRouterModel, StoredOpenRouterModels } from '../electron/ipc/openrouter-models.handlers';
-
 export type {
   FileSearchRequest,
   FileSearchResponse,
@@ -102,6 +106,19 @@ export type {
   HighlightRange,
   MatchType,
 } from '../lib/validations/file-search';
+
+// Re-export AI log types from types/ai-log.ts for renderer use
+export type {
+  AiLogConfig,
+  AiLogEntry,
+  AiLogStats,
+  AiLogStreamChunk,
+  AiLogToolCall,
+  NewAiLogEntry,
+  ParsedStreamChunks,
+  ParsedToolCalls,
+  UpdateAiLogEntry,
+} from '../types/ai-log';
 
 /**
  * Electron API exposed to the renderer process via context bridge.
@@ -144,6 +161,15 @@ export interface ElectronAPI {
         callback: (chunk: import('../electron/ipc/ai-overview.handlers').RepositoryOverviewStreamChunk) => void
       ): () => void;
     };
+  };
+  /** AI debug logging configuration and window management */
+  aiDebugLogging: {
+    /** Get the current AI debug logging configuration */
+    getConfig(): Promise<import('../types/ai-log').AiLogConfig>;
+    /** Open the AI debug logging DevTools window */
+    openWindow(): Promise<boolean>;
+    /** Update the AI debug logging configuration */
+    setConfig(config: import('../types/ai-log').AiLogConfig): Promise<boolean>;
   };
   /**
    * API key management for AI providers.
@@ -197,6 +223,32 @@ export interface ElectronAPI {
   };
   /** Database operations for managing application data */
   db: {
+    /** AI log entries for debugging and monitoring AI operations */
+    aiLogs: {
+      /** Create a new AI log entry */
+      create(data: import('../db/schema/ai-logs.schema').NewAiLog): Promise<import('../db/schema/ai-logs.schema').AiLog>;
+      /** Delete an AI log entry by ID */
+      delete(id: number): Promise<boolean>;
+      /** Get an AI log entry by ID */
+      getById(id: number): Promise<import('../db/schema/ai-logs.schema').AiLog | undefined>;
+      /** Get an AI log entry by request ID */
+      getByRequestId(requestId: string): Promise<import('../db/schema/ai-logs.schema').AiLog | undefined>;
+      /** Get the count of AI log entries matching optional filters */
+      getCount(filters?: import('../db/repositories/ai-logs.repository').AiLogFilterParams): Promise<number>;
+      /** Get the latest AI log entries */
+      getLatest(limit?: number): Promise<Array<import('../db/schema/ai-logs.schema').AiLog>>;
+      /** Purge AI log entries older than the specified date */
+      purge(date: string): Promise<number>;
+      /** Query AI log entries with filters and pagination */
+      query(
+        params: import('../db/repositories/ai-logs.repository').AiLogFilterParams
+      ): Promise<import('../db/repositories/ai-logs.repository').AiLogQueryResult>;
+      /** Update an AI log entry */
+      update(
+        id: number,
+        data: Partial<import('../db/schema/ai-logs.schema').NewAiLog>
+      ): Promise<import('../db/schema/ai-logs.schema').AiLog | undefined>;
+    };
     featureRequestContextFiles: {
       bulkCreate(
         data: Array<import('../db/schema/feature-request-context-files.schema').NewFeatureRequestContextFile>

@@ -1,5 +1,6 @@
 import { inferQueryKeyStore, mergeQueryKeys } from '@lukemorales/query-key-factory';
 
+import { aiLogKeys } from './ai-logs';
 import { apiKeyKeys } from './api-keys';
 import { discoveryKeys } from './discovery';
 import { featureRequestContextFileKeys } from './feature-request-context-files';
@@ -14,6 +15,7 @@ import { repositoryOverviewKeys } from './repository-overviews';
 import { stepConfigurationKeys } from './step-configurations';
 
 export const queries = mergeQueryKeys(
+  aiLogKeys,
   apiKeyKeys,
   discoveryKeys,
   featureRequestContextFileKeys,

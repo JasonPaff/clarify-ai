@@ -3,6 +3,9 @@
 import { useCallback, useMemo } from 'react';
 
 import type {
+  AiLogConfig,
+  AiLogFilterParams,
+  AiLogQueryResult,
   ApiKeyInfo,
   ApiKeyProvider,
   CollectRepositoryDataResult,
@@ -13,6 +16,7 @@ import type {
   FileSearchProgress,
   FileSearchRequest,
   FileSearchResponse,
+  NewAiLog,
   OpenRouterModel,
   ProviderCredentials,
   RepositoryOverviewGenerateRequest,
@@ -43,6 +47,35 @@ export function useElectron(): UseElectronResult {
   }, []);
 
   return { api, isElectron };
+}
+
+export function useElectronAiDebugLogging() {
+  const { api, isElectron } = useElectron();
+
+  const getConfig = useCallback(async (): Promise<AiLogConfig | null> => {
+    if (!api) return null;
+    return api.aiDebugLogging.getConfig();
+  }, [api]);
+
+  const setConfig = useCallback(
+    async (config: AiLogConfig): Promise<boolean> => {
+      if (!api) return false;
+      return api.aiDebugLogging.setConfig(config);
+    },
+    [api]
+  );
+
+  const openWindow = useCallback(async (): Promise<boolean> => {
+    if (!api) return false;
+    return api.aiDebugLogging.openWindow();
+  }, [api]);
+
+  return {
+    getConfig,
+    isElectron,
+    openWindow,
+    setConfig,
+  };
 }
 
 export function useElectronAiOverview() {
@@ -177,6 +210,45 @@ export function useElectronApp() {
 
 export function useElectronDb() {
   const { api, isElectron } = useElectron();
+
+  const aiLogs = useMemo(
+    () => ({
+      create: (data: NewAiLog) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiLogs.create(data);
+      },
+      delete: (id: number) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiLogs.delete(id);
+      },
+      getById: (id: number) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.aiLogs.getById(id);
+      },
+      getByRequestId: (requestId: string) => {
+        if (!api) return Promise.resolve(undefined);
+        return api.db.aiLogs.getByRequestId(requestId);
+      },
+      getCount: (filters?: AiLogFilterParams) => {
+        if (!api) return Promise.resolve(0);
+        return api.db.aiLogs.getCount(filters);
+      },
+      getLatest: (limit?: number) => api?.db.aiLogs.getLatest(limit) ?? Promise.resolve([]),
+      purge: (date: string) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiLogs.purge(date);
+      },
+      query: (params: AiLogFilterParams): Promise<AiLogQueryResult> => {
+        if (!api) return Promise.resolve({ entries: [], totalCount: 0 });
+        return api.db.aiLogs.query(params);
+      },
+      update: (id: number, data: Partial<NewAiLog>) => {
+        if (!api) throw new Error('Electron API not available');
+        return api.db.aiLogs.update(id, data);
+      },
+    }),
+    [api]
+  );
 
   const featureRequestRepositories = useMemo(
     () => ({
@@ -420,6 +492,7 @@ export function useElectronDb() {
   );
 
   return {
+    aiLogs,
     featureRequestContextFiles,
     featureRequestRepositories,
     featureRequestRuns,

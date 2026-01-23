@@ -2,6 +2,7 @@ import type { BrowserWindow, IpcMainInvokeEvent } from 'electron';
 
 import { ipcMain } from 'electron';
 
+import type { AiLoggingService } from './lib/ai-logging-service';
 import type { ApiKeyProvider } from './lib/provider-types';
 
 import { IpcChannels } from './channels';
@@ -36,7 +37,10 @@ export interface RepositoryOverviewStreamChunk {
 // Active abort controller for cancellation
 let activeAbortController: AbortController | null = null;
 
-export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | null): void {
+export function registerAiOverviewHandlers(
+  getMainWindow: () => BrowserWindow | null,
+  loggingService: AiLoggingService
+): void {
   // Generate repository overview with streaming
   ipcMain.handle(
     IpcChannels.ai.repositoryOverview.generate,
@@ -67,6 +71,15 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
       if (!credentials) {
         return { error: `No credentials configured for ${provider}`, success: false };
       }
+
+      // Start logging operation (outside try block so it's accessible in catch)
+      // Note: overview does not have featureRequestId, use 'describe' workflow step
+      const logResult = loggingService.startOperation({
+        modelId,
+        requestBody: request,
+        workflowStep: 'describe',
+      });
+      const requestId = logResult?.requestId;
 
       try {
         // Collect repository data
@@ -139,6 +152,16 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
                     }
                   : undefined,
               };
+
+              // Complete logging operation
+              if (requestId) {
+                loggingService.completeOperation({
+                  inputTokens: usage?.inputTokens,
+                  outputTokens: usage?.outputTokens,
+                  reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
+                  requestId,
+                });
+              }
               break;
             }
 
@@ -147,6 +170,15 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
                 content: part.text,
                 type: 'reasoning',
               };
+
+              // Log reasoning chunk
+              if (requestId) {
+                loggingService.recordStreamChunk({
+                  content: part.text,
+                  requestId,
+                  type: 'reasoning',
+                });
+              }
               break;
 
             case 'reasoning-end':
@@ -162,6 +194,15 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
                 content: part.text,
                 type: 'text',
               };
+
+              // Log text chunk
+              if (requestId) {
+                loggingService.recordStreamChunk({
+                  content: part.text,
+                  requestId,
+                  type: 'text',
+                });
+              }
               break;
 
             default:
@@ -181,10 +222,25 @@ export function registerAiOverviewHandlers(getMainWindow: () => BrowserWindow | 
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
+          // Log cancellation as failure
+          if (requestId) {
+            loggingService.failOperation({
+              error: 'Generation cancelled',
+              requestId,
+            });
+          }
           return { error: 'Generation cancelled', success: false };
         }
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error during overview generation';
+
+        // Log the failure
+        if (requestId) {
+          loggingService.failOperation({
+            error: errorMessage,
+            requestId,
+          });
+        }
 
         // Send error chunk to renderer
         mainWindow.webContents.send(IpcChannels.ai.repositoryOverview.stream, {

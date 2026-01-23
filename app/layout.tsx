@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
+import { AiDebugLoggingProvider } from '@/components/providers/ai-debug-logging-provider';
 import { GlobalModelDefaultsProvider } from '@/components/providers/global-model-defaults-provider';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
@@ -45,9 +46,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <QueryProvider>
               <ThemeProvider>
                 <ThinkingPreferenceProvider>
-                  <GlobalModelDefaultsProvider>
-                    <ToastProvider>{children}</ToastProvider>
-                  </GlobalModelDefaultsProvider>
+                  <AiDebugLoggingProvider>
+                    <GlobalModelDefaultsProvider>
+                      <ToastProvider>{children}</ToastProvider>
+                    </GlobalModelDefaultsProvider>
+                  </AiDebugLoggingProvider>
                 </ThinkingPreferenceProvider>
               </ThemeProvider>
             </QueryProvider>

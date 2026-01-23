@@ -10,12 +10,29 @@ import { cn } from '@/lib/utils';
 
 export const DialogRoot = BaseDialog.Root;
 export const DialogPortal = BaseDialog.Portal;
-export const DialogClose = BaseDialog.Close;
 
 type DialogTriggerProps = RequiredChildren;
 
 export const DialogTrigger = ({ children }: DialogTriggerProps) => {
   return <BaseDialog.Trigger render={(props) => cloneElement(children as ReactElement<object>, props)} />;
+};
+
+type DialogCloseProps = {
+  /** The element to render as the close button */
+  children: React.ReactNode;
+  /** Optional render prop for custom element (children will be passed to it) */
+  render?: ReactElement<object>;
+};
+
+export const DialogClose = ({ children, render }: DialogCloseProps) => {
+  // If render prop is provided, use it and pass children to the rendered element
+  if (render) {
+    return (
+      <BaseDialog.Close render={(props) => cloneElement(render, props)}>{children}</BaseDialog.Close>
+    );
+  }
+  // Otherwise, clone children with dialog props (avoids nested buttons)
+  return <BaseDialog.Close render={(props) => cloneElement(children as ReactElement<object>, props)} />;
 };
 
 export const dialogBackdropVariants = cva(

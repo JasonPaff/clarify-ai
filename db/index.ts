@@ -3,6 +3,7 @@ import type { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 
+import * as aiLogsSchema from './schema/ai-logs.schema';
 import * as featureRequestContextFilesSchema from './schema/feature-request-context-files.schema';
 import * as featureRequestRepositoriesSchema from './schema/feature-request-repositories.schema';
 import * as featureRequestRunsSchema from './schema/feature-request-runs.schema';
@@ -13,6 +14,7 @@ import * as repositoryOverviewsSchema from './schema/repository-overviews.schema
 import * as stepConfigurationsSchema from './schema/step-configurations.schema';
 
 const schema = {
+  ...aiLogsSchema,
   ...featureRequestContextFilesSchema,
   ...featureRequestRepositoriesSchema,
   ...featureRequestRunsSchema,
