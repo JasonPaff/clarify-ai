@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:database-schema), Task(subagent_type:tanstack-query), Task(subagent_type:tanstack-form), Task(subagent_type:tanstack-form-base-components), Task(subagent_type:ipc-handler), Task(subagent_type:frontend-component), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,pnpm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:gemini-review), Task(subagent_type:database-schema), Task(subagent_type:tanstack-query), Task(subagent_type:tanstack-form), Task(subagent_type:tanstack-form-base-components), Task(subagent_type:ipc-handler), Task(subagent_type:frontend-component), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,pnpm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
@@ -105,6 +105,7 @@ You do NOT implement code. Subagents implement code.
 ## Step-Type Detection Rules
 
 ```
+0. IF step title contains "Gemini Code Review" OR validation commands include "/gemini-review" → gemini-review
 1. IF files contain "db/schema/" AND end with ".schema.ts" → database-schema
 2. IF files contain "db/repositories/" → database-schema
 3. IF files contain "electron/ipc/" OR "electron/preload.ts" OR step involves IPC handlers → ipc-handler
@@ -165,6 +166,22 @@ You do NOT implement code. Subagents implement code.
 3. **Launch subagent using Task tool:**
 
 ```
+
+**Gemini Review Special Case**:
+
+- If the specialist is `gemini-review`, your Task prompt MUST instruct the subagent to run the Gemini review.
+- Do NOT run `/gemini-review` yourself.
+- Do NOT include generic validation commands like `pnpm lint` for this step.
+
+Example prompt:
+
+```
+Task(
+  subagent_type: "gemini-review",
+  description: "Run Gemini code review for Step {N}: {title}",
+  prompt: "Execute a Gemini code review for this plan step. Use the review mode implied by the plan step (default: uncommitted). Include any custom focus notes from the step. Return the review results and any action items."
+)
+```
 Task(
   subagent_type: "{specialist-from-routing-table}",
   description: "Implement step {N}: {title}",
@@ -196,6 +213,8 @@ Task(
 1. Run `pnpm lint && pnpm typecheck` via Bash
 2. Save `XX-quality-gates.md`
 3. Mark quality gates todo as completed/failed
+
+**Important**: Do NOT run `/gemini-review` here. Gemini reviews are executed only via plan steps routed to the `gemini-review` subagent.
 
 ### Phase 5: Summary and Commit (Orchestrator)
 

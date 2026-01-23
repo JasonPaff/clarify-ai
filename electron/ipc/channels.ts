@@ -1,5 +1,10 @@
 export const IpcChannels = {
   ai: {
+    aiDiscovery: {
+      cancel: 'ai:aiDiscovery:cancel',
+      generate: 'ai:aiDiscovery:generate',
+      stream: 'ai:aiDiscovery:stream',
+    },
     clarification: {
       cancel: 'ai:clarification:cancel',
       generate: 'ai:clarification:generate',

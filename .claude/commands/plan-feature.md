@@ -198,7 +198,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
    - **TIMEOUT**: Set 60-second timeout for plan generation
    - **RETRY STRATEGY**: If format validation fails, retry with explicit format constraints (maximum 2 attempts)
    - **FALLBACK**: If all retries fail, flag for manual review and continue with available output
-   - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'pnpm run lint:fix && pnpm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples. CRITICAL: Include Gemini code review quality gate steps using '/gemini-review' at logical checkpoints in the plan (e.g., after completing a major component, after database schema changes, after API endpoint implementation) AND always as the final quality gate step at the end of the plan. The Gemini review uses Gemini 3 Pro to review code changes."
+   - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'pnpm run lint:fix && pnpm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples. CRITICAL: Include Gemini code review quality gate steps using '/gemini-review' at logical checkpoints in the plan (e.g., after completing a major component, after database schema changes, after API endpoint implementation) AND always as the final quality gate step at the end of the plan. The Gemini review uses Gemini 3 Pro to review code changes. For every Gemini review step, use the exact step title 'Gemini Code Review (Quality Gate)' and include '/gemini-review' in Validation Commands."
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - **VALIDATION COMMANDS**: Ensure all steps include appropriate validation commands
@@ -210,7 +210,7 @@ relevant to implementing the feature by analyzing the refined request and codeba
    - **Template Compliance**: Check for Overview, Prerequisites, Implementation Steps, Quality Gates
    - **Section Validation**: Verify each required section contains appropriate content
    - **Command Validation**: Ensure steps include `pnpm run lint:fix && pnpm run typecheck`
-   - **Gemini Review Validation**: Ensure plan includes `/gemini-review` quality gate steps at logical points and as final step
+   - **Gemini Review Validation**: Ensure plan includes `/gemini-review` quality gate steps at logical points and as final step, and that each Gemini review step uses the exact title `Gemini Code Review (Quality Gate)`
    - **Content Quality**: Verify no code examples or implementations included
    - **Completeness Check**: Confirm plan addresses all aspects of the refined request
    - **Error Recovery**: If validation fails, retry with explicit format constraints
@@ -332,7 +332,7 @@ Execution time: X.X seconds
   - **Format Compliance**: Plan must be in markdown format (not XML)
   - **Template Adherence**: Includes all required sections (Overview, Prerequisites, Steps, Quality Gates)
   - **Validation Commands**: Every step includes appropriate lint/typecheck commands
-  - **Gemini Review Gates**: Plan includes `/gemini-review` quality gate steps at logical checkpoints AND as final step
+  - **Gemini Review Gates**: Plan includes `/gemini-review` quality gate steps at logical checkpoints AND as final step, each titled `Gemini Code Review (Quality Gate)`
   - **No Code Examples**: Plan contains no implementation code, only instructions
   - **Actionable Steps**: Implementation plan contains concrete, actionable steps
   - **Complete Coverage**: Plan addresses the refined feature request completely

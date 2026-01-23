@@ -2,7 +2,7 @@
 
 import type { ComponentPropsWithRef } from 'react';
 
-import { ChevronDown, Settings2 } from 'lucide-react';
+import { ChevronDown, FolderSearch, Settings2 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
@@ -11,6 +11,13 @@ import type { FullModelId } from '@/lib/ai/models';
 import { ModelSelector } from '@/components/features/clarification/model-selector';
 import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  NumberInputDecrement,
+  NumberInputField,
+  NumberInputGroup,
+  NumberInputIncrement,
+  NumberInputRoot,
+} from '@/components/ui/number-input';
 import { Textarea } from '@/components/ui/textarea';
 import { useStepConfig, useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
 import { getModelInfo } from '@/lib/ai/models';
@@ -23,6 +30,8 @@ import { ThinkingBudgetControl } from './thinking-budget-control';
 const DEFAULT_TEMPERATURE = 0.7;
 const DEFAULT_MAX_TOKENS = 4096;
 const DEFAULT_THINKING_BUDGET = 8192;
+const DEFAULT_AI_DISCOVERY_MAX_FILES = 50;
+const DEFAULT_AI_DISCOVERY_TOKEN_BUDGET = 100000;
 
 interface StepSettingsPanelProps extends ComponentPropsWithRef<'div'> {
   projectId: number;
@@ -143,6 +152,49 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
     });
   };
 
+  // AI Discovery settings local state (for research step only)
+  const serverIgnorePatternsRef = useRef(config?.aiDiscoveryIgnorePatterns ?? '');
+  const [localIgnorePatterns, setLocalIgnorePatterns] = useState(config?.aiDiscoveryIgnorePatterns ?? '');
+
+  // Sync ignore patterns local state when server value changes
+  const serverIgnorePatterns = config?.aiDiscoveryIgnorePatterns ?? '';
+  if (serverIgnorePatternsRef.current !== serverIgnorePatterns) {
+    serverIgnorePatternsRef.current = serverIgnorePatterns;
+    setLocalIgnorePatterns(serverIgnorePatterns);
+  }
+
+  const isResearchStep = step === 'research';
+
+  const handleAiDiscoveryMaxFilesChange = (value: null | number) => {
+    upsertMutation.mutate({
+      data: {
+        aiDiscoveryMaxFiles: value ?? DEFAULT_AI_DISCOVERY_MAX_FILES,
+      },
+      projectId,
+      step,
+    });
+  };
+
+  const handleAiDiscoveryTokenBudgetChange = (value: null | number) => {
+    upsertMutation.mutate({
+      data: {
+        aiDiscoveryTokenBudget: value,
+      },
+      projectId,
+      step,
+    });
+  };
+
+  const handleAiDiscoveryIgnorePatternsBlur = (value: string) => {
+    upsertMutation.mutate({
+      data: {
+        aiDiscoveryIgnorePatterns: value || null,
+      },
+      projectId,
+      step,
+    });
+  };
+
   const stepLabel = useMemo(() => {
     switch (step) {
       case 'plan':
@@ -245,6 +297,97 @@ export const StepSettingsPanel = ({ className, projectId, ref, step, ...props }:
               onBudgetChange={handleThinkingBudgetChange}
               onEnabledChange={handleThinkingEnabledChange}
             />
+
+            {/* AI Discovery Settings - Only shown for research step */}
+            {isResearchStep && (
+              <Collapsible defaultOpen={false}>
+                <CollapsibleTrigger
+                  className={cn(
+                    'flex w-full items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2 text-left text-sm',
+                    'transition-colors hover:bg-muted/50'
+                  )}
+                  isHideChevron
+                >
+                  <div className={'flex items-center gap-2'}>
+                    <FolderSearch className={'size-4 text-muted-foreground'} />
+                    <span className={'font-medium'}>AI Discovery Settings</span>
+                  </div>
+                  <ChevronDown
+                    className={
+                      'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'
+                    }
+                  />
+                </CollapsibleTrigger>
+
+                <CollapsibleContent className={'mt-2'}>
+                  <div className={'space-y-4 rounded-md border border-border bg-muted/10 p-3'}>
+                    {/* Max Files and Token Budget - Side by side */}
+                    <div className={'flex flex-col gap-4 sm:flex-row sm:gap-6'}>
+                      {/* Max Files */}
+                      <div className={'flex flex-col gap-1.5'}>
+                        <label className={'text-xs font-medium sm:text-sm'}>Max Files</label>
+                        <p className={'text-xs text-muted-foreground'}>
+                          Maximum number of files to include in discovery results.
+                        </p>
+                        <NumberInputRoot
+                          disabled={isLoading || upsertMutation.isPending}
+                          max={200}
+                          min={1}
+                          onValueChange={handleAiDiscoveryMaxFilesChange}
+                          step={5}
+                          value={config?.aiDiscoveryMaxFiles ?? DEFAULT_AI_DISCOVERY_MAX_FILES}
+                        >
+                          <NumberInputGroup>
+                            <NumberInputDecrement size={'sm'} />
+                            <NumberInputField size={'sm'} />
+                            <NumberInputIncrement size={'sm'} />
+                          </NumberInputGroup>
+                        </NumberInputRoot>
+                      </div>
+
+                      {/* Token Budget */}
+                      <div className={'flex flex-col gap-1.5'}>
+                        <label className={'text-xs font-medium sm:text-sm'}>Token Budget</label>
+                        <p className={'text-xs text-muted-foreground'}>
+                          Maximum tokens for file content in discovery context.
+                        </p>
+                        <NumberInputRoot
+                          disabled={isLoading || upsertMutation.isPending}
+                          max={500000}
+                          min={10000}
+                          onValueChange={handleAiDiscoveryTokenBudgetChange}
+                          step={10000}
+                          value={config?.aiDiscoveryTokenBudget ?? DEFAULT_AI_DISCOVERY_TOKEN_BUDGET}
+                        >
+                          <NumberInputGroup>
+                            <NumberInputDecrement size={'sm'} />
+                            <NumberInputField size={'sm'} />
+                            <NumberInputIncrement size={'sm'} />
+                          </NumberInputGroup>
+                        </NumberInputRoot>
+                      </div>
+                    </div>
+
+                    {/* Ignore Patterns */}
+                    <div className={'flex flex-col gap-1.5'}>
+                      <label className={'text-xs font-medium sm:text-sm'}>Additional Ignore Patterns</label>
+                      <p className={'text-xs text-muted-foreground'}>
+                        Add extra glob patterns to exclude from discovery (one per line). These are added to
+                        the default patterns.
+                      </p>
+                      <Textarea
+                        className={'min-h-20 font-mono text-xs'}
+                        disabled={isLoading || upsertMutation.isPending}
+                        onBlur={(e) => handleAiDiscoveryIgnorePatternsBlur(e.target.value)}
+                        onChange={(e) => setLocalIgnorePatterns(e.target.value)}
+                        placeholder={'**/generated/**\n*.min.js\n**/vendor/**'}
+                        value={localIgnorePatterns}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
 
             {/* Custom System Prompt */}
             <div className={'flex flex-col gap-1.5 sm:gap-2'}>

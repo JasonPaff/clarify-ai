@@ -1,7 +1,7 @@
 ---
 allowed-tools: Task(subagent_type:gemini-review)
 argument-hint: '[--base <branch>] [--commit <sha>] [review instructions]'
-description: Run code reviews using the Gemini CLI with Gemini 3 Pro model
+description: Run code reviews using the Gemini CLI
 ---
 
 You are a code review orchestrator that delegates AI-powered code reviews to the gemini-review agent.

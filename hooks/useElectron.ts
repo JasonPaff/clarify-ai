@@ -3,6 +3,8 @@
 import { useCallback, useMemo } from 'react';
 
 import type {
+  AiDiscoveryAssistedGenerateRequest,
+  AiDiscoveryAssistedStreamChunk,
   ApiKeyInfo,
   ApiKeyProvider,
   CollectRepositoryDataResult,
@@ -43,6 +45,43 @@ export function useElectron(): UseElectronResult {
   }, []);
 
   return { api, isElectron };
+}
+
+export function useElectronAiDiscovery() {
+  const { api, isElectron } = useElectron();
+
+  const generate = useCallback(
+    async (request: AiDiscoveryAssistedGenerateRequest): Promise<{ error?: string; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.ai.aiDiscovery.generate(request);
+    },
+    [api]
+  );
+
+  const cancel = useCallback(async (): Promise<void> => {
+    if (!api) return;
+    return api.ai.aiDiscovery.cancel();
+  }, [api]);
+
+  const subscribeToStream = useCallback(
+    (callback: (chunk: AiDiscoveryAssistedStreamChunk) => void): (() => void) => {
+      if (!api) {
+        // Return a no-op unsubscribe function
+        return function noop() {
+          // No cleanup needed when api is not available
+        };
+      }
+      return api.ai.aiDiscovery.onStream(callback);
+    },
+    [api]
+  );
+
+  return {
+    cancel,
+    generate,
+    isElectron,
+    subscribeToStream,
+  };
 }
 
 export function useElectronAiOverview() {

@@ -56,7 +56,7 @@ CORE REQUIREMENTS:
   npm run lint:fix && npm run typecheck
   ```
 - **Quality Gates**: Plan must include overall quality gates section with lint and typecheck validation commands
-- **Gemini Review Quality Gates**: Plan MUST include `/gemini-review` steps at logical checkpoints AND always as the final quality gate:
+- **Gemini Review Quality Gates**: Plan MUST include `/gemini-review` steps at logical checkpoints AND always as the final quality gate. Every Gemini review step must use the exact title `Gemini Code Review (Quality Gate)` and include `/gemini-review` in Validation Commands:
   - After completing a major component or module
   - After database schema changes
   - After API endpoint implementation
@@ -170,7 +170,7 @@ npm run lint:fix && npm run typecheck
 - [ ] All TypeScript files pass `npm run typecheck`
 - [ ] All files pass `npm run lint:fix`
 - [ ] [Any intermediate Gemini reviews pass - add at logical checkpoints]
-- [ ] Final Gemini code review passes (`/gemini-review`)
+- [ ] Final Gemini code review passes (`/gemini-review`) and uses the exact step title `Gemini Code Review (Quality Gate)`
 - [ ] [Any manual verification required]
 
 ## Notes
@@ -187,7 +187,7 @@ npm run lint:fix && npm run typecheck
 
 **GEMINI REVIEW QUALITY GATES (REQUIRED):**
 
-- Plans MUST include `/gemini-review` as the FINAL step before completion
+- Plans MUST include `/gemini-review` as the FINAL step before completion, using the exact step title `Gemini Code Review (Quality Gate)` and including `/gemini-review` in Validation Commands
 - Add intermediate Gemini review steps at logical checkpoints (after major components, schema changes, API work)
 - Gemini uses Gemini 3 Pro for AI-powered code review via piped git diff
 - Runs non-interactively without permission prompts (safe for automated execution)

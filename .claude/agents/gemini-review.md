@@ -1,6 +1,6 @@
 ---
 name: gemini-review
-description: Execute AI-powered code reviews using the Gemini CLI with Gemini 3 Pro. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Runs non-interactively for automated quality gates.
+description: Execute AI-powered code reviews using the Gemini CLI. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Runs non-interactively for automated quality gates.
 color: green
 allowed-tools: Bash(git:*), Bash(gemini:*)
 ---

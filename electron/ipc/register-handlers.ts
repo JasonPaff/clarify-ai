@@ -12,6 +12,7 @@ import { createRepositoryOverviewsRepository } from '@/db/repositories/repositor
 import { createStepConfigurationsRepository } from '@/db/repositories/step-configurations.repository';
 
 import { registerAiClarificationHandlers } from './ai-clarification.handlers';
+import { registerAiDiscoveryAssistedHandlers } from './ai-discovery-assisted.handlers';
 import { registerAiDiscoveryHandlers } from './ai-discovery.handlers';
 import { registerAiOverviewHandlers } from './ai-overview.handlers';
 import { registerAiPlanHandlers } from './ai-plan.handlers';
@@ -52,6 +53,9 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 
   // AI discovery handlers (need window reference for streaming)
   registerAiDiscoveryHandlers(getMainWindow);
+
+  // AI-assisted discovery handlers (need window reference for streaming)
+  registerAiDiscoveryAssistedHandlers(getMainWindow);
 
   // AI overview handlers (need window reference for streaming)
   registerAiOverviewHandlers(getMainWindow);
