@@ -89,7 +89,7 @@ function buildContextFilesSection(contextFiles: Array<ClarificationContextFile>)
 
   const sections = contextFiles.map((file) => {
     const excerpt = file.excerpt?.trim();
-    const excerptSection = excerpt ? `\n\nExcerpt (truncated):\n${excerpt}` : '\n\nExcerpt not available.';
+    const excerptSection = excerpt ? `\n\nContent:\n${excerpt}` : '\n\nContent not available.';
 
     return `### ${file.displayName}
 **Path**: ${file.filePath}

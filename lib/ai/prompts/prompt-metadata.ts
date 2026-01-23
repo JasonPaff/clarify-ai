@@ -53,7 +53,7 @@ export const PROMPT_METADATA: Record<StepConfigurationStep, PromptMetadata> = {
     defaultPrompt: DEFAULT_CLARIFICATION_PROMPT,
     variables: [
       { description: 'Repository context and overview information', name: '{repositoryOverviews}' },
-      { description: 'Additional context files and excerpts', name: '{contextFiles}' },
+      { description: 'Additional context files and content', name: '{contextFiles}' },
       { description: 'The feature request to analyze for clarification', name: '{featureRequest}' },
     ],
   },

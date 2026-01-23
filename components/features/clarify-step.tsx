@@ -28,7 +28,6 @@ import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { useElectronFs } from '@/hooks/useElectron';
 
-const MAX_CONTEXT_FILE_EXCERPT_CHARS = 2000;
 
 interface ClarifyStepProps {
   /** Ref to register the cancel callback for external cancellation */
@@ -106,7 +105,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
     return contextFiles.filter((file) => file.includedInContext && file.fileType !== 'image');
   }, [contextFiles]);
 
-  const [contextFileExcerpts, setContextFileExcerpts] = useState<Array<ClarificationContextFile>>([]);
+  const [contextFileContents, setContextFileContents] = useState<Array<ClarificationContextFile>>([]);
 
   useEffect(() => {
     let isActive = true;
@@ -115,15 +114,14 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
       if (!isElectron) return;
 
       if (includedContextFiles.length === 0) {
-        setContextFileExcerpts([]);
+        setContextFileContents([]);
         return;
       }
 
       const results = await Promise.all(
         includedContextFiles.map(async (file) => {
           const result = await readFile(file.filePath);
-          const excerpt =
-            result.success && result.content ? result.content.slice(0, MAX_CONTEXT_FILE_EXCERPT_CHARS) : undefined;
+          const excerpt = result.success ? result.content ?? undefined : undefined;
 
           return {
             displayName: file.displayName,
@@ -135,7 +133,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
       );
 
       if (isActive) {
-        setContextFileExcerpts(results);
+        setContextFileContents(results);
       }
     };
 
@@ -256,7 +254,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
         >
           <ClarificationPanel
             contextFileCount={includedContextFiles.length}
-            contextFiles={contextFileExcerpts}
+            contextFiles={contextFileContents}
             currentRun={currentRun ?? undefined}
             featureRequest={featureRequest}
             isConfigLoading={isConfigLoading}
