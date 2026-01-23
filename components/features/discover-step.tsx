@@ -132,6 +132,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     resetDiscovery,
     startDiscovery,
     status,
+    streamingText,
     updateFile,
   } = useDiscovery({
     currentRun: currentRun ?? undefined,
@@ -446,6 +447,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
             percentage={progress.percentage}
             reasoning={reasoningText}
             status={status}
+            streamingText={streamingText}
           />
         </ErrorBoundary>
       )}

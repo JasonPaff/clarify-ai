@@ -9,6 +9,7 @@ import type { DiscoveryStatus } from '@/lib/validations/discovery';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
+import { StreamingAnalysis } from '@/components/ui/ai/streaming-analysis';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +32,8 @@ type DiscoveryProgressProps = ComponentPropsWithRef<'div'> & {
   repositoryProgress?: Array<RepositoryProgress>;
   /** Current discovery workflow status */
   status: DiscoveryStatus;
+  /** Streaming text output from the AI model */
+  streamingText?: string;
 };
 
 /** Repository scanning status for progress display */
@@ -62,6 +65,7 @@ export const DiscoveryProgress = ({
   ref,
   repositoryProgress = [],
   status,
+  streamingText,
   ...props
 }: DiscoveryProgressProps) => {
   const isActive = status === 'scanning' || status === 'analyzing';
@@ -204,6 +208,9 @@ export const DiscoveryProgress = ({
           <ReasoningContent className={'h-60'}>{reasoning}</ReasoningContent>
         </Reasoning>
       )}
+
+      {/* Streaming Text Output Section */}
+      <StreamingAnalysis isLoading={isLoading} placeholder={'Discovering relevant files...'} text={streamingText ?? ''} />
     </div>
   );
 };

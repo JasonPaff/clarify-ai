@@ -6,13 +6,21 @@ import { cn } from '@/lib/utils';
 
 type StreamingAnalysisProps = ClassName & {
   isLoading: boolean;
+  /** Placeholder text shown when loading but no text received yet */
+  placeholder?: string;
   text: string;
 };
 
 /**
  * Displays streaming AI analysis text with a loading indicator.
+ * Shows a spinner during loading and an animated cursor while text is streaming.
  */
-export const StreamingAnalysis = ({ className, isLoading, text }: StreamingAnalysisProps) => {
+export const StreamingAnalysis = ({
+  className,
+  isLoading,
+  placeholder = 'Processing...',
+  text,
+}: StreamingAnalysisProps) => {
   if (!text && !isLoading) {
     return null;
   }
@@ -22,7 +30,7 @@ export const StreamingAnalysis = ({ className, isLoading, text }: StreamingAnaly
       <div className={'flex items-start gap-3'}>
         {isLoading && <Loader2 className={'mt-0.5 size-4 shrink-0 animate-spin text-muted-foreground'} />}
         <div className={'flex-1'}>
-          {isLoading && !text && <p className={'text-sm text-muted-foreground'}>Analyzing your feature request...</p>}
+          {isLoading && !text && <p className={'text-sm text-muted-foreground'}>{placeholder}</p>}
           {text && (
             <div className={'max-w-none'}>
               <p className={'text-sm/relaxed whitespace-pre-wrap text-foreground'}>

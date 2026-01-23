@@ -22,6 +22,7 @@ import type { ClarificationContextFile, ClarificationRepositoryOverview } from '
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
 import { useWorkflow } from '@/components/providers/workflow-provider';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
+import { StreamingAnalysis } from '@/components/ui/ai/streaming-analysis';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useClarification } from '@/hooks/use-clarification';
@@ -31,7 +32,6 @@ import { cn } from '@/lib/utils';
 import { AnalysisSummary } from './analysis-summary';
 import { ClarificationCostEstimate } from './cost-estimate';
 import { QuestionsList } from './questions-list';
-import { StreamingAnalysis } from './streaming-analysis';
 
 export interface ClarificationModelConfig {
   customPrompt?: string;
@@ -362,7 +362,7 @@ export const ClarificationPanel = ({
             </Reasoning>
           )}
 
-          <StreamingAnalysis isLoading={isLoading} text={streamingText} />
+          <StreamingAnalysis isLoading={isLoading} placeholder={'Analyzing your feature request...'} text={streamingText} />
           <CancelAiDialog onConfirm={cancelClarification} stepName={'Clarification'}>
             <Button variant={'outline'}>Cancel</Button>
           </CancelAiDialog>
