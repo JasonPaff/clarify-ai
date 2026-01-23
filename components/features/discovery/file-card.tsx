@@ -2,17 +2,22 @@
 
 import type { ComponentPropsWithRef } from 'react';
 
-import { AlertTriangle, Eye, FileMinus, FilePen, FilePlus, Pencil } from 'lucide-react';
+import { AlertTriangle, Code, Eye, FileMinus, FilePen, FilePlus, Pencil } from 'lucide-react';
 
 import type { DiscoveredFileEntry, DiscoveryFileAction, DiscoveryRiskLevel } from '@/lib/validations/discovery';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+
+import { FileSourceViewerDialog } from './file-source-viewer-dialog';
 
 type FileCardProps = ComponentPropsWithRef<'div'> & {
   /** The discovered file entry to display */
   discoveredFile: DiscoveredFileEntry;
+  /** Base path of the repository containing this file (required for viewing source) */
+  repositoryPath?: string;
 };
 
 /**
@@ -48,7 +53,7 @@ const RISK_LEVEL_CLASSES: Record<DiscoveryRiskLevel, string> = {
  * Displays a discovered file with its action, risk level, and summary information.
  * Includes expandable details for dependencies and code snippets.
  */
-export const FileCard = ({ className, discoveredFile, ref, ...props }: FileCardProps) => {
+export const FileCard = ({ className, discoveredFile, ref, repositoryPath, ...props }: FileCardProps) => {
   const { action, dependencies, isEdited, path, reason, risk, snippets } = discoveredFile;
 
   const ActionIcon = ACTION_ICONS[action];
@@ -59,6 +64,9 @@ export const FileCard = ({ className, discoveredFile, ref, ...props }: FileCardP
   const hasDependencies = dependencies && dependencies.length > 0;
   const hasSnippets = snippets && snippets.length > 0;
   const hasExpandableContent = hasDependencies || hasSnippets;
+
+  // Can view source if file exists (not 'create' action) and repository path is provided
+  const canViewSource = action !== 'create' && repositoryPath !== undefined;
 
   // Extract filename from path
   const fileName = path.split('/').pop() ?? path;
@@ -106,7 +114,7 @@ export const FileCard = ({ className, discoveredFile, ref, ...props }: FileCardP
             </div>
           </div>
 
-          {/* Badges */}
+          {/* Badges and Actions */}
           <div className={'flex shrink-0 items-center gap-2'}>
             <Badge size={'sm'} variant={actionBadgeVariant}>
               {action}
@@ -115,6 +123,13 @@ export const FileCard = ({ className, discoveredFile, ref, ...props }: FileCardP
               {risk === 'high' && <AlertTriangle aria-hidden={'true'} className={'mr-1 size-3'} />}
               {risk}
             </span>
+            {canViewSource && (
+              <FileSourceViewerDialog discoveredFile={discoveredFile} repositoryPath={repositoryPath}>
+                <Button aria-label={'View source'} size={'icon-sm'} variant={'ghost'}>
+                  <Code aria-hidden={'true'} className={'size-4'} />
+                </Button>
+              </FileSourceViewerDialog>
+            )}
           </div>
         </div>
 

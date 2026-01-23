@@ -17,12 +17,20 @@ import { codeToHtml } from 'shiki';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+/** Range of lines to highlight in the code block */
+export interface HighlightRange {
+  endLine: number;
+  startLine: number;
+}
+
 interface CodeBlockContextType {
   code: string;
 }
 
 type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   code: string;
+  /** Ranges of lines to visually highlight */
+  highlightRanges?: Array<HighlightRange>;
   language: BundledLanguage;
   showLineNumbers?: boolean;
 };
@@ -45,8 +53,35 @@ const lineNumberTransformer: ShikiTransformer = {
   name: 'line-numbers',
 };
 
-export async function highlightCode(code: string, language: BundledLanguage, showLineNumbers = false) {
-  const transformers: Array<ShikiTransformer> = showLineNumbers ? [lineNumberTransformer] : [];
+/**
+ * Creates a Shiki transformer that highlights specified line ranges
+ */
+const createHighlightTransformer = (ranges: Array<HighlightRange>): ShikiTransformer => ({
+  line(node, line) {
+    const isHighlighted = ranges.some((range) => line >= range.startLine && line <= range.endLine);
+    if (isHighlighted) {
+      const existingClasses = (node.properties.className as Array<string> | undefined) ?? [];
+      node.properties.className = [...existingClasses, 'highlighted-line'];
+    }
+  },
+  name: 'highlight-lines',
+});
+
+export async function highlightCode(
+  code: string,
+  language: BundledLanguage,
+  showLineNumbers = false,
+  highlightRanges: Array<HighlightRange> = []
+) {
+  const transformers: Array<ShikiTransformer> = [];
+
+  if (showLineNumbers) {
+    transformers.push(lineNumberTransformer);
+  }
+
+  if (highlightRanges.length > 0) {
+    transformers.push(createHighlightTransformer(highlightRanges));
+  }
 
   return await Promise.all([
     codeToHtml(code, {
@@ -66,6 +101,7 @@ export const CodeBlock = ({
   children,
   className,
   code,
+  highlightRanges = [],
   language,
   showLineNumbers = false,
   ...props
@@ -75,7 +111,7 @@ export const CodeBlock = ({
   const mounted = useRef(false);
 
   useEffect(() => {
-    highlightCode(code, language, showLineNumbers).then(([light, dark]) => {
+    highlightCode(code, language, showLineNumbers, highlightRanges).then(([light, dark]) => {
       if (!mounted.current) {
         setHtml(light);
         setDarkHtml(dark);
@@ -86,7 +122,7 @@ export const CodeBlock = ({
     return () => {
       mounted.current = false;
     };
-  }, [code, language, showLineNumbers]);
+  }, [code, language, showLineNumbers, highlightRanges]);
 
   return (
     <CodeBlockContext.Provider value={{ code }}>

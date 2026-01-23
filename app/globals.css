@@ -261,6 +261,15 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* Code block snippet highlighting for file source viewer */
+.highlighted-line {
+  display: block;
+  background-color: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-left: 2px solid var(--accent);
+  margin-left: -1rem;
+  padding-left: calc(1rem - 2px);
+}
+
 /*
  * Container Query Support for Component-Level Responsiveness
  * Use these classes to enable container queries on parent elements,

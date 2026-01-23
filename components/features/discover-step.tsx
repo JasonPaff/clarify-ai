@@ -186,7 +186,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     }
   }, [cancelCallbackRef, cancelDiscovery]);
 
-  // Build repository options for the results filter
+  // Build repository options for the results filter (includes path for file viewing)
   const repositoryOptions = useMemo(() => {
     if (!repositories) return [];
     return repositories
@@ -194,6 +194,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
       .map((repo) => ({
         id: repo.id,
         name: repo.name,
+        path: repo.path,
       }));
   }, [repositories, selectedRepositoryIds]);
 

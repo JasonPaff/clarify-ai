@@ -58,10 +58,11 @@ interface DiscoveryResultsProps extends ComponentPropsWithRef<'div'> {
   repositories?: Array<RepositoryOption>;
 }
 
-/** Repository option for filter dropdown */
+/** Repository option for filter dropdown and file path resolution */
 interface RepositoryOption {
   id: number;
   name: string;
+  path: string;
 }
 
 /**
@@ -447,9 +448,15 @@ export const DiscoveryResults = ({
                 );
               }
 
+              // Find repository path for this file
+              // If file has repositoryId, use it; otherwise default to first repository (for single-repo projects)
+              const repository = file.repositoryId
+                ? repositories.find((r) => r.id === file.repositoryId)
+                : repositories[0];
+
               return (
                 <div className={'group relative'} key={file.path}>
-                  <FileCard discoveredFile={file} />
+                  <FileCard discoveredFile={file} repositoryPath={repository?.path} />
                   {/* Action Overlay Buttons */}
                   <div
                     className={
