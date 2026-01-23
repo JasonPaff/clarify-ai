@@ -2,6 +2,7 @@
 
 import type { RefObject } from 'react';
 
+import { Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -12,12 +13,14 @@ import type { ClarificationContextFile, ClarificationRepositoryOverview } from '
 import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { ClarificationCostEstimate } from '@/components/features/clarification/cost-estimate';
 import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
+import { FileSearchDialog } from '@/components/features/workflow/file-search-dialog';
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
 import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { ClarifyStepSkeleton } from '@/components/skeletons/clarify-step-skeleton';
+import { Button } from '@/components/ui/button';
 import { useContextFiles } from '@/hooks/queries/use-feature-request-context-files';
 import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-request-repositories';
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
@@ -100,6 +103,25 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
         };
       });
   }, [overviewContentsMap, overviewStatusMap, repositories, selectedRepositoryIds]);
+
+  // Repositories formatted for FileSearchDialog
+  const linkedRepositories = useMemo(() => {
+    if (!repositories) return [];
+
+    return selectedRepositoryIds
+      .map((repoId) => {
+        const repo = repositories.find((item) => item.id === repoId);
+        if (!repo) return null;
+        return {
+          id: repo.id,
+          name: repo.name,
+          path: repo.path,
+        };
+      })
+      .filter((repo): repo is { id: number; name: string; path: string } => repo !== null);
+  }, [repositories, selectedRepositoryIds]);
+
+  const hasLinkedRepositories = linkedRepositories.length > 0;
 
   const includedContextFiles = useMemo(() => {
     return contextFiles.filter((file) => file.includedInContext && file.fileType !== 'image');
@@ -206,6 +228,13 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
     setErrorBoundaryKey((prev) => prev + 1);
   }, []);
 
+  // Handler for when files are added via FileSearchDialog
+  // Note: Cache invalidation is handled by useBulkAddContextFiles mutation onSuccess
+  const handleFilesAdded = useCallback(() => {
+    // The useBulkAddContextFiles mutation already invalidates the context files query
+    // This callback is provided for any additional side effects if needed in the future
+  }, []);
+
   // Show skeleton during initial configuration loading
   if (isConfigLoading) {
     return <ClarifyStepSkeleton />;
@@ -229,7 +258,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
       <div className={'flex flex-col gap-3'}>
         <StepSettingsPanel projectId={featureRequest.projectId} step={'refine'} />
 
-        {/* Cost Estimate and Run History */}
+        {/* Cost Estimate, Context Files, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <ClarificationCostEstimate
             customPrompt={modelConfig?.customPrompt}
@@ -238,6 +267,21 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
             modelId={modelConfig?.modelId ?? null}
             variant={'compact'}
           />
+
+          {/* Find Context Files Button */}
+          {hasLinkedRepositories && (
+            <FileSearchDialog
+              featureRequestId={featureRequest.id}
+              onFilesAdded={handleFilesAdded}
+              repositories={linkedRepositories}
+            >
+              <Button size={'sm'} variant={'outline'}>
+                <Search aria-hidden={'true'} className={'mr-2 size-4'} />
+                Find Context Files
+              </Button>
+            </FileSearchDialog>
+          )}
+
           <RunHistoryDropdown featureRequestId={featureRequest.id} onRunRestored={handleRunRestored} step={'refine'} />
         </div>
       </div>

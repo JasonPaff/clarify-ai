@@ -20,12 +20,14 @@ import type {
   StepConfiguration,
   StepConfigurationStep,
 } from '@/db/schema/step-configurations.schema';
+import type { FileSearchRequest, FileSearchResponse } from '@/lib/validations/file-search';
 
 import type { ClarificationGenerateRequest, ClarificationStreamChunk } from './ipc/ai-clarification.handlers';
 import type { DiscoveryGenerateRequest, DiscoveryStreamChunk } from './ipc/ai-discovery.handlers';
 import type { RepositoryOverviewGenerateRequest, RepositoryOverviewStreamChunk } from './ipc/ai-overview.handlers';
 import type { PlanGenerateRequest, PlanStreamChunk } from './ipc/ai-plan.handlers';
 import type { ApiKeyInfo, SetApiKeyInput } from './ipc/api-keys.handlers';
+import type { FileSearchProgress } from './ipc/file-search.handlers';
 import type { CollectRepositoryDataResult } from './ipc/fs.handlers';
 import type { ApiKeyProvider, ProviderCredentials } from './ipc/lib/provider-types';
 import type { OpenRouterModel, StoredOpenRouterModels } from './ipc/openrouter-models.handlers';
@@ -176,6 +178,14 @@ export interface ElectronAPI {
       repositoryId: number,
       content: string
     ): Promise<{ error?: string; overview?: RepositoryOverview; success: boolean }>;
+  };
+  fileSearch: {
+    cancel(): Promise<void>;
+    onProgress(callback: (progress: FileSearchProgress) => void): () => void;
+    search(
+      request: FileSearchRequest,
+      repositories: Array<{ id: number; name: string; path: string }>
+    ): Promise<{ error?: string; response?: FileSearchResponse; success: boolean }>;
   };
   fs: {
     collectRepositoryData(repositoryPath: string): Promise<CollectRepositoryDataResult>;
@@ -400,6 +410,20 @@ const electronAPI: ElectronAPI = {
   electron: {
     importRepositoryOverview: (repositoryId, content) =>
       ipcRenderer.invoke(IpcChannels.electron.importRepositoryOverview, repositoryId, content),
+  },
+  fileSearch: {
+    cancel: () => ipcRenderer.invoke(IpcChannels.fileSearch.cancel),
+    onProgress: (callback) => {
+      const handler = (_event: Electron.IpcRendererEvent, progress: FileSearchProgress) => {
+        callback(progress);
+      };
+      ipcRenderer.on(IpcChannels.fileSearch.progress, handler);
+      // Return unsubscribe function
+      return () => {
+        ipcRenderer.removeListener(IpcChannels.fileSearch.progress, handler);
+      };
+    },
+    search: (request, repositories) => ipcRenderer.invoke(IpcChannels.fileSearch.search, request, repositories),
   },
   fs: {
     collectRepositoryData: (repositoryPath) => ipcRenderer.invoke(IpcChannels.fs.collectRepositoryData, repositoryPath),

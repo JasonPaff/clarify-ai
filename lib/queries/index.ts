@@ -6,6 +6,7 @@ import { featureRequestContextFileKeys } from './feature-request-context-files';
 import { featureRequestRepositoryKeys } from './feature-request-repositories';
 import { featureRequestRunKeys } from './feature-request-runs';
 import { featureRequestKeys } from './feature-requests';
+import { fileSearchKeys } from './file-search';
 import { openRouterModelsKeys } from './openrouter-models';
 import { projectKeys } from './projects';
 import { repositoryKeys } from './repositories';
@@ -19,6 +20,7 @@ export const queries = mergeQueryKeys(
   featureRequestKeys,
   featureRequestRepositoryKeys,
   featureRequestRunKeys,
+  fileSearchKeys,
   openRouterModelsKeys,
   projectKeys,
   repositoryKeys,

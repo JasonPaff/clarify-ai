@@ -59,8 +59,11 @@ export type {
 
 // Re-export API key types for renderer use (excluding ApiKeyProvider and ProviderCredentials which come from provider-types)
 export type { ApiKeyInfo, ApiKeySource, SetApiKeyInput } from '../electron/ipc/api-keys.handlers';
+// Re-export file search types for renderer use
+export type { FileSearchProgress } from '../electron/ipc/file-search.handlers';
 // Re-export file system types for renderer use
 export type { CollectRepositoryDataResult, DetectedFramework, RepositoryData } from '../electron/ipc/fs.handlers';
+
 // Re-export provider types from centralized module (single source of truth)
 export type {
   ApiKeyProvider,
@@ -87,9 +90,17 @@ export {
   providerRequiresApiKey,
   validateProviderCredentials,
 } from '../electron/ipc/lib/provider-types';
-
 // Re-export OpenRouter models types for renderer use
 export type { OpenRouterModel, StoredOpenRouterModels } from '../electron/ipc/openrouter-models.handlers';
+
+export type {
+  FileSearchRequest,
+  FileSearchResponse,
+  FileSearchResult,
+  FileSearchSnippet,
+  FileType,
+  HighlightRange,
+} from '../lib/validations/file-search';
 
 /**
  * Electron API exposed to the renderer process via context bridge.
@@ -355,6 +366,22 @@ export interface ElectronAPI {
     ): Promise<{
       error?: string;
       overview?: import('../db/schema/repository-overviews.schema').RepositoryOverview;
+      success: boolean;
+    }>;
+  };
+  /** File search operations for searching across repositories */
+  fileSearch: {
+    /** Cancel an ongoing search operation */
+    cancel(): Promise<void>;
+    /** Subscribe to search progress updates. Returns an unsubscribe function. */
+    onProgress(callback: (progress: import('../electron/ipc/file-search.handlers').FileSearchProgress) => void): () => void;
+    /** Execute a file search across repositories */
+    search(
+      request: import('../lib/validations/file-search').FileSearchRequest,
+      repositories: Array<{ id: number; name: string; path: string }>
+    ): Promise<{
+      error?: string;
+      response?: import('../lib/validations/file-search').FileSearchResponse;
       success: boolean;
     }>;
   };

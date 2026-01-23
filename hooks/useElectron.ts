@@ -10,6 +10,9 @@ import type {
   ElectronAPI,
   FeatureRequestRunStatus,
   FeatureRequestRunStep,
+  FileSearchProgress,
+  FileSearchRequest,
+  FileSearchResponse,
   OpenRouterModel,
   ProviderCredentials,
   RepositoryOverviewGenerateRequest,
@@ -461,6 +464,46 @@ export function useElectronDialog() {
     openDirectory,
     openFile,
     saveFile,
+  };
+}
+
+export function useElectronFileSearch() {
+  const { api, isElectron } = useElectron();
+
+  const search = useCallback(
+    async (
+      request: FileSearchRequest,
+      repositories: Array<{ id: number; name: string; path: string }>
+    ): Promise<{ error?: string; response?: FileSearchResponse; success: boolean }> => {
+      if (!api) return { error: 'Not running in Electron', success: false };
+      return api.fileSearch.search(request, repositories);
+    },
+    [api]
+  );
+
+  const cancel = useCallback(async (): Promise<void> => {
+    if (!api) return;
+    return api.fileSearch.cancel();
+  }, [api]);
+
+  const subscribeToProgress = useCallback(
+    (callback: (progress: FileSearchProgress) => void): (() => void) => {
+      if (!api) {
+        // Return a no-op unsubscribe function
+        return function noop() {
+          // No cleanup needed when api is not available
+        };
+      }
+      return api.fileSearch.onProgress(callback);
+    },
+    [api]
+  );
+
+  return {
+    cancel,
+    isElectron,
+    search,
+    subscribeToProgress,
   };
 }
 

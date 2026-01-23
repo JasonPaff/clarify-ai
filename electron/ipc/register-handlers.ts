@@ -22,6 +22,7 @@ import { registerFeatureRequestContextFilesHandlers } from './feature-request-co
 import { registerFeatureRequestRepositoriesHandlers } from './feature-request-repositories.handlers';
 import { registerFeatureRequestRunsHandlers } from './feature-request-runs.handlers';
 import { registerFeatureRequestsHandlers } from './feature-requests.handlers';
+import { registerFileSearchHandlers } from './file-search.handlers';
 import { registerFsHandlers } from './fs.handlers';
 import { registerOpenRouterModelsHandlers } from './openrouter-models.handlers';
 import { registerProjectsHandlers } from './projects.handlers';
@@ -60,6 +61,9 @@ export function registerAllHandlers(db: DrizzleDatabase, getMainWindow: () => Br
 
   // OpenRouter models handlers (caching via electron-store)
   registerOpenRouterModelsHandlers();
+
+  // File search handlers (need window reference for progress updates)
+  registerFileSearchHandlers(getMainWindow);
 
   // Database handlers - Projects
   const projectsRepository = createProjectsRepository(db);

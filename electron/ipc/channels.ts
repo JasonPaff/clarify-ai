@@ -112,6 +112,11 @@ export const IpcChannels = {
   electron: {
     importRepositoryOverview: 'electron:importRepositoryOverview',
   },
+  fileSearch: {
+    cancel: 'fileSearch:cancel',
+    progress: 'fileSearch:progress',
+    search: 'fileSearch:search',
+  },
   fs: {
     collectRepositoryData: 'fs:collectRepositoryData',
     exists: 'fs:exists',
