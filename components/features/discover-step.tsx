@@ -2,7 +2,7 @@
 
 import type { RefObject } from 'react';
 
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useEffectEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -215,8 +215,10 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
   const hasRepositoriesMissingOverviews = repositoriesMissingOverviews.length > 0;
   const hasNoRepositoriesSelected = selectedRepositoryIds.length === 0;
   const isDiscoveryComplete = status === 'completed';
+  const isDiscoveryFailed = status === 'failed';
   const isDiscoveryActive = status === 'scanning' || status === 'analyzing';
   const isDiscoveryIdle = status === 'idle';
+  const canRerunDiscovery = isDiscoveryComplete || isDiscoveryFailed;
 
   // Determine if we can start discovery
   const canStartDiscovery = !hasNoRepositoriesSelected && !hasRepositoriesMissingOverviews && modelConfig?.modelId;
@@ -343,7 +345,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
       <div className={'flex flex-col gap-3'}>
         <StepSettingsPanel projectId={projectId} step={'research'} />
 
-        {/* Cost Estimate and Run History */}
+        {/* Cost Estimate, Re-run Button, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <DiscoveryCostEstimate
             customPrompt={modelConfig?.customPrompt}
@@ -353,6 +355,12 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
             repositoryOverviews={repositoryOverviewsForCostEstimate}
             variant={'compact'}
           />
+          {canRerunDiscovery && (
+            <Button onClick={resetDiscovery} size={'sm'} variant={'outline'}>
+              <RefreshCw className={'size-4'} />
+              Re-run
+            </Button>
+          )}
           <RunHistoryDropdown
             featureRequestId={featureRequest.id}
             onRunRestored={handleRunRestored}
