@@ -12,6 +12,7 @@ import type {
   FileSearchSnippet,
   FileType,
   HighlightRange,
+  MatchType,
 } from '@/lib/validations/file-search';
 
 import { fileSearchRequestSchema, validateRegexPattern } from '@/lib/validations/file-search';
@@ -300,6 +301,25 @@ function extractSnippets(
 }
 
 /**
+ * Generate a contextual snippet for filename-only matches
+ * Shows the first few lines of the file to give context
+ * @param content - File content
+ * @param snippetDepth - Number of lines for context (uses this as max lines shown)
+ * @returns A snippet showing the beginning of the file
+ */
+function generateFilenameSnippet(content: string, snippetDepth: number): FileSearchSnippet {
+  const lines = content.split('\n');
+  // Show up to (snippetDepth * 2 + 1) lines to be consistent with content snippet sizes
+  const maxLines = Math.min(lines.length, snippetDepth * 2 + 1);
+  const snippetLines = lines.slice(0, maxLines);
+
+  return {
+    content: snippetLines.join('\n'),
+    lineNumber: 1,
+  };
+}
+
+/**
  * Check if a file is likely binary based on extension
  */
 function isBinaryFile(filePath: string): boolean {
@@ -369,6 +389,25 @@ function isValidPath(filePath: string): boolean {
   return !normalizedPath.includes('..');
 }
 
+/**
+ * Check if a filename matches the search query
+ * @param filePath - Full path to the file
+ * @param query - Search query string
+ * @param compiledRegex - Pre-compiled regex for regex mode (avoids recompilation in loops)
+ * @returns true if the filename matches the query
+ */
+function matchesFilename(filePath: string, query: string, compiledRegex?: RegExp): boolean {
+  const filename = path.basename(filePath);
+
+  if (compiledRegex) {
+    // Use the pre-compiled regex for matching
+    return compiledRegex.test(filename);
+  }
+
+  // Case-insensitive substring matching for plain text
+  return filename.toLowerCase().includes(query.toLowerCase());
+}
+
 // ============================================================================
 // Main Search Logic
 // ============================================================================
@@ -405,6 +444,9 @@ async function performSearch(
 
   // Build the search pattern
   const searchPattern = useRegex ? new RegExp(query, 'gi') : query;
+
+  // Pre-compile regex for filename matching (case-insensitive) to avoid recompilation in loop
+  const filenameRegex = useRegex ? new RegExp(query, 'i') : undefined;
 
   // Build include patterns
   const { includesDotfiles, patterns: typePatterns } = fileTypes
@@ -495,22 +537,58 @@ async function performSearch(
       totalFiles,
     });
 
+    // Check if filename matches (uses pre-compiled regex if in regex mode)
+    const filenameMatches = matchesFilename(filePath, query, filenameRegex);
+
     // Read file content
     const content = await readFileContent(filePath);
-    if (content === null) continue;
+    if (content === null) {
+      // If we can't read content but filename matches, still include the result
+      if (filenameMatches) {
+        results.push({
+          filePath: path.relative(repo.path, filePath),
+          matchCount: 0,
+          matchType: 'filename',
+          repositoryId: repo.id,
+          repositoryName: repo.name,
+        });
+      }
+      continue;
+    }
 
-    // Search for matches
+    // Search for content matches
     const { matchCount, snippets } = extractSnippets(content, searchPattern, snippetDepth);
+    const contentMatches = matchCount > 0;
 
-    if (matchCount > 0) {
+    // Determine match type and whether to include result
+    let matchType: MatchType | null = null;
+    if (filenameMatches && contentMatches) {
+      matchType = 'both';
+    } else if (filenameMatches) {
+      matchType = 'filename';
+    } else if (contentMatches) {
+      matchType = 'content';
+    }
+
+    // Only include files that match either by filename or content
+    if (matchType !== null) {
       totalMatches += matchCount;
+
+      // For filename-only matches, generate a contextual snippet showing the file beginning
+      const resultSnippets =
+        matchType === 'filename'
+          ? [generateFilenameSnippet(content, snippetDepth)]
+          : snippets.length > 0
+            ? snippets
+            : undefined;
 
       results.push({
         filePath: path.relative(repo.path, filePath),
         matchCount,
+        matchType,
         repositoryId: repo.id,
         repositoryName: repo.name,
-        snippets: snippets.length > 0 ? snippets : undefined,
+        snippets: resultSnippets,
       });
     }
   }

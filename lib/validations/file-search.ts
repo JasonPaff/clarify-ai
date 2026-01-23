@@ -33,6 +33,15 @@ export const fileTypeSchema = z.enum(['all', 'code', 'config', 'documentation', 
 export type FileType = z.infer<typeof fileTypeSchema>;
 
 // ============================================================================
+// Match Type Schema
+// ============================================================================
+
+// How a file was matched in search results
+export const matchTypeSchema = z.enum(['filename', 'content', 'both']);
+
+export type MatchType = z.infer<typeof matchTypeSchema>;
+
+// ============================================================================
 // Snippet Schemas
 // ============================================================================
 
@@ -61,6 +70,9 @@ export type FileSearchSnippet = z.infer<typeof fileSearchSnippetSchema>;
 export const fileSearchResultSchema = z.object({
   filePath: z.string().min(1),
   matchCount: z.number().nonnegative(),
+  // matchType indicates how the file was discovered: by filename, content, or both
+  // Optional during transition; handler will populate once filename matching is implemented
+  matchType: matchTypeSchema.optional(),
   repositoryId: z.number(),
   repositoryName: z.string(),
   snippets: z.array(fileSearchSnippetSchema).optional(),

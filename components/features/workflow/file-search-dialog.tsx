@@ -6,8 +6,9 @@ import { AlertCircle, Loader2, Search, X } from 'lucide-react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { FileType } from '@/lib/validations/file-search';
-import type { FileSearchResult } from '@/types/electron';
+import type { FileSearchResult, MatchType } from '@/types/electron';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -219,6 +220,33 @@ export const FileSearchDialog = ({
     return `${result.repositoryId}:${result.filePath}`;
   };
 
+  const getMatchTypeDisplay = (matchType: MatchType | undefined): { label: string; variant: 'default' } => {
+    switch (matchType) {
+      case 'both':
+        return { label: 'Name + Content', variant: 'default' };
+      case 'content':
+        return { label: 'Content', variant: 'default' };
+      case 'filename':
+        return { label: 'Name', variant: 'default' };
+      default:
+        return { label: 'Content', variant: 'default' };
+    }
+  };
+
+  const getMatchCountText = (result: FileSearchResult): string => {
+    const { matchCount, matchType } = result;
+    const matchWord = matchCount === 1 ? 'match' : 'matches';
+
+    if (matchType === 'filename') {
+      return 'filename match';
+    }
+    if (matchType === 'both') {
+      return `${matchCount} content ${matchWord} + filename`;
+    }
+    // Default case: content matches or undefined matchType
+    return `${matchCount} ${matchWord}`;
+  };
+
   const isAllSelected = useMemo(() => {
     if (!response || response.results.length === 0) return false;
     return response.results.every((r) => selectedFiles.has(createFileKey(r)));
@@ -290,9 +318,9 @@ export const FileSearchDialog = ({
               <form.AppField name={'query'}>
                 {(field) => (
                   <field.TextField
-                    description={'Enter a search term or pattern to find in file contents'}
+                    description={'Search by filename or content. Matches filenames and file contents.'}
                     label={'Search Query'}
-                    placeholder={'e.g., function handleSubmit or *.tsx'}
+                    placeholder={'e.g., button.tsx, handleSubmit, or *.config.*'}
                   />
                 )}
               </form.AppField>
@@ -449,6 +477,9 @@ export const FileSearchDialog = ({
                   const fileKey = createFileKey(result);
                   const isSelected = selectedFiles.has(fileKey);
                   const repo = repositories.find((r) => r.id === result.repositoryId);
+                  const matchTypeDisplay = getMatchTypeDisplay(result.matchType);
+                  const hasSnippets = result.snippets && result.snippets.length > 0;
+                  const isFilenameOnlyMatch = !hasSnippets && result.matchType === 'filename';
 
                   return (
                     <button
@@ -464,18 +495,22 @@ export const FileSearchDialog = ({
                     >
                       <Checkbox checked={isSelected} className={'mt-0.5'} />
                       <div className={'min-w-0 flex-1'}>
-                        <p className={'truncate text-sm font-medium'}>{result.filePath}</p>
+                        <div className={'flex items-center gap-2'}>
+                          <p className={'truncate text-sm font-medium'}>{result.filePath}</p>
+                          <Badge size={'sm'} variant={matchTypeDisplay.variant}>
+                            {matchTypeDisplay.label}
+                          </Badge>
+                        </div>
                         <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
                           {repo && <span>{repo.name}</span>}
                           <span>|</span>
-                          <span>
-                            {result.matchCount} match{result.matchCount !== 1 ? 'es' : ''}
-                          </span>
+                          <span>{getMatchCountText(result)}</span>
                         </div>
-                        {/* Snippets */}
-                        {result.snippets?.length ? (
+
+                        {/* Snippets - only shown for content matches */}
+                        {hasSnippets ? (
                           <div className={'mt-2 space-y-1'}>
-                            {result.snippets.slice(0, 2).map((snippet, idx) => (
+                            {result.snippets?.slice(0, 2).map((snippet, idx) => (
                               <div
                                 className={'rounded-sm bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground'}
                                 key={idx}
@@ -488,6 +523,13 @@ export const FileSearchDialog = ({
                             ))}
                           </div>
                         ) : null}
+
+                        {/* Filename-only match indicator when no snippets */}
+                        {isFilenameOnlyMatch && (
+                          <p className={'mt-1 text-xs text-muted-foreground/70 italic'}>
+                            Matched by filename pattern
+                          </p>
+                        )}
                       </div>
                     </button>
                   );

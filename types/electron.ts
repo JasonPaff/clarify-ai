@@ -100,6 +100,7 @@ export type {
   FileSearchSnippet,
   FileType,
   HighlightRange,
+  MatchType,
 } from '../lib/validations/file-search';
 
 /**
