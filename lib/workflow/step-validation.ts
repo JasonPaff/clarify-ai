@@ -30,6 +30,18 @@ export interface ValidationContext {
 }
 
 /**
+ * Options for step validation functions.
+ */
+export interface ValidationOptions {
+  /**
+   * Whether to check if the step's work is complete (e.g., questions answered).
+   * When false, only prerequisite checks are performed.
+   * Defaults to true for backward compatibility.
+   */
+  checkCompleteness?: boolean;
+}
+
+/**
  * Severity levels for validation warnings.
  * - 'info': Informational, no action needed
  * - 'warning': Suggested action, can proceed
@@ -63,17 +75,27 @@ export type ValidationWarningType =
   | 'stale_data';
 
 /**
+ * Type for step validation functions.
+ */
+type StepValidator = (context: ValidationContext, options?: ValidationOptions) => Array<ValidationWarning>;
+
+/**
  * Validates the Clarify step for completeness.
  *
  * Checks:
- * - Clarification questions were generated
- * - All clarification questions have been answered
- * - Describe step is complete (prerequisite)
+ * - Describe step is complete (prerequisite) - always checked
+ * - Clarification questions were generated - only when checkCompleteness is true
+ * - All clarification questions have been answered - only when checkCompleteness is true
  *
  * @param context - Validation context with feature request
+ * @param options - Validation options (checkCompleteness defaults to true)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validateClarifyStep(context: ValidationContext): Array<ValidationWarning> {
+export function validateClarifyStep(
+  context: ValidationContext,
+  options?: ValidationOptions
+): Array<ValidationWarning> {
+  const { checkCompleteness = true } = options ?? {};
   const { featureRequest } = context;
   const warnings: Array<ValidationWarning> = [];
 
@@ -86,6 +108,11 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
       severity: 'caution',
       type: 'missing_prerequisite',
     });
+  }
+
+  // If only checking prerequisites, return early
+  if (!checkCompleteness) {
+    return warnings;
   }
 
   // Check if clarification questions were generated
@@ -149,9 +176,14 @@ export function validateClarifyStep(context: ValidationContext): Array<Validatio
  * - At least one repository is linked
  *
  * @param context - Validation context with feature request and linked repositories
+ * @param options - Validation options (unused for Describe step, included for consistent API)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validateDescribeStep(context: ValidationContext): Array<ValidationWarning> {
+export function validateDescribeStep(
+  context: ValidationContext,
+  options?: ValidationOptions
+): Array<ValidationWarning> {
+  void options; // Intentionally unused - included for consistent API signature
   const { featureRequest, linkedRepositoryIds } = context;
   const warnings: Array<ValidationWarning> = [];
 
@@ -181,19 +213,24 @@ export function validateDescribeStep(context: ValidationContext): Array<Validati
  * Validates the Discover step for completeness.
  *
  * Checks:
- * - Research findings are present
- * - Context files have been identified
- * - Clarify step is complete (prerequisite)
+ * - Clarify step prerequisite is complete (Describe step done)
+ * - Research findings are present - only when checkCompleteness is true
+ * - Context files have been identified - only when checkCompleteness is true
  *
  * @param context - Validation context with feature request and context files
+ * @param options - Validation options (checkCompleteness defaults to true)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validateDiscoverStep(context: ValidationContext): Array<ValidationWarning> {
+export function validateDiscoverStep(
+  context: ValidationContext,
+  options?: ValidationOptions
+): Array<ValidationWarning> {
+  const { checkCompleteness = true } = options ?? {};
   const { contextFiles, featureRequest } = context;
   const warnings: Array<ValidationWarning> = [];
 
-  // Check prerequisite: Clarify step
-  const clarifyWarnings = validateClarifyStep(context);
+  // Check prerequisite: Clarify step (only check prerequisites, not completeness)
+  const clarifyWarnings = validateClarifyStep(context, { checkCompleteness: false });
   const hasMissingPrereq = clarifyWarnings.some((w) => w.type === 'missing_prerequisite');
   if (hasMissingPrereq) {
     warnings.push({
@@ -201,6 +238,11 @@ export function validateDiscoverStep(context: ValidationContext): Array<Validati
       severity: 'caution',
       type: 'missing_prerequisite',
     });
+  }
+
+  // If only checking prerequisites, return early
+  if (!checkCompleteness) {
+    return warnings;
   }
 
   // Check for research findings
@@ -229,13 +271,20 @@ export function validateDiscoverStep(context: ValidationContext): Array<Validati
  * Validates the Plan step for completeness.
  *
  * Checks:
- * - All prerequisite steps are sufficiently complete
- * - Implementation plan prerequisites are met
+ * - Describe step is complete (hard prerequisite)
+ * - Clarify step was done with answers (soft prerequisite)
+ * - Discover step was done (soft prerequisite)
+ * - Data is not stale
  *
  * @param context - Validation context with feature request and context files
+ * @param options - Validation options (Plan step always checks all requirements)
  * @returns Array of validation warnings (empty if valid)
  */
-export function validatePlanStep(context: ValidationContext): Array<ValidationWarning> {
+export function validatePlanStep(
+  context: ValidationContext,
+  options?: ValidationOptions
+): Array<ValidationWarning> {
+  void options; // Intentionally unused - Plan step always checks all requirements
   const { featureRequest } = context;
   const warnings: Array<ValidationWarning> = [];
 
@@ -292,7 +341,7 @@ export function validatePlanStep(context: ValidationContext): Array<ValidationWa
 /**
  * Step validation function mapping.
  */
-const STEP_VALIDATORS: Record<StepId, (context: ValidationContext) => Array<ValidationWarning>> = {
+const STEP_VALIDATORS: Record<StepId, StepValidator> = {
   describe: validateDescribeStep,
   plan: validatePlanStep,
   refine: validateClarifyStep,
@@ -335,25 +384,25 @@ export function filterWarningsByType(
  *
  * @param step - The step ID to validate
  * @param context - Validation context with all necessary data
+ * @param options - Validation options (e.g., checkCompleteness)
  * @returns Array of validation warnings for the step
  *
  * @example
  * ```ts
- * const warnings = getStepWarnings('refine', {
- *   featureRequest,
- *   linkedRepositories,
- *   contextFiles,
- * });
+ * // Full validation (default) - checks prerequisites AND completeness
+ * const warnings = getStepWarnings('refine', { featureRequest, linkedRepositories, contextFiles });
  *
- * if (warnings.length > 0) {
- *   // Show warnings to user
- *   warnings.forEach(w => console.log(`[${w.severity}] ${w.message}`));
- * }
+ * // Prerequisite-only validation - when entering a step
+ * const prereqWarnings = getStepWarnings('refine', context, { checkCompleteness: false });
  * ```
  */
-export function getStepWarnings(step: StepId, context: ValidationContext): Array<ValidationWarning> {
+export function getStepWarnings(
+  step: StepId,
+  context: ValidationContext,
+  options?: ValidationOptions
+): Array<ValidationWarning> {
   const validator = STEP_VALIDATORS[step];
-  return validator(context);
+  return validator(context, options);
 }
 
 /**

@@ -132,17 +132,30 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
   /**
    * Attempts to navigate to a target step with validation.
    * If caution-severity warnings exist, shows the warning dialog instead.
+   *
+   * When navigating to an adjacent step (exactly 1 step forward), only checks
+   * prerequisites. When jumping multiple steps, checks completeness of the
+   * target step.
    */
   const attemptStepTransition = useCallback(
     (targetStep: StepId) => {
       if (!featureRequest) return;
 
-      // Get warnings for the target step
-      const warnings = getStepWarnings(targetStep, {
-        contextFiles: contextFiles ?? undefined,
-        featureRequest,
-        linkedRepositoryIds: linkedRepositories ?? undefined,
-      });
+      const sourceIndex = STEP_ORDER.indexOf(currentStep);
+      const targetIndex = STEP_ORDER.indexOf(targetStep);
+      const isAdjacentStep = targetIndex === sourceIndex + 1;
+
+      // When navigating to adjacent step, only check prerequisites (not completeness)
+      // This allows entering a step to do its work without warnings about incomplete work
+      const warnings = getStepWarnings(
+        targetStep,
+        {
+          contextFiles: contextFiles ?? undefined,
+          featureRequest,
+          linkedRepositoryIds: linkedRepositories ?? undefined,
+        },
+        { checkCompleteness: !isAdjacentStep }
+      );
 
       // If there are caution-severity warnings, show dialog instead of navigating
       if (hasCautionWarnings(warnings)) {
@@ -153,7 +166,7 @@ function FeatureWorkflowPage({ routeParams }: FeatureWorkflowPageProps) {
       // No caution warnings - navigate directly
       setCurrentStep(targetStep);
     },
-    [contextFiles, featureRequest, linkedRepositories]
+    [contextFiles, currentStep, featureRequest, linkedRepositories]
   );
 
   /**
