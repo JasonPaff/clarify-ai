@@ -295,7 +295,20 @@ clarify-ai/
 
 > **Note**: Always verify that target directories exist before creating new files. Use existing patterns in the codebase as templates for new additions.
 
-## 9. Specialist Subagents
+## 9. Custom Commands
+
+Custom commands in `.claude/commands/` provide high-level workflows. Use slash commands to invoke them.
+
+| Command           | Description                                                                                    |
+| ----------------- | ---------------------------------------------------------------------------------------------- |
+| `/plan-feature`   | Generate implementation plans through 3-4 step orchestration (clarify → refine → discover → plan) |
+| `/implement-plan` | Execute implementation plans with structured tracking using subagent architecture             |
+| `/gemini-review`  | Run AI-powered code reviews using Gemini CLI with Gemini 3 Pro                                |
+| `/create-schema`  | Create or modify database schemas using natural language descriptions                         |
+| `/fix-file`       | Fix a file to follow project patterns using specialist agents with automatic review           |
+| `/next-feature`   | Identify the next logical feature area based on design document and codebase analysis         |
+
+## 10. Specialist Subagents
 
 Specialist subagents in `.claude/agents/` handle domain-specific implementation tasks. Use them when working in their respective domains.
 
@@ -310,6 +323,7 @@ Specialist subagents in `.claude/agents/` handle domain-specific implementation 
 | `clarification-agent`           | Requirement gathering        | Gathering clarifying questions for ambiguous requests      |
 | `file-discovery-agent`          | File discovery               | Identifying all files relevant to a feature                |
 | `implementation-planner`        | Implementation planning      | Creating comprehensive implementation plans                |
+| `gemini-review`                 | Code review                  | AI-powered code reviews using Gemini CLI                   |
 
 ---
 

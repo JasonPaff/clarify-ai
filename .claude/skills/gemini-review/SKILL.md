@@ -1,13 +1,13 @@
 ---
 name: gemini-review
-description: Run code reviews using the Gemini CLI with Gemini 2.5 Pro model. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Can be used standalone or as a quality gate in plan-feature workflow.
+description: Run code reviews using the Gemini CLI with Gemini 3 Pro model. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Can be used standalone or as a quality gate in plan-feature workflow.
 ---
 
 # Gemini Code Review Skill
 
 ## Purpose
 
-This skill provides AI-powered code review capabilities using the Gemini CLI with Gemini 2.5 Pro. It can review uncommitted changes, compare against branches, or analyze specific commits to provide quality feedback.
+This skill provides AI-powered code review capabilities using the Gemini CLI with Gemini 3 Pro. It can review uncommitted changes, compare against branches, or analyze specific commits to provide quality feedback.
 
 ## When to Use This Skill
 
@@ -58,6 +58,16 @@ Use this skill in the following scenarios:
 # Review specific commit
 /gemini-review --commit HEAD~1
 ```
+
+## Architecture
+
+This skill follows the orchestrator pattern:
+
+1. **Command** (`/gemini-review`) - Parses arguments and delegates to the agent
+2. **Agent** (`gemini-review`) - Executes the actual review using Gemini CLI
+3. **Skill** (this file) - Documents capabilities and conventions
+
+The command acts as an orchestrator, keeping Claude Code's main context clean while the specialized agent handles all Gemini CLI interaction.
 
 ## How This Skill Works
 
@@ -158,13 +168,6 @@ The implementation planner adds Gemini review steps:
 - After API endpoint implementation
 - After significant refactoring
 - **Always as the final step** before plan completion
-
-## Configuration
-
-The Gemini CLI uses the `GEMINI_API_KEY` environment variable for authentication. Set it in your shell profile or a `.env` file:
-
-```bash
-export GEMINI_API_KEY="your_api_key_here"
 ```
 
 To verify Gemini configuration:
@@ -196,25 +199,22 @@ The skill presents review output in a structured format:
 ## Error Handling
 
 - **Gemini not installed**: Provides installation instructions (`npm install -g @google/gemini-cli`)
-- **Not authenticated**: Prompts user to set `GEMINI_API_KEY` environment variable
 - **No changes to review**: Informs user that working directory is clean
 - **Timeout**: Reports timeout and suggests retrying with smaller scope
 
 ## Comparison with Codex Review
 
-| Feature | Codex Review | Gemini Review |
-|---------|--------------|---------------|
-| Model | GPT 5.2 | Gemini 2.5 Pro |
-| Built-in review command | Yes (`codex review`) | No (uses `-p` prompts) |
-| Diff handling | Internal | Piped via git |
+| Feature | Codex Review | Gemini Review            |
+|---------|--------------|--------------------------|
+| Model | GPT 5.2 | Gemini 3 Pro             |
+| Built-in review command | Yes (`codex review`) | No (uses `-p` prompts)   |
+| Diff handling | Internal | Piped via git            |
 | Auth method | `codex login` | `GEMINI_API_KEY` env var |
 | Sandbox mode | `--sandbox read-only` | Not needed (piped input) |
 
 ## Important Notes
 
-- Gemini CLI must be installed (`npm install -g @google/gemini-cli`)
-- Requires `GEMINI_API_KEY` environment variable to be set
-- Uses Gemini 2.5 Pro model by default
+- Uses Gemini 3 Pro model by default
 - Runs in non-interactive mode using `-p` flag
 - Git diff content is piped directly to Gemini for analysis
 - No permission prompts - safe for automated/unattended execution by Claude Code

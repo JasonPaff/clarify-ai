@@ -56,7 +56,7 @@ CORE REQUIREMENTS:
   npm run lint:fix && npm run typecheck
   ```
 - **Quality Gates**: Plan must include overall quality gates section with lint and typecheck validation commands
-- **Codex Review Quality Gates**: Plan MUST include `/codex-review` steps at logical checkpoints AND always as the final quality gate:
+- **Gemini Review Quality Gates**: Plan MUST include `/gemini-review` steps at logical checkpoints AND always as the final quality gate:
   - After completing a major component or module
   - After database schema changes
   - After API endpoint implementation
@@ -145,23 +145,23 @@ npm run lint:fix && npm run typecheck
 
 ---
 
-### Step N: Codex Code Review (Quality Gate)
+### Step N: Gemini Code Review (Quality Gate)
 
-**What**: Run Codex code review to validate implementation quality
-**Why**: AI-powered code review (GPT 5.2) catches issues before they become problems. Runs in read-only sandbox mode for non-interactive execution.
+**What**: Run Gemini code review to validate implementation quality
+**Why**: AI-powered code review (Gemini 3 Pro) catches issues before they become problems. Runs non-interactively via piped git diff.
 **Confidence**: High
 
 **Validation Commands:**
 
 ```bash
-/codex-review
+/gemini-review
 ```
 
 **Success Criteria:**
 
-- [ ] Codex review completes without critical issues
+- [ ] Gemini review completes without critical issues
 - [ ] Any warnings or suggestions addressed or documented
-- [ ] Code quality approved by GPT 5.2 review
+- [ ] Code quality approved by Gemini 3 Pro review
 
 ---
 
@@ -169,8 +169,8 @@ npm run lint:fix && npm run typecheck
 
 - [ ] All TypeScript files pass `npm run typecheck`
 - [ ] All files pass `npm run lint:fix`
-- [ ] [Any intermediate Codex reviews pass - add at logical checkpoints]
-- [ ] Final Codex code review passes (`/codex-review`)
+- [ ] [Any intermediate Gemini reviews pass - add at logical checkpoints]
+- [ ] Final Gemini code review passes (`/gemini-review`)
 - [ ] [Any manual verification required]
 
 ## Notes
@@ -185,11 +185,11 @@ npm run lint:fix && npm run typecheck
 - EVERY step that touches .js/.jsx/.ts/.tsx files MUST include validation commands
 - NO EXCEPTIONS - this is critical for code quality and preventing errors
 
-**CODEX REVIEW QUALITY GATES (REQUIRED):**
+**GEMINI REVIEW QUALITY GATES (REQUIRED):**
 
-- Plans MUST include `/codex-review` as the FINAL step before completion
-- Add intermediate Codex review steps at logical checkpoints (after major components, schema changes, API work)
-- Codex uses GPT 5.2 for AI-powered code review in read-only sandbox mode
+- Plans MUST include `/gemini-review` as the FINAL step before completion
+- Add intermediate Gemini review steps at logical checkpoints (after major components, schema changes, API work)
+- Gemini uses Gemini 3 Pro for AI-powered code review via piped git diff
 - Runs non-interactively without permission prompts (safe for automated execution)
 - This is a MANDATORY requirement for all implementation plans
 

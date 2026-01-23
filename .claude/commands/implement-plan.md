@@ -99,6 +99,7 @@ You do NOT implement code. Subagents implement code.
 | `tanstack-form`                 | Form implementations         | Forms in dialogs, pages, features + validation schemas     |
 | `tanstack-form-base-components` | Base form components         | Field components in `components/ui/form/`                  |
 | `frontend-component`            | UI & feature components      | UI primitives in `components/ui/`, feature components      |
+| `gemini-review`                 | Code review                  | AI-powered code reviews using Gemini CLI                   |
 | `general-purpose`               | Everything else              | Pages, utilities, non-component code                       |
 
 ## Step-Type Detection Rules
