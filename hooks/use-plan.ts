@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
@@ -347,7 +346,7 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
                 // Only set current on completion if we haven't switched to another run
                 const currentRunData = queryClient.getQueryData(
                   featureRequestRunKeys.currentRun(featureRequest.id, 'plan').queryKey
-                ) as { id?: number } | undefined;
+                ) as undefined | { id?: number };
                 if (!currentRunData || currentRunData.id === runIdRef.current) {
                   void setCurrentRunMutation.mutateAsync({
                     featureRequestId: featureRequest.id,

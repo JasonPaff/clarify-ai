@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { ClarificationModelConfig } from '@/components/features/clarification/clarification-panel';
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -483,7 +482,7 @@ export function useClarification({
                 // Only set current on completion if we haven't switched to another run
                 const currentRunData = queryClient.getQueryData(
                   featureRequestRunKeys.currentRun(featureRequest.id, 'refine').queryKey
-                ) as { id?: number } | undefined;
+                ) as undefined | { id?: number };
                 if (!currentRunData || currentRunData.id === runIdRef.current) {
                   void setCurrentRunMutation.mutateAsync({
                     featureRequestId: featureRequest.id,
@@ -762,7 +761,7 @@ Please generate additional clarifying questions that:
                 // Only set current on completion if we haven't switched to another run
                 const currentRunData = queryClient.getQueryData(
                   featureRequestRunKeys.currentRun(featureRequest.id, 'refine').queryKey
-                ) as { id?: number } | undefined;
+                ) as undefined | { id?: number };
                 if (!currentRunData || currentRunData.id === runIdRef.current) {
                   void setCurrentRunMutation.mutateAsync({
                     featureRequestId: featureRequest.id,

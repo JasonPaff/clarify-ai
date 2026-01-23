@@ -3,16 +3,14 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { Progress } from '@base-ui/react/progress';
-import { ChevronDown, ChevronRight, CheckCircle2, FileSearch, Loader2, Sparkles, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { CheckCircle2, FileSearch, Loader2, XCircle } from 'lucide-react';
 
 import type { DiscoveryStatus } from '@/lib/validations/discovery';
 
 import { CancelAiDialog } from '@/components/features/workflow/cancel-ai-dialog';
+import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import { useStickToBottom } from 'use-stick-to-bottom';
 
 type DiscoveryProgressProps = ComponentPropsWithRef<'div'> & {
   /** Current step text describing what is happening */
@@ -21,6 +19,8 @@ type DiscoveryProgressProps = ComponentPropsWithRef<'div'> & {
   filesDiscovered?: number;
   /** Whether the discovery process is currently running */
   isLoading: boolean;
+  /** Whether reasoning output is currently being streamed */
+  isReasoningStreaming?: boolean;
   /** Callback when cancel is confirmed */
   onCancel?: () => void;
   /** Overall progress percentage (0-100) */
@@ -55,6 +55,7 @@ export const DiscoveryProgress = ({
   currentStep,
   filesDiscovered = 0,
   isLoading,
+  isReasoningStreaming = false,
   onCancel,
   percentage = 0,
   reasoning,
@@ -63,11 +64,6 @@ export const DiscoveryProgress = ({
   status,
   ...props
 }: DiscoveryProgressProps) => {
-  const [isReasoningOpen, setIsReasoningOpen] = useState(true);
-  const { scrollRef } = useStickToBottom({
-    resize: 'smooth',
-  });
-
   const isActive = status === 'scanning' || status === 'analyzing';
   const isCompleted = status === 'completed';
   const isFailed = status === 'failed';
@@ -203,30 +199,10 @@ export const DiscoveryProgress = ({
 
       {/* Reasoning Output Section */}
       {hasReasoning && (
-        <Collapsible
-          className={'overflow-hidden rounded-md border border-border bg-background'}
-          onOpenChange={setIsReasoningOpen}
-          open={isReasoningOpen}
-        >
-          <CollapsibleTrigger
-            className={'flex w-full items-center justify-between bg-muted/30 px-4 py-2 hover:bg-muted/50'}
-          >
-            <div className={'flex items-center gap-2'}>
-              <Sparkles className={'size-4 text-purple-500'} />
-              <span className={'text-sm font-medium'}>AI Reasoning</span>
-            </div>
-            {isReasoningOpen ? (
-              <ChevronDown className={'size-4 text-muted-foreground'} />
-            ) : (
-              <ChevronRight className={'size-4 text-muted-foreground'} />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className={'max-h-60 overflow-y-auto bg-muted/10 p-4 text-xs font-mono text-muted-foreground'} ref={scrollRef}>
-              <div className={'whitespace-pre-wrap'}>{reasoning}</div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        <Reasoning isStreaming={isReasoningStreaming}>
+          <ReasoningTrigger />
+          <ReasoningContent className={'h-60'}>{reasoning}</ReasoningContent>
+        </Reasoning>
       )}
     </div>
   );
