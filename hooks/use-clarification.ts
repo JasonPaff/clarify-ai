@@ -68,6 +68,8 @@ interface UseClarificationResult {
   startClarification: (options?: StartClarificationOptions) => Promise<void>;
   status: ClarificationStatus;
   streamingText: string;
+  /** Whether generation was cancelled (for UI feedback) */
+  wasCancelled: boolean;
   /** Whether the current state was restored from a run (for UI feedback) */
   wasRestored: boolean;
 }
@@ -179,6 +181,7 @@ export function useClarification({
   const [isLoading, setIsLoading] = useState(false);
   const [isQuestionsComplete, setIsQuestionsComplete] = useState(true);
   const [parseError, setParseError] = useState<null | string>(() => initialState.parseError);
+  const [wasCancelled, setWasCancelled] = useState(false);
   const [wasRestored, setWasRestored] = useState(() => initialState.wasRestored);
 
   // Stream handler reference for cleanup
@@ -322,6 +325,7 @@ export function useClarification({
       setQuestions([]);
       setAnalysis(null);
       setParseError(null);
+      setWasCancelled(false);
       setWasRestored(false);
 
       // Build parameters object for run record
@@ -789,6 +793,7 @@ Please generate additional clarifying questions that:
     setIsReasoningStreaming(false);
     setIsQuestionsComplete(true);
     setStatus('idle');
+    setWasCancelled(true);
 
     if (runIdRef.current) {
       void updateRunMutation.mutateAsync({
@@ -862,7 +867,7 @@ Please generate additional clarifying questions that:
     setStatus('skipped_by_user');
   }, [featureRequest.id, updateMutation]);
 
-  // Reset clarification state
+  // Reset clarification state (clears local state only, preserves database run history)
   const resetClarification = useCallback(() => {
     setStatus('idle');
     setAnalysis(null);
@@ -874,6 +879,7 @@ Please generate additional clarifying questions that:
     setError(null);
     setIsLoading(false);
     setParseError(null);
+    setWasCancelled(false);
     setWasRestored(false);
     runIdRef.current = null;
   }, []);
@@ -957,6 +963,7 @@ Please generate additional clarifying questions that:
     startClarification,
     status,
     streamingText,
+    wasCancelled,
     wasRestored,
   };
 }

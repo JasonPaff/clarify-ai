@@ -1,6 +1,7 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, History, Loader2, MessageCirclePlus, SkipForward } from 'lucide-react';
+import { format } from 'date-fns';
+import { AlertCircle, CheckCircle2, Clock, History, Loader2, MessageCirclePlus, SkipForward, XCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { FeatureRequestRun } from '@/db/schema/feature-request-runs.schema';
@@ -44,6 +45,28 @@ type ClarificationPanelProps = ClassName & {
   repositoryOverviews?: Array<ClarificationRepositoryOverview>;
 };
 
+/** Get a friendly display name for a model ID */
+function getModelDisplayName(modelId: string): string {
+  const modelNames: Record<string, string> = {
+    'claude-3-5-haiku-20241022': 'Claude 3.5 Haiku',
+    'claude-3-5-haiku-latest': 'Claude 3.5 Haiku',
+    'claude-3-5-sonnet-20241022': 'Claude 3.5 Sonnet',
+    'claude-3-5-sonnet-latest': 'Claude 3.5 Sonnet',
+    'claude-3-7-sonnet-20250219': 'Claude 3.7 Sonnet',
+    'claude-3-7-sonnet-latest': 'Claude 3.7 Sonnet',
+    'claude-opus-4-5-20251101': 'Claude Opus 4.5',
+    'claude-sonnet-4-5-20250514': 'Claude Sonnet 4.5',
+    'gpt-4.1': 'GPT-4.1',
+    'gpt-4.1-mini': 'GPT-4.1 Mini',
+    'gpt-4o': 'GPT-4o',
+    'gpt-4o-mini': 'GPT-4o Mini',
+    'o3': 'o3',
+    'o3-mini': 'o3 Mini',
+    'o4-mini': 'o4 Mini',
+  };
+  return modelNames[modelId] ?? modelId;
+}
+
 /**
  * Main panel component for the clarification workflow.
  * Orchestrates AI analysis, questions display, and answer submission.
@@ -83,6 +106,7 @@ export const ClarificationPanel = ({
     startClarification,
     status,
     streamingText,
+    wasCancelled,
     wasRestored,
   } = useClarification({ contextFiles, currentRun, featureRequest, modelConfig, repositoryOverviews });
 
@@ -207,11 +231,29 @@ export const ClarificationPanel = ({
         </Alert>
       )}
 
-      {/* Restored from run indicator */}
-      {_showRestoredIndicator && (
+      {/* Restored from run indicator with timestamp and model */}
+      {_showRestoredIndicator && currentRun && (
+        <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
+          <Clock className={'size-3'} />
+          <span>
+            {format(new Date(currentRun.createdAt), 'MMM d, yyyy h:mm a')} · {getModelDisplayName(currentRun.modelId)}
+          </span>
+        </div>
+      )}
+
+      {/* Fallback restored indicator without run metadata */}
+      {_showRestoredIndicator && !currentRun && (
         <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
           <History className={'size-3'} />
           <span>Restored from previous run</span>
+        </div>
+      )}
+
+      {/* Cancelled notice - shows when generation was cancelled */}
+      {wasCancelled && (
+        <div className={'flex items-center gap-2 text-xs text-amber-600'}>
+          <XCircle className={'size-3'} />
+          <span>Generation cancelled. Previous answers preserved.</span>
         </div>
       )}
 
