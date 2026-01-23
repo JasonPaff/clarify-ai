@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { usePurgeAiLogs } from '@/hooks/queries/use-ai-logs';
-import { useElectronDb, useElectronDialog } from '@/hooks/useElectron';
+import { useElectronDb, useElectronDialog, useElectronFs } from '@/hooks/useElectron';
 import { cn } from '@/lib/utils';
 
 /**
@@ -159,6 +159,7 @@ export const ExportControls = ({
 
   const { saveFile } = useElectronDialog();
   const { aiLogs } = useElectronDb();
+  const { writeFile } = useElectronFs();
   const purgeMutation = usePurgeAiLogs();
 
   const hasLogs = logs.length > 0;
@@ -179,19 +180,12 @@ export const ExportControls = ({
       const filePath = await saveFile(defaultFileName, [{ extensions: ['json'], name: 'JSON' }]);
 
       if (filePath) {
-        const { writeFile } = await import('@/hooks/useElectron').then((mod) => {
-          const { api } = mod.useElectron();
-          return { writeFile: api?.fs.writeFile };
-        });
-
-        if (writeFile) {
-          await writeFile(filePath, jsonContent);
-        }
+        await writeFile(filePath, jsonContent);
       }
     } finally {
       setIsExportingJson(false);
     }
-  }, [hasLogs, logs, saveFile]);
+  }, [hasLogs, logs, saveFile, writeFile]);
 
   const handleExportCsv = useCallback(async () => {
     if (!hasLogs) return;
@@ -204,19 +198,12 @@ export const ExportControls = ({
       const filePath = await saveFile(defaultFileName, [{ extensions: ['csv'], name: 'CSV' }]);
 
       if (filePath) {
-        const { writeFile } = await import('@/hooks/useElectron').then((mod) => {
-          const { api } = mod.useElectron();
-          return { writeFile: api?.fs.writeFile };
-        });
-
-        if (writeFile) {
-          await writeFile(filePath, csvContent);
-        }
+        await writeFile(filePath, csvContent);
       }
     } finally {
       setIsExportingCsv(false);
     }
-  }, [hasLogs, logs, saveFile]);
+  }, [hasLogs, logs, saveFile, writeFile]);
 
   const handleCopySelected = useCallback(async () => {
     if (!hasSelectedLogs) return;

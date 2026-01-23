@@ -7,11 +7,10 @@ export const AI_DEBUG_LOGGING_STORAGE_KEY = 'app:ai-debug-logging-config';
 
 /**
  * Check if we're in development mode.
- * In Electron, process.env.NODE_ENV is available in the main process,
- * but we check for common development indicators.
+ * Only explicitly set NODE_ENV='development' enables debug logging by default.
+ * This ensures packaged/production builds don't accidentally enable logging.
  */
-const isDevelopment =
-  process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 /**
  * Default configuration for AI debug logging.

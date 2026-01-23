@@ -308,7 +308,18 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
 
     // Get existing chunks from DB
     const existing = repository.getById(operation.logId);
-    const existingChunks = existing?.streamChunks ? JSON.parse(existing.streamChunks) : [];
+    let existingChunks: Array<unknown> = [];
+
+    // Parse existing chunks with fallback - truncation may have made the JSON invalid
+    if (existing?.streamChunks) {
+      try {
+        existingChunks = JSON.parse(existing.streamChunks);
+      } catch {
+        // If parsing fails (e.g., due to truncation), start fresh with current chunks
+        // The truncated data is preserved in the DB but we can't merge with it
+        existingChunks = [];
+      }
+    }
 
     // Merge with new chunks
     const allChunks = [...existingChunks, ...operation.chunks];
