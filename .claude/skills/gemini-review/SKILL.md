@@ -1,13 +1,13 @@
 ---
 name: gemini-review
-description: Run code reviews using the Gemini CLI with Gemini 3 Pro model. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Can be used standalone or as a quality gate in plan-feature workflow.
+description: Run code reviews using the Gemini CLI with Gemini 3. Supports reviewing uncommitted changes, changes against a base branch, or specific commits. Can be used standalone or as a quality gate in plan-feature workflow.
 ---
 
 # Gemini Code Review Skill
 
 ## Purpose
 
-This skill provides AI-powered code review capabilities using the Gemini CLI with Gemini 3 Pro. It can review uncommitted changes, compare against branches, or analyze specific commits to provide quality feedback.
+This skill provides AI-powered code review capabilities using the Gemini CLI. It can review uncommitted changes, compare against branches, or analyze specific commits to provide quality feedback.
 
 ## When to Use This Skill
 
