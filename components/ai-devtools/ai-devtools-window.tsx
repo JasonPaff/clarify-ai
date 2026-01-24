@@ -10,7 +10,7 @@ import type { AiLogEntry } from '@/types/ai-log';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAiLogs, useAiLogsCount } from '@/hooks/queries/use-ai-logs';
+import { useAiLogs } from '@/hooks/queries/use-ai-logs';
 import { cn } from '@/lib/utils';
 
 import type { LogFilterState } from './log-filter-toolbar';
@@ -27,27 +27,19 @@ const REFETCH_INTERVAL_MS = 3000;
 
 /**
  * Maps database workflow step names to the interface workflow step names.
- * Database uses short names (clarify, plan) while interface uses full names (clarification, planning).
+ * Both now use the same short names (clarify, describe, discover, other, plan).
  */
 const mapDbWorkflowStep = (dbStep: AiLog['workflowStep']): AiLogEntry['workflowStep'] => {
-  if (!dbStep) return 'planning';
-  const stepMap: Record<string, AiLogEntry['workflowStep']> = {
-    clarify: 'clarification',
-    describe: 'overview',
-    discover: 'discovery',
-    other: 'planning',
-    plan: 'planning',
-  };
-  return stepMap[dbStep] ?? 'planning';
+  if (!dbStep) return 'plan';
+  return dbStep;
 };
 
 /**
  * Maps database status to interface status.
- * Database has 'cancelled' which maps to 'failed' in the interface.
+ * Both database and interface now support the same status values.
  */
 const mapDbStatus = (dbStatus: AiLog['status']): AiLogEntry['status'] => {
-  if (dbStatus === 'cancelled') return 'failed';
-  return dbStatus as AiLogEntry['status'];
+  return dbStatus;
 };
 
 /**
@@ -66,6 +58,7 @@ const transformDbLogToEntry = (dbLog: AiLog): AiLogEntry => ({
   modelId: dbLog.modelId,
   outputTokens: dbLog.outputTokens ?? undefined,
   projectId: dbLog.projectId ?? undefined,
+  reasoningBody: dbLog.reasoningBody ?? undefined,
   reasoningTokens: dbLog.reasoningTokens ?? undefined,
   requestBody: dbLog.requestBody ?? undefined,
   requestId: dbLog.requestId,
@@ -102,8 +95,6 @@ export const AiDevtoolsWindow = () => {
     limit: 100,
   });
 
-  const { data: totalCount } = useAiLogsCount(filterParams);
-
   // Set up real-time refetching
   useEffect(() => {
     if (!isAutoRefreshEnabled) return;
@@ -120,7 +111,7 @@ export const AiDevtoolsWindow = () => {
     [logsResult?.entries]
   );
   const displayedCount = logs.length;
-  const totalLogCount = totalCount ?? 0;
+  const totalLogCount = logsResult?.totalCount ?? 0;
 
   const selectedLog = useMemo(() => {
     if (selectedLogId === null) return null;

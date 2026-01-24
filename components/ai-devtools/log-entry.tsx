@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentPropsWithRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import { format } from 'date-fns';
@@ -13,6 +13,7 @@ import {
   Copy,
   Hourglass,
   Loader2,
+  XCircle,
   Zap,
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -56,6 +57,7 @@ export const statusIndicatorVariants = cva(
         sm: 'size-4',
       },
       status: {
+        cancelled: 'text-amber-600 dark:text-amber-400',
         completed: 'text-green-600 dark:text-green-400',
         failed: 'text-red-600 dark:text-red-400',
         pending: 'text-muted-foreground',
@@ -74,14 +76,15 @@ export const workflowStepBadgeVariants = cva(
   `,
   {
     defaultVariants: {
-      step: 'clarification',
+      step: 'clarify',
     },
     variants: {
       step: {
-        clarification: 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-        discovery: 'bg-blue-500/15 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-        overview: 'bg-cyan-500/15 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-400',
-        planning: 'bg-purple-500/15 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+        clarify: 'bg-yellow-500/15 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
+        describe: 'bg-cyan-500/15 text-cyan-700 dark:bg-cyan-500/20 dark:text-cyan-400',
+        discover: 'bg-blue-500/15 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+        other: 'bg-gray-500/15 text-gray-700 dark:bg-gray-500/20 dark:text-gray-400',
+        plan: 'bg-purple-500/15 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
       },
     },
   }
@@ -94,6 +97,8 @@ const StatusIndicator = ({ className, ref, size, status, ...props }: StatusIndic
 
   const icon = useMemo(() => {
     switch (status) {
+      case 'cancelled':
+        return <XCircle className={iconClass} />;
       case 'completed':
         return <Check className={iconClass} />;
       case 'failed':
@@ -182,16 +187,23 @@ const ExpandableSection = ({ children, isDefaultOpen = false, onCopy, title }: E
   const [isOpen, setIsOpen] = useState(isDefaultOpen);
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopyClick = useCallback(() => {
-    onCopy?.();
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  }, [onCopy]);
+  const handleCopyClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onCopy?.();
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    },
+    [onCopy]
+  );
 
   return (
     <Collapsible onOpenChange={setIsOpen} open={isOpen}>
       <div className={'flex items-center justify-between'}>
-        <CollapsibleTrigger className={'flex items-center gap-1 px-2 py-1 text-xs font-medium text-muted-foreground'}>
+        <CollapsibleTrigger
+          className={'flex items-center gap-1 px-2 py-1 text-xs font-medium text-muted-foreground'}
+          isHideChevron
+        >
           {isOpen ? <ChevronDown className={'size-3'} /> : <ChevronRight className={'size-3'} />}
           {title}
         </CollapsibleTrigger>

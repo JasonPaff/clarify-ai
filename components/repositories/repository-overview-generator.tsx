@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertCircle, Loader2, RefreshCw, Save, Square } from 'lucide-react';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { forwardRef, Fragment, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
@@ -24,6 +24,31 @@ import { cn } from '@/lib/utils';
 
 import { ModelSelector } from '../features/clarification/model-selector';
 
+/**
+ * Data returned when preparing for background transition.
+ */
+export interface BackgroundTransitionData {
+  content: string;
+  customPrompt: string;
+  modelId: string;
+}
+
+/**
+ * Imperative handle for the RepositoryOverviewGenerator component.
+ */
+export interface RepositoryOverviewGeneratorHandle {
+  /** Whether generation is currently in progress */
+  isGenerating: boolean;
+  /**
+   * Prepare for background transition.
+   * Sets the skip-cancel flag and returns current generation state.
+   * Call this before unmounting to transfer generation to background.
+   */
+  prepareBackgroundTransition: () => BackgroundTransitionData | null;
+  /** Stop the current generation */
+  stopGeneration: () => Promise<void>;
+}
+
 type GenerationStatus = 'complete' | 'error' | 'generating' | 'idle' | 'stopped';
 
 type RepositoryOverviewGeneratorProps = ClassName & {
@@ -44,37 +69,64 @@ interface SaveData {
  * Component for generating repository overviews with AI.
  * Handles model selection, custom prompts, streaming output, and save/regenerate actions.
  */
-export const RepositoryOverviewGenerator = ({
-  className,
-  onCancel,
-  onSave,
-  projectId,
-  repositoryId,
-  repositoryPath,
-}: RepositoryOverviewGeneratorProps) => {
-  const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [isCustomPromptOpen, setIsCustomPromptOpen] = useState(false);
-  const [status, setStatus] = useState<GenerationStatus>('idle');
-  const [streamingContent, setStreamingContent] = useState('');
-  const [reasoningContent, setReasoningContent] = useState('');
-  const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
-  const [usageData, setUsageData] = useState<null | RepositoryOverviewStreamChunk['usage']>(null);
-  const [error, setError] = useState<null | string>(null);
-  const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
+export const RepositoryOverviewGenerator = forwardRef<RepositoryOverviewGeneratorHandle, RepositoryOverviewGeneratorProps>(
+  function RepositoryOverviewGenerator(
+    { className, onCancel, onSave, projectId, repositoryId, repositoryPath },
+    ref
+  ) {
+    const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
+    const [customPrompt, setCustomPrompt] = useState('');
+    const [isCustomPromptOpen, setIsCustomPromptOpen] = useState(false);
+    const [status, setStatus] = useState<GenerationStatus>('idle');
+    const [streamingContent, setStreamingContent] = useState('');
+    const [reasoningContent, setReasoningContent] = useState('');
+    const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
+    const [usageData, setUsageData] = useState<null | RepositoryOverviewStreamChunk['usage']>(null);
+    const [error, setError] = useState<null | string>(null);
+    const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
 
-  const { isThinkingEnabled } = useThinkingPreference();
-  const { cancel, generate, subscribeToStream } = useElectronAiOverview();
-  const { data: overviewConfig } = useStepConfig(projectId, 'overview');
+    // Ref to skip cancel on unmount when transitioning to background
+    const skipCancelRef = useRef(false);
 
-  // Compute the default model from config
-  const configDefaultModel =
-    overviewConfig?.modelProvider && overviewConfig?.modelId
-      ? (`${overviewConfig.modelProvider}:${overviewConfig.modelId}` as FullModelId)
-      : null;
+    const { isThinkingEnabled } = useThinkingPreference();
+    const { cancel, generate, subscribeToStream } = useElectronAiOverview();
+    const { data: overviewConfig } = useStepConfig(projectId, 'overview');
 
-  // Use user-selected model if available, otherwise fall back to config default
-  const effectiveSelectedModel = selectedModel ?? configDefaultModel;
+    // Compute the default model from config
+    const configDefaultModel =
+      overviewConfig?.modelProvider && overviewConfig?.modelId
+        ? (`${overviewConfig.modelProvider}:${overviewConfig.modelId}` as FullModelId)
+        : null;
+
+    // Use user-selected model if available, otherwise fall back to config default
+    const effectiveSelectedModel = selectedModel ?? configDefaultModel;
+
+    const isGenerating = status === 'generating';
+
+    // Expose imperative handle for parent component
+    useImperativeHandle(
+      ref,
+      () => ({
+        isGenerating,
+        prepareBackgroundTransition: () => {
+          if (!isGenerating || !effectiveSelectedModel) {
+            return null;
+          }
+          // Set flag to skip cancel on unmount
+          skipCancelRef.current = true;
+          return {
+            content: streamingContent,
+            customPrompt,
+            modelId: effectiveSelectedModel,
+          };
+        },
+        stopGeneration: async () => {
+          await cancel();
+          setStatus('stopped');
+        },
+      }),
+      [isGenerating, effectiveSelectedModel, streamingContent, customPrompt, cancel]
+    );
 
   const handleStreamChunk = useCallback((chunk: RepositoryOverviewStreamChunk) => {
     switch (chunk.type) {
@@ -116,12 +168,15 @@ export const RepositoryOverviewGenerator = ({
     };
   }, [handleStreamChunk, subscribeToStream]);
 
-  // Cancel any active generation when component unmounts (e.g., dialog closed)
-  useEffect(() => {
-    return () => {
-      cancel();
-    };
-  }, [cancel]);
+    // Cancel any active generation when component unmounts (e.g., dialog closed)
+    // Skip cancel if transitioning to background generation
+    useEffect(() => {
+      return () => {
+        if (!skipCancelRef.current) {
+          cancel();
+        }
+      };
+    }, [cancel]);
 
   const handleGenerate = async () => {
     if (!effectiveSelectedModel) return;
@@ -185,11 +240,10 @@ export const RepositoryOverviewGenerator = ({
     setThinkingOverride(isChecked);
   };
 
-  const isGenerating = status === 'generating';
-  const isComplete = status === 'complete';
-  const isStopped = status === 'stopped';
-  const isError = status === 'error';
-  const isIdle = status === 'idle';
+    const isComplete = status === 'complete';
+    const isStopped = status === 'stopped';
+    const isError = status === 'error';
+    const isIdle = status === 'idle';
 
   const hasStreamingContent = streamingContent.length > 0;
   const shouldShowContent = (isGenerating || isComplete || isStopped || isError) && hasStreamingContent;
@@ -405,4 +459,5 @@ export const RepositoryOverviewGenerator = ({
       </div>
     </div>
   );
-};
+  }
+);

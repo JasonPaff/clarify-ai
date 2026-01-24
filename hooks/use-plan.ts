@@ -411,6 +411,7 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
         featureRequestId: featureRequest.id,
         maxTokens: modelConfig.maxTokens,
         modelId: modelConfig.modelId,
+        projectId: featureRequest.projectId,
         repositoryOverviews,
         scopeConfig,
         temperature: modelConfig.temperature,

@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentPropsWithRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, MouseEvent, ReactNode } from 'react';
 
 import { format, formatDistanceStrict } from 'date-fns';
 import {
@@ -13,17 +13,12 @@ import {
   Hash,
   Hourglass,
   Loader2,
+  XCircle,
   Zap,
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-import type {
-  AiLogEntry,
-  AiLogStatus,
-  AiLogWorkflowStep,
-  ParsedStreamChunks,
-  ParsedToolCalls,
-} from '@/types/ai-log';
+import type { AiLogEntry, AiLogStatus, AiLogWorkflowStep, ParsedStreamChunks, ParsedToolCalls } from '@/types/ai-log';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -134,6 +129,8 @@ const StatusIndicatorLarge = ({ status }: StatusIndicatorLargeProps) => {
 
   const icon = useMemo(() => {
     switch (status) {
+      case 'cancelled':
+        return <XCircle className={iconClass} />;
       case 'completed':
         return <Check className={iconClass} />;
       case 'failed':
@@ -149,6 +146,8 @@ const StatusIndicatorLarge = ({ status }: StatusIndicatorLargeProps) => {
 
   const colorClass = useMemo(() => {
     switch (status) {
+      case 'cancelled':
+        return 'text-amber-600 dark:text-amber-400';
       case 'completed':
         return 'text-green-600 dark:text-green-400';
       case 'failed':
@@ -181,27 +180,29 @@ const CollapsibleSection = ({ children, isDefaultOpen = false, onCopy, title }: 
   const [isOpen, setIsOpen] = useState(isDefaultOpen);
   const [isCopied, setIsCopied] = useState(false);
 
-  const handleCopyClick = useCallback(() => {
-    onCopy?.();
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
-  }, [onCopy]);
+  const handleCopyClick = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      onCopy?.();
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    },
+    [onCopy]
+  );
 
   return (
     <Collapsible onOpenChange={setIsOpen} open={isOpen}>
       <div className={'flex items-center justify-between border-b border-border pb-2'}>
-        <CollapsibleTrigger className={'flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent'}>
+        <CollapsibleTrigger
+          className={'flex items-center gap-2 text-sm font-medium text-foreground hover:text-accent'}
+          isHideChevron
+        >
           {isOpen ? <ChevronDown className={'size-4'} /> : <ChevronRight className={'size-4'} />}
           {title}
         </CollapsibleTrigger>
         {onCopy && (
           <Tooltip content={isCopied ? 'Copied!' : 'Copy to clipboard'}>
-            <IconButton
-              aria-label={'Copy to clipboard'}
-              className={'size-7'}
-              onClick={handleCopyClick}
-              type={'button'}
-            >
+            <IconButton aria-label={'Copy to clipboard'} className={'size-7'} onClick={handleCopyClick} type={'button'}>
               {isCopied ? <Check className={'size-4'} /> : <Copy className={'size-4'} />}
             </IconButton>
           </Tooltip>
@@ -237,9 +238,7 @@ const TruncatedJsonContent = ({
 
   return (
     <div className={'rounded-md bg-muted/50 p-3'}>
-      <pre className={'overflow-x-auto font-mono text-xs/relaxed break-all whitespace-pre-wrap'}>
-        {maskedContent}
-      </pre>
+      <pre className={'overflow-x-auto font-mono text-xs/relaxed break-all whitespace-pre-wrap'}>{maskedContent}</pre>
       {isTruncated && (
         <div className={'mt-2 border-t border-border pt-2'}>
           <Button className={'h-7 px-3 text-xs'} onClick={handleToggleClick} variant={'ghost'}>
@@ -303,7 +302,7 @@ const ToolCallTimelineItem = ({ toolCall }: ToolCallTimelineItemProps) => {
   return (
     <div className={'relative flex gap-4 pb-4 last:pb-0'}>
       {/* Timeline Line */}
-      <div className={'absolute top-6 bottom-0 left-[7px] w-0.5 bg-border last:hidden'} />
+      <div className={'absolute top-6 bottom-0 left-1.75 w-0.5 bg-border last:hidden'} />
 
       {/* Timeline Dot */}
       <div className={'relative z-10 flex size-4 shrink-0 items-center justify-center'}>
@@ -325,12 +324,7 @@ const ToolCallTimelineItem = ({ toolCall }: ToolCallTimelineItemProps) => {
             )}
           </div>
           <Tooltip content={isCopied ? 'Copied!' : 'Copy tool call JSON'}>
-            <IconButton
-              aria-label={'Copy tool call'}
-              className={'size-7'}
-              onClick={handleCopyClick}
-              type={'button'}
-            >
+            <IconButton aria-label={'Copy tool call'} className={'size-7'} onClick={handleCopyClick} type={'button'}>
               {isCopied ? <Check className={'size-4'} /> : <Copy className={'size-4'} />}
             </IconButton>
           </Tooltip>
@@ -485,6 +479,7 @@ export const LogDetailView = ({ className, log, onClose, ref, ...props }: LogDet
       modelId: log.modelId,
       outputTokens: log.outputTokens,
       projectId: log.projectId,
+      reasoningBody: log.reasoningBody ?? null,
       reasoningTokens: log.reasoningTokens,
       requestBody: log.requestBody ? safeJsonParse(log.requestBody) : null,
       requestId: log.requestId,
@@ -514,6 +509,12 @@ export const LogDetailView = ({ className, log, onClose, ref, ...props }: LogDet
       await copyToClipboard(formatJsonContent(log.responseBody));
     }
   }, [log.responseBody]);
+
+  const handleCopyReasoningBody = useCallback(async () => {
+    if (log.reasoningBody) {
+      await copyToClipboard(log.reasoningBody);
+    }
+  }, [log.reasoningBody]);
 
   const formattedCreatedAt = useMemo(() => {
     try {
@@ -554,11 +555,10 @@ export const LogDetailView = ({ className, log, onClose, ref, ...props }: LogDet
     }
   }, [log.createdAt]);
 
-  const workflowStepName = log.workflowStep
-    ? WORKFLOW_STEP_DISPLAY_NAMES[log.workflowStep as AiLogWorkflowStep]
-    : null;
+  const workflowStepName = log.workflowStep ? WORKFLOW_STEP_DISPLAY_NAMES[log.workflowStep as AiLogWorkflowStep] : null;
 
   const hasRequestBody = Boolean(log.requestBody);
+  const hasReasoningBody = Boolean(log.reasoningBody);
   const hasResponseBody = Boolean(log.responseBody);
   const hasToolCalls = parsedToolCalls.length > 0;
   const hasStreamChunks = parsedStreamChunks.length > 0;
@@ -668,6 +668,13 @@ export const LogDetailView = ({ className, log, onClose, ref, ...props }: LogDet
         {hasRequestBody && (
           <CollapsibleSection isDefaultOpen onCopy={handleCopyRequestBody} title={'Request Body'}>
             <TruncatedJsonContent content={log.requestBody!} />
+          </CollapsibleSection>
+        )}
+
+        {/* Reasoning Body Section */}
+        {hasReasoningBody && (
+          <CollapsibleSection isDefaultOpen onCopy={handleCopyReasoningBody} title={'Reasoning Body'}>
+            <TruncatedJsonContent content={log.reasoningBody!} />
           </CollapsibleSection>
         )}
 

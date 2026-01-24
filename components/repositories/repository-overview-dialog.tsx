@@ -3,8 +3,9 @@
 import type { ReactNode } from 'react';
 
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
+import { useBackgroundOverviewGeneration } from '@/components/providers/background-overview-generation-provider';
 import {
   DialogBackdrop,
   DialogClose,
@@ -22,7 +23,8 @@ import {
   useUpsertRepositoryOverview,
 } from '@/hooks/queries/use-repository-overviews';
 
-import { RepositoryOverviewGenerator } from './repository-overview-generator';
+import { OverviewCloseConfirmationDialog } from './overview-close-confirmation-dialog';
+import { RepositoryOverviewGenerator, type RepositoryOverviewGeneratorHandle } from './repository-overview-generator';
 import { RepositoryOverviewViewer } from './repository-overview-viewer';
 
 type DialogMode = 'generate' | 'view';
@@ -48,19 +50,53 @@ export function RepositoryOverviewDialog({
 }: RepositoryOverviewDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<DialogMode>('view');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const generatorRef = useRef<RepositoryOverviewGeneratorHandle>(null);
 
   const { data: overview, isLoading: isLoadingOverview } = useRepositoryOverview(repositoryId);
   const upsertOverview = useUpsertRepositoryOverview();
   const updateOverview = useUpdateRepositoryOverview();
+  const { startBackgroundGeneration } = useBackgroundOverviewGeneration();
 
   const hasOverview = overview !== undefined && overview !== null;
 
-  // Determine initial mode when dialog opens
+  // Determine initial mode when dialog opens, or intercept close during generation
   const handleOpenChange = (open: boolean) => {
+    if (!open && generatorRef.current?.isGenerating) {
+      // User is trying to close while generation is in progress
+      // Show confirmation dialog instead of closing
+      setShowConfirmation(true);
+      return;
+    }
+
     setIsOpen(open);
     if (open) {
       setMode(hasOverview ? 'view' : 'generate');
     }
+  };
+
+  // Handle "Stop Generation" from confirmation dialog
+  const handleStopGeneration = async () => {
+    await generatorRef.current?.stopGeneration();
+    setShowConfirmation(false);
+    setIsOpen(false);
+  };
+
+  // Handle "Continue in Background" from confirmation dialog
+  const handleContinueInBackground = () => {
+    const transitionData = generatorRef.current?.prepareBackgroundTransition();
+    if (transitionData) {
+      startBackgroundGeneration({
+        content: transitionData.content,
+        customPrompt: transitionData.customPrompt,
+        modelId: transitionData.modelId,
+        repositoryId,
+        repositoryName,
+      });
+    }
+    setShowConfirmation(false);
+    setIsOpen(false);
   };
 
   const handleSaveGenerated = async (data: { content: string; customPrompt: string; modelId: string }) => {
@@ -140,6 +176,7 @@ export function RepositoryOverviewDialog({
                 onCancel={handleCancelGenerate}
                 onSave={handleSaveGenerated}
                 projectId={projectId}
+                ref={generatorRef}
                 repositoryId={repositoryId}
                 repositoryPath={repositoryPath}
               />
@@ -172,6 +209,15 @@ export function RepositoryOverviewDialog({
           </div>
         </DialogPopup>
       </DialogPortal>
+
+      {/* Confirmation dialog for closing during generation */}
+      <OverviewCloseConfirmationDialog
+        onContinueInBackground={handleContinueInBackground}
+        onOpenChange={setShowConfirmation}
+        onStopGeneration={handleStopGeneration}
+        open={showConfirmation}
+        repositoryName={repositoryName}
+      />
     </DialogRoot>
   );
 }

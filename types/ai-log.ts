@@ -46,6 +46,8 @@ export interface AiLogEntry {
   outputTokens?: number;
   /** Associated project ID (optional, for correlation) */
   projectId?: number;
+  /** Accumulated reasoning/thinking content from the AI model */
+  reasoningBody?: string;
   /** Number of reasoning tokens used (for models that support extended thinking) */
   reasoningTokens?: number;
   /** Request body sent to the AI model (JSON string) */
@@ -132,8 +134,9 @@ export interface AiLogStats {
  * - 'streaming': Operation currently streaming response
  * - 'completed': Operation finished successfully
  * - 'failed': Operation encountered an error
+ * - 'cancelled': Operation was cancelled by user
  */
-export type AiLogStatus = 'completed' | 'failed' | 'pending' | 'streaming';
+export type AiLogStatus = 'cancelled' | 'completed' | 'failed' | 'pending' | 'streaming';
 
 /**
  * Represents a streaming chunk received during an AI operation.
@@ -180,12 +183,13 @@ export interface AiLogToolCall {
 
 /**
  * AI workflow step values representing the different stages of AI operations:
- * - 'discovery': File discovery step that identifies relevant files
- * - 'clarification': Clarification step that refines user requirements
- * - 'planning': Implementation planning step
- * - 'overview': Repository overview generation step
+ * - 'clarify': Clarification step that refines user requirements
+ * - 'describe': Repository overview/description generation step
+ * - 'discover': File discovery step that identifies relevant files
+ * - 'other': Any other AI operation outside the main workflow
+ * - 'plan': Implementation planning step
  */
-export type AiLogWorkflowStep = 'clarification' | 'discovery' | 'overview' | 'planning';
+export type AiLogWorkflowStep = 'clarify' | 'describe' | 'discover' | 'other' | 'plan';
 
 /**
  * Display names for workflow steps.

@@ -97,16 +97,21 @@ export const SENSITIVE_DATA_PATTERNS: Array<{
  * Maps internal workflow step identifiers to human-readable names.
  */
 export const WORKFLOW_STEP_DISPLAY_NAMES: Record<AiLogWorkflowStep, string> = {
-  clarification: 'Clarification',
-  discovery: 'File Discovery',
-  overview: 'Repository Overview',
-  planning: 'Implementation Planning',
+  clarify: 'Clarification',
+  describe: 'Repository Overview',
+  discover: 'File Discovery',
+  other: 'Other',
+  plan: 'Implementation Planning',
 };
 
 /**
  * Status display configuration for log entries.
  */
 export const STATUS_DISPLAY_CONFIG = {
+  cancelled: {
+    color: 'warning',
+    label: 'Cancelled',
+  },
   completed: {
     color: 'success',
     label: 'Completed',

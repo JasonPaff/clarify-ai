@@ -1,0 +1,1 @@
+ALTER TABLE `ai_logs` ADD `reasoning_body` text;

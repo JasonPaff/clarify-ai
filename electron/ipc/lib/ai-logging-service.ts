@@ -31,6 +31,14 @@ import {
 // ============================================================================
 
 /**
+ * Options for cancelling an AI operation.
+ */
+export interface CancelOperationOptions {
+  /** Request ID of the operation to cancel */
+  requestId: string;
+}
+
+/**
  * Options for completing an AI operation.
  */
 export interface CompleteOperationOptions {
@@ -38,6 +46,8 @@ export interface CompleteOperationOptions {
   inputTokens?: number;
   /** Number of output tokens generated */
   outputTokens?: number;
+  /** Accumulated reasoning/thinking content */
+  reasoningBody?: string;
   /** Number of reasoning tokens used */
   reasoningTokens?: number;
   /** Request ID of the operation to complete */
@@ -166,6 +176,7 @@ const store = new Store() as unknown as StoreType;
  * AI Logging Service interface.
  */
 export interface AiLoggingService {
+  cancelOperation(options: CancelOperationOptions): void;
   completeOperation(options: CompleteOperationOptions): void;
   failOperation(options: FailOperationOptions): void;
   getActiveOperation(requestId: string): undefined | { chunkCount: number; logId: number; toolCallCount: number };
@@ -310,20 +321,24 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
     const existing = repository.getById(operation.logId);
     let existingChunks: Array<unknown> = [];
 
-    // Parse existing chunks with fallback - truncation may have made the JSON invalid
+    // Parse existing chunks with fallback
     if (existing?.streamChunks) {
       try {
         existingChunks = JSON.parse(existing.streamChunks);
       } catch {
-        // If parsing fails (e.g., due to truncation), start fresh with current chunks
-        // The truncated data is preserved in the DB but we can't merge with it
+        // If parsing fails, start fresh with current chunks
         existingChunks = [];
       }
     }
 
     // Merge with new chunks
     const allChunks = [...existingChunks, ...operation.chunks];
-    const chunksJson = prepareContentForStorage(allChunks);
+
+    // Serialize chunks WITHOUT truncation - stream chunks need full data
+    // Use safeJsonStringify to handle circular references, but don't truncate
+    // the JSON as that would make it invalid and cause data loss
+    // Note: Individual chunk content is already redacted when recording
+    const chunksJson = safeJsonStringify(allChunks);
 
     // Update the database
     repository.update(operation.logId, {
@@ -369,6 +384,51 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
 
   return {
     /**
+     * Cancels an AI operation that was stopped by the user.
+     *
+     * @param options - Cancellation options
+     */
+    cancelOperation(options: CancelOperationOptions): void {
+      if (!isEnabled()) {
+        return;
+      }
+
+      const operation = activeOperations.get(options.requestId);
+      if (!operation) {
+        return;
+      }
+
+      // Cancel any pending batch timer
+      const timer = batchTimers.get(options.requestId);
+      if (timer) {
+        clearTimeout(timer);
+        batchTimers.delete(options.requestId);
+      }
+
+      // Flush any remaining chunks
+      flushChunks(options.requestId);
+
+      const completedAt = getCurrentTimestamp();
+      const durationMs = Date.now() - operation.startTime;
+
+      // Prepare tool calls
+      const toolCallsArray = Array.from(operation.toolCalls.values());
+      const toolCalls = toolCallsArray.length > 0 ? JSON.stringify(toolCallsArray) : undefined;
+
+      // Update the log entry with cancelled status
+      repository.update(operation.logId, {
+        completedAt,
+        durationMs,
+        errorMessage: 'Generation cancelled by user',
+        status: 'cancelled' as AiLogStatus,
+        toolCalls,
+      });
+
+      // Clean up active operation
+      activeOperations.delete(options.requestId);
+    },
+
+    /**
      * Completes an AI operation successfully.
      *
      * @param options - Completion options
@@ -396,6 +456,11 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
       const completedAt = getCurrentTimestamp();
       const durationMs = Date.now() - operation.startTime;
 
+      // Prepare reasoning body
+      const reasoningBody = options.reasoningBody
+        ? prepareContentForStorage(options.reasoningBody)
+        : undefined;
+
       // Prepare response body
       const responseBody = options.responseBody
         ? prepareContentForStorage(options.responseBody)
@@ -411,6 +476,7 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
         durationMs,
         inputTokens: options.inputTokens,
         outputTokens: options.outputTokens,
+        reasoningBody,
         reasoningTokens: options.reasoningTokens,
         responseBody,
         status: 'completed' as AiLogStatus,

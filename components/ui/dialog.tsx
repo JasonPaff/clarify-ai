@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentPropsWithRef, ReactElement } from 'react';
+import type { ComponentPropsWithRef, ReactElement, ReactNode } from 'react';
 
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -17,12 +17,12 @@ export const DialogTrigger = ({ children }: DialogTriggerProps) => {
   return <BaseDialog.Trigger render={(props) => cloneElement(children as ReactElement<object>, props)} />;
 };
 
-type DialogCloseProps = {
+interface DialogCloseProps {
   /** The element to render as the close button */
-  children: React.ReactNode;
+  children: ReactNode;
   /** Optional render prop for custom element (children will be passed to it) */
   render?: ReactElement<object>;
-};
+}
 
 export const DialogClose = ({ children, render }: DialogCloseProps) => {
   // If render prop is provided, use it and pass children to the rendered element

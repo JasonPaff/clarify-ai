@@ -22,6 +22,7 @@ export interface ClarificationGenerateRequest {
   featureRequestId: number;
   maxTokens?: number;
   modelId: string; // Format: "provider:modelId"
+  projectId?: number;
   repositoryOverviews?: Array<ClarificationRepositoryOverview>;
   temperature?: number;
   thinkingBudget?: number;
@@ -87,6 +88,7 @@ export function registerAiClarificationHandlers(
       const logResult = loggingService.startOperation({
         featureRequestId: request.featureRequestId,
         modelId,
+        projectId: request.projectId,
         requestBody: request,
         workflowStep: 'clarify',
       });
@@ -133,6 +135,10 @@ export function registerAiClarificationHandlers(
           ...thinkingOptions,
         } as Parameters<typeof streamText>[0]);
 
+        // Accumulate response text and reasoning for logging
+        let accumulatedText = '';
+        let accumulatedReasoning = '';
+
         // Process the stream and send chunks to renderer
         for await (const part of result.fullStream) {
           if (activeAbortController?.signal.aborted) {
@@ -168,8 +174,10 @@ export function registerAiClarificationHandlers(
                 loggingService.completeOperation({
                   inputTokens: usage?.inputTokens,
                   outputTokens: usage?.outputTokens,
+                  reasoningBody: accumulatedReasoning || undefined,
                   reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
                   requestId,
+                  responseBody: accumulatedText || undefined,
                 });
               }
               break;
@@ -180,6 +188,9 @@ export function registerAiClarificationHandlers(
                 content: part.text,
                 type: 'reasoning',
               };
+
+              // Accumulate reasoning for reasoningBody logging
+              accumulatedReasoning += part.text;
 
               // Log reasoning chunk
               if (requestId) {
@@ -204,6 +215,9 @@ export function registerAiClarificationHandlers(
                 content: part.text,
                 type: 'text',
               };
+
+              // Accumulate text for responseBody logging
+              accumulatedText += part.text;
 
               // Log text chunk
               if (requestId) {
@@ -266,6 +280,15 @@ export function registerAiClarificationHandlers(
           mainWindow.webContents.send(IpcChannels.ai.clarification.stream, chunk);
         }
 
+        // Check if we broke due to cancellation
+        if (activeAbortController?.signal.aborted) {
+          if (requestId) {
+            loggingService.cancelOperation({ requestId });
+          }
+          activeAbortController = null;
+          return { error: 'Generation cancelled', success: false };
+        }
+
         // Clean up
         activeAbortController = null;
 
@@ -275,12 +298,9 @@ export function registerAiClarificationHandlers(
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
-          // Log cancellation as failure
+          // Log cancellation
           if (requestId) {
-            loggingService.failOperation({
-              error: 'Generation cancelled',
-              requestId,
-            });
+            loggingService.cancelOperation({ requestId });
           }
           return { error: 'Generation cancelled', success: false };
         }

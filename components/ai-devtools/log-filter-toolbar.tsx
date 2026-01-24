@@ -33,7 +33,7 @@ import {
  */
 const WORKFLOW_STEP_LABELS: Record<string, string> = {
   clarify: 'Clarification',
-  describe: 'Description',
+  describe: 'Repository Overview',
   discover: 'Discovery',
   other: 'Other',
   plan: 'Planning',
@@ -344,14 +344,13 @@ export const toAiLogFilterParams = (filters: LogFilterState): AiLogFilterParams 
     params.timeRange = filters.timeRange as AiLogFilterParams['timeRange'];
   }
 
-  // For workflow steps and statuses, the repository currently only supports single values
-  // We could extend this if the repository is updated to support arrays
-  if (filters.selectedWorkflowSteps.length === 1) {
-    params.workflowStep = filters.selectedWorkflowSteps[0] as AiLogFilterParams['workflowStep'];
+  // Support multi-select for workflow steps and statuses
+  if (filters.selectedWorkflowSteps.length > 0) {
+    params.workflowStep = filters.selectedWorkflowSteps as AiLogFilterParams['workflowStep'];
   }
 
-  if (filters.selectedStatuses.length === 1) {
-    params.status = filters.selectedStatuses[0] as AiLogFilterParams['status'];
+  if (filters.selectedStatuses.length > 0) {
+    params.status = filters.selectedStatuses as AiLogFilterParams['status'];
   }
 
   return params;

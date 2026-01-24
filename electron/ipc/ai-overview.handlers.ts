@@ -16,6 +16,7 @@ export interface RepositoryOverviewGenerateRequest {
   enableThinking?: boolean;
   maxTokens?: number;
   modelId: string; // Format: "provider:modelId"
+  projectId?: number;
   repositoryId: number;
   repositoryPath: string;
   temperature?: number;
@@ -76,6 +77,7 @@ export function registerAiOverviewHandlers(
       // Note: overview does not have featureRequestId, use 'describe' workflow step
       const logResult = loggingService.startOperation({
         modelId,
+        projectId: request.projectId,
         requestBody: request,
         workflowStep: 'describe',
       });
@@ -123,6 +125,10 @@ export function registerAiOverviewHandlers(
           ...thinkingOptions,
         } as Parameters<typeof streamText>[0]);
 
+        // Accumulate response text and reasoning for logging
+        let accumulatedText = '';
+        let accumulatedReasoning = '';
+
         // Process the stream and send chunks to renderer
         for await (const part of result.fullStream) {
           if (activeAbortController?.signal.aborted) {
@@ -158,8 +164,10 @@ export function registerAiOverviewHandlers(
                 loggingService.completeOperation({
                   inputTokens: usage?.inputTokens,
                   outputTokens: usage?.outputTokens,
+                  reasoningBody: accumulatedReasoning || undefined,
                   reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
                   requestId,
+                  responseBody: accumulatedText || undefined,
                 });
               }
               break;
@@ -170,6 +178,9 @@ export function registerAiOverviewHandlers(
                 content: part.text,
                 type: 'reasoning',
               };
+
+              // Accumulate reasoning for reasoningBody logging
+              accumulatedReasoning += part.text;
 
               // Log reasoning chunk
               if (requestId) {
@@ -195,6 +206,9 @@ export function registerAiOverviewHandlers(
                 type: 'text',
               };
 
+              // Accumulate text for responseBody logging
+              accumulatedText += part.text;
+
               // Log text chunk
               if (requestId) {
                 loggingService.recordStreamChunk({
@@ -213,6 +227,15 @@ export function registerAiOverviewHandlers(
           mainWindow.webContents.send(IpcChannels.ai.repositoryOverview.stream, chunk);
         }
 
+        // Check if we broke due to cancellation
+        if (activeAbortController?.signal.aborted) {
+          if (requestId) {
+            loggingService.cancelOperation({ requestId });
+          }
+          activeAbortController = null;
+          return { error: 'Generation cancelled', success: false };
+        }
+
         // Clean up
         activeAbortController = null;
 
@@ -222,12 +245,9 @@ export function registerAiOverviewHandlers(
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
-          // Log cancellation as failure
+          // Log cancellation
           if (requestId) {
-            loggingService.failOperation({
-              error: 'Generation cancelled',
-              requestId,
-            });
+            loggingService.cancelOperation({ requestId });
           }
           return { error: 'Generation cancelled', success: false };
         }

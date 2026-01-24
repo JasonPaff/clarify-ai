@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, like, lt, or, sql } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray, like, lt, or, sql } from 'drizzle-orm';
 
 import type { DrizzleDatabase } from '../index';
 import type { AiLog, AiLogStatus, AiLogWorkflowStep, NewAiLog } from '../schema/ai-logs.schema';
@@ -27,12 +27,12 @@ export interface AiLogFilterParams {
   searchQuery?: string;
   /** Custom start date for time range filtering (ISO 8601 format) */
   startDate?: string;
-  /** Filter by operation status */
-  status?: AiLogStatus;
+  /** Filter by operation status (single value or array for multi-select) */
+  status?: AiLogStatus | Array<AiLogStatus>;
   /** Predefined time range filter */
   timeRange?: AiLogTimeRange;
-  /** Filter by workflow step */
-  workflowStep?: AiLogWorkflowStep;
+  /** Filter by workflow step (single value or array for multi-select) */
+  workflowStep?: AiLogWorkflowStep | Array<AiLogWorkflowStep>;
 }
 
 /**
@@ -98,7 +98,13 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
     }
 
     if (params.workflowStep) {
-      conditions.push(eq(aiLogs.workflowStep, params.workflowStep));
+      if (Array.isArray(params.workflowStep)) {
+        if (params.workflowStep.length > 0) {
+          conditions.push(inArray(aiLogs.workflowStep, params.workflowStep));
+        }
+      } else {
+        conditions.push(eq(aiLogs.workflowStep, params.workflowStep));
+      }
     }
 
     if (params.modelId) {
@@ -106,7 +112,13 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
     }
 
     if (params.status) {
-      conditions.push(eq(aiLogs.status, params.status));
+      if (Array.isArray(params.status)) {
+        if (params.status.length > 0) {
+          conditions.push(inArray(aiLogs.status, params.status));
+        }
+      } else {
+        conditions.push(eq(aiLogs.status, params.status));
+      }
     }
 
     if (params.featureRequestId !== undefined) {

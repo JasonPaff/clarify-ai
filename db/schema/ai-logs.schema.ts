@@ -41,6 +41,7 @@ export const aiLogs = sqliteTable(
     modelId: text('model_id').notNull(),
     outputTokens: integer('output_tokens'),
     projectId: integer('project_id').references(() => projects.id, { onDelete: 'set null' }),
+    reasoningBody: text('reasoning_body'),
     reasoningTokens: integer('reasoning_tokens'),
     requestBody: text('request_body'),
     requestId: text('request_id').notNull().unique(),

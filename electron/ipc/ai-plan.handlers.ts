@@ -24,6 +24,7 @@ export interface PlanGenerateRequest {
   featureRequestId: number;
   maxTokens?: number;
   modelId: string; // Format: "provider:modelId"
+  projectId?: number;
   repositoryOverviews: Array<PlanRepositoryOverview>;
   scopeConfig?: PlanScopeConfig;
   temperature?: number;
@@ -156,6 +157,7 @@ export function registerAiPlanHandlers(
       const logResult = loggingService.startOperation({
         featureRequestId: request.featureRequestId,
         modelId,
+        projectId: request.projectId,
         requestBody: request,
         workflowStep: 'plan',
       });
@@ -244,6 +246,10 @@ export function registerAiPlanHandlers(
         // Track progress through the stream
         let hasStartedAnalysis = false;
 
+        // Accumulate response text and reasoning for logging
+        let accumulatedText = '';
+        let accumulatedReasoning = '';
+
         // Process the stream and send chunks to renderer
         for await (const part of result.fullStream) {
           if (activeAbortController?.signal.aborted) {
@@ -279,8 +285,10 @@ export function registerAiPlanHandlers(
                 loggingService.completeOperation({
                   inputTokens: usage?.inputTokens,
                   outputTokens: usage?.outputTokens,
+                  reasoningBody: accumulatedReasoning || undefined,
                   reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
                   requestId,
+                  responseBody: accumulatedText || undefined,
                 });
               }
               break;
@@ -302,6 +310,9 @@ export function registerAiPlanHandlers(
                 content: part.text,
                 type: 'reasoning',
               };
+
+              // Accumulate reasoning for reasoningBody logging
+              accumulatedReasoning += part.text;
 
               // Log reasoning chunk
               if (requestId) {
@@ -337,6 +348,9 @@ export function registerAiPlanHandlers(
                 content: part.text,
                 type: 'text',
               };
+
+              // Accumulate text for responseBody logging
+              accumulatedText += part.text;
 
               // Log text chunk
               if (requestId) {
@@ -431,6 +445,15 @@ export function registerAiPlanHandlers(
           mainWindow.webContents.send(IpcChannels.ai.plan.stream, chunk);
         }
 
+        // Check if we broke due to cancellation
+        if (activeAbortController?.signal.aborted) {
+          if (requestId) {
+            loggingService.cancelOperation({ requestId });
+          }
+          activeAbortController = null;
+          return { error: 'Generation cancelled', success: false };
+        }
+
         // Clean up
         activeAbortController = null;
 
@@ -440,12 +463,9 @@ export function registerAiPlanHandlers(
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
-          // Log cancellation as failure
+          // Log cancellation
           if (requestId) {
-            loggingService.failOperation({
-              error: 'Generation cancelled',
-              requestId,
-            });
+            loggingService.cancelOperation({ requestId });
           }
           return { error: 'Generation cancelled', success: false };
         }
