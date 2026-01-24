@@ -482,6 +482,7 @@ export function useDiscovery({ currentRun, featureRequest, modelConfig }: UseDis
       api,
       createRunMutation,
       featureRequest.id,
+      featureRequest.projectId,
       featureRequest.rawRequest,
       isElectron,
       modelConfig,

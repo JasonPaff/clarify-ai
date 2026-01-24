@@ -448,6 +448,7 @@ export function usePlan({ currentRun, featureRequest, modelConfig }: UsePlanOpti
       api,
       createRunMutation,
       featureRequest.id,
+      featureRequest.projectId,
       featureRequest.rawRequest,
       isElectron,
       modelConfig,
