@@ -91,6 +91,7 @@ export function RepositoryOverviewDialog({
         content: transitionData.content,
         customPrompt: transitionData.customPrompt,
         modelId: transitionData.modelId,
+        projectId: transitionData.projectId,
         repositoryId,
         repositoryName,
       });

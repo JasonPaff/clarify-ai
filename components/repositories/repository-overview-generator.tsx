@@ -31,6 +31,7 @@ export interface BackgroundTransitionData {
   content: string;
   customPrompt: string;
   modelId: string;
+  projectId: number;
 }
 
 /**
@@ -117,6 +118,7 @@ export const RepositoryOverviewGenerator = forwardRef<
           content: streamingContent,
           customPrompt,
           modelId: effectiveSelectedModel,
+          projectId,
         };
       },
       stopGeneration: async () => {
@@ -124,7 +126,7 @@ export const RepositoryOverviewGenerator = forwardRef<
         setStatus('stopped');
       },
     }),
-    [isGenerating, effectiveSelectedModel, streamingContent, customPrompt, cancel]
+    [isGenerating, effectiveSelectedModel, streamingContent, customPrompt, projectId, cancel]
   );
 
   const handleStreamChunk = useCallback((chunk: RepositoryOverviewStreamChunk) => {
@@ -193,6 +195,7 @@ export const RepositoryOverviewGenerator = forwardRef<
       enableThinking: modelSupportsThinking ? effectiveThinking : undefined,
       maxTokens: overviewConfig?.maxTokens ?? undefined,
       modelId: effectiveSelectedModel,
+      projectId,
       repositoryId,
       repositoryPath,
       temperature: overviewConfig?.temperature ?? undefined,

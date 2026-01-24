@@ -18,6 +18,8 @@ interface BackgroundGenerationSession {
   customPrompt: string;
   /** AI model ID used for generation */
   modelId: string;
+  /** Project ID for AI logging */
+  projectId: number;
   /** Repository ID being generated for */
   repositoryId: number;
   /** Repository name for display in notifications */

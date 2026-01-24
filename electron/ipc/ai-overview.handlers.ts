@@ -164,11 +164,18 @@ export function registerAiOverviewHandlers(
 
               // Complete logging operation
               if (requestId) {
+                // Estimate reasoning tokens if not provided but reasoning content exists
+                // Average ~4 characters per token is a reasonable approximation
+                const providerReasoningTokens = usage?.outputTokenDetails?.reasoningTokens;
+                const estimatedReasoningTokens = accumulatedReasoning
+                  ? Math.ceil(accumulatedReasoning.length / 4)
+                  : undefined;
+
                 loggingService.completeOperation({
                   inputTokens: usage?.inputTokens,
                   outputTokens: usage?.outputTokens,
                   reasoningBody: accumulatedReasoning || undefined,
-                  reasoningTokens: usage?.outputTokenDetails?.reasoningTokens,
+                  reasoningTokens: providerReasoningTokens ?? estimatedReasoningTokens,
                   requestId,
                   responseBody: accumulatedText || undefined,
                 });
