@@ -1,12 +1,14 @@
 'use client';
 
-import { AlertCircle, Loader2, RefreshCw, Save, Square } from 'lucide-react';
+import { AlertCircle, ChevronDown, Loader2, RefreshCw, Save, Settings2, Square } from 'lucide-react';
 import { forwardRef, Fragment, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
 import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
+import { ParameterSlider } from '@/components/features/workflow/parameter-slider';
+import { ThinkingBudgetControl } from '@/components/features/workflow/thinking-budget-control';
 import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
@@ -14,7 +16,7 @@ import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/a
 import { UsageFooter } from '@/components/ui/ai/usage-footer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Textarea } from '@/components/ui/textarea';
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useElectronAiOverview } from '@/hooks/useElectron';
@@ -85,6 +87,12 @@ export const RepositoryOverviewGenerator = forwardRef<
   const [error, setError] = useState<null | string>(null);
   const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
 
+  // Advanced settings override state
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+  const [temperatureOverride, setTemperatureOverride] = useState<null | number>(null);
+  const [maxTokensOverride, setMaxTokensOverride] = useState<null | number>(null);
+  const [thinkingBudgetOverride, setThinkingBudgetOverride] = useState<null | number>(null);
+
   // Ref to skip cancel on unmount when transitioning to background
   const skipCancelRef = useRef(false);
 
@@ -102,6 +110,42 @@ export const RepositoryOverviewGenerator = forwardRef<
   const effectiveSelectedModel = selectedModel ?? configDefaultModel;
 
   const isGenerating = status === 'generating';
+
+  // Default values for advanced settings
+  const DEFAULT_TEMPERATURE = 0.7;
+  const DEFAULT_MAX_TOKENS = 4096;
+  const DEFAULT_THINKING_BUDGET = 8192;
+
+  // Defaults from config (falling back to hardcoded defaults)
+  const defaultTemperature = overviewConfig?.temperature ?? DEFAULT_TEMPERATURE;
+  const defaultMaxTokens = overviewConfig?.maxTokens ?? DEFAULT_MAX_TOKENS;
+  const defaultThinkingBudget = overviewConfig?.thinkingBudget ?? DEFAULT_THINKING_BUDGET;
+
+  // Effective values (user override or project default)
+  const effectiveTemperature = temperatureOverride ?? defaultTemperature;
+  const effectiveMaxTokens = maxTokensOverride ?? defaultMaxTokens;
+  const effectiveThinkingBudget = thinkingBudgetOverride ?? defaultThinkingBudget;
+
+  // Modification indicators
+  const isTemperatureModified = temperatureOverride !== null;
+  const isMaxTokensModified = maxTokensOverride !== null;
+  const isThinkingModified = thinkingOverride !== null || thinkingBudgetOverride !== null;
+  const hasAnyModifications = isTemperatureModified || isMaxTokensModified || isThinkingModified;
+
+  // Handler functions for advanced settings
+  const handleTemperatureChange = (value: number) => setTemperatureOverride(value);
+  const handleMaxTokensChange = (value: number) => setMaxTokensOverride(value);
+  const handleThinkingBudgetChange = (budget: number) => setThinkingBudgetOverride(budget);
+  const handleResetToDefaults = () => {
+    setTemperatureOverride(null);
+    setMaxTokensOverride(null);
+    setThinkingBudgetOverride(null);
+    setThinkingOverride(null);
+  };
+
+  // Format functions for slider display
+  const formatTemperature = (value: number) => value.toFixed(1);
+  const formatMaxTokens = (value: number) => (value >= 1000 ? `${(value / 1000).toFixed(1)}k` : String(value));
 
   // Expose imperative handle for parent component
   useImperativeHandle(
@@ -193,13 +237,13 @@ export const RepositoryOverviewGenerator = forwardRef<
     const result = await generate({
       customPrompt: customPrompt || overviewConfig?.customSystemPrompt || undefined,
       enableThinking: modelSupportsThinking ? effectiveThinking : undefined,
-      maxTokens: overviewConfig?.maxTokens ?? undefined,
+      maxTokens: effectiveMaxTokens,
       modelId: effectiveSelectedModel,
       projectId,
       repositoryId,
       repositoryPath,
-      temperature: overviewConfig?.temperature ?? undefined,
-      thinkingBudget: overviewConfig?.thinkingBudget ?? undefined,
+      temperature: effectiveTemperature,
+      thinkingBudget: effectiveThinkingBudget,
     });
 
     if (!result.success) {
@@ -335,22 +379,91 @@ export const RepositoryOverviewGenerator = forwardRef<
             )}
           </div>
 
-          {/* Thinking Toggle - Only shown for models that support thinking */}
-          {supportsThinking && (
-            <div className={'flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2'}>
-              <div className={'flex flex-col gap-0.5'}>
-                <label className={'text-sm font-medium'} htmlFor={'thinking-toggle'}>
-                  Enable thinking for this request
-                </label>
-                <span className={'text-xs text-muted-foreground'}>
-                  {thinkingOverride === null
-                    ? `Using global preference (${isThinkingEnabled ? 'enabled' : 'disabled'})`
-                    : 'Override for this request'}
-                </span>
+          {/* Advanced Settings Section */}
+          <Collapsible onOpenChange={setIsAdvancedSettingsOpen} open={isAdvancedSettingsOpen}>
+            <CollapsibleTrigger
+              className={cn(
+                'flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-left text-sm',
+                'transition-colors hover:bg-muted/50'
+              )}
+              isHideChevron
+            >
+              <div className={'flex items-center gap-2'}>
+                <Settings2 className={'size-4 text-muted-foreground'} />
+                <span className={'font-medium'}>Advanced Settings</span>
+                {hasAnyModifications && (
+                  <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>Modified</span>
+                )}
               </div>
-              <Switch checked={effectiveThinking} id={'thinking-toggle'} onCheckedChange={handleThinkingToggle} />
-            </div>
-          )}
+              <ChevronDown
+                className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'}
+              />
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className={'mt-2'}>
+              <div className={'space-y-4 rounded-md border border-border bg-card p-4'}>
+                {/* Temperature and Max Tokens sliders */}
+                <div className={'flex flex-col gap-4 md:flex-row md:gap-8'}>
+                  {/* Temperature Slider */}
+                  <div className={'flex-1'}>
+                    <ParameterSlider
+                      description={'Controls randomness. Lower is more focused.'}
+                      formatValue={formatTemperature}
+                      isDisabled={isGenerating}
+                      label={'Temperature'}
+                      max={2}
+                      min={0}
+                      onValueChange={handleTemperatureChange}
+                      step={0.1}
+                      value={effectiveTemperature}
+                    />
+                    {isTemperatureModified && (
+                      <p className={'mt-1 text-xs text-muted-foreground'}>
+                        Default: {formatTemperature(defaultTemperature)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Max Tokens Slider */}
+                  <div className={'flex-1'}>
+                    <ParameterSlider
+                      description={'Maximum response length.'}
+                      formatValue={formatMaxTokens}
+                      isDisabled={isGenerating}
+                      label={'Max Tokens'}
+                      max={16000}
+                      min={100}
+                      onValueChange={handleMaxTokensChange}
+                      step={100}
+                      value={effectiveMaxTokens}
+                    />
+                    {isMaxTokensModified && (
+                      <p className={'mt-1 text-xs text-muted-foreground'}>
+                        Default: {formatMaxTokens(defaultMaxTokens)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Thinking Budget Control */}
+                <ThinkingBudgetControl
+                  budget={effectiveThinkingBudget}
+                  isDisabled={isGenerating}
+                  isEnabled={effectiveThinking}
+                  isSupportsThinking={supportsThinking}
+                  onBudgetChange={handleThinkingBudgetChange}
+                  onEnabledChange={handleThinkingToggle}
+                />
+
+                {/* Reset to Defaults Button */}
+                {hasAnyModifications && (
+                  <Button className={'mt-2'} onClick={handleResetToDefaults} size={'sm'} variant={'ghost'}>
+                    Reset to Project Defaults
+                  </Button>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </Fragment>
       )}
 
