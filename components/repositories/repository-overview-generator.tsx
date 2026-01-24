@@ -1,30 +1,23 @@
 'use client';
 
-import { AlertCircle, ChevronDown, Loader2, RefreshCw, Save, Settings2, Square } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw, Save, Square } from 'lucide-react';
 import { forwardRef, Fragment, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
-import type { FullModelId } from '@/lib/ai/models';
 import type { RepositoryOverviewStreamChunk } from '@/types/electron';
 
-import { DefaultPromptViewer } from '@/components/features/workflow/default-prompt-viewer';
-import { ParameterSlider } from '@/components/features/workflow/parameter-slider';
-import { ThinkingBudgetControl } from '@/components/features/workflow/thinking-budget-control';
-import { useThinkingPreference } from '@/components/providers/thinking-preference-provider';
+import { AIModelSelector, AISettingsAdvanced } from '@/components/ai-settings';
 import { Conversation, ConversationContent, ConversationScrollButton } from '@/components/ui/ai/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ui/ai/message';
 import { Reasoning, ReasoningContent, ReasoningTrigger } from '@/components/ui/ai/reasoning';
 import { UsageFooter } from '@/components/ui/ai/usage-footer';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Textarea } from '@/components/ui/textarea';
 import { useStepConfig } from '@/hooks/queries/use-step-configurations';
+import { useLocalAISettings } from '@/hooks/use-local-ai-settings';
 import { useElectronAiOverview } from '@/hooks/useElectron';
 import { getModelInfo } from '@/lib/ai/models';
-import { getPromptMetadata } from '@/lib/ai/prompts/prompt-metadata';
+import { mapConfigToValues } from '@/lib/ai/settings';
 import { cn } from '@/lib/utils';
-
-import { ModelSelector } from '../features/clarification/model-selector';
 
 /**
  * Data returned when preparing for background transition.
@@ -71,81 +64,36 @@ interface SaveData {
 /**
  * Component for generating repository overviews with AI.
  * Handles model selection, custom prompts, streaming output, and save/regenerate actions.
+ * Uses the unified AI settings components with local/temporary overrides.
  */
 export const RepositoryOverviewGenerator = forwardRef<
   RepositoryOverviewGeneratorHandle,
   RepositoryOverviewGeneratorProps
 >(function RepositoryOverviewGenerator({ className, onCancel, onSave, projectId, repositoryId, repositoryPath }, ref) {
-  const [selectedModel, setSelectedModel] = useState<FullModelId | null>(null);
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [isCustomPromptOpen, setIsCustomPromptOpen] = useState(false);
+  // Generation state
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [streamingContent, setStreamingContent] = useState('');
   const [reasoningContent, setReasoningContent] = useState('');
   const [isReasoningStreaming, setIsReasoningStreaming] = useState(false);
   const [usageData, setUsageData] = useState<null | RepositoryOverviewStreamChunk['usage']>(null);
   const [error, setError] = useState<null | string>(null);
-  const [thinkingOverride, setThinkingOverride] = useState<boolean | null>(null);
-
-  // Advanced settings override state
-  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
-  const [temperatureOverride, setTemperatureOverride] = useState<null | number>(null);
-  const [maxTokensOverride, setMaxTokensOverride] = useState<null | number>(null);
-  const [thinkingBudgetOverride, setThinkingBudgetOverride] = useState<null | number>(null);
 
   // Ref to skip cancel on unmount when transitioning to background
   const skipCancelRef = useRef(false);
 
-  const { isThinkingEnabled } = useThinkingPreference();
-  const { cancel, generate, subscribeToStream } = useElectronAiOverview();
+  // Fetch project-level defaults
   const { data: overviewConfig } = useStepConfig(projectId, 'overview');
 
-  // Compute the default model from config
-  const configDefaultModel =
-    overviewConfig?.modelProvider && overviewConfig?.modelId
-      ? (`${overviewConfig.modelProvider}:${overviewConfig.modelId}` as FullModelId)
-      : null;
+  // Convert project config to AISettingsValues for use as defaults
+  const projectDefaults = useMemo(() => mapConfigToValues(overviewConfig), [overviewConfig]);
 
-  // Use user-selected model if available, otherwise fall back to config default
-  const effectiveSelectedModel = selectedModel ?? configDefaultModel;
+  // Use local AI settings (temporary overrides that don't persist)
+  const settings = useLocalAISettings(projectDefaults);
+
+  // Electron AI overview API
+  const { cancel, generate, subscribeToStream } = useElectronAiOverview();
 
   const isGenerating = status === 'generating';
-
-  // Default values for advanced settings
-  const DEFAULT_TEMPERATURE = 0.7;
-  const DEFAULT_MAX_TOKENS = 4096;
-  const DEFAULT_THINKING_BUDGET = 8192;
-
-  // Defaults from config (falling back to hardcoded defaults)
-  const defaultTemperature = overviewConfig?.temperature ?? DEFAULT_TEMPERATURE;
-  const defaultMaxTokens = overviewConfig?.maxTokens ?? DEFAULT_MAX_TOKENS;
-  const defaultThinkingBudget = overviewConfig?.thinkingBudget ?? DEFAULT_THINKING_BUDGET;
-
-  // Effective values (user override or project default)
-  const effectiveTemperature = temperatureOverride ?? defaultTemperature;
-  const effectiveMaxTokens = maxTokensOverride ?? defaultMaxTokens;
-  const effectiveThinkingBudget = thinkingBudgetOverride ?? defaultThinkingBudget;
-
-  // Modification indicators
-  const isTemperatureModified = temperatureOverride !== null;
-  const isMaxTokensModified = maxTokensOverride !== null;
-  const isThinkingModified = thinkingOverride !== null || thinkingBudgetOverride !== null;
-  const hasAnyModifications = isTemperatureModified || isMaxTokensModified || isThinkingModified;
-
-  // Handler functions for advanced settings
-  const handleTemperatureChange = (value: number) => setTemperatureOverride(value);
-  const handleMaxTokensChange = (value: number) => setMaxTokensOverride(value);
-  const handleThinkingBudgetChange = (budget: number) => setThinkingBudgetOverride(budget);
-  const handleResetToDefaults = () => {
-    setTemperatureOverride(null);
-    setMaxTokensOverride(null);
-    setThinkingBudgetOverride(null);
-    setThinkingOverride(null);
-  };
-
-  // Format functions for slider display
-  const formatTemperature = (value: number) => value.toFixed(1);
-  const formatMaxTokens = (value: number) => (value >= 1000 ? `${(value / 1000).toFixed(1)}k` : String(value));
 
   // Expose imperative handle for parent component
   useImperativeHandle(
@@ -153,15 +101,15 @@ export const RepositoryOverviewGenerator = forwardRef<
     () => ({
       isGenerating,
       prepareBackgroundTransition: () => {
-        if (!isGenerating || !effectiveSelectedModel) {
+        if (!isGenerating || !settings.values.modelId) {
           return null;
         }
         // Set flag to skip cancel on unmount
         skipCancelRef.current = true;
         return {
           content: streamingContent,
-          customPrompt,
-          modelId: effectiveSelectedModel,
+          customPrompt: settings.values.customSystemPrompt ?? '',
+          modelId: settings.values.modelId,
           projectId,
         };
       },
@@ -170,7 +118,7 @@ export const RepositoryOverviewGenerator = forwardRef<
         setStatus('stopped');
       },
     }),
-    [isGenerating, effectiveSelectedModel, streamingContent, customPrompt, projectId, cancel]
+    [isGenerating, settings.values.modelId, settings.values.customSystemPrompt, streamingContent, projectId, cancel]
   );
 
   const handleStreamChunk = useCallback((chunk: RepositoryOverviewStreamChunk) => {
@@ -224,9 +172,11 @@ export const RepositoryOverviewGenerator = forwardRef<
   }, [cancel]);
 
   const handleGenerate = async () => {
-    if (!effectiveSelectedModel) return;
+    const effectiveModelId = settings.values.modelId;
+    if (!effectiveModelId) return;
 
-    const modelSupportsThinking = getModelInfo(effectiveSelectedModel)?.supportsThinking ?? false;
+    const modelSupportsThinking = getModelInfo(effectiveModelId)?.supportsThinking ?? false;
+    const effectiveThinking = modelSupportsThinking && settings.values.thinkingEnabled;
 
     setStatus('generating');
     setStreamingContent('');
@@ -235,15 +185,15 @@ export const RepositoryOverviewGenerator = forwardRef<
     setError(null);
 
     const result = await generate({
-      customPrompt: customPrompt || overviewConfig?.customSystemPrompt || undefined,
-      enableThinking: modelSupportsThinking ? effectiveThinking : undefined,
-      maxTokens: effectiveMaxTokens,
-      modelId: effectiveSelectedModel,
+      customPrompt: settings.values.customSystemPrompt || undefined,
+      enableThinking: effectiveThinking,
+      maxTokens: settings.values.maxTokens,
+      modelId: effectiveModelId,
       projectId,
       repositoryId,
       repositoryPath,
-      temperature: effectiveTemperature,
-      thinkingBudget: effectiveThinkingBudget,
+      temperature: settings.values.temperature,
+      thinkingBudget: settings.values.thinkingBudget,
     });
 
     if (!result.success) {
@@ -273,17 +223,14 @@ export const RepositoryOverviewGenerator = forwardRef<
   };
 
   const handleSave = () => {
-    if (streamingContent && effectiveSelectedModel) {
+    const effectiveModelId = settings.values.modelId;
+    if (streamingContent && effectiveModelId) {
       onSave({
         content: streamingContent,
-        customPrompt,
-        modelId: effectiveSelectedModel,
+        customPrompt: settings.values.customSystemPrompt ?? '',
+        modelId: effectiveModelId,
       });
     }
-  };
-
-  const handleThinkingToggle = (isChecked: boolean) => {
-    setThinkingOverride(isChecked);
   };
 
   const isComplete = status === 'complete';
@@ -296,22 +243,9 @@ export const RepositoryOverviewGenerator = forwardRef<
   const isFinishedState = isComplete || isStopped || isError;
   const canSave = (isComplete || isStopped) && hasStreamingContent;
 
-  const modelInfo = effectiveSelectedModel ? getModelInfo(effectiveSelectedModel) : undefined;
+  const modelInfo = settings.values.modelId ? getModelInfo(settings.values.modelId) : undefined;
   const supportsThinking = modelInfo?.supportsThinking ?? false;
   const hasReasoningContent = reasoningContent.length > 0;
-  const effectiveThinking = thinkingOverride ?? overviewConfig?.thinkingEnabled ?? isThinkingEnabled;
-
-  const promptMetadata = useMemo(() => getPromptMetadata('overview'), []);
-
-  const handleUseAsStartingPoint = useCallback(
-    (prompt: string) => {
-      setCustomPrompt(prompt);
-      if (!isCustomPromptOpen) {
-        setIsCustomPromptOpen(true);
-      }
-    },
-    [isCustomPromptOpen]
-  );
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -328,142 +262,19 @@ export const RepositoryOverviewGenerator = forwardRef<
         </div>
       </div>
 
-      {/* Model Selection - Only show in idle state */}
+      {/* Model Selection and Settings - Only show in idle state */}
       {isIdle && (
         <Fragment>
-          <div>
-            <label className={'mb-1.5 block text-sm font-medium'}>AI Model</label>
-            <ModelSelector isDisabled={isGenerating} onValueChange={setSelectedModel} value={effectiveSelectedModel} />
-          </div>
+          {/* Model Selector */}
+          <AIModelSelector
+            isDisabled={isGenerating}
+            isModified={settings.modifications.modelId}
+            onChange={(value) => settings.updateValue('modelId', value)}
+            value={settings.values.modelId}
+          />
 
-          {/* Custom Prompt Section */}
-          <div>
-            <button
-              className={`
-                flex items-center gap-1 text-sm text-muted-foreground transition-colors
-                hover:text-foreground
-              `}
-              onClick={() => setIsCustomPromptOpen(!isCustomPromptOpen)}
-              type={'button'}
-            >
-              <span>{isCustomPromptOpen ? 'Hide' : 'Show'} custom prompt</span>
-              <span className={'text-xs'}>{isCustomPromptOpen ? '(optional)' : ''}</span>
-            </button>
-
-            {isCustomPromptOpen && (
-              <div className={'mt-2 space-y-2'}>
-                <Textarea
-                  className={'min-h-24'}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder={'Add any specific instructions for the AI to follow when generating the overview...'}
-                  value={customPrompt}
-                />
-                {/* Default Prompt Viewer - shown when custom prompt section is open */}
-                <DefaultPromptViewer
-                  defaultPrompt={promptMetadata.defaultPrompt}
-                  isDisabled={isGenerating}
-                  onUseAsStartingPoint={handleUseAsStartingPoint}
-                  variables={promptMetadata.variables}
-                />
-              </div>
-            )}
-
-            {/* Default Prompt Viewer - shown when custom prompt section is collapsed for discoverability */}
-            {!isCustomPromptOpen && (
-              <DefaultPromptViewer
-                defaultPrompt={promptMetadata.defaultPrompt}
-                isDisabled={isGenerating}
-                onUseAsStartingPoint={handleUseAsStartingPoint}
-                variables={promptMetadata.variables}
-              />
-            )}
-          </div>
-
-          {/* Advanced Settings Section */}
-          <Collapsible onOpenChange={setIsAdvancedSettingsOpen} open={isAdvancedSettingsOpen}>
-            <CollapsibleTrigger
-              className={cn(
-                'flex w-full items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-left text-sm',
-                'transition-colors hover:bg-muted/50'
-              )}
-              isHideChevron
-            >
-              <div className={'flex items-center gap-2'}>
-                <Settings2 className={'size-4 text-muted-foreground'} />
-                <span className={'font-medium'}>Advanced Settings</span>
-                {hasAnyModifications && (
-                  <span className={'rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent'}>Modified</span>
-                )}
-              </div>
-              <ChevronDown
-                className={'size-4 text-muted-foreground transition-transform in-data-panel-open:rotate-180'}
-              />
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className={'mt-2'}>
-              <div className={'space-y-4 rounded-md border border-border bg-card p-4'}>
-                {/* Temperature and Max Tokens sliders */}
-                <div className={'flex flex-col gap-4 md:flex-row md:gap-8'}>
-                  {/* Temperature Slider */}
-                  <div className={'flex-1'}>
-                    <ParameterSlider
-                      description={'Controls randomness. Lower is more focused.'}
-                      formatValue={formatTemperature}
-                      isDisabled={isGenerating}
-                      label={'Temperature'}
-                      max={2}
-                      min={0}
-                      onValueChange={handleTemperatureChange}
-                      step={0.1}
-                      value={effectiveTemperature}
-                    />
-                    {isTemperatureModified && (
-                      <p className={'mt-1 text-xs text-muted-foreground'}>
-                        Default: {formatTemperature(defaultTemperature)}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Max Tokens Slider */}
-                  <div className={'flex-1'}>
-                    <ParameterSlider
-                      description={'Maximum response length.'}
-                      formatValue={formatMaxTokens}
-                      isDisabled={isGenerating}
-                      label={'Max Tokens'}
-                      max={16000}
-                      min={100}
-                      onValueChange={handleMaxTokensChange}
-                      step={100}
-                      value={effectiveMaxTokens}
-                    />
-                    {isMaxTokensModified && (
-                      <p className={'mt-1 text-xs text-muted-foreground'}>
-                        Default: {formatMaxTokens(defaultMaxTokens)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Thinking Budget Control */}
-                <ThinkingBudgetControl
-                  budget={effectiveThinkingBudget}
-                  isDisabled={isGenerating}
-                  isEnabled={effectiveThinking}
-                  isSupportsThinking={supportsThinking}
-                  onBudgetChange={handleThinkingBudgetChange}
-                  onEnabledChange={handleThinkingToggle}
-                />
-
-                {/* Reset to Defaults Button */}
-                {hasAnyModifications && (
-                  <Button className={'mt-2'} onClick={handleResetToDefaults} size={'sm'} variant={'ghost'}>
-                    Reset to Project Defaults
-                  </Button>
-                )}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          {/* Advanced Settings (includes all parameters and custom system prompt) */}
+          <AISettingsAdvanced isDisabled={isGenerating} settings={settings} step={'overview'} />
         </Fragment>
       )}
 
@@ -536,7 +347,7 @@ export const RepositoryOverviewGenerator = forwardRef<
             <Button onClick={onCancel} variant={'outline'}>
               Cancel
             </Button>
-            <Button disabled={!effectiveSelectedModel} onClick={handleGenerate}>
+            <Button disabled={!settings.values.modelId} onClick={handleGenerate}>
               Generate
             </Button>
           </Fragment>

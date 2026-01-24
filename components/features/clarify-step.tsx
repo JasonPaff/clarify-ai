@@ -7,9 +7,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
-import type { FullModelId } from '@/lib/ai/models';
 import type { ClarificationContextFile, ClarificationRepositoryOverview } from '@/types/electron';
 
+import { AISettingsInline } from '@/components/ai-settings';
 import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { ClarificationCostEstimate } from '@/components/features/clarification/cost-estimate';
 import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
@@ -17,7 +17,6 @@ import { FileSearchDialog } from '@/components/features/workflow/file-search-dia
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
-import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { ClarifyStepSkeleton } from '@/components/skeletons/clarify-step-skeleton';
 import { Button } from '@/components/ui/button';
@@ -27,7 +26,7 @@ import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useUpdateFeatureRequest } from '@/hooks/queries/use-feature-requests';
 import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/hooks/queries/use-repository-overviews';
-import { useStepConfig } from '@/hooks/queries/use-step-configurations';
+import { useProjectAISettings } from '@/hooks/use-project-ai-settings';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { useElectronFs } from '@/hooks/useElectron';
 
@@ -52,8 +51,9 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
   // Track error boundary key for resetting after errors
   const [errorBoundaryKey, setErrorBoundaryKey] = useState(0);
 
-  const { data: config, isLoading: isConfigLoading } = useStepConfig(featureRequest.projectId, 'refine');
+  const settings = useProjectAISettings(featureRequest.projectId, 'refine');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'refine');
+  const isConfigLoading = settings.isPersisting;
   const { data: contextFiles = [] } = useContextFiles(featureRequest.id);
   const { data: repositories } = useRepositories(featureRequest.projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
@@ -165,21 +165,17 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
     };
   }, [includedContextFiles, isElectron, readFile]);
 
+  // Derive modelConfig from the new settings hook for backward compatibility with ClarificationPanel
   const modelConfig = useMemo(() => {
-    if (!config) return null;
-
-    const modelId =
-      config.modelProvider && config.modelId ? (`${config.modelProvider}:${config.modelId}` as FullModelId) : null;
-
     return {
-      customPrompt: config.customSystemPrompt ?? undefined,
-      maxTokens: config.maxTokens ?? undefined,
-      modelId,
-      temperature: config.temperature ?? undefined,
-      thinkingBudget: config.thinkingBudget ?? undefined,
-      thinkingEnabled: config.thinkingEnabled,
+      customPrompt: settings.values.customSystemPrompt,
+      maxTokens: settings.values.maxTokens,
+      modelId: settings.values.modelId ?? null,
+      temperature: settings.values.temperature,
+      thinkingBudget: settings.values.thinkingBudget,
+      thinkingEnabled: settings.values.thinkingEnabled ?? false,
     };
-  }, [config]);
+  }, [settings.values]);
 
   const handleRunRestored = useCallback(() => {
     // When a run is restored via RunHistoryDropdown, the currentRun query
@@ -255,7 +251,7 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <StepSettingsPanel projectId={featureRequest.projectId} step={'refine'} />
+        <AISettingsInline settings={settings} step={'refine'} stepLabel={'Clarify'} />
 
         {/* Cost Estimate, Context Files, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>

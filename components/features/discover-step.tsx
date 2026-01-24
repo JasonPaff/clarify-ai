@@ -8,10 +8,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
-import type { FullModelId } from '@/lib/ai/models';
 import type { DiscoveryRepositoryOverview } from '@/lib/ai/prompts/discovery';
 import type { DiscoveryScopeConfig } from '@/lib/validations/discovery';
 
+import { AISettingsInline } from '@/components/ai-settings';
 import { DiscoveryCostEstimate } from '@/components/features/discovery/discovery-cost-estimate';
 import { DiscoveryProgress } from '@/components/features/discovery/discovery-progress';
 import { DiscoveryResults } from '@/components/features/discovery/discovery-results';
@@ -20,7 +20,6 @@ import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status'
 import { RepositoryOverviewStatusPanel } from '@/components/features/workflow/repository-overview-status-panel';
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
-import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { useWorkflow } from '@/components/providers/workflow-provider';
 import { DiscoverySkeleton } from '@/components/skeletons/discovery-skeleton';
@@ -31,8 +30,8 @@ import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-reque
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/hooks/queries/use-repository-overviews';
-import { useStepConfig } from '@/hooks/queries/use-step-configurations';
 import { useDiscovery } from '@/hooks/use-discovery';
+import { useProjectAISettings } from '@/hooks/use-project-ai-settings';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { buildClarificationContext } from '@/lib/ai/clarification-context';
 
@@ -44,8 +43,9 @@ interface DiscoverStepProps {
 }
 
 export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: DiscoverStepProps) => {
-  const { data: config, isLoading: isConfigLoading } = useStepConfig(projectId, 'research');
+  const settings = useProjectAISettings(projectId, 'research');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'research');
+  const isConfigLoading = settings.isPersisting;
   const { data: repositories } = useRepositories(projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
 
@@ -101,22 +101,17 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
     return buildClarificationContext(featureRequest.clarificationQuestions, featureRequest.clarificationAnswers);
   }, [featureRequest.clarificationAnswers, featureRequest.clarificationQuestions]);
 
-  // Build model config from step configuration
+  // Derive modelConfig from the new settings hook for backward compatibility
   const modelConfig = useMemo(() => {
-    if (!config) return null;
-
-    const modelId =
-      config.modelProvider && config.modelId ? (`${config.modelProvider}:${config.modelId}` as FullModelId) : null;
-
     return {
-      customPrompt: config.customSystemPrompt ?? undefined,
-      maxTokens: config.maxTokens ?? undefined,
-      modelId,
-      temperature: config.temperature ?? undefined,
-      thinkingBudget: config.thinkingBudget ?? undefined,
-      thinkingEnabled: config.thinkingEnabled,
+      customPrompt: settings.values.customSystemPrompt,
+      maxTokens: settings.values.maxTokens,
+      modelId: settings.values.modelId ?? null,
+      temperature: settings.values.temperature,
+      thinkingBudget: settings.values.thinkingBudget,
+      thinkingEnabled: settings.values.thinkingEnabled ?? false,
     };
-  }, [config]);
+  }, [settings.values]);
 
   // Use the discovery hook for state management
   const {
@@ -347,7 +342,7 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <StepSettingsPanel projectId={projectId} step={'research'} />
+        <AISettingsInline settings={settings} step={'research'} stepLabel={'Discover'} />
 
         {/* Cost Estimate, Re-run Button, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>

@@ -7,16 +7,15 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { ErrorBoundary } from 'react-error-boundary';
 
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
-import type { FullModelId } from '@/lib/ai/models';
 import type { PlanRepositoryOverview } from '@/types/electron';
 
+import { AISettingsInline } from '@/components/ai-settings';
 import { PlanCostEstimate } from '@/components/features/plan/plan-cost-estimate';
 import { PlanPanel } from '@/components/features/plan/plan-panel';
 import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
 import { RunHistoryDropdown } from '@/components/features/workflow/run-history-dropdown';
 import { SaveErrorAlert } from '@/components/features/workflow/save-error-alert';
 import { StaleWarningBanner } from '@/components/features/workflow/stale-warning-banner';
-import { StepSettingsPanel } from '@/components/features/workflow/step-settings-panel';
 import { StreamingErrorFallback } from '@/components/features/workflow/streaming-error-fallback';
 import { WorkflowEmptyState } from '@/components/features/workflow/workflow-empty-state';
 import { useWorkflow } from '@/components/providers/workflow-provider';
@@ -25,7 +24,7 @@ import { useFeatureRequestRepositories } from '@/hooks/queries/use-feature-reque
 import { useCurrentRun } from '@/hooks/queries/use-feature-request-runs';
 import { useRepositories } from '@/hooks/queries/use-repositories';
 import { useRepositoryOverviewContents, useRepositoryOverviewStatuses } from '@/hooks/queries/use-repository-overviews';
-import { useStepConfig } from '@/hooks/queries/use-step-configurations';
+import { useProjectAISettings } from '@/hooks/use-project-ai-settings';
 import { useStaleSteps } from '@/hooks/use-stale-steps';
 import { parseDiscoveredFiles } from '@/lib/validations/discovery';
 
@@ -37,8 +36,9 @@ interface PlanStepProps {
 }
 
 export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanStepProps) => {
-  const { data: config, isLoading: isConfigLoading } = useStepConfig(projectId, 'plan');
+  const settings = useProjectAISettings(projectId, 'plan');
   const { data: currentRun } = useCurrentRun(featureRequest.id, 'plan');
+  const isConfigLoading = settings.isPersisting;
   const { data: repositories } = useRepositories(projectId);
   const { data: featureRequestRepositories } = useFeatureRequestRepositories(featureRequest.id);
 
@@ -119,22 +119,17 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
     };
   }, [unregisterAiOperation]);
 
-  // Build model config from step configuration
+  // Derive modelConfig from the new settings hook for backward compatibility
   const modelConfig = useMemo(() => {
-    if (!config) return null;
-
-    const modelId =
-      config.modelProvider && config.modelId ? (`${config.modelProvider}:${config.modelId}` as FullModelId) : null;
-
     return {
-      customPrompt: config.customSystemPrompt ?? undefined,
-      maxTokens: config.maxTokens ?? undefined,
-      modelId,
-      temperature: config.temperature ?? undefined,
-      thinkingBudget: config.thinkingBudget ?? undefined,
-      thinkingEnabled: config.thinkingEnabled,
+      customPrompt: settings.values.customSystemPrompt,
+      maxTokens: settings.values.maxTokens,
+      modelId: settings.values.modelId ?? null,
+      temperature: settings.values.temperature,
+      thinkingBudget: settings.values.thinkingBudget,
+      thinkingEnabled: settings.values.thinkingEnabled ?? false,
     };
-  }, [config]);
+  }, [settings.values]);
 
   // Build repository overviews for plan generation
   const repositoryOverviews = useMemo((): Array<PlanRepositoryOverview> => {
@@ -260,7 +255,7 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
 
       {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <StepSettingsPanel projectId={projectId} step={'plan'} />
+        <AISettingsInline settings={settings} step={'plan'} stepLabel={'Plan'} />
 
         {/* Cost Estimate and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>

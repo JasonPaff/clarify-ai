@@ -3,87 +3,50 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { Bot, Loader2 } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
 
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
 
-import { type StepModelDefaults, StepModelSection } from '@/components/features/workflow/step-model-section';
+import { AISettingsPanel } from '@/components/ai-settings';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useStepConfigurations, useUpsertStepConfig } from '@/hooks/queries/use-step-configurations';
+import { useStepConfigurations } from '@/hooks/queries/use-step-configurations';
+import { useProjectAISettings } from '@/hooks/use-project-ai-settings';
+import { WORKFLOW_STEPS } from '@/lib/ai/settings';
 import { cn } from '@/lib/utils';
-
-interface StepInfo {
-  description: string;
-  label: string;
-  step: StepConfigurationStep;
-}
-
-const WORKFLOW_STEPS: Array<StepInfo> = [
-  {
-    description: 'Generates clarifying questions to refine the feature',
-    label: 'Clarify',
-    step: 'refine',
-  },
-  {
-    description: 'Discovers relevant files in the codebase',
-    label: 'Discover',
-    step: 'research',
-  },
-  {
-    description: 'Creates the implementation plan',
-    label: 'Plan',
-    step: 'plan',
-  },
-  {
-    description: 'Generates AI-powered repository overviews',
-    label: 'Overview',
-    step: 'overview',
-  },
-];
 
 interface DefaultModelSettingsProps extends ComponentPropsWithRef<'div'> {
   projectId: number;
 }
 
-export const DefaultModelSettings = ({ className, projectId, ref, ...props }: DefaultModelSettingsProps) => {
-  const { data: configurations, isLoading } = useStepConfigurations(projectId);
-  const upsertMutation = useUpsertStepConfig();
+interface ProjectStepSettingsPanelProps {
+  description: string;
+  label: string;
+  projectId: number;
+  step: StepConfigurationStep;
+}
 
-  const configurationMap = useMemo(() => {
-    const map = new Map<StepConfigurationStep, StepModelDefaults | undefined>();
+/**
+ * Individual step settings panel that uses the project AI settings hook.
+ */
+function ProjectStepSettingsPanel({ description, label, projectId, step }: ProjectStepSettingsPanelProps) {
+  const settings = useProjectAISettings(projectId, step);
 
-    for (const stepInfo of WORKFLOW_STEPS) {
-      map.set(stepInfo.step, undefined);
-    }
-
-    if (configurations) {
-      for (const config of configurations) {
-        const defaults: StepModelDefaults = {
-          customSystemPrompt: config.customSystemPrompt ?? undefined,
-          maxTokens: config.maxTokens ?? undefined,
-          modelId: config.modelId ?? undefined,
-          modelProvider: config.modelProvider ?? undefined,
-          temperature: config.temperature ?? undefined,
-          thinkingBudget: config.thinkingBudget ?? undefined,
-          thinkingEnabled: config.thinkingEnabled ?? undefined,
-        };
-        map.set(config.step, defaults);
-      }
-    }
-
-    return map;
-  }, [configurations]);
-
-  const handleStepUpdate = useCallback(
-    (step: StepConfigurationStep) => (updates: StepModelDefaults) => {
-      upsertMutation.mutate({
-        data: updates,
-        projectId,
-        step,
-      });
-    },
-    [projectId, upsertMutation]
+  return (
+    <AISettingsPanel
+      description={description}
+      isDisabled={settings.isPersisting}
+      label={label}
+      settings={settings}
+      step={step}
+    />
   );
+}
+
+/**
+ * Default AI model settings section for the project settings page.
+ * Allows configuring project-specific AI settings for each workflow step.
+ */
+export const DefaultModelSettings = ({ className, projectId, ref, ...props }: DefaultModelSettingsProps) => {
+  const { isLoading } = useStepConfigurations(projectId);
 
   return (
     <Card className={cn(className)} ref={ref} {...props}>
@@ -109,13 +72,11 @@ export const DefaultModelSettings = ({ className, projectId, ref, ...props }: De
         ) : (
           <div className={'space-y-4'}>
             {WORKFLOW_STEPS.map((stepInfo) => (
-              <StepModelSection
-                defaults={configurationMap.get(stepInfo.step)}
+              <ProjectStepSettingsPanel
                 description={stepInfo.description}
-                isDisabled={upsertMutation.isPending}
                 key={stepInfo.step}
                 label={stepInfo.label}
-                onUpdate={handleStepUpdate(stepInfo.step)}
+                projectId={projectId}
                 step={stepInfo.step}
               />
             ))}

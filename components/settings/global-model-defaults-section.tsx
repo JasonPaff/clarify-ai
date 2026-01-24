@@ -3,56 +3,39 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { Bot, Loader2 } from 'lucide-react';
-import { useCallback } from 'react';
 
 import type { StepConfigurationStep } from '@/db/schema/step-configurations.schema';
-import type { GlobalStepModelDefaults } from '@/lib/ai/global-model-defaults';
 
-import { StepModelSection } from '@/components/features/workflow/step-model-section';
+import { AISettingsPanel } from '@/components/ai-settings';
 import { useGlobalModelDefaults } from '@/components/providers/global-model-defaults-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useGlobalAISettings } from '@/hooks/use-global-ai-settings';
+import { WORKFLOW_STEPS } from '@/lib/ai/settings';
 import { cn } from '@/lib/utils';
 
-interface StepInfo {
+type GlobalModelDefaultsSectionProps = ComponentPropsWithRef<'div'>;
+
+interface GlobalStepSettingsPanelProps {
   description: string;
   label: string;
   step: StepConfigurationStep;
 }
 
-const WORKFLOW_STEPS: Array<StepInfo> = [
-  {
-    description: 'Generates clarifying questions to refine feature requests',
-    label: 'Clarify',
-    step: 'refine',
-  },
-  {
-    description: 'Discovers relevant files and code patterns',
-    label: 'Discover',
-    step: 'research',
-  },
-  {
-    description: 'Creates the implementation plan',
-    label: 'Plan',
-    step: 'plan',
-  },
-  {
-    description: 'Generates AI-powered repository overviews',
-    label: 'Overview',
-    step: 'overview',
-  },
-];
+/**
+ * Individual step settings panel that uses the global AI settings hook.
+ */
+function GlobalStepSettingsPanel({ description, label, step }: GlobalStepSettingsPanelProps) {
+  const settings = useGlobalAISettings(step);
 
-type GlobalModelDefaultsSectionProps = ComponentPropsWithRef<'div'>;
+  return <AISettingsPanel description={description} label={label} settings={settings} step={step} />;
+}
 
+/**
+ * Global model defaults section for the app settings page.
+ * Allows configuring default AI settings for each workflow step.
+ */
 export const GlobalModelDefaultsSection = ({ className, ref, ...props }: GlobalModelDefaultsSectionProps) => {
-  const { defaults, isLoaded, setStepDefaults } = useGlobalModelDefaults();
-
-  const handleStepUpdate = useCallback(
-    (step: StepConfigurationStep) => (updates: GlobalStepModelDefaults) => {
-      void setStepDefaults(step, updates);
-    },
-    [setStepDefaults]
-  );
+  const { isLoaded } = useGlobalModelDefaults();
 
   const isLoading = !isLoaded;
 
@@ -82,12 +65,10 @@ export const GlobalModelDefaultsSection = ({ className, ref, ...props }: GlobalM
         ) : (
           <div className={'space-y-4'}>
             {WORKFLOW_STEPS.map((stepInfo) => (
-              <StepModelSection
-                defaults={defaults[stepInfo.step]}
+              <GlobalStepSettingsPanel
                 description={stepInfo.description}
                 key={stepInfo.step}
                 label={stepInfo.label}
-                onUpdate={handleStepUpdate(stepInfo.step)}
                 step={stepInfo.step}
               />
             ))}
