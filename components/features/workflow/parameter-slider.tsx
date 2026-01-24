@@ -101,7 +101,12 @@ export const ParameterSlider = ({
   };
 
   return (
-    <div className={cn('flex flex-col gap-2', className)} ref={ref} {...props}>
+    <div
+      className={cn('flex flex-col gap-2', className)}
+      onPointerDown={(e) => e.stopPropagation()}
+      ref={ref}
+      {...props}
+    >
       {/* Label and Value Display */}
       <div className={'flex items-center justify-between'}>
         <label className={'text-sm font-medium'}>{label}</label>

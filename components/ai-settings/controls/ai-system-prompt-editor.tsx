@@ -94,7 +94,10 @@ export function AISystemPromptEditor({
           <button
             className={'text-xs text-muted-foreground hover:text-foreground'}
             disabled={isDisabled}
-            onClick={handleClear}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClear();
+            }}
             type={'button'}
           >
             Clear custom prompt (use default)

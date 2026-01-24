@@ -9,7 +9,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { ClarificationContextFile, ClarificationRepositoryOverview } from '@/types/electron';
 
-import { AISettingsInline } from '@/components/ai-settings';
 import { ClarificationPanel } from '@/components/features/clarification/clarification-panel';
 import { ClarificationCostEstimate } from '@/components/features/clarification/cost-estimate';
 import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
@@ -249,10 +248,8 @@ export const ClarifyStep = ({ cancelCallbackRef, featureRequest }: ClarifyStepPr
         />
       )}
 
-      {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
+      {/* Section 1: Step Header with Cost Estimate and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <AISettingsInline settings={settings} step={'refine'} stepLabel={'Clarify'} />
-
         {/* Cost Estimate, Context Files, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <ClarificationCostEstimate

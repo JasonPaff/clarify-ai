@@ -11,7 +11,6 @@ import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { DiscoveryRepositoryOverview } from '@/lib/ai/prompts/discovery';
 import type { DiscoveryScopeConfig } from '@/lib/validations/discovery';
 
-import { AISettingsInline } from '@/components/ai-settings';
 import { DiscoveryCostEstimate } from '@/components/features/discovery/discovery-cost-estimate';
 import { DiscoveryProgress } from '@/components/features/discovery/discovery-progress';
 import { DiscoveryResults } from '@/components/features/discovery/discovery-results';
@@ -340,10 +339,8 @@ export const DiscoverStep = ({ cancelCallbackRef, featureRequest, projectId }: D
         />
       )}
 
-      {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
+      {/* Section 1: Step Header with Cost Estimate and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <AISettingsInline settings={settings} step={'research'} stepLabel={'Discover'} />
-
         {/* Cost Estimate, Re-run Button, and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <DiscoveryCostEstimate

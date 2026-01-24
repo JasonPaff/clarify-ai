@@ -9,7 +9,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import type { FeatureRequest } from '@/db/schema/feature-requests.schema';
 import type { PlanRepositoryOverview } from '@/types/electron';
 
-import { AISettingsInline } from '@/components/ai-settings';
 import { PlanCostEstimate } from '@/components/features/plan/plan-cost-estimate';
 import { PlanPanel } from '@/components/features/plan/plan-panel';
 import { AutoSaveStatus } from '@/components/features/workflow/auto-save-status';
@@ -253,10 +252,8 @@ export const PlanStep = ({ cancelCallbackRef, featureRequest, projectId }: PlanS
         />
       )}
 
-      {/* Section 1: Step Header with Settings, Cost Estimate, and Run History */}
+      {/* Section 1: Step Header with Cost Estimate and Run History */}
       <div className={'flex flex-col gap-3'}>
-        <AISettingsInline settings={settings} step={'plan'} stepLabel={'Plan'} />
-
         {/* Cost Estimate and Run History */}
         <div className={'flex flex-wrap items-center justify-end gap-3'}>
           <PlanCostEstimate

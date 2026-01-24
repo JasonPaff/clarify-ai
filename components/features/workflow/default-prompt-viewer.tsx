@@ -112,11 +112,27 @@ export const DefaultPromptViewer = ({
 
               {/* Action Buttons */}
               <div className={'flex items-center gap-1.5'}>
-                <Button disabled={isDisabled} onClick={handleCopyToClipboard} size={'sm'} variant={'ghost'}>
+                <Button
+                  disabled={isDisabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCopyToClipboard();
+                  }}
+                  size={'sm'}
+                  variant={'ghost'}
+                >
                   <CopyIcon className={'size-3.5'} />
                   {isCopied ? 'Copied!' : 'Copy'}
                 </Button>
-                <Button disabled={isDisabled} onClick={handleUseAsStartingPoint} size={'sm'} variant={'outline'}>
+                <Button
+                  disabled={isDisabled}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleUseAsStartingPoint();
+                  }}
+                  size={'sm'}
+                  variant={'outline'}
+                >
                   <FileInput className={'size-3.5'} />
                   Use as starting point
                 </Button>
