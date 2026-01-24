@@ -457,14 +457,10 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
       const durationMs = Date.now() - operation.startTime;
 
       // Prepare reasoning body
-      const reasoningBody = options.reasoningBody
-        ? prepareContentForStorage(options.reasoningBody)
-        : undefined;
+      const reasoningBody = options.reasoningBody ? prepareContentForStorage(options.reasoningBody) : undefined;
 
       // Prepare response body
-      const responseBody = options.responseBody
-        ? prepareContentForStorage(options.responseBody)
-        : undefined;
+      const responseBody = options.responseBody ? prepareContentForStorage(options.responseBody) : undefined;
 
       // Prepare tool calls
       const toolCallsArray = Array.from(operation.toolCalls.values());
@@ -516,8 +512,7 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
       const durationMs = Date.now() - operation.startTime;
 
       // Extract error message
-      const errorMessage =
-        typeof options.error === 'string' ? options.error : options.error.message;
+      const errorMessage = typeof options.error === 'string' ? options.error : options.error.message;
 
       // Prepare tool calls
       const toolCallsArray = Array.from(operation.toolCalls.values());
@@ -678,9 +673,7 @@ export function createAiLoggingService(repository: AiLogsRepository): AiLoggingS
       const startedAt = getCurrentTimestamp();
 
       // Prepare request body for storage
-      const requestBody = options.requestBody
-        ? prepareContentForStorage(options.requestBody)
-        : undefined;
+      const requestBody = options.requestBody ? prepareContentForStorage(options.requestBody) : undefined;
 
       // Create the log entry
       const newLog: NewAiLog = {

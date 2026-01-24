@@ -11,13 +11,7 @@ import { z } from 'zod';
  * - 'other': Any other AI operation outside the main workflow
  * - 'plan': The implementation planning step
  */
-export const aiLogWorkflowStepSchema = z.enum([
-  'clarify',
-  'describe',
-  'discover',
-  'other',
-  'plan',
-]);
+export const aiLogWorkflowStepSchema = z.enum(['clarify', 'describe', 'discover', 'other', 'plan']);
 
 export type AiLogWorkflowStepValue = z.infer<typeof aiLogWorkflowStepSchema>;
 
@@ -32,26 +26,14 @@ export type AiLogWorkflowStepValue = z.infer<typeof aiLogWorkflowStepSchema>;
  * - 'pending': Request not yet started
  * - 'streaming': Currently streaming response
  */
-export const aiLogStatusSchema = z.enum([
-  'cancelled',
-  'completed',
-  'failed',
-  'pending',
-  'streaming',
-]);
+export const aiLogStatusSchema = z.enum(['cancelled', 'completed', 'failed', 'pending', 'streaming']);
 
 export type AiLogStatusValue = z.infer<typeof aiLogStatusSchema>;
 
 /**
  * Time range options for filtering AI logs.
  */
-export const aiLogTimeRangeSchema = z.enum([
-  'all',
-  'custom',
-  'last-7d',
-  'last-24h',
-  'last-hour',
-]);
+export const aiLogTimeRangeSchema = z.enum(['all', 'custom', 'last-7d', 'last-24h', 'last-hour']);
 
 export type AiLogTimeRangeValue = z.infer<typeof aiLogTimeRangeSchema>;
 
@@ -97,7 +79,12 @@ export const aiLogConfigSchema = z.object({
   /** Whether to redact sensitive data (API keys, tokens) in logs */
   redactSensitiveData: z.boolean(),
   /** Maximum size of content fields before truncation (in characters) */
-  truncationThreshold: z.number().int().positive().min(100, 'Minimum 100 characters').max(100000, 'Maximum 100,000 characters'),
+  truncationThreshold: z
+    .number()
+    .int()
+    .positive()
+    .min(100, 'Minimum 100 characters')
+    .max(100000, 'Maximum 100,000 characters'),
 });
 
 export type AiLogConfigFormValues = z.infer<typeof aiLogConfigSchema>;

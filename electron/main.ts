@@ -99,11 +99,7 @@ function createApplicationMenu(): void {
         { role: 'copy' as const },
         { role: 'paste' as const },
         ...(isMac
-          ? [
-              { role: 'pasteAndMatchStyle' as const },
-              { role: 'delete' as const },
-              { role: 'selectAll' as const },
-            ]
+          ? [{ role: 'pasteAndMatchStyle' as const }, { role: 'delete' as const }, { role: 'selectAll' as const }]
           : [{ role: 'delete' as const }, { type: 'separator' as const }, { role: 'selectAll' as const }]),
       ],
     },
@@ -137,7 +133,12 @@ function createApplicationMenu(): void {
         { role: 'minimize' as const },
         { role: 'zoom' as const },
         ...(isMac
-          ? [{ type: 'separator' as const }, { role: 'front' as const }, { type: 'separator' as const }, { role: 'window' as const }]
+          ? [
+              { type: 'separator' as const },
+              { role: 'front' as const },
+              { type: 'separator' as const },
+              { role: 'window' as const },
+            ]
           : [{ role: 'close' as const }]),
       ],
     },

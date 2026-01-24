@@ -226,7 +226,9 @@ export interface ElectronAPI {
     /** AI log entries for debugging and monitoring AI operations */
     aiLogs: {
       /** Create a new AI log entry */
-      create(data: import('../db/schema/ai-logs.schema').NewAiLog): Promise<import('../db/schema/ai-logs.schema').AiLog>;
+      create(
+        data: import('../db/schema/ai-logs.schema').NewAiLog
+      ): Promise<import('../db/schema/ai-logs.schema').AiLog>;
       /** Delete an AI log entry by ID */
       delete(id: number): Promise<boolean>;
       /** Get an AI log entry by ID */

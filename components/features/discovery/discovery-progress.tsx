@@ -210,7 +210,11 @@ export const DiscoveryProgress = ({
       )}
 
       {/* Streaming Text Output Section */}
-      <StreamingAnalysis isLoading={isLoading} placeholder={'Discovering relevant files...'} text={streamingText ?? ''} />
+      <StreamingAnalysis
+        isLoading={isLoading}
+        placeholder={'Discovering relevant files...'}
+        text={streamingText ?? ''}
+      />
     </div>
   );
 };

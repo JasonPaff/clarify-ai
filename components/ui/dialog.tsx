@@ -27,9 +27,7 @@ interface DialogCloseProps {
 export const DialogClose = ({ children, render }: DialogCloseProps) => {
   // If render prop is provided, use it and pass children to the rendered element
   if (render) {
-    return (
-      <BaseDialog.Close render={(props) => cloneElement(render, props)}>{children}</BaseDialog.Close>
-    );
+    return <BaseDialog.Close render={(props) => cloneElement(render, props)}>{children}</BaseDialog.Close>;
   }
   // Otherwise, clone children with dialog props (avoids nested buttons)
   return <BaseDialog.Close render={(props) => cloneElement(children as ReactElement<object>, props)} />;

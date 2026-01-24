@@ -35,12 +35,10 @@ export type SearchFilesToolInput = z.infer<typeof searchFilesToolInputSchema>;
  * @param repositories - Map of repository ID to root path
  * @param scopeConfig - Optional scope configuration
  */
-export function createFileSearchTool(
-  repositories: Map<number, string>,
-  scopeConfig?: DiscoveryScopeConfig
-) {
+export function createFileSearchTool(repositories: Map<number, string>, scopeConfig?: DiscoveryScopeConfig) {
   return tool({
-    description: 'Search for files in the repository using glob patterns. Use this to find relevant files based on naming conventions or directory structures.',
+    description:
+      'Search for files in the repository using glob patterns. Use this to find relevant files based on naming conventions or directory structures.',
     execute: async (input: SearchFilesToolInput) => {
       const { pattern, repositoryId } = input;
       const repoPath = repositories.get(repositoryId);
@@ -54,10 +52,7 @@ export function createFileSearchTool(
 
       try {
         // Merge default excludes with scope excludes
-        const excludes = [
-          ...DEFAULT_EXCLUDE_PATTERNS,
-          ...(scopeConfig?.excludePatterns ?? []),
-        ];
+        const excludes = [...DEFAULT_EXCLUDE_PATTERNS, ...(scopeConfig?.excludePatterns ?? [])];
 
         // Perform glob search
         const files = await fg(pattern, {

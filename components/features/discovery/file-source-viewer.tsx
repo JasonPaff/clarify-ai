@@ -39,12 +39,7 @@ export const FileSourceViewer = ({ className, content, filePath, snippets }: Fil
 
   return (
     <div className={cn('max-h-[60vh] overflow-auto', className)}>
-      <CodeBlock
-        code={content}
-        highlightRanges={highlightRanges}
-        language={language}
-        showLineNumbers
-      />
+      <CodeBlock code={content} highlightRanges={highlightRanges} language={language} showLineNumbers />
     </div>
   );
 };

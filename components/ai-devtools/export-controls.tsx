@@ -142,14 +142,7 @@ interface ExportControlsProps extends ComponentPropsWithRef<'div'> {
   selectedLogs?: Array<AiLogEntry>;
 }
 
-export const ExportControls = ({
-  className,
-  logs,
-  onClear,
-  ref,
-  selectedLogs = [],
-  ...props
-}: ExportControlsProps) => {
+export const ExportControls = ({ className, logs, onClear, ref, selectedLogs = [], ...props }: ExportControlsProps) => {
   const [isCopied, setIsCopied] = useState(false);
   const [isExportingJson, setIsExportingJson] = useState(false);
   const [isExportingCsv, setIsExportingCsv] = useState(false);
@@ -264,11 +257,7 @@ export const ExportControls = ({
           size={'sm'}
           variant={'outline'}
         >
-          {isExportingJson ? (
-            <Loader2 className={'size-4 animate-spin'} />
-          ) : (
-            <FileJson className={'size-4'} />
-          )}
+          {isExportingJson ? <Loader2 className={'size-4 animate-spin'} /> : <FileJson className={'size-4'} />}
           Export JSON
         </Button>
 
@@ -280,11 +269,7 @@ export const ExportControls = ({
           size={'sm'}
           variant={'outline'}
         >
-          {isExportingCsv ? (
-            <Loader2 className={'size-4 animate-spin'} />
-          ) : (
-            <FileSpreadsheet className={'size-4'} />
-          )}
+          {isExportingCsv ? <Loader2 className={'size-4 animate-spin'} /> : <FileSpreadsheet className={'size-4'} />}
           Export CSV
         </Button>
 
@@ -306,12 +291,7 @@ export const ExportControls = ({
         {/* Clear All Dialog */}
         <DialogRoot onOpenChange={setIsClearDialogOpen} open={isClearDialogOpen}>
           <DialogTrigger>
-            <Button
-              aria-label={'Clear all logs'}
-              disabled={!hasLogs}
-              size={'sm'}
-              variant={'destructive'}
-            >
+            <Button aria-label={'Clear all logs'} disabled={!hasLogs} size={'sm'} variant={'destructive'}>
               <Trash2 className={'size-4'} />
               Clear All
             </Button>
@@ -321,8 +301,7 @@ export const ExportControls = ({
             <DialogPopup>
               <DialogTitle>Clear All Logs</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete all {logs.length} log entries? This action cannot be
-                undone.
+                Are you sure you want to delete all {logs.length} log entries? This action cannot be undone.
               </DialogDescription>
 
               {/* Actions */}
@@ -344,12 +323,7 @@ export const ExportControls = ({
         {/* Purge Old Logs Dialog */}
         <DialogRoot onOpenChange={setIsPurgeDialogOpen} open={isPurgeDialogOpen}>
           <DialogTrigger>
-            <Button
-              aria-label={'Purge old logs'}
-              disabled={!hasLogs || isPurging}
-              size={'sm'}
-              variant={'outline'}
-            >
+            <Button aria-label={'Purge old logs'} disabled={!hasLogs || isPurging} size={'sm'} variant={'outline'}>
               <Download className={'size-4 rotate-180'} />
               Purge Old
             </Button>
@@ -364,9 +338,7 @@ export const ExportControls = ({
 
               {/* Retention Period Selector */}
               <div className={'mt-4'}>
-                <label className={'mb-2 block text-sm font-medium text-foreground'}>
-                  Delete logs:
-                </label>
+                <label className={'mb-2 block text-sm font-medium text-foreground'}>Delete logs:</label>
                 <SelectRoot<string> onValueChange={handleRetentionChange} value={retentionPeriod}>
                   <SelectTrigger aria-label={'Select retention period'}>
                     <SelectValue placeholder={retentionLabel} />
@@ -394,12 +366,7 @@ export const ExportControls = ({
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button
-                  disabled={isPurging}
-                  onClick={handlePurgeOldLogs}
-                  size={'sm'}
-                  variant={'destructive'}
-                >
+                <Button disabled={isPurging} onClick={handlePurgeOldLogs} size={'sm'} variant={'destructive'}>
                   {isPurging && <Loader2 className={'size-4 animate-spin'} />}
                   <Trash2 className={'size-4'} />
                   Purge Logs

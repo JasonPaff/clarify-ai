@@ -161,11 +161,7 @@ async function findImportedBy(filePath: string, repoPath: string): Promise<Relat
 /**
  * Find files that a given file imports
  */
-async function findImports(
-  absolutePath: string,
-  relativePath: string,
-  repoPath: string
-): Promise<RelatedFilesResult> {
+async function findImports(absolutePath: string, relativePath: string, repoPath: string): Promise<RelatedFilesResult> {
   // Check if file is binary
   if (isBinaryFile(absolutePath)) {
     return {

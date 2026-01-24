@@ -141,9 +141,7 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
     // Handle search query (search in requestBody and responseBody)
     if (params.searchQuery) {
       const searchPattern = `%${params.searchQuery}%`;
-      conditions.push(
-        or(like(aiLogs.requestBody, searchPattern), like(aiLogs.responseBody, searchPattern))
-      );
+      conditions.push(or(like(aiLogs.requestBody, searchPattern), like(aiLogs.responseBody, searchPattern)));
     }
 
     return conditions.length > 0 ? and(...conditions) : undefined;
@@ -207,21 +205,11 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
     },
 
     getByModelId(modelId: string): Array<AiLog> {
-      return db
-        .select()
-        .from(aiLogs)
-        .where(eq(aiLogs.modelId, modelId))
-        .orderBy(desc(aiLogs.createdAt))
-        .all();
+      return db.select().from(aiLogs).where(eq(aiLogs.modelId, modelId)).orderBy(desc(aiLogs.createdAt)).all();
     },
 
     getByProjectId(projectId: number): Array<AiLog> {
-      return db
-        .select()
-        .from(aiLogs)
-        .where(eq(aiLogs.projectId, projectId))
-        .orderBy(desc(aiLogs.createdAt))
-        .all();
+      return db.select().from(aiLogs).where(eq(aiLogs.projectId, projectId)).orderBy(desc(aiLogs.createdAt)).all();
     },
 
     getByRequestId(requestId: string): AiLog | undefined {
@@ -249,11 +237,7 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
     getCount(filters?: AiLogFilterParams): number {
       const whereConditions = filters ? buildWhereConditions(filters) : undefined;
 
-      const result = db
-        .select({ count: count() })
-        .from(aiLogs)
-        .where(whereConditions)
-        .get();
+      const result = db.select({ count: count() }).from(aiLogs).where(whereConditions).get();
 
       return result?.count ?? 0;
     },
@@ -266,33 +250,21 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
       const whereConditions = filters ? buildWhereConditions(filters) : undefined;
 
       // Get total count
-      const totalResult = db
-        .select({ count: count() })
-        .from(aiLogs)
-        .where(whereConditions)
-        .get();
+      const totalResult = db.select({ count: count() }).from(aiLogs).where(whereConditions).get();
       const totalCount = totalResult?.count ?? 0;
 
       // Get completed count
       const completedConditions = whereConditions
         ? and(whereConditions, eq(aiLogs.status, 'completed' as AiLogStatus))
         : eq(aiLogs.status, 'completed' as AiLogStatus);
-      const completedResult = db
-        .select({ count: count() })
-        .from(aiLogs)
-        .where(completedConditions)
-        .get();
+      const completedResult = db.select({ count: count() }).from(aiLogs).where(completedConditions).get();
       const completedCount = completedResult?.count ?? 0;
 
       // Get failed count
       const failedConditions = whereConditions
         ? and(whereConditions, eq(aiLogs.status, 'failed' as AiLogStatus))
         : eq(aiLogs.status, 'failed' as AiLogStatus);
-      const failedResult = db
-        .select({ count: count() })
-        .from(aiLogs)
-        .where(failedConditions)
-        .get();
+      const failedResult = db.select({ count: count() }).from(aiLogs).where(failedConditions).get();
       const failedCount = failedResult?.count ?? 0;
 
       // Get token totals and average duration using raw SQL for aggregation
@@ -327,11 +299,7 @@ export function createAiLogsRepository(db: DrizzleDatabase): AiLogsRepository {
       const offset = params.offset ?? 0;
 
       // Get total count for pagination
-      const countResult = db
-        .select({ count: count() })
-        .from(aiLogs)
-        .where(whereConditions)
-        .get();
+      const countResult = db.select({ count: count() }).from(aiLogs).where(whereConditions).get();
       const totalCount = countResult?.count ?? 0;
 
       // Get paginated results

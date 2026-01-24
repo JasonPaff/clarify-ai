@@ -362,7 +362,11 @@ export const ClarificationPanel = ({
             </Reasoning>
           )}
 
-          <StreamingAnalysis isLoading={isLoading} placeholder={'Analyzing your feature request...'} text={streamingText} />
+          <StreamingAnalysis
+            isLoading={isLoading}
+            placeholder={'Analyzing your feature request...'}
+            text={streamingText}
+          />
           <CancelAiDialog onConfirm={cancelClarification} stepName={'Clarification'}>
             <Button variant={'outline'}>Cancel</Button>
           </CancelAiDialog>

@@ -179,11 +179,7 @@ export default function SettingsPage() {
                     </p>
                   </div>
                 </div>
-                <Switch
-                  checked={isLoggingEnabled}
-                  id={'debug-logging-toggle'}
-                  onCheckedChange={handleLoggingToggle}
-                />
+                <Switch checked={isLoggingEnabled} id={'debug-logging-toggle'} onCheckedChange={handleLoggingToggle} />
               </div>
 
               {/* Actions */}

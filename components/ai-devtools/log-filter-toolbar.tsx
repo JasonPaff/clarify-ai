@@ -21,11 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import {
-  aiLogStatusOptions,
-  aiLogTimeRangeOptions,
-  aiLogWorkflowStepOptions,
-} from '@/lib/validations/ai-log';
+import { aiLogStatusOptions, aiLogTimeRangeOptions, aiLogWorkflowStepOptions } from '@/lib/validations/ai-log';
 
 /**
  * Display names for workflow steps.
@@ -273,12 +269,7 @@ export const LogFilterToolbar = ({
 
         {/* Clear Filters Button */}
         {hasActiveFilters && (
-          <Button
-            aria-label={'Clear all filters'}
-            onClick={handleClearFiltersClick}
-            size={'sm'}
-            variant={'ghost'}
-          >
+          <Button aria-label={'Clear all filters'} onClick={handleClearFiltersClick} size={'sm'} variant={'ghost'}>
             <X className={'size-4'} />
             Clear
           </Button>
@@ -296,9 +287,7 @@ export const LogFilterToolbar = ({
                 onCheckedChange={(isChecked) => handleWorkflowStepToggle(step, isChecked)}
                 size={'sm'}
               />
-              <span className={'text-xs text-foreground select-none'}>
-                {WORKFLOW_STEP_LABELS[step] ?? step}
-              </span>
+              <span className={'text-xs text-foreground select-none'}>{WORKFLOW_STEP_LABELS[step] ?? step}</span>
             </label>
           ))}
         </div>
@@ -315,9 +304,7 @@ export const LogFilterToolbar = ({
                 onCheckedChange={(isChecked) => handleStatusToggle(status, isChecked)}
                 size={'sm'}
               />
-              <span className={'text-xs text-foreground select-none'}>
-                {STATUS_LABELS[status] ?? status}
-              </span>
+              <span className={'text-xs text-foreground select-none'}>{STATUS_LABELS[status] ?? status}</span>
             </label>
           ))}
         </div>

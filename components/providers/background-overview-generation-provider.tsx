@@ -205,7 +205,9 @@ export function BackgroundOverviewGenerationProvider({ children }: BackgroundOve
   );
 
   return (
-    <BackgroundOverviewGenerationContext.Provider value={value}>{children}</BackgroundOverviewGenerationContext.Provider>
+    <BackgroundOverviewGenerationContext.Provider value={value}>
+      {children}
+    </BackgroundOverviewGenerationContext.Provider>
   );
 }
 

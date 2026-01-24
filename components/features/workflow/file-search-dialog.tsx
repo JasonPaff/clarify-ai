@@ -526,9 +526,7 @@ export const FileSearchDialog = ({
 
                         {/* Filename-only match indicator when no snippets */}
                         {isFilenameOnlyMatch && (
-                          <p className={'mt-1 text-xs text-muted-foreground/70 italic'}>
-                            Matched by filename pattern
-                          </p>
+                          <p className={'mt-1 text-xs text-muted-foreground/70 italic'}>Matched by filename pattern</p>
                         )}
                       </div>
                     </button>

@@ -106,10 +106,7 @@ export const AiDevtoolsWindow = () => {
     return () => clearInterval(intervalId);
   }, [isAutoRefreshEnabled, refetchLogs]);
 
-  const logs = useMemo(
-    () => (logsResult?.entries ?? []).map(transformDbLogToEntry),
-    [logsResult?.entries]
-  );
+  const logs = useMemo(() => (logsResult?.entries ?? []).map(transformDbLogToEntry), [logsResult?.entries]);
   const displayedCount = logs.length;
   const totalLogCount = logsResult?.totalCount ?? 0;
 
@@ -256,11 +253,7 @@ export const AiDevtoolsWindow = () => {
 
       {/* Filter Toolbar */}
       <div className={'border-b border-border px-4 py-3'}>
-        <LogFilterToolbar
-          availableModels={availableModels}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        <LogFilterToolbar availableModels={availableModels} filters={filters} onFilterChange={handleFilterChange} />
       </div>
 
       {/* Main Content Area */}
@@ -300,8 +293,8 @@ export const AiDevtoolsWindow = () => {
                 <Bug className={'size-12 text-muted-foreground/50'} />
                 <h3 className={'mt-4 text-lg font-medium text-foreground'}>No AI Logs Found</h3>
                 <p className={'mt-2 max-w-sm text-sm text-muted-foreground'}>
-                  AI operations will appear here when debug logging is enabled. Try running an AI
-                  workflow or adjusting your filters.
+                  AI operations will appear here when debug logging is enabled. Try running an AI workflow or adjusting
+                  your filters.
                 </p>
                 {hasActiveFilters && (
                   <Button
@@ -345,8 +338,7 @@ export const AiDevtoolsWindow = () => {
             {/* Load More Indicator */}
             {isShowLoadMoreIndicator && (
               <div className={'mt-4 text-center text-sm text-muted-foreground'}>
-                Showing {displayedCount} of {totalLogCount.toLocaleString()} logs. Apply filters to narrow
-                results.
+                Showing {displayedCount} of {totalLogCount.toLocaleString()} logs. Apply filters to narrow results.
               </div>
             )}
           </div>

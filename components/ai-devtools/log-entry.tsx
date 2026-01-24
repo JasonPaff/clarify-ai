@@ -18,13 +18,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 
-import type {
-  AiLogEntry,
-  AiLogStatus,
-  AiLogWorkflowStep,
-  ParsedStreamChunks,
-  ParsedToolCalls,
-} from '@/types/ai-log';
+import type { AiLogEntry, AiLogStatus, AiLogWorkflowStep, ParsedStreamChunks, ParsedToolCalls } from '@/types/ai-log';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -209,12 +203,7 @@ const ExpandableSection = ({ children, isDefaultOpen = false, onCopy, title }: E
         </CollapsibleTrigger>
         {onCopy && (
           <Tooltip content={isCopied ? 'Copied!' : 'Copy to clipboard'}>
-            <IconButton
-              aria-label={'Copy to clipboard'}
-              className={'size-6'}
-              onClick={handleCopyClick}
-              type={'button'}
-            >
+            <IconButton aria-label={'Copy to clipboard'} className={'size-6'} onClick={handleCopyClick} type={'button'}>
               {isCopied ? <Check className={'size-3'} /> : <Copy className={'size-3'} />}
             </IconButton>
           </Tooltip>
@@ -288,9 +277,7 @@ const ToolCallDisplay = ({ toolCall }: ToolCallDisplayProps) => {
           <Zap className={'size-3 text-muted-foreground'} />
           <span className={'font-mono text-xs font-medium'}>{toolCall.toolName}</span>
           <span className={cn('text-xs', statusColor)}>{toolCall.status}</span>
-          {toolCall.durationMs && (
-            <span className={'text-xs text-muted-foreground'}>{toolCall.durationMs}ms</span>
-          )}
+          {toolCall.durationMs && <span className={'text-xs text-muted-foreground'}>{toolCall.durationMs}ms</span>}
         </div>
         <Tooltip content={isCopied ? 'Copied!' : 'Copy tool call'}>
           <IconButton aria-label={'Copy tool call'} className={'size-6'} onClick={handleCopyClick} type={'button'}>
@@ -393,10 +380,7 @@ export const LogEntry = ({ className, isExpanded = false, log, onToggleExpand, r
     }
   }, [log.responseBody]);
 
-  const parsedToolCalls = useMemo(
-    () => safeJsonParse<ParsedToolCalls>(log.toolCalls) ?? [],
-    [log.toolCalls]
-  );
+  const parsedToolCalls = useMemo(() => safeJsonParse<ParsedToolCalls>(log.toolCalls) ?? [], [log.toolCalls]);
 
   const parsedStreamChunks = useMemo(
     () => safeJsonParse<ParsedStreamChunks>(log.streamChunks) ?? [],
@@ -412,9 +396,7 @@ export const LogEntry = ({ className, isExpanded = false, log, onToggleExpand, r
   }, [log.createdAt]);
 
   const statusConfig = STATUS_DISPLAY_CONFIG[log.status as keyof typeof STATUS_DISPLAY_CONFIG];
-  const workflowStepName = log.workflowStep
-    ? WORKFLOW_STEP_DISPLAY_NAMES[log.workflowStep as AiLogWorkflowStep]
-    : null;
+  const workflowStepName = log.workflowStep ? WORKFLOW_STEP_DISPLAY_NAMES[log.workflowStep as AiLogWorkflowStep] : null;
 
   const hasRequestBody = Boolean(log.requestBody);
   const hasResponseBody = Boolean(log.responseBody);
@@ -433,10 +415,7 @@ export const LogEntry = ({ className, isExpanded = false, log, onToggleExpand, r
     >
       {/* Summary Row */}
       <button
-        className={cn(
-          'flex w-full items-center gap-3 px-3 py-2 text-left',
-          hasExpandableContent && 'cursor-pointer'
-        )}
+        className={cn('flex w-full items-center gap-3 px-3 py-2 text-left', hasExpandableContent && 'cursor-pointer')}
         disabled={!hasExpandableContent}
         onClick={handleToggleClick}
         type={'button'}
@@ -469,9 +448,7 @@ export const LogEntry = ({ className, isExpanded = false, log, onToggleExpand, r
         </Tooltip>
 
         {/* Duration */}
-        {hasDuration && (
-          <span className={'shrink-0 text-xs text-muted-foreground'}>{log.durationMs}ms</span>
-        )}
+        {hasDuration && <span className={'shrink-0 text-xs text-muted-foreground'}>{log.durationMs}ms</span>}
 
         {/* Token Usage */}
         {hasTokenUsage && (

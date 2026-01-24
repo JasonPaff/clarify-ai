@@ -18,16 +18,8 @@ const MAX_MATCHES = 50;
 
 // Zod schema for content search tool input
 const contentSearchInputSchema = z.object({
-  contextLines: z
-    .number()
-    .min(0)
-    .max(10)
-    .optional()
-    .describe('Lines of context before/after each match (default: 2)'),
-  fileExtensions: z
-    .array(z.string())
-    .optional()
-    .describe('Filter by file extensions (e.g., ["ts", "tsx", "js"])'),
+  contextLines: z.number().min(0).max(10).optional().describe('Lines of context before/after each match (default: 2)'),
+  fileExtensions: z.array(z.string()).optional().describe('Filter by file extensions (e.g., ["ts", "tsx", "js"])'),
   pattern: z.string().describe('Text pattern or regex to search for in file contents'),
   repositoryId: z.number().describe('The ID of the repository to search in'),
 });
@@ -54,10 +46,7 @@ export interface ContentSearchResult {
  * @param repositories - Map of repository ID to root path
  * @param scopeConfig - Optional scope configuration
  */
-export function createContentSearchTool(
-  repositories: Map<number, string>,
-  scopeConfig?: DiscoveryScopeConfig
-) {
+export function createContentSearchTool(repositories: Map<number, string>, scopeConfig?: DiscoveryScopeConfig) {
   return tool({
     description:
       'Search for text patterns or regex in file contents across the repository. Use this to find specific code patterns, function calls, class definitions, or variable usage. Returns matching lines with surrounding context.',
