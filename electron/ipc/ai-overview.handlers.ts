@@ -37,6 +37,8 @@ export interface RepositoryOverviewStreamChunk {
 
 // Active abort controller for cancellation
 let activeAbortController: AbortController | null = null;
+// Active request ID for logging cancellation
+let activeRequestId: null | string = null;
 
 export function registerAiOverviewHandlers(
   getMainWindow: () => BrowserWindow | null,
@@ -82,6 +84,7 @@ export function registerAiOverviewHandlers(
         workflowStep: 'describe',
       });
       const requestId = logResult?.requestId;
+      activeRequestId = requestId ?? null;
 
       try {
         // Collect repository data
@@ -229,8 +232,10 @@ export function registerAiOverviewHandlers(
 
         // Check if we broke due to cancellation
         if (activeAbortController?.signal.aborted) {
-          if (requestId) {
+          // Only cancel if not already handled by cancel handler
+          if (requestId && requestId === activeRequestId) {
             loggingService.cancelOperation({ requestId });
+            activeRequestId = null;
           }
           activeAbortController = null;
           return { error: 'Generation cancelled', success: false };
@@ -238,6 +243,7 @@ export function registerAiOverviewHandlers(
 
         // Clean up
         activeAbortController = null;
+        activeRequestId = null;
 
         return { success: true };
       } catch (error) {
@@ -245,9 +251,10 @@ export function registerAiOverviewHandlers(
 
         // Check if it was an abort error
         if (error instanceof Error && error.name === 'AbortError') {
-          // Log cancellation
-          if (requestId) {
+          // Only cancel if not already handled by cancel handler
+          if (requestId && requestId === activeRequestId) {
             loggingService.cancelOperation({ requestId });
+            activeRequestId = null;
           }
           return { error: 'Generation cancelled', success: false };
         }
@@ -261,6 +268,7 @@ export function registerAiOverviewHandlers(
             requestId,
           });
         }
+        activeRequestId = null;
 
         // Send error chunk to renderer
         mainWindow.webContents.send(IpcChannels.ai.repositoryOverview.stream, {
@@ -278,6 +286,12 @@ export function registerAiOverviewHandlers(
     if (activeAbortController) {
       activeAbortController.abort();
       activeAbortController = null;
+    }
+    // Cancel the logging operation if one is active
+    if (activeRequestId) {
+      const requestIdToCancel = activeRequestId;
+      activeRequestId = null; // Clear first to prevent double-call from generate handler
+      loggingService.cancelOperation({ requestId: requestIdToCancel });
     }
   });
 }

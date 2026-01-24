@@ -48,6 +48,9 @@ type BackgroundOverviewGenerationProviderProps = RequiredChildren;
 export function BackgroundOverviewGenerationProvider({ children }: BackgroundOverviewGenerationProviderProps) {
   const [sessions, setSessions] = useState<Map<number, BackgroundGenerationSession>>(new Map());
   const unsubscribeRef = useRef<(() => void) | null>(null);
+  // Track repository IDs that have already had their finish/error events processed
+  // to prevent duplicate side effects when React calls the state updater multiple times
+  const processedEventsRef = useRef<Set<number>>(new Set());
 
   const { subscribeToStream } = useElectronAiOverview();
   const upsertOverview = useUpsertRepositoryOverview();
@@ -69,41 +72,53 @@ export function BackgroundOverviewGenerationProvider({ children }: BackgroundOve
 
         switch (chunk.type) {
           case 'error': {
-            // Show error toast
-            toast.error({
-              description: chunk.content ?? 'An error occurred during generation',
-              title: 'Generation Failed',
-            });
+            // Check if this event was already processed (React may call state updaters multiple times)
+            if (!processedEventsRef.current.has(repositoryId)) {
+              processedEventsRef.current.add(repositoryId);
+              // Show error toast
+              toast.error({
+                description: chunk.content ?? 'An error occurred during generation',
+                title: 'Generation Failed',
+              });
+            }
             // Remove the session
             newSessions.delete(repositoryId);
             break;
           }
           case 'finish': {
-            // Auto-save the overview
-            void upsertOverview
-              .mutateAsync({
-                data: {
-                  content: session.content,
-                  generatedAt: new Date().toISOString(),
-                  modelId: session.modelId,
-                  promptUsed: session.customPrompt || 'default',
-                },
-                repositoryId,
-              })
-              .then(() => {
-                // Show success toast
-                toast.success({
-                  description: `Overview for "${session.repositoryName}" has been saved.`,
-                  title: 'Overview Generated',
+            // Check if this event was already processed (React may call state updaters multiple times)
+            if (!processedEventsRef.current.has(repositoryId)) {
+              processedEventsRef.current.add(repositoryId);
+              // Auto-save the overview
+              void upsertOverview
+                .mutateAsync({
+                  data: {
+                    content: session.content,
+                    generatedAt: new Date().toISOString(),
+                    modelId: session.modelId,
+                    promptUsed: session.customPrompt || 'default',
+                  },
+                  repositoryId,
+                })
+                .then(() => {
+                  // Show success toast
+                  toast.success({
+                    description: `Overview for "${session.repositoryName}" has been saved.`,
+                    title: 'Overview Generated',
+                  });
+                  // Clean up the processed event tracking
+                  processedEventsRef.current.delete(repositoryId);
+                })
+                .catch((error: unknown) => {
+                  // Show error toast if save fails
+                  toast.error({
+                    description: error instanceof Error ? error.message : 'Failed to save the overview',
+                    title: 'Save Failed',
+                  });
+                  // Clean up the processed event tracking
+                  processedEventsRef.current.delete(repositoryId);
                 });
-              })
-              .catch((error: unknown) => {
-                // Show error toast if save fails
-                toast.error({
-                  description: error instanceof Error ? error.message : 'Failed to save the overview',
-                  title: 'Save Failed',
-                });
-              });
+            }
             // Remove the session
             newSessions.delete(repositoryId);
             break;
@@ -160,6 +175,9 @@ export function BackgroundOverviewGenerationProvider({ children }: BackgroundOve
 
   const startBackgroundGeneration = useCallback(
     (sessionData: Omit<BackgroundGenerationSession, 'status'>) => {
+      // Clear any previous processed event tracking for this repository
+      processedEventsRef.current.delete(sessionData.repositoryId);
+
       setSessions((prev) => {
         const newSessions = new Map(prev);
         newSessions.set(sessionData.repositoryId, {

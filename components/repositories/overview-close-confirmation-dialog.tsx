@@ -73,14 +73,16 @@ export function OverviewCloseConfirmationDialog({
           </p>
 
           {/* Actions */}
-          <div className={'mt-6 flex justify-end gap-3'}>
+          <div className={'mt-6 flex items-center justify-between'}>
             <AlertDialog.Close render={<Button variant={'ghost'} />}>Cancel</AlertDialog.Close>
-            <Button onClick={onStopGeneration} variant={'destructive'}>
-              Stop Generation
-            </Button>
-            <Button onClick={onContinueInBackground} variant={'outline'}>
-              Continue in Background
-            </Button>
+            <div className={'flex gap-3'}>
+              <Button onClick={onStopGeneration} variant={'destructive'}>
+                Stop Generation
+              </Button>
+              <Button onClick={onContinueInBackground} variant={'outline'}>
+                Continue in Background
+              </Button>
+            </div>
           </div>
         </AlertDialog.Popup>
       </AlertDialog.Portal>
